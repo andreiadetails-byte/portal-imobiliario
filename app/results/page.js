@@ -40,7 +40,7 @@ function ResultsInner() {
 
     let query = supabase
       .from('properties')
-      .select('id, title, price, address, district, typology, property_type, area, bedrooms, bathrooms, business_type', { count: 'exact' })
+      .select('id, title, price, address, district, typology, property_type, area, bedrooms, bathrooms, business_type, property_photos(url, position)', { count: 'exact' })
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
@@ -146,19 +146,27 @@ function ResultsInner() {
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {properties.map((p) => (
-                <Link key={p.id} href={`/property/${p.id}`} className="card"
-                      style={{ display: 'grid', gridTemplateColumns: '160px 1fr', overflow: 'hidden' }}>
-                  <div className="card-photo" style={{ height: '100%', minHeight: 110 }} />
-                  <div className="card-body">
-                    <div className="price mono">
-                      {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+              {properties.map((p) => {
+                const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+                return (
+                  <Link key={p.id} href={`/property/${p.id}`} className="card"
+                        style={{ display: 'grid', gridTemplateColumns: '160px 1fr', overflow: 'hidden' }}>
+                    {firstPhoto ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 110, objectFit: 'cover' }} />
+                    ) : (
+                      <div className="card-photo" style={{ height: '100%', minHeight: 110 }} />
+                    )}
+                    <div className="card-body">
+                      <div className="price mono">
+                        {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+                      </div>
+                      <div className="addr">{p.typology} · {p.address}</div>
+                      <div className="meta">{p.district} · {p.area} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
                     </div>
-                    <div className="addr">{p.typology} · {p.address}</div>
-                    <div className="meta">{p.district} · {p.area} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

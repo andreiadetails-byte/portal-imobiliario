@@ -19,6 +19,8 @@ export default function PropertyPage() {
   const [ownerProfile, setOwnerProfile] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
+  const [photos, setPhotos] = useState([]);
+  const [activePhoto, setActivePhoto] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -29,6 +31,9 @@ export default function PropertyPage() {
       if (data) {
         const { data: owner } = await supabase.from('profiles').select('id, full_name, agency_name, account_type').eq('id', data.owner_id).single();
         setOwnerProfile(owner);
+
+        const { data: photosData } = await supabase.from('property_photos').select('url').eq('property_id', data.id).order('position');
+        setPhotos((photosData || []).map((p) => p.url));
       }
 
       const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -90,7 +95,35 @@ export default function PropertyPage() {
 
   return (
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
-      <div className="card-photo" style={{ height: 320, borderRadius: 8, marginBottom: 24 }} />
+      {photos.length > 0 ? (
+        <div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photos[activePhoto]}
+            alt=""
+            style={{ width: '100%', height: 320, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }}
+          />
+          {photos.length > 1 && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto' }}>
+              {photos.map((url, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src={url}
+                  alt=""
+                  onClick={() => setActivePhoto(i)}
+                  style={{
+                    width: 72, height: 56, objectFit: 'cover', borderRadius: 4, cursor: 'pointer', flexShrink: 0,
+                    border: i === activePhoto ? '2px solid var(--telha)' : '2px solid transparent',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="card-photo" style={{ height: 320, borderRadius: 8, marginBottom: 24 }} />
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
         <div>

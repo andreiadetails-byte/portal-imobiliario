@@ -18,6 +18,7 @@ export default function PublishPage() {
   const [features, setFeatures] = useState(['Elevador', 'Garagem']);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [photos, setPhotos] = useState([]); // { file, preview }
 
   const [form, setForm] = useState({
     title: '', description: '', property_type: 'Apartamento', typology: 'T3',
@@ -38,6 +39,35 @@ export default function PublishPage() {
 
   function toggleFeature(f) {
     setFeatures((cur) => (cur.includes(f) ? cur.filter((x) => x !== f) : [...cur, f]));
+  }
+
+  function handlePhotoSelect(e) {
+    const files = Array.from(e.target.files || []);
+    const newPhotos = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
+    setPhotos((cur) => [...cur, ...newPhotos].slice(0, 12)); // máximo 12 fotos
+  }
+
+  function removePhoto(index) {
+    setPhotos((cur) => cur.filter((_, i) => i !== index));
+  }
+
+  async function uploadPhotos(propertyId) {
+    for (let i = 0; i < photos.length; i++) {
+      const { file } = photos[i];
+      const ext = file.name.split('.').pop();
+      const path = `${user.id}/${propertyId}/${Date.now()}-${i}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, file);
+      if (uploadError) continue; // se uma foto falhar, continua com as outras
+
+      const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
+
+      await supabase.from('property_photos').insert({
+        property_id: propertyId,
+        url: publicUrlData.publicUrl,
+        position: i,
+      });
+    }
   }
 
   async function handleSubmit(e) {
@@ -65,8 +95,13 @@ export default function PublishPage() {
       status: 'em_revisao',
     }).select().single();
 
+    if (error) { setError(error.message); setSaving(false); return; }
+
+    if (photos.length > 0) {
+      await uploadPhotos(data.id);
+    }
+
     setSaving(false);
-    if (error) { setError(error.message); return; }
     router.push('/dashboard');
   }
 
@@ -162,6 +197,41 @@ export default function PublishPage() {
             <label>Preço (€)</label>
             <input type="number" required value={form.price} onChange={(e) => updateField('price', e.target.value)} />
           </div>
+        </div>
+
+        <div className="field">
+          <label>Fotografias</label>
+          <label
+            htmlFor="photo-input"
+            style={{
+              display: 'block', border: '1.5px dashed var(--line)', borderRadius: 6, padding: '28px 16px',
+              textAlign: 'center', color: 'var(--text-soft)', fontSize: 13.5, cursor: 'pointer',
+            }}
+          >
+            Clique para escolher fotografias (até 12)
+          </label>
+          <input id="photo-input" type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} />
+
+          {photos.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 12 }}>
+              {photos.map((p, i) => (
+                <div key={i} style={{ position: 'relative', aspectRatio: '1', borderRadius: 6, overflow: 'hidden' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(i)}
+                    style={{
+                      position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, lineHeight: 1,
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {error && <p className="error-text">{error}</p>}

@@ -16,7 +16,7 @@ export default function HomePage() {
     async function loadProperties() {
       const { data, error } = await supabase
         .from('properties')
-        .select('id, title, price, address, district, typology, area, bedrooms, bathrooms, business_type')
+        .select('id, title, price, address, district, typology, area, bedrooms, bathrooms, business_type, property_photos(url, position)')
         .eq('status', 'ativo')
         .order('created_at', { ascending: false })
         .limit(6);
@@ -80,18 +80,26 @@ export default function HomePage() {
           )}
 
           <div className="grid-listings">
-            {properties.map((p) => (
-              <Link key={p.id} href={`/property/${p.id}`} className="card">
-                <div className="card-photo" />
-                <div className="card-body">
-                  <div className="price mono">
-                    {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+            {properties.map((p) => {
+              const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+              return (
+                <Link key={p.id} href={`/property/${p.id}`} className="card">
+                  {firstPhoto ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={firstPhoto} alt="" style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                  ) : (
+                    <div className="card-photo" />
+                  )}
+                  <div className="card-body">
+                    <div className="price mono">
+                      {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+                    </div>
+                    <div className="addr">{p.typology} · {p.address}</div>
+                    <div className="meta">{p.district}</div>
                   </div>
-                  <div className="addr">{p.typology} · {p.address}</div>
-                  <div className="meta">{p.district}</div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
