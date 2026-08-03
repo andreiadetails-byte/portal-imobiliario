@@ -66,28 +66,29 @@ export default function HomePage() {
 
       <section
         style={{
-          padding: '88px 0 56px',
-          backgroundImage: 'radial-gradient(circle at 18px 18px, rgba(126,143,106,0.14) 2px, transparent 2.4px)',
-          backgroundSize: '36px 36px',
+          padding: '100px 0 64px',
+          backgroundImage: 'linear-gradient(rgba(30,26,18,0.62), rgba(30,26,18,0.42)), url(/hero.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.08em',
-            textTransform: 'uppercase', color: 'var(--telha)', marginBottom: 18, display: 'block',
+            textTransform: 'uppercase', color: 'var(--brass)', marginBottom: 18, display: 'block',
           }}>
             {t('home_eyebrow')}
           </span>
-          <h1 className="display" style={{ fontSize: 48, lineHeight: 1.08, letterSpacing: '-0.01em', marginBottom: 14 }}>
+          <h1 className="display" style={{ fontSize: 48, lineHeight: 1.08, letterSpacing: '-0.01em', marginBottom: 14, color: '#fff' }}>
             {t('home_title')}
           </h1>
-          <p style={{ fontSize: 16, color: 'var(--text-soft)', maxWidth: 480, marginBottom: 36 }}>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', maxWidth: 480, marginBottom: 36 }}>
             {t('home_lede')}
           </p>
         </div>
 
         <div className="wrap">
-          <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760 }}>
+          <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760, boxShadow: '0 8px 30px rgba(0,0,0,0.25)' }}>
             <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
               {['Venda', 'Arrendamento'].map((bt) => (
                 <button
