@@ -35,6 +35,7 @@ export default function HomePage() {
         <div className="navbar">
           <div className="logo">more<span>&middot;</span>ada</div>
           <div>
+            <Link href="/chat" className="btn" style={{ marginRight: 12 }}>Mensagens</Link>
             <Link href="/favorites" className="btn" style={{ marginRight: 12 }}>Favoritos</Link>
             <Link href="/login" className="btn" style={{ marginRight: 12 }}>Entrar</Link>
             <Link href="/publish" className="btn btn-primary">Publicar imóvel</Link>

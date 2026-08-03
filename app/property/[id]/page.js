@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 
 export default function PropertyPage() {
@@ -13,6 +14,7 @@ export default function PropertyPage() {
   const [lead, setLead] = useState({ name: '', phone: '', message: 'Olá, gostaria de saber mais sobre este imóvel e agendar uma visita.' });
 
   const [user, setUser] = useState(null);
+  const [ownerProfile, setOwnerProfile] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
 
@@ -21,6 +23,11 @@ export default function PropertyPage() {
       const { data } = await supabase.from('properties').select('*').eq('id', id).single();
       setProperty(data);
       setLoading(false);
+
+      if (data) {
+        const { data: owner } = await supabase.from('profiles').select('id, full_name, agency_name, account_type').eq('id', data.owner_id).single();
+        setOwnerProfile(owner);
+      }
 
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       setUser(currentUser);
@@ -45,6 +52,23 @@ export default function PropertyPage() {
       setIsFavorite(true);
     }
     setFavLoading(false);
+  }
+
+  async function startConversation() {
+    if (!user) { router.push('/login'); return; }
+    if (user.id === property.owner_id) return; // dono não conversa consigo próprio
+
+    const { data: existing } = await supabase
+      .from('conversations').select('id').eq('property_id', property.id).eq('buyer_id', user.id).maybeSingle();
+
+    if (existing) { router.push(`/chat?c=${existing.id}`); return; }
+
+    const { data: created, error } = await supabase
+      .from('conversations')
+      .insert({ property_id: property.id, buyer_id: user.id, seller_id: property.owner_id })
+      .select().single();
+
+    if (!error) router.push(`/chat?c=${created.id}`);
   }
 
   async function handleSendLead(e) {
@@ -112,58 +136,32 @@ export default function PropertyPage() {
         </div>
 
         <aside className="card" style={{ padding: 22, height: 'fit-content' }}>
-          {sent ? (
-            <p style={{ fontSize: 14 }}>Mensagem enviada! O anunciante vai receber o seu contacto em breve.</p>
-          ) : (
-            <form onSubmit={handleSendLead}>
-              <div className="field">
-                <label>Nome</label>
-                <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
+          {ownerProfile && (
+            <Link href={`/agency/${ownerProfile.id}`} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 600, flexShrink: 0,
+              }}>
+                {(ownerProfile.agency_name || ownerProfile.full_name || '?')[0].toUpperCase()}
               </div>
-              <div className="field">
-                <label>Telefone</label>
-                <input required value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 600 }}>{ownerProfile.agency_name || ownerProfile.full_name}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
+                  {ownerProfile.account_type === 'agencia' ? 'Agência imobiliária' : 'Particular'}
+                </div>
               </div>
-              <div className="field">
-                <label>Mensagem</label>
-                <textarea rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
-              </div>
-              <button type="submit" className="btn btn-primary btn-block">Enviar mensagem</button>
-              <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
-                O contacto é enviado diretamente ao anunciante
-              </p>
-            </form>
+            </Link>
           )}
-        </aside>
-      </div>
-    </div>
-  );
-}
 
-
-          <div style={{ display: 'flex', gap: 24, borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '18px 0', margin: '24px 0' }}>
-            <div><b>{property.area} m²</b><div className="meta">Área</div></div>
-            <div><b>{property.bedrooms}</b><div className="meta">Quartos</div></div>
-            <div><b>{property.bathrooms}</b><div className="meta">Casas de banho</div></div>
-            <div><b>{property.energy_certificate || '—'}</b><div className="meta">C. Energético</div></div>
+          <button onClick={startConversation} className="btn btn-block" style={{ marginBottom: 14 }}>
+            💬 Enviar mensagem no chat
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 16px', fontSize: 11.5, color: 'var(--text-soft)' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+            ou preencha o formulário
+            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
           </div>
 
-          <h3 className="display" style={{ fontSize: 19, marginBottom: 10 }}>Sobre o imóvel</h3>
-          <p style={{ color: 'var(--text-soft)', fontSize: 14.5 }}>{property.description}</p>
-
-          {property.features?.length > 0 && (
-            <>
-              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>Características</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {property.features.map((f) => (
-                  <span key={f} style={{ fontSize: 13, padding: '5px 12px', background: 'var(--plaster)', borderRadius: 14 }}>{f}</span>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-
-        <aside className="card" style={{ padding: 22, height: 'fit-content' }}>
           {sent ? (
             <p style={{ fontSize: 14 }}>Mensagem enviada! O anunciante vai receber o seu contacto em breve.</p>
           ) : (
