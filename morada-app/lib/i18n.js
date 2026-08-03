@@ -1,0 +1,156 @@
+'use client';
+
+import { createContext, useContext, useEffect, useState } from 'react';
+
+const dictionaries = {
+  pt: {
+    nav_results: 'Resultados', nav_favorites: 'Favoritos', nav_chat: 'Mensagens',
+    nav_login: 'Entrar', nav_publish: 'Publicar imóvel', nav_logout: 'Sair',
+    home_title: 'A sua próxima morada, publicada por quem a conhece.',
+    home_search_placeholder: 'Cidade, zona ou distrito',
+    home_search_btn: 'Pesquisar',
+    home_featured: 'Imóveis em destaque',
+    home_loading: 'A carregar imóveis...',
+    home_empty: 'Ainda não há imóveis publicados. Sê o primeiro!',
+    results_title: 'Resultados', results_business: 'Negócio', results_buy: 'Comprar', results_rent: 'Arrendar',
+    results_district: 'Distrito', results_maxprice: 'Preço máximo (€)', results_type: 'Tipo de imóvel',
+    results_typology: 'Tipologia', results_filter: 'Filtrar', results_searching: 'A procurar...',
+    results_found: 'imóveis encontrados', results_sort_recent: 'Mais recentes',
+    results_sort_price_asc: 'Preço: mais baixo', results_sort_price_desc: 'Preço: mais alto',
+    results_empty: 'Não encontrámos imóveis com estes filtros.',
+    login_login: 'Entrar', login_signup: 'Criar conta', login_welcome: 'Bem-vindo de volta',
+    login_sub: 'Entre para gerir os seus anúncios e favoritos.', login_email: 'Email', login_pw: 'Palavra-passe',
+    login_account_type: 'Tipo de conta', login_individual: 'Particular', login_agency: 'Agência',
+    login_name: 'Nome', login_pw_min: 'Palavra-passe (mín. 6 caracteres)',
+    login_signup_btn: 'Criar conta', login_back: 'Voltar à página inicial',
+    property_area: 'Área', property_rooms: 'Quartos', property_baths: 'Casas de banho',
+    property_energy: 'C. Energético', property_about: 'Sobre o imóvel', property_features: 'Características',
+    property_chat_btn: '💬 Enviar mensagem no chat', property_or_form: 'ou preencha o formulário',
+    property_name: 'Nome', property_phone: 'Telefone', property_message: 'Mensagem',
+    property_send: 'Enviar mensagem', property_sent: 'Mensagem enviada! O anunciante vai receber o seu contacto em breve.',
+    property_privacy: 'O contacto é enviado diretamente ao anunciante', property_save: 'Guardar', property_saved: 'Guardado',
+    property_not_found: 'Imóvel não encontrado.',
+    dashboard_hi: 'Olá', dashboard_sub: 'Aqui gere os seus anúncios e todas as propostas recebidas.',
+    dashboard_new: '+ Novo anúncio', dashboard_my_listings: 'Os meus anúncios', dashboard_none_listings: 'Ainda não publicaste nenhum imóvel.',
+    dashboard_view: 'Ver anúncio', dashboard_recent_leads: 'Leads recentes', dashboard_none_leads: 'Ainda não recebeste nenhuma lead.',
+    dashboard_new_status: 'Por responder', dashboard_done_status: 'Respondido', dashboard_mark_replied: 'Marcar como respondido',
+    publish_title: 'Publicar imóvel', publish_desc: 'Estes dados aparecem em destaque no anúncio.',
+    publish_submit: 'Publicar anúncio', publish_saving: 'A publicar...', publish_review_note: 'O anúncio fica "em revisão" até ser aprovado.',
+    favorites_title: 'Os meus favoritos', favorites_empty: 'Ainda não guardaste nenhum imóvel.',
+    chat_title: 'Mensagens', chat_empty: 'Ainda não tens conversas. Envia uma mensagem a partir da página de um imóvel.',
+    chat_with_advertiser: 'Conversa com o anunciante', chat_with_interested: 'Conversa com interessado',
+    chat_placeholder: 'Escreva uma mensagem...',
+    agency_active_listings: 'Imóveis ativos', agency_listings: 'Imóveis', agency_none: 'Ainda não tem imóveis ativos.',
+    agency_type: 'Agência imobiliária', agency_individual_type: 'Particular',
+  },
+  en: {
+    nav_results: 'Results', nav_favorites: 'Favourites', nav_chat: 'Messages',
+    nav_login: 'Log in', nav_publish: 'List your property', nav_logout: 'Log out',
+    home_title: 'Your next home, listed by someone who knows it.',
+    home_search_placeholder: 'City, area or district',
+    home_search_btn: 'Search',
+    home_featured: 'Featured properties',
+    home_loading: 'Loading properties...',
+    home_empty: 'No properties listed yet. Be the first!',
+    results_title: 'Results', results_business: 'Listing type', results_buy: 'Buy', results_rent: 'Rent',
+    results_district: 'District', results_maxprice: 'Max price (€)', results_type: 'Property type',
+    results_typology: 'Layout', results_filter: 'Filter', results_searching: 'Searching...',
+    results_found: 'properties found', results_sort_recent: 'Most recent',
+    results_sort_price_asc: 'Price: low to high', results_sort_price_desc: 'Price: high to low',
+    results_empty: 'No properties found with these filters.',
+    login_login: 'Log in', login_signup: 'Create account', login_welcome: 'Welcome back',
+    login_sub: 'Log in to manage your listings and favourites.', login_email: 'Email', login_pw: 'Password',
+    login_account_type: 'Account type', login_individual: 'Individual', login_agency: 'Agency',
+    login_name: 'Name', login_pw_min: 'Password (min. 6 characters)',
+    login_signup_btn: 'Create account', login_back: 'Back to home',
+    property_area: 'Area', property_rooms: 'Bedrooms', property_baths: 'Bathrooms',
+    property_energy: 'Energy rating', property_about: 'About this property', property_features: 'Features',
+    property_chat_btn: '💬 Send a chat message', property_or_form: 'or fill in the form',
+    property_name: 'Name', property_phone: 'Phone', property_message: 'Message',
+    property_send: 'Send message', property_sent: 'Message sent! The advertiser will get your contact soon.',
+    property_privacy: 'Your contact details are sent directly to the advertiser', property_save: 'Save', property_saved: 'Saved',
+    property_not_found: 'Property not found.',
+    dashboard_hi: 'Hi', dashboard_sub: 'Manage your listings and all the leads you\u2019ve received.',
+    dashboard_new: '+ New listing', dashboard_my_listings: 'My listings', dashboard_none_listings: 'You haven\u2019t listed any property yet.',
+    dashboard_view: 'View listing', dashboard_recent_leads: 'Recent leads', dashboard_none_leads: 'No leads received yet.',
+    dashboard_new_status: 'Awaiting reply', dashboard_done_status: 'Replied', dashboard_mark_replied: 'Mark as replied',
+    publish_title: 'List your property', publish_desc: 'This information appears prominently in the listing.',
+    publish_submit: 'Publish listing', publish_saving: 'Publishing...', publish_review_note: 'The listing stays "under review" until approved.',
+    favorites_title: 'My favourites', favorites_empty: 'You haven\u2019t saved any property yet.',
+    chat_title: 'Messages', chat_empty: 'No conversations yet. Send a message from a property page.',
+    chat_with_advertiser: 'Conversation with advertiser', chat_with_interested: 'Conversation with interested buyer',
+    chat_placeholder: 'Write a message...',
+    agency_active_listings: 'Active listings', agency_listings: 'Listings', agency_none: 'No active listings yet.',
+    agency_type: 'Real estate agency', agency_individual_type: 'Individual',
+  },
+  es: {
+    nav_results: 'Resultados', nav_favorites: 'Favoritos', nav_chat: 'Mensajes',
+    nav_login: 'Entrar', nav_publish: 'Publicar inmueble', nav_logout: 'Salir',
+    home_title: 'Su próxima morada, publicada por quien la conoce.',
+    home_search_placeholder: 'Ciudad, zona o distrito',
+    home_search_btn: 'Buscar',
+    home_featured: 'Inmuebles destacados',
+    home_loading: 'Cargando inmuebles...',
+    home_empty: 'Aún no hay inmuebles publicados. ¡Sea el primero!',
+    results_title: 'Resultados', results_business: 'Tipo de operación', results_buy: 'Comprar', results_rent: 'Alquilar',
+    results_district: 'Distrito', results_maxprice: 'Precio máximo (€)', results_type: 'Tipo de inmueble',
+    results_typology: 'Tipología', results_filter: 'Filtrar', results_searching: 'Buscando...',
+    results_found: 'inmuebles encontrados', results_sort_recent: 'Más recientes',
+    results_sort_price_asc: 'Precio: más bajo', results_sort_price_desc: 'Precio: más alto',
+    results_empty: 'No encontramos inmuebles con estos filtros.',
+    login_login: 'Entrar', login_signup: 'Crear cuenta', login_welcome: 'Bienvenido de nuevo',
+    login_sub: 'Entre para gestionar sus anuncios y favoritos.', login_email: 'Email', login_pw: 'Contraseña',
+    login_account_type: 'Tipo de cuenta', login_individual: 'Particular', login_agency: 'Agencia',
+    login_name: 'Nombre', login_pw_min: 'Contraseña (mín. 6 caracteres)',
+    login_signup_btn: 'Crear cuenta', login_back: 'Volver al inicio',
+    property_area: 'Superficie', property_rooms: 'Habitaciones', property_baths: 'Baños',
+    property_energy: 'Certif. energético', property_about: 'Sobre el inmueble', property_features: 'Características',
+    property_chat_btn: '💬 Enviar mensaje en el chat', property_or_form: 'o rellene el formulario',
+    property_name: 'Nombre', property_phone: 'Teléfono', property_message: 'Mensaje',
+    property_send: 'Enviar mensaje', property_sent: '¡Mensaje enviado! El anunciante recibirá su contacto pronto.',
+    property_privacy: 'El contacto se envía directamente al anunciante', property_save: 'Guardar', property_saved: 'Guardado',
+    property_not_found: 'Inmueble no encontrado.',
+    dashboard_hi: 'Hola', dashboard_sub: 'Gestione sus anuncios y todos los contactos recibidos.',
+    dashboard_new: '+ Nuevo anuncio', dashboard_my_listings: 'Mis anuncios', dashboard_none_listings: 'Aún no ha publicado ningún inmueble.',
+    dashboard_view: 'Ver anuncio', dashboard_recent_leads: 'Contactos recientes', dashboard_none_leads: 'Aún no ha recibido ningún contacto.',
+    dashboard_new_status: 'Por responder', dashboard_done_status: 'Respondido', dashboard_mark_replied: 'Marcar como respondido',
+    publish_title: 'Publicar inmueble', publish_desc: 'Estos datos aparecen destacados en el anuncio.',
+    publish_submit: 'Publicar anuncio', publish_saving: 'Publicando...', publish_review_note: 'El anuncio queda "en revisión" hasta ser aprobado.',
+    favorites_title: 'Mis favoritos', favorites_empty: 'Aún no ha guardado ningún inmueble.',
+    chat_title: 'Mensajes', chat_empty: 'Aún no tiene conversaciones. Envíe un mensaje desde la página de un inmueble.',
+    chat_with_advertiser: 'Conversación con el anunciante', chat_with_interested: 'Conversación con interesado',
+    chat_placeholder: 'Escriba un mensaje...',
+    agency_active_listings: 'Inmuebles activos', agency_listings: 'Inmuebles', agency_none: 'Aún no tiene inmuebles activos.',
+    agency_type: 'Agencia inmobiliaria', agency_individual_type: 'Particular',
+  },
+};
+
+const LanguageContext = createContext({ lang: 'pt', setLang: () => {}, t: (k) => k });
+
+export function LanguageProvider({ children }) {
+  const [lang, setLangState] = useState('pt');
+
+  useEffect(() => {
+    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('morada_lang') : null;
+    if (saved && dictionaries[saved]) setLangState(saved);
+  }, []);
+
+  function setLang(newLang) {
+    setLangState(newLang);
+    if (typeof window !== 'undefined') window.localStorage.setItem('morada_lang', newLang);
+  }
+
+  function t(key) {
+    return dictionaries[lang]?.[key] || dictionaries.pt[key] || key;
+  }
+
+  return (
+    <LanguageContext.Provider value={{ lang, setLang, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  return useContext(LanguageContext);
+}
