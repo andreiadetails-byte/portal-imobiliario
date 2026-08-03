@@ -8,6 +8,10 @@ import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
 import Header from '../../components/Header';
+import dynamic from 'next/dynamic';
+
+const MapDrawSearch = dynamic(() => import('../../components/MapDrawSearch'), { ssr: false });
+import { displayAddress } from '../../lib/displayAddress';
 
 function ResultsInner() {
   const searchParams = useSearchParams();
@@ -25,7 +29,13 @@ function ResultsInner() {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedTypologies, setSelectedTypologies] = useState([]);
   const [maxPrice, setMaxPrice] = useState('');
+  const [minBedrooms, setMinBedrooms] = useState('');
+  const [minBathrooms, setMinBathrooms] = useState('');
+  const [minArea, setMinArea] = useState('');
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [sortBy, setSortBy] = useState('recent');
+  const [showMap, setShowMap] = useState(false);
+  const [mapFilterIds, setMapFilterIds] = useState(null);
 
   useEffect(() => {
     runSearch();
@@ -36,13 +46,27 @@ function ResultsInner() {
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
   }
 
+  async function saveSearch() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { window.location.href = '/login'; return; }
+
+    const name = district
+      ? `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} em ${district}`
+      : `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} imóvel`;
+
+    const filters = { district, businessType, selectedTypes, selectedTypologies, maxPrice, minBedrooms, minBathrooms, minArea, selectedAmenities };
+
+    const { error } = await supabase.from('saved_searches').insert({ user_id: user.id, name, filters, notify: true });
+    if (!error) alert(`Pesquisa guardada! Vai receber um email sempre que aparecer um imóvel novo que corresponda.`);
+  }
+
   async function runSearch(e) {
     if (e) e.preventDefault();
     setLoading(true);
 
     let query = supabase
       .from('properties')
-      .select('id, title, price, address, district, typology, property_type, area, bedrooms, bathrooms, business_type, property_photos(url, position)', { count: 'exact' })
+      .select('id, title, price, address, district, municipality, parish, show_full_address, typology, property_type, area, bedrooms, bathrooms, business_type, latitude, longitude, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, property_photos(url, position)', { count: 'exact' })
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
@@ -50,6 +74,10 @@ function ResultsInner() {
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
+    if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
+    if (minBathrooms) query = query.gte('bathrooms', Number(minBathrooms));
+    if (minArea) query = query.gte('area', Number(minArea));
+    selectedAmenities.forEach((col) => { query = query.eq(col, true); });
 
     query = sortBy === 'price_asc' ? query.order('price', { ascending: true })
       : sortBy === 'price_desc' ? query.order('price', { ascending: false })
@@ -57,7 +85,8 @@ function ResultsInner() {
 
     const { data, count: total, error } = await query;
     if (!error) {
-      setProperties(data || []);
+      const sorted = [...(data || [])].sort((a, b) => (b.featured_status === 'active') - (a.featured_status === 'active'));
+      setProperties(sorted);
       setCount(total || 0);
     }
     setLoading(false);
@@ -119,31 +148,103 @@ function ResultsInner() {
               ))}
             </div>
 
+            <div className="field">
+              <label>Quartos (mín.)</label>
+              <select value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)}>
+                <option value="">Qualquer</option>
+                {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}+</option>)}
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Casas de banho (mín.)</label>
+              <select value={minBathrooms} onChange={(e) => setMinBathrooms(e.target.value)}>
+                <option value="">Qualquer</option>
+                {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}+</option>)}
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Área mínima (m²)</label>
+              <input type="number" value={minArea} onChange={(e) => setMinArea(e.target.value)} />
+            </div>
+
+            <div className="field">
+              <label>Características</label>
+              {[
+                ['has_storage', 'Arrumos'], ['has_parking', 'Estacionamento'], ['has_balcony', 'Varanda'],
+                ['has_garden', 'Jardim'], ['has_pool', 'Piscina'], ['has_gym', 'Ginásio'], ['has_coworking', 'Sala coworking'],
+              ].map(([col, label]) => (
+                <label key={col} style={{ display: 'flex', gap: 6, fontSize: 13, marginBottom: 5, fontWeight: 400 }}>
+                  <input
+                    type="checkbox"
+                    checked={selectedAmenities.includes(col)}
+                    onChange={() => toggleFromList(selectedAmenities, setSelectedAmenities, col)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+
             <button type="submit" className="btn btn-primary btn-block">{t('results_filter')}</button>
           </form>
 
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
               <span style={{ fontSize: 13, color: 'var(--text-soft)' }}>
-                {loading ? t('results_searching') : `${count} ${t('results_found')}`}
+                {loading ? t('results_searching') : `${(mapFilterIds ? properties.filter((p) => mapFilterIds.includes(p.id)) : properties).length} ${t('results_found')}`}
               </span>
-              <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); runSearch(); }} style={{ padding: '8px 10px', border: '1px solid var(--line)', borderRadius: 5 }}>
-                <option value="recent">{t('results_sort_recent')}</option>
-                <option value="price_asc">{t('results_sort_price_asc')}</option>
-                <option value="price_desc">{t('results_sort_price_desc')}</option>
-              </select>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button type="button" onClick={saveSearch} className="btn" style={{ fontSize: 13 }}>
+                  🔔 Guardar pesquisa
+                </button>
+                <button type="button" onClick={() => setShowMap((s) => !s)} className="btn" style={{ fontSize: 13 }}>
+                  {showMap ? '✕ Fechar mapa' : '🗺️ Ver no mapa'}
+                </button>
+                <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); runSearch(); }} style={{ padding: '8px 10px', border: '1px solid var(--line)', borderRadius: 5 }}>
+                  <option value="recent">{t('results_sort_recent')}</option>
+                  <option value="price_asc">{t('results_sort_price_asc')}</option>
+                  <option value="price_desc">{t('results_sort_price_desc')}</option>
+                </select>
+              </div>
             </div>
+
+            {showMap && (
+              <div style={{ marginBottom: 20 }}>
+                <MapDrawSearch properties={properties} onFilter={setMapFilterIds} />
+              </div>
+            )}
+
+            {mapFilterIds && (
+              <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 12 }}>
+                A mostrar só imóveis dentro da zona desenhada.{' '}
+                <span onClick={() => setMapFilterIds(null)} style={{ color: 'var(--telha)', cursor: 'pointer', textDecoration: 'underline' }}>
+                  Remover filtro de zona
+                </span>
+              </p>
+            )}
 
             {!loading && properties.length === 0 && (
               <div className="empty-state">{t('results_empty')}</div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {properties.map((p) => {
+              {(mapFilterIds ? properties.filter((p) => mapFilterIds.includes(p.id)) : properties).map((p) => {
                 const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                 return (
                   <Link key={p.id} href={`/property/${p.id}`} className="card"
-                        style={{ display: 'grid', gridTemplateColumns: '160px 1fr', overflow: 'hidden' }}>
+                        style={{
+                          display: 'grid', gridTemplateColumns: '160px 1fr', overflow: 'hidden', position: 'relative',
+                          border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
+                        }}>
+                    {p.featured_status === 'active' && (
+                      <span style={{
+                        position: 'absolute', top: 8, left: 8, zIndex: 1, fontSize: 10.5, fontWeight: 700,
+                        padding: '3px 9px', borderRadius: 10, background: 'var(--brass)', color: '#5C4E2A',
+                      }}>
+                        ★ DESTAQUE
+                      </span>
+                    )}
                     {firstPhoto ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 110, objectFit: 'cover' }} />
@@ -154,7 +255,7 @@ function ResultsInner() {
                       <div className="price mono">
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
-                      <div className="addr">{p.typology} · {p.address}</div>
+                      <div className="addr">{p.typology} · {displayAddress(p)}</div>
                       <div className="meta">{p.district} · {p.area} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
                     </div>
                   </Link>

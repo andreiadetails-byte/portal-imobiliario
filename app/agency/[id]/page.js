@@ -7,6 +7,7 @@ import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
 import Header from '../../../components/Header';
+import { displayAddress } from '../../../lib/displayAddress';
 
 export default function AgencyPage() {
   const { id } = useParams();
@@ -22,7 +23,7 @@ export default function AgencyPage() {
 
       const { data: propsData } = await supabase
         .from('properties')
-        .select('id, price, address, district, typology, area, bedrooms, business_type')
+        .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, business_type')
         .eq('owner_id', id)
         .eq('status', 'ativo')
         .order('created_at', { ascending: false });
@@ -55,9 +56,20 @@ export default function AgencyPage() {
             {initials}
           </div>
           <div style={{ flex: 1 }}>
-            <h1 className="display" style={{ fontSize: 24 }}>{profile.agency_name || profile.full_name}</h1>
+            <h1 className="display" style={{ fontSize: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
+              {profile.agency_name || profile.full_name}
+              {profile.is_verified && (
+                <span title="Profissional verificado" style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22,
+                  borderRadius: '50%', background: 'var(--azulejo)', color: '#fff', fontSize: 12,
+                }}>
+                  ✓
+                </span>
+              )}
+            </h1>
             <div className="meta">
               {profile.account_type === 'agencia' ? t('agency_type') : t('agency_individual_type')}
+              {profile.is_verified && ' · Verificado pelo Morada'}
               {profile.agency_license && ` · ${profile.agency_license}`}
             </div>
           </div>
@@ -79,7 +91,7 @@ export default function AgencyPage() {
                 <div className="price mono">
                   {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                 </div>
-                <div className="addr">{p.typology} · {p.address}</div>
+                <div className="addr">{p.typology} · {displayAddress(p)}</div>
                 <div className="meta">{p.district}</div>
               </div>
             </Link>

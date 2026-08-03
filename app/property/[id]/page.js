@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import Header from '../../../components/Header';
+import { displayAddress } from '../../../lib/displayAddress';
+import MortgageSimulator from '../../../components/MortgageSimulator';
 
 export default function PropertyPage() {
   const { id } = useParams();
@@ -22,6 +24,8 @@ export default function PropertyPage() {
   const [favLoading, setFavLoading] = useState(false);
   const [photos, setPhotos] = useState([]);
   const [activePhoto, setActivePhoto] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+  const [similar, setSimilar] = useState([]);
 
   useEffect(() => {
     async function load() {
@@ -30,11 +34,23 @@ export default function PropertyPage() {
       setLoading(false);
 
       if (data) {
-        const { data: owner } = await supabase.from('profiles').select('id, full_name, agency_name, account_type').eq('id', data.owner_id).single();
+        const { data: owner } = await supabase.from('profiles').select('id, full_name, agency_name, account_type, is_verified').eq('id', data.owner_id).single();
         setOwnerProfile(owner);
 
         const { data: photosData } = await supabase.from('property_photos').select('url').eq('property_id', data.id).order('position');
         setPhotos((photosData || []).map((p) => p.url));
+
+        supabase.from('properties').update({ views_count: (data.views_count || 0) + 1 }).eq('id', data.id).then(() => {});
+
+        const { data: similarData } = await supabase
+          .from('properties')
+          .select('id, price, address, district, typology, business_type, property_photos(url, position)')
+          .eq('status', 'ativo')
+          .eq('district', data.district)
+          .eq('property_type', data.property_type)
+          .neq('id', data.id)
+          .limit(4);
+        setSimilar(similarData || []);
       }
 
       const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -104,7 +120,8 @@ export default function PropertyPage() {
           <img
             src={photos[activePhoto]}
             alt=""
-            style={{ width: '100%', height: 320, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }}
+            onClick={() => setLightbox(true)}
+            style={{ width: '100%', height: 320, objectFit: 'cover', borderRadius: 8, marginBottom: 8, cursor: 'zoom-in' }}
           />
           {photos.length > 1 && (
             <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto' }}>
@@ -134,42 +151,104 @@ export default function PropertyPage() {
             <div className="price mono" style={{ fontSize: 30 }}>
               {Number(property.price).toLocaleString('pt-PT')} {property.business_type === 'Arrendamento' ? '€/mês' : '€'}
             </div>
-            <button
-              onClick={toggleFavorite}
-              disabled={favLoading}
-              className="btn"
-              style={{
-                fontSize: 13, display: 'flex', alignItems: 'center', gap: 6,
-                background: isFavorite ? 'rgba(126,143,106,0.12)' : 'transparent',
-                borderColor: isFavorite ? 'var(--azulejo)' : 'var(--ink)',
-                color: isFavorite ? 'var(--telha)' : 'var(--ink)',
-              }}
-            >
-              {isFavorite ? `♥ ${t('property_saved')}` : `♡ ${t('property_save')}`}
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: property.title, url: window.location.href });
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link copiado!');
+                  }
+                }}
+                className="btn"
+                style={{ fontSize: 13 }}
+              >
+                ↗ Partilhar
+              </button>
+              <button
+                onClick={toggleFavorite}
+                disabled={favLoading}
+                className="btn"
+                style={{
+                  fontSize: 13, display: 'flex', alignItems: 'center', gap: 6,
+                  background: isFavorite ? 'rgba(126,143,106,0.12)' : 'transparent',
+                  borderColor: isFavorite ? 'var(--azulejo)' : 'var(--ink)',
+                  color: isFavorite ? 'var(--telha)' : 'var(--ink)',
+                }}
+              >
+                {isFavorite ? `♥ ${t('property_saved')}` : `♡ ${t('property_save')}`}
+              </button>
+            </div>
           </div>
-          <div className="addr" style={{ fontSize: 17 }}>{property.typology} · {property.address}</div>
+          <div className="addr" style={{ fontSize: 17 }}>{property.typology} · {displayAddress(property)}</div>
           <div className="meta">{property.district}</div>
 
-          <div style={{ display: 'flex', gap: 24, borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '18px 0', margin: '24px 0' }}>
+          <div style={{ display: 'flex', gap: 24, borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '18px 0', margin: '24px 0', flexWrap: 'wrap' }}>
             <div><b>{property.area} m²</b><div className="meta">{t('property_area')}</div></div>
             <div><b>{property.bedrooms}</b><div className="meta">{t('property_rooms')}</div></div>
             <div><b>{property.bathrooms}</b><div className="meta">{t('property_baths')}</div></div>
             <div><b>{property.energy_certificate || '—'}</b><div className="meta">{t('property_energy')}</div></div>
+            {property.floor && <div><b>{property.floor}</b><div className="meta">Piso</div></div>}
+            {property.state && <div><b>{property.state}</b><div className="meta">Estado</div></div>}
           </div>
+
+          {property.property_type === 'Moradia' && property.house_subtype && (
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginTop: -14, marginBottom: 20 }}>
+              {property.house_subtype}
+            </p>
+          )}
 
           <h3 className="display" style={{ fontSize: 19, marginBottom: 10 }}>{t('property_about')}</h3>
           <p style={{ color: 'var(--text-soft)', fontSize: 14.5 }}>{property.description}</p>
 
-          {property.features?.length > 0 && (
+          {property.solar_orientation && (
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginTop: 10 }}>
+              <b style={{ color: 'var(--ink)' }}>Orientação solar:</b> {property.solar_orientation}
+            </p>
+          )}
+
+          {(() => {
+            const amenities = [
+              property.has_storage && 'Arrumos',
+              property.has_parking && 'Estacionamento',
+              property.has_balcony && 'Varanda',
+              property.has_garden && 'Jardim',
+              property.has_pool && 'Piscina',
+              property.has_gym && 'Ginásio',
+              property.has_coworking && 'Sala de coworking',
+              ...(property.features || []),
+            ].filter(Boolean);
+            return amenities.length > 0 && (
+              <>
+                <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>{t('property_features')}</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {amenities.map((f) => (
+                    <span key={f} style={{ fontSize: 13, padding: '5px 12px', background: 'var(--plaster)', borderRadius: 14 }}>{f}</span>
+                  ))}
+                </div>
+              </>
+            );
+          })()}
+
+          {property.floor_plan_url && (
             <>
-              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>{t('property_features')}</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {property.features.map((f) => (
-                  <span key={f} style={{ fontSize: 13, padding: '5px 12px', background: 'var(--plaster)', borderRadius: 14 }}>{f}</span>
-                ))}
-              </div>
+              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>Planta do imóvel</h3>
+              {property.floor_plan_url.toLowerCase().endsWith('.pdf') ? (
+                <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer" className="btn">
+                  📄 Ver planta (PDF)
+                </a>
+              ) : (
+                <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={property.floor_plan_url} alt="Planta do imóvel" style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid var(--line)' }} />
+                </a>
+              )}
             </>
+          )}
+
+          {property.business_type === 'Venda' && (
+            <MortgageSimulator price={Number(property.price)} />
           )}
         </div>
 
@@ -183,7 +262,17 @@ export default function PropertyPage() {
                 {(ownerProfile.agency_name || ownerProfile.full_name || '?')[0].toUpperCase()}
               </div>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 600 }}>{ownerProfile.agency_name || ownerProfile.full_name}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  {ownerProfile.agency_name || ownerProfile.full_name}
+                  {ownerProfile.is_verified && (
+                    <span title="Profissional verificado" style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 15, height: 15,
+                      borderRadius: '50%', background: 'var(--azulejo)', color: '#fff', fontSize: 9,
+                    }}>
+                      ✓
+                    </span>
+                  )}
+                </div>
                 <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
                   {ownerProfile.account_type === 'agencia' ? t('agency_type') : t('agency_individual_type')}
                 </div>
@@ -232,7 +321,69 @@ export default function PropertyPage() {
           )}
         </aside>
       </div>
+
+      {similar.length > 0 && (
+        <div style={{ marginTop: 8 }}>
+          <h3 className="display" style={{ fontSize: 19, marginBottom: 14 }}>Imóveis semelhantes</h3>
+          <div className="grid-listings">
+            {similar.map((s) => {
+              const sPhoto = s.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+              return (
+                <Link key={s.id} href={`/property/${s.id}`} className="card">
+                  {sPhoto ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={sPhoto} alt="" style={{ width: '100%', height: 150, objectFit: 'cover' }} />
+                  ) : (
+                    <div className="card-photo" style={{ height: 150 }} />
+                  )}
+                  <div className="card-body">
+                    <div className="price mono">
+                      {Number(s.price).toLocaleString('pt-PT')} {s.business_type === 'Arrendamento' ? '€/mês' : '€'}
+                    </div>
+                    <div className="addr">{s.typology} · {s.address}</div>
+                    <div className="meta">{s.district}</div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
+
+    {lightbox && (
+      <div
+        onClick={() => setLightbox(false)}
+        style={{
+          position: 'fixed', inset: 0, background: 'rgba(20,17,12,0.92)', zIndex: 200,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={photos[activePhoto]} alt="" style={{ maxWidth: '90vw', maxHeight: '78vh', borderRadius: 6, objectFit: 'contain' }} />
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); setActivePhoto((i) => (i - 1 + photos.length) % photos.length); }}
+            style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', fontSize: 18 }}
+          >
+            ‹
+          </button>
+          <span style={{ color: '#fff', fontSize: 13 }}>{activePhoto + 1} / {photos.length}</span>
+          <button
+            onClick={(e) => { e.stopPropagation(); setActivePhoto((i) => (i + 1) % photos.length); }}
+            style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', fontSize: 18 }}
+          >
+            ›
+          </button>
+        </div>
+        <button
+          onClick={() => setLightbox(false)}
+          style={{ position: 'absolute', top: 20, right: 24, background: 'none', border: 'none', color: '#fff', fontSize: 26, cursor: 'pointer' }}
+        >
+          ✕
+        </button>
+      </div>
+    )}
     </>
   );
 }

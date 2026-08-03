@@ -7,6 +7,7 @@ import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
+import { displayAddress } from '../lib/displayAddress';
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -15,17 +16,21 @@ export default function HomePage() {
   const [location, setLocation] = useState('');
   const [businessType, setBusinessType] = useState('Venda');
   const [stats, setStats] = useState({ totalProperties: 0, totalDistricts: 0 });
+  const [news, setNews] = useState([]);
 
   useEffect(() => {
     async function loadProperties() {
       const { data, error } = await supabase
         .from('properties')
-        .select('id, title, price, address, district, typology, area, bedrooms, bathrooms, business_type, property_photos(url, position)')
+        .select('id, title, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, featured_status, property_photos(url, position)')
         .eq('status', 'ativo')
         .order('created_at', { ascending: false })
         .limit(6);
 
-      if (!error) setProperties(data || []);
+      if (!error) {
+        const sorted = [...(data || [])].sort((a, b) => (b.featured_status === 'active') - (a.featured_status === 'active'));
+        setProperties(sorted);
+      }
       setLoading(false);
     }
 
@@ -41,8 +46,15 @@ export default function HomePage() {
       setStats({ totalProperties: count || 0, totalDistricts: uniqueDistricts });
     }
 
+    async function loadNews() {
+      const { data } = await supabase
+        .from('news').select('*').eq('published', true).order('created_at', { ascending: false }).limit(3);
+      setNews(data || []);
+    }
+
     loadProperties();
     loadStats();
+    loadNews();
   }, []);
 
   function handleSearch(e) {
@@ -134,7 +146,15 @@ export default function HomePage() {
             {properties.map((p) => {
               const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
               return (
-                <Link key={p.id} href={`/property/${p.id}`} className="card">
+                <Link key={p.id} href={`/property/${p.id}`} className="card" style={{ position: 'relative', border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined }}>
+                  {p.featured_status === 'active' && (
+                    <span style={{
+                      position: 'absolute', top: 10, left: 10, zIndex: 1, fontSize: 10.5, fontWeight: 700,
+                      padding: '3px 9px', borderRadius: 10, background: 'var(--brass)', color: '#5C4E2A',
+                    }}>
+                      ★ DESTAQUE
+                    </span>
+                  )}
                   {firstPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={firstPhoto} alt="" style={{ width: '100%', height: 170, objectFit: 'cover' }} />
@@ -145,7 +165,7 @@ export default function HomePage() {
                     <div className="price mono">
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="addr">{p.typology} · {p.address}</div>
+                    <div className="addr">{p.typology} · {displayAddress(p)}</div>
                     <div className="meta">{p.district}</div>
                   </div>
                 </Link>
@@ -192,24 +212,28 @@ export default function HomePage() {
       <section style={{ padding: '0 0 80px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 22, marginBottom: 20 }}>{t('home_news_title')}</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-            {[
-              { cat: t('news_cat_housing'), title: t('news1_title'), body: t('news1_body') },
-              { cat: t('news_cat_credit'), title: t('news2_title'), body: t('news2_body') },
-              { cat: t('news_cat_construction'), title: t('news3_title'), body: t('news3_body') },
-            ].map((n, i) => (
-              <div key={i} style={{ borderTop: '2px solid var(--line)', paddingTop: 14 }}>
-                <span style={{
-                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, textTransform: 'uppercase',
-                  letterSpacing: '0.05em', color: 'var(--telha)', display: 'block', marginBottom: 8,
-                }}>
-                  {n.cat}
-                </span>
-                <h4 style={{ fontSize: 15.5, fontWeight: 500, marginBottom: 6, lineHeight: 1.35 }}>{n.title}</h4>
-                <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
-              </div>
-            ))}
-          </div>
+          {news.length === 0 ? (
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>Ainda não há notícias publicadas.</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+              {news.map((n) => (
+                <div key={n.id} style={{ borderTop: '2px solid var(--line)', paddingTop: 14 }}>
+                  {n.cover_image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={n.cover_image_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 6, marginBottom: 12 }} />
+                  )}
+                  <span style={{
+                    fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, textTransform: 'uppercase',
+                    letterSpacing: '0.05em', color: 'var(--telha)', display: 'block', marginBottom: 8,
+                  }}>
+                    {n.category}
+                  </span>
+                  <h4 style={{ fontSize: 15.5, fontWeight: 500, marginBottom: 6, lineHeight: 1.35 }}>{n.title}</h4>
+                  <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

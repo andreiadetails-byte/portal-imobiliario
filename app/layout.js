@@ -1,5 +1,6 @@
 import './globals.css';
 import { LanguageProvider } from '../lib/i18n';
+import SupportAgentWidget from '../components/SupportAgentWidget';
 
 export const metadata = {
   title: 'Morada — Portal imobiliário',
@@ -10,7 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-PT">
       <body>
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          {children}
+          <SupportAgentWidget />
+        </LanguageProvider>
       </body>
     </html>
   );
