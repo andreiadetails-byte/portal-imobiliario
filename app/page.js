@@ -103,6 +103,64 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <section style={{ padding: '0 0 64px' }}>
+        <div className="wrap">
+          <div style={{
+            background: 'var(--brass)', borderRadius: 10, padding: '36px 40px',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 24, flexWrap: 'wrap',
+          }}>
+            <div>
+              <h2 className="display" style={{ fontSize: 22, marginBottom: 6 }}>{t('home_valuation_title')}</h2>
+              <p style={{ fontSize: 14, color: '#5C4E2A', maxWidth: 420 }}>{t('home_valuation_sub')}</p>
+            </div>
+            <Link href="/publish" className="btn btn-primary">{t('home_valuation_btn')}</Link>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '0 0 64px' }}>
+        <div className="wrap">
+          <h2 className="display" style={{ fontSize: 22, marginBottom: 4 }}>{t('home_districts_title')}</h2>
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+            {['Lisboa', 'Porto', 'Faro', 'Setúbal', 'Braga', 'Leiria', 'Aveiro', 'Coimbra'].map((d) => (
+              <Link
+                key={d}
+                href={`/results?location=${encodeURIComponent(d)}`}
+                className="card"
+                style={{ padding: '16px 18px', fontSize: 14, fontWeight: 500 }}
+              >
+                {d}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '0 0 80px' }}>
+        <div className="wrap">
+          <h2 className="display" style={{ fontSize: 22, marginBottom: 20 }}>{t('home_news_title')}</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {[
+              { cat: t('news_cat_housing'), title: t('news1_title'), body: t('news1_body') },
+              { cat: t('news_cat_credit'), title: t('news2_title'), body: t('news2_body') },
+              { cat: t('news_cat_construction'), title: t('news3_title'), body: t('news3_body') },
+            ].map((n, i) => (
+              <div key={i} style={{ borderTop: '2px solid var(--line)', paddingTop: 14 }}>
+                <span style={{
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, textTransform: 'uppercase',
+                  letterSpacing: '0.05em', color: 'var(--telha)', display: 'block', marginBottom: 8,
+                }}>
+                  {n.cat}
+                </span>
+                <h4 style={{ fontSize: 15.5, fontWeight: 500, marginBottom: 6, lineHeight: 1.35 }}>{n.title}</h4>
+                <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   );
 }
