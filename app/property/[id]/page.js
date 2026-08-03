@@ -188,36 +188,44 @@ export default function PropertyPage() {
             </Link>
           )}
 
-          <button onClick={startConversation} className="btn btn-block" style={{ marginBottom: 14 }}>
-            {t('property_chat_btn')}
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 16px', fontSize: 11.5, color: 'var(--text-soft)' }}>
-            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
-            {t('property_or_form')}
-            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
-          </div>
-
-          {sent ? (
-            <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+          {user && user.id === property.owner_id ? (
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', textAlign: 'center', padding: '12px 0' }}>
+              {t('property_own_listing')}
+            </p>
           ) : (
-            <form onSubmit={handleSendLead}>
-              <div className="field">
-                <label>{t('property_name')}</label>
-                <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
+            <>
+              <button onClick={startConversation} className="btn btn-block" style={{ marginBottom: 14 }}>
+                {t('property_chat_btn')}
+              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 16px', fontSize: 11.5, color: 'var(--text-soft)' }}>
+                <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+                {t('property_or_form')}
+                <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
               </div>
-              <div className="field">
-                <label>{t('property_phone')}</label>
-                <input required value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
-              </div>
-              <div className="field">
-                <label>{t('property_message')}</label>
-                <textarea rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
-              </div>
-              <button type="submit" className="btn btn-primary btn-block">{t('property_send')}</button>
-              <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
-                {t('property_privacy')}
-              </p>
-            </form>
+
+              {sent ? (
+                <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+              ) : (
+                <form onSubmit={handleSendLead}>
+                  <div className="field">
+                    <label>{t('property_name')}</label>
+                    <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('property_phone')}</label>
+                    <input required value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('property_message')}</label>
+                    <textarea rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-block">{t('property_send')}</button>
+                  <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
+                    {t('property_privacy')}
+                  </p>
+                </form>
+              )}
+            </>
           )}
         </aside>
       </div>
