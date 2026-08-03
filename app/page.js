@@ -11,6 +11,8 @@ export default function HomePage() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState('');
+  const [businessType, setBusinessType] = useState('Venda');
+  const [stats, setStats] = useState({ totalProperties: 0, totalDistricts: 0 });
 
   useEffect(() => {
     async function loadProperties() {
@@ -24,12 +26,26 @@ export default function HomePage() {
       if (!error) setProperties(data || []);
       setLoading(false);
     }
+
+    async function loadStats() {
+      const { count } = await supabase
+        .from('properties').select('id', { count: 'exact', head: true }).eq('status', 'ativo');
+
+      const { data: districtsData } = await supabase
+        .from('properties').select('district').eq('status', 'ativo');
+
+      const uniqueDistricts = new Set((districtsData || []).map((d) => d.district)).size;
+
+      setStats({ totalProperties: count || 0, totalDistricts: uniqueDistricts });
+    }
+
     loadProperties();
+    loadStats();
   }, []);
 
   function handleSearch(e) {
     e.preventDefault();
-    window.location.href = `/results?location=${encodeURIComponent(location)}`;
+    window.location.href = `/results?location=${encodeURIComponent(location)}&business=${businessType}`;
   }
 
   return (
@@ -48,26 +64,76 @@ export default function HomePage() {
         <div className="tile-strip" />
       </header>
 
-      <section style={{ padding: '64px 0' }}>
-        <div className="wrap">
-          <h1 className="display" style={{ fontSize: 44, marginBottom: 16 }}>
+      <section
+        style={{
+          padding: '88px 0 56px',
+          backgroundImage: 'radial-gradient(circle at 18px 18px, rgba(126,143,106,0.14) 2px, transparent 2.4px)',
+          backgroundSize: '36px 36px',
+        }}
+      >
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <span style={{
+            fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.08em',
+            textTransform: 'uppercase', color: 'var(--telha)', marginBottom: 18, display: 'block',
+          }}>
+            {t('home_eyebrow')}
+          </span>
+          <h1 className="display" style={{ fontSize: 48, lineHeight: 1.08, letterSpacing: '-0.01em', marginBottom: 14 }}>
             {t('home_title')}
           </h1>
+          <p style={{ fontSize: 16, color: 'var(--text-soft)', maxWidth: 480, marginBottom: 36 }}>
+            {t('home_lede')}
+          </p>
+        </div>
 
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 12, maxWidth: 560 }}>
-            <input
-              type="text"
-              placeholder={t('home_search_placeholder')}
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              style={{ flex: 1, padding: '12px 14px', border: '1px solid var(--line)', borderRadius: 5 }}
-            />
-            <button type="submit" className="btn btn-primary">{t('home_search_btn')}</button>
+        <div className="wrap">
+          <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760 }}>
+            <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
+              {['Venda', 'Arrendamento'].map((bt) => (
+                <button
+                  key={bt}
+                  type="button"
+                  onClick={() => setBusinessType(bt)}
+                  style={{
+                    fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 600, padding: '8px 16px',
+                    border: 'none', background: 'transparent', cursor: 'pointer',
+                    color: businessType === bt ? 'var(--ink)' : 'var(--text-soft)',
+                    borderBottom: businessType === bt ? '2px solid var(--telha)' : '2px solid transparent',
+                  }}
+                >
+                  {bt === 'Venda' ? t('results_buy') : t('results_rent')}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <input
+                type="text"
+                placeholder={t('home_search_placeholder')}
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                style={{ flex: 1, padding: '12px 14px', border: '1px solid var(--line)', borderRadius: 5 }}
+              />
+              <button type="submit" className="btn btn-primary">{t('home_search_btn')}</button>
+            </div>
           </form>
         </div>
       </section>
 
-      <section style={{ padding: '32px 0 80px' }}>
+      <div style={{ borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', background: 'var(--paper)' }}>
+        <div className="wrap" style={{ display: 'flex', gap: 48, padding: '24px 32px', flexWrap: 'wrap' }}>
+          <div>
+            <b className="display" style={{ fontSize: 24, display: 'block' }}>{stats.totalProperties}</b>
+            <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{t('home_stat_properties')}</span>
+          </div>
+          <div>
+            <b className="display" style={{ fontSize: 24, display: 'block' }}>{stats.totalDistricts}</b>
+            <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{t('home_stat_districts')}</span>
+          </div>
+        </div>
+      </div>
+
+      <section style={{ padding: '48px 0 80px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 26, marginBottom: 24 }}>{t('home_featured')}</h2>
 
@@ -161,6 +227,44 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
+        <div className="wrap" style={{ padding: '48px 32px 32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, marginBottom: 32 }}>
+            <div>
+              <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
+                {t('footer_search')}
+              </h5>
+              <Link href="/results" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_buy')}</Link>
+              <Link href="/results" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_rent')}</Link>
+            </div>
+            <div>
+              <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
+                {t('footer_have_property')}
+              </h5>
+              <Link href="/publish" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_publish')}</Link>
+              <Link href="/dashboard" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_dashboard')}</Link>
+            </div>
+            <div>
+              <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
+                {t('footer_account')}
+              </h5>
+              <Link href="/login" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_login')}</Link>
+              <Link href="/favorites" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('nav_favorites')}</Link>
+              <Link href="/chat" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('nav_chat')}</Link>
+            </div>
+            <div>
+              <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
+                {t('footer_about')}
+              </h5>
+              <span style={{ display: 'block', fontSize: 13.5, padding: '5px 0', color: 'var(--text-soft)' }}>{t('footer_about_text')}</span>
+            </div>
+          </div>
+          <div style={{ borderTop: '1px solid var(--line)', paddingTop: 20, fontSize: 13, color: 'var(--text-soft)' }}>
+            © 2026 morada — {t('footer_tagline')}
+          </div>
+        </div>
+      </footer>
     </>
   );
 }

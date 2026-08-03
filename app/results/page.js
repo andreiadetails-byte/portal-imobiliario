@@ -19,7 +19,7 @@ function ResultsInner() {
   const [count, setCount] = useState(0);
 
   const [district, setDistrict] = useState(searchParams.get('location') || '');
-  const [businessType, setBusinessType] = useState('Venda');
+  const [businessType, setBusinessType] = useState(searchParams.get('business') || 'Venda');
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedTypologies, setSelectedTypologies] = useState([]);
   const [maxPrice, setMaxPrice] = useState('');
