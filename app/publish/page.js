@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
+import LocationAutocomplete from '../../components/LocationAutocomplete';
 
 const CARACTERISTICAS = [
   'Elevador', 'Garagem', 'Varanda', 'Arrecadação', 'Cozinha equipada', 'Aquecimento central',
@@ -23,7 +24,7 @@ export default function PublishPage() {
   const [form, setForm] = useState({
     title: '', description: '', property_type: 'Apartamento', typology: 'T3',
     business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: 3, bathrooms: 2,
-    state: 'Usado', energy_certificate: 'B', address: '', district: 'Lisboa',
+    state: 'Usado', energy_certificate: 'B', address: '', district: '', municipality: '', parish: '',
   });
 
   useEffect(() => {
@@ -73,6 +74,12 @@ export default function PublishPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+
+    if (!form.district) {
+      setError('Por favor, escolha um distrito na localização.');
+      return;
+    }
+
     setSaving(true);
 
     const { data, error } = await supabase.from('properties').insert({
@@ -91,6 +98,8 @@ export default function PublishPage() {
       energy_certificate: form.energy_certificate,
       address: form.address,
       district: form.district,
+      municipality: form.municipality || null,
+      parish: form.parish || null,
       features,
       status: 'em_revisao',
     }).select().single();
@@ -156,8 +165,16 @@ export default function PublishPage() {
         </div>
 
         <div className="field">
-          <label>Distrito</label>
-          <input required value={form.district} onChange={(e) => updateField('district', e.target.value)} />
+          <label>Localização</label>
+          <LocationAutocomplete
+            onLevels={({ distrito, concelho, freguesia }) => {
+              updateField('district', distrito || '');
+              updateField('municipality', concelho || '');
+              updateField('parish', freguesia || '');
+            }}
+            onChange={() => {}}
+            placeholder="Escreva o distrito"
+          />
         </div>
 
         <div className="field">

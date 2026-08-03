@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import LocationAutocomplete from '../components/LocationAutocomplete';
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -108,13 +109,7 @@ export default function HomePage() {
             </div>
 
             <div style={{ display: 'flex', gap: 12 }}>
-              <input
-                type="text"
-                placeholder={t('home_search_placeholder')}
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                style={{ flex: 1, padding: '12px 14px', border: '1px solid var(--line)', borderRadius: 5 }}
-              />
+              <LocationAutocomplete onChange={setLocation} placeholder={t('home_search_placeholder')} />
               <button type="submit" className="btn btn-primary">{t('home_search_btn')}</button>
             </div>
           </form>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import LocationAutocomplete from '../../components/LocationAutocomplete';
 
 function ResultsInner() {
   const searchParams = useSearchParams();
@@ -44,7 +45,7 @@ function ResultsInner() {
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
-    if (district) query = query.ilike('district', `%${district}%`);
+    if (district) query = query.or(`district.ilike.%${district}%,address.ilike.%${district}%`);
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
@@ -90,7 +91,7 @@ function ResultsInner() {
 
             <div className="field">
               <label>{t('results_district')}</label>
-              <input value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="ex: Lisboa" />
+              <LocationAutocomplete onChange={setDistrict} placeholder="ex: Lisboa" />
             </div>
 
             <div className="field">
