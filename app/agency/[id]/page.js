@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
+import Header from '../../../components/Header';
 
 export default function AgencyPage() {
   const { id } = useParams();
@@ -32,20 +33,18 @@ export default function AgencyPage() {
     if (id) load();
   }, [id]);
 
-  if (loading) return <div className="wrap" style={{ padding: 60 }}>...</div>;
-  if (!profile) return <div className="wrap" style={{ padding: 60 }}>Perfil não encontrado.</div>;
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
+  if (!profile) return (<><Header /><div className="wrap" style={{ padding: 60 }}>Perfil não encontrado.</div></>);
 
   const initials = (profile.agency_name || profile.full_name || '?')
     .split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
   return (
     <div>
+      <Header />
       <div style={{ height: 140, background: 'linear-gradient(135deg, var(--telha) 0%, #3E4A32 100%)' }} />
 
       <div className="wrap" style={{ paddingTop: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 14 }}>
-          <LanguageSwitcher />
-        </div>
         <div style={{ display: 'flex', gap: 20, alignItems: 'flex-end', marginTop: -26, paddingBottom: 24, borderBottom: '1px solid var(--line)', flexWrap: 'wrap' }}>
           <div style={{
             width: 84, height: 84, borderRadius: 10, background: 'var(--paper)', border: '4px solid var(--paper)',

@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import LocationAutocomplete from '../components/LocationAutocomplete';
+import Header from '../components/Header';
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -51,19 +52,7 @@ export default function HomePage() {
 
   return (
     <>
-      <header className="site-header">
-        <div className="navbar">
-          <div className="logo">more<span>&middot;</span>ada</div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <LanguageSwitcher />
-            <Link href="/chat" className="btn" style={{ marginRight: 12 }}>{t('nav_chat')}</Link>
-            <Link href="/favorites" className="btn" style={{ marginRight: 12 }}>{t('nav_favorites')}</Link>
-            <Link href="/login" className="btn" style={{ marginRight: 12 }}>{t('nav_login')}</Link>
-            <Link href="/publish" className="btn btn-primary">{t('nav_publish')}</Link>
-          </div>
-        </div>
-        <div className="tile-strip" />
-      </header>
+      <Header />
 
       <section
         style={{

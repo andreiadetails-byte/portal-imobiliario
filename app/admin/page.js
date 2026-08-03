@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
+import Header from '../../components/Header';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -40,18 +41,23 @@ export default function AdminPage() {
     setProperties((cur) => cur.filter((p) => p.id !== id));
   }
 
-  if (checking) return <div className="wrap" style={{ padding: 60 }}>A verificar acesso...</div>;
+  if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar acesso...</div></>);
 
   if (!allowed) {
     return (
-      <div className="wrap" style={{ padding: 60 }}>
-        <h1 className="display" style={{ fontSize: 22 }}>Sem acesso</h1>
-        <p style={{ color: 'var(--text-soft)' }}>Esta página é só para administradores.</p>
-      </div>
+      <>
+        <Header />
+        <div className="wrap" style={{ padding: 60 }}>
+          <h1 className="display" style={{ fontSize: 22 }}>Sem acesso</h1>
+          <p style={{ color: 'var(--text-soft)' }}>Esta página é só para administradores.</p>
+        </div>
+      </>
     );
   }
 
   return (
+    <>
+      <Header />
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>Administração de anúncios</h1>
 
@@ -102,5 +108,6 @@ export default function AdminPage() {
         ))}
       </div>
     </div>
+    </>
   );
 }

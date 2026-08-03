@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
+import Header from '../../../components/Header';
 
 export default function PropertyPage() {
   const { id } = useParams();
@@ -90,10 +91,12 @@ export default function PropertyPage() {
     setSent(true);
   }
 
-  if (loading) return <div className="wrap" style={{ padding: 60 }}>...</div>;
-  if (!property) return <div className="wrap" style={{ padding: 60 }}>{t('property_not_found')}</div>;
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
+  if (!property) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('property_not_found')}</div></>);
 
   return (
+    <>
+      <Header />
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
       {photos.length > 0 ? (
         <div>
@@ -230,5 +233,6 @@ export default function PropertyPage() {
         </aside>
       </div>
     </div>
+    </>
   );
 }

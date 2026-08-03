@@ -45,7 +45,7 @@ export async function POST(request) {
             <p><b>Telefone:</b> ${lead.phone || '—'}</p>
             <p><b>Mensagem:</b> ${lead.message || '—'}</p>
             <p style="margin-top: 24px;">
-              <a href="https://SEU-SITE.netlify.app/dashboard" style="color: #5A6B49;">Ver no painel do Morada</a>
+              <a href="https://portalimobiliario.netlify.app/dashboard" style="color: #5A6B49;">Ver no painel do Morada</a>
             </p>
           </div>
         `,

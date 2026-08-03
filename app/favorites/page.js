@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import Header from '../../components/Header';
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -37,17 +38,20 @@ export default function FavoritesPage() {
     setProperties((cur) => cur.filter((p) => p.id !== propertyId));
   }
 
-  if (loading) return <div className="wrap" style={{ padding: 60 }}>...</div>;
+  if (loading) return (
+    <><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>
+  );
 
   return (
-    <div className="wrap" style={{ padding: '40px 32px 80px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 className="display" style={{ fontSize: 26 }}>{t('favorites_title')}</h1>
-        <LanguageSwitcher />
-      </div>
+    <>
+      <Header />
+      <div className="wrap" style={{ padding: '40px 32px 80px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <h1 className="display" style={{ fontSize: 26 }}>{t('favorites_title')}</h1>
+        </div>
 
-      {properties.length === 0 && (
-        <div className="empty-state">{t('favorites_empty')}</div>
+        {properties.length === 0 && (
+          <div className="empty-state">{t('favorites_empty')}</div>
       )}
 
       <div className="grid-listings">
@@ -77,6 +81,7 @@ export default function FavoritesPage() {
           </div>
         ))}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

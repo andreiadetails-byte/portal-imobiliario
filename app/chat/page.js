@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import Header from '../../components/Header';
 
 function ChatInner() {
   const router = useRouter();
@@ -65,13 +66,14 @@ function ChatInner() {
 
   const activeConversation = conversations.find((c) => c.id === activeId);
 
-  if (loading) return <div className="wrap" style={{ padding: 60 }}>...</div>;
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
 
   return (
+    <>
+      <Header />
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h1 className="display" style={{ fontSize: 26 }}>{t('chat_title')}</h1>
-        <LanguageSwitcher />
       </div>
 
       {conversations.length === 0 ? (
@@ -130,6 +132,7 @@ function ChatInner() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

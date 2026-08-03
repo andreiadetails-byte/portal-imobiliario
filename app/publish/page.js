@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
+import Header from '../../components/Header';
 
 const CARACTERISTICAS = [
   'Elevador', 'Garagem', 'Varanda', 'Arrecadação', 'Cozinha equipada', 'Aquecimento central',
@@ -114,9 +115,11 @@ export default function PublishPage() {
     router.push('/dashboard');
   }
 
-  if (!user) return <div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div>;
+  if (!user) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div></>);
 
   return (
+    <>
+      <Header />
     <div className="wrap" style={{ maxWidth: 720, padding: '48px 32px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 className="display" style={{ fontSize: 28 }}>{t('publish_title')}</h1>
@@ -261,5 +264,6 @@ export default function PublishPage() {
         </p>
       </form>
     </div>
+    </>
   );
 }

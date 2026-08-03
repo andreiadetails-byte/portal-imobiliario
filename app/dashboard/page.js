@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import Header from '../../components/Header';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -46,14 +47,15 @@ export default function DashboardPage() {
     router.push('/');
   }
 
-  if (loading) return <div className="wrap" style={{ padding: 60 }}>...</div>;
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
 
   return (
+    <>
+      <Header />
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
         <h1 className="display" style={{ fontSize: 28 }}>{t('dashboard_hi')}, {profile?.full_name || ''}</h1>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <LanguageSwitcher />
           <Link href="/publish" className="btn btn-primary" style={{ marginRight: 12 }}>{t('dashboard_new')}</Link>
           <button onClick={handleLogout} className="btn">{t('nav_logout')}</button>
         </div>
@@ -102,5 +104,6 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

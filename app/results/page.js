@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
+import Header from '../../components/Header';
 
 function ResultsInner() {
   const searchParams = useSearchParams();
@@ -64,16 +65,7 @@ function ResultsInner() {
 
   return (
     <>
-      <header className="site-header">
-        <div className="navbar">
-          <Link href="/" className="logo">more<span>&middot;</span>ada</Link>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <LanguageSwitcher />
-            <Link href="/publish" className="btn btn-primary">{t('nav_publish')}</Link>
-          </div>
-        </div>
-        <div className="tile-strip" />
-      </header>
+      <Header />
 
       <div className="wrap" style={{ padding: '32px' }}>
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('results_title')}</h1>
