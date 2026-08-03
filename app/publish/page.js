@@ -122,7 +122,7 @@ export default function PublishPage() {
         <h1 className="display" style={{ fontSize: 28 }}>{t('publish_title')}</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="card" style={{ padding: 32 }}>
+      <form onSubmit={handleSubmit} className="card" style={{ padding: 32, overflow: 'visible' }}>
         <div className="field">
           <label>Título do anúncio (opcional)</label>
           <input value={form.title} onChange={(e) => updateField('title', e.target.value)} placeholder="ex: T3 remodelado em Campo de Ourique" />

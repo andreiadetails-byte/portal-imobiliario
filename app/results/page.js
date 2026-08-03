@@ -80,7 +80,7 @@ function ResultsInner() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 28, alignItems: 'start' }}>
 
-          <form onSubmit={runSearch} className="card" style={{ padding: 18, position: 'sticky', top: 90 }}>
+          <form onSubmit={runSearch} className="card" style={{ padding: 18, position: 'sticky', top: 90, overflow: 'visible' }}>
             <div className="field">
               <label>{t('results_business')}</label>
               <select value={businessType} onChange={(e) => setBusinessType(e.target.value)}>

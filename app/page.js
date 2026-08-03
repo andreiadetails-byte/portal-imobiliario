@@ -89,7 +89,7 @@ export default function HomePage() {
         </div>
 
         <div className="wrap">
-          <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760, boxShadow: '0 8px 30px rgba(0,0,0,0.25)' }}>
+          <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760, boxShadow: '0 8px 30px rgba(0,0,0,0.25)', overflow: 'visible' }}>
             <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
               {['Venda', 'Arrendamento'].map((bt) => (
                 <button
