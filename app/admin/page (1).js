@@ -68,6 +68,11 @@ export default function AdminPage() {
     setSupportMessages(data || []);
   }
 
+  async function resolveSupportMessage(id) {
+    await supabase.from('support_requests').update({ status: 'resolvida' }).eq('id', id);
+    setSupportMessages((cur) => cur.map((m) => (m.id === id ? { ...m, status: 'resolvida' } : m)));
+  }
+
   async function loadReports() {
     const { data } = await supabase
       .from('reports')
@@ -287,9 +292,18 @@ export default function AdminPage() {
           {supportMessages.length === 0 && <p className="empty-state">Ainda não chegou nenhuma mensagem.</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {supportMessages.map((m) => (
-              <div key={m.id} className="card" style={{ padding: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <b style={{ fontSize: 14 }}>{m.name}</b>
+              <div key={m.id} className="card" style={{ padding: 16, opacity: m.status === 'resolvida' ? 0.55 : 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, flexWrap: 'wrap', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <b style={{ fontSize: 14 }}>{m.name}</b>
+                    <span style={{
+                      fontSize: 10.5, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
+                      background: m.status === 'resolvida' ? 'var(--line)' : 'rgba(126,143,106,0.18)',
+                      color: m.status === 'resolvida' ? 'var(--text-soft)' : 'var(--telha)',
+                    }}>
+                      {m.status === 'resolvida' ? 'Resolvida' : 'Por responder'}
+                    </span>
+                  </div>
                   <span style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
                     {new Date(m.created_at).toLocaleString('pt-PT')}
                   </span>
@@ -297,7 +311,23 @@ export default function AdminPage() {
                 <div className="meta" style={{ marginBottom: 6 }}>
                   Falou com a "agente" {m.agent_name} · Contacto: {m.contact || 'não fornecido'}
                 </div>
-                <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>{m.message}</p>
+                <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 12 }}>{m.message}</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {m.contact && (
+                    <a
+                      href={m.contact.includes('@') ? `mailto:${m.contact}` : `tel:${m.contact}`}
+                      className="btn btn-primary"
+                      style={{ fontSize: 12.5 }}
+                    >
+                      Responder
+                    </a>
+                  )}
+                  {m.status !== 'resolvida' && (
+                    <button onClick={() => resolveSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5 }}>
+                      Marcar como resolvida
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
