@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 const NOMES = ['Beatriz', 'Inês', 'Mariana', 'Catarina', 'Carolina', 'Sofia', 'Joana', 'Rita', 'Leonor', 'Matilde'];
@@ -24,11 +24,17 @@ function AgentAvatar({ size = 46 }) {
 }
 
 export default function SupportAgentWidget() {
-  const [agentName] = useState(randomAgentName);
+  const [agentName, setAgentName] = useState(null);
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: '', contact: '', message: '' });
+
+  useEffect(() => {
+    setAgentName(randomAgentName());
+  }, []);
+
+  if (!agentName) return null;
 
   async function handleSubmit(e) {
     e.preventDefault();
