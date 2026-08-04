@@ -34,7 +34,7 @@ function ResultsInner() {
   const [minArea, setMinArea] = useState('');
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [sortBy, setSortBy] = useState('recent');
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(true);
   const [mapFilterIds, setMapFilterIds] = useState(null);
 
   useEffect(() => {
