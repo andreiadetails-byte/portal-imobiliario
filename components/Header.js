@@ -11,11 +11,16 @@ export default function Header() {
   const { t } = useLanguage();
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user || null);
+      if (data.user) {
+        const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', data.user.id).single();
+        setIsAdmin(!!profile?.is_admin);
+      }
       setChecked(true);
     });
   }, []);
@@ -37,6 +42,9 @@ export default function Header() {
           {checked && user ? (
             <>
               <Link href="/dashboard" className="btn" style={{ marginRight: 12 }}>{t('dashboard_my_listings')}</Link>
+              {isAdmin && (
+                <Link href="/admin" className="btn" style={{ marginRight: 12, color: 'var(--telha)' }}>Admin</Link>
+              )}
               <button onClick={handleLogout} className="btn" style={{ marginRight: 12 }}>{t('nav_logout')}</button>
             </>
           ) : (
