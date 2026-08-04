@@ -93,14 +93,14 @@ export default function LoginPage() {
         {!forgotMode && (
           <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid var(--line)', marginBottom: 20 }}>
             <button
-              onClick={() => setMode('login')}
+              onClick={() => { setMode('login'); setEmail(''); setPassword(''); setError(''); }}
               style={{ background: 'none', border: 'none', padding: '0 0 12px', fontWeight: 600, cursor: 'pointer',
                        color: mode === 'login' ? 'var(--ink)' : 'var(--text-soft)',
                        borderBottom: mode === 'login' ? '2px solid var(--telha)' : '2px solid transparent' }}>
               {t('login_login')}
             </button>
             <button
-              onClick={() => setMode('signup')}
+              onClick={() => { setMode('signup'); setEmail(''); setPassword(''); setError(''); }}
               style={{ background: 'none', border: 'none', padding: '0 0 12px', fontWeight: 600, cursor: 'pointer',
                        color: mode === 'signup' ? 'var(--ink)' : 'var(--text-soft)',
                        borderBottom: mode === 'signup' ? '2px solid var(--telha)' : '2px solid transparent' }}>
@@ -189,15 +189,15 @@ export default function LoginPage() {
 
             <div className="field">
               <label>{t('login_name')}</label>
-              <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <input type="text" required autoComplete="off" value={fullName} onChange={(e) => setFullName(e.target.value)} />
             </div>
             <div className="field">
               <label>{t('login_email')}</label>
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="email" required autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="field">
               <label>{t('login_pw_min')}</label>
-              <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <input type="password" required minLength={6} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
             <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
