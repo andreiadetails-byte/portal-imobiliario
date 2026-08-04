@@ -114,6 +114,16 @@ export default function HomePage() {
               <button type="submit" className="btn btn-primary">{t('home_search_btn')}</button>
             </div>
           </form>
+
+          <Link
+            href="/results"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 16,
+              fontSize: 13.5, fontWeight: 600, color: '#fff', textDecoration: 'underline', textUnderlineOffset: 3,
+            }}
+          >
+            🗺️ Prefere desenhar a sua zona no mapa?
+          </Link>
         </div>
       </section>
 
