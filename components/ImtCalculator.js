@@ -46,15 +46,20 @@ function PillGroup({ options, value, onChange }) {
 
 export default function ImtCalculator({ price }) {
   const [value, setValue] = useState(price);
+  const [isResident, setIsResident] = useState('Sim');
   const [under35, setUnder35] = useState('Não');
   const [firstHome, setFirstHome] = useState('Sim');
 
-  const isJovemElegivel = under35 === 'Sim' && firstHome === 'Sim';
+  const isJovemElegivel = isResident === 'Sim' && under35 === 'Sim' && firstHome === 'Sim';
 
   let imt;
   let selo;
 
-  if (isJovemElegivel) {
+  if (isResident === 'Não') {
+    // Decreto-Lei n.º 97/2026 — taxa fixa de 7,5% para não residentes fiscais (desde 25/05/2026)
+    imt = value * 0.075;
+    selo = value * 0.008;
+  } else if (isJovemElegivel) {
     if (value <= LIMITE_JOVEM_TOTAL) {
       imt = 0;
       selo = 0;
@@ -90,21 +95,35 @@ export default function ImtCalculator({ price }) {
       </div>
 
       <div className="field">
-        <label>Tens 35 anos ou menos?</label>
-        <PillGroup value={under35} onChange={setUnder35} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
+        <label>É residente fiscal em Portugal?</label>
+        <PillGroup value={isResident} onChange={setIsResident} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
       </div>
 
-      {under35 === 'Sim' && (
-        <div className="field">
-          <label>É a tua primeira habitação própria?</label>
-          <PillGroup value={firstHome} onChange={setFirstHome} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
-        </div>
-      )}
-
-      {isJovemElegivel && value <= LIMITE_JOVEM_TOTAL && (
-        <p style={{ fontSize: 12, color: 'var(--telha)', marginBottom: 12 }}>
-          ✓ Com o regime "IMT Jovem", este imóvel fica isento de IMT e de Imposto do Selo.
+      {isResident === 'Não' ? (
+        <p style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 12 }}>
+          Desde maio de 2026, não residentes pagam uma taxa fixa de 7,5% de IMT na compra de habitação.
+          Há exceções (ex: antigo residente fiscal, mudança de residência dentro do prazo legal, certos arrendamentos acessíveis) — confirme se alguma se aplica ao seu caso.
         </p>
+      ) : (
+        <>
+          <div className="field">
+            <label>Tens 35 anos ou menos?</label>
+            <PillGroup value={under35} onChange={setUnder35} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
+          </div>
+
+          {under35 === 'Sim' && (
+            <div className="field">
+              <label>É a tua primeira habitação própria?</label>
+              <PillGroup value={firstHome} onChange={setFirstHome} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
+            </div>
+          )}
+
+          {isJovemElegivel && value <= LIMITE_JOVEM_TOTAL && (
+            <p style={{ fontSize: 12, color: 'var(--telha)', marginBottom: 12 }}>
+              ✓ Com o regime "IMT Jovem", este imóvel fica isento de IMT e de Imposto do Selo.
+            </p>
+          )}
+        </>
       )}
 
       <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 6 }}>
