@@ -15,7 +15,7 @@ const CARACTERISTICAS = [
 
 const TIPOS_IMOVEL = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Quarto'];
 const SUBTIPOS_MORADIA = ['Moradia bifamiliar', 'Moradia geminada', 'Moradia em banda', 'Moradia independente'];
-const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente', 'Norte/Nascente', 'Norte/Poente', 'Sul/Nascente', 'Sul/Poente'];
+const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente'];
 
 function YesNoField({ label, value, onChange }) {
   return (
@@ -47,6 +47,7 @@ export default function PublishPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [features, setFeatures] = useState(['Elevador', 'Garagem']);
+  const [solarOrientations, setSolarOrientations] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [photos, setPhotos] = useState([]); // { file, preview }
@@ -56,7 +57,7 @@ export default function PublishPage() {
     title: '', description: '', property_type: 'Apartamento', typology: 'T3',
     business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: 3, bathrooms: 2,
     state: 'Usado', energy_certificate: 'B', address: '', district: '', municipality: '', parish: '',
-    floor: '', solar_orientation: '', house_subtype: '',
+    floor: '', area_util: '', house_subtype: '',
     has_storage: null, has_parking: null, has_balcony: null,
     has_garden: null, has_pool: null, has_gym: null, has_coworking: null,
     show_full_address: null,
@@ -84,7 +85,7 @@ export default function PublishPage() {
     // Planta anexada — 10 pontos
     if (planFile) score += 10;
     // Orientação solar preenchida — 10 pontos
-    if (form.solar_orientation) score += 10;
+    if (solarOrientations.length > 0) score += 10;
     // Título personalizado — 5 pontos
     if (form.title) score += 5;
     // Condomínio preenchido — 10 pontos
@@ -163,6 +164,10 @@ export default function PublishPage() {
       setError('Por favor, indique o piso.');
       return;
     }
+    if (!form.area_util) {
+      setError('Por favor, indique a área útil.');
+      return;
+    }
     if (form.description.trim().length < 50) {
       setError(`A descrição precisa de pelo menos 50 caracteres (tem ${form.description.trim().length}).`);
       return;
@@ -216,7 +221,8 @@ export default function PublishPage() {
       latitude,
       longitude,
       floor: form.floor,
-      solar_orientation: form.solar_orientation || null,
+      area_util: Number(form.area_util),
+      solar_orientations: solarOrientations.length > 0 ? solarOrientations : null,
       house_subtype: form.property_type === 'Moradia' ? form.house_subtype : null,
       has_storage: form.has_storage,
       has_parking: form.has_parking,
@@ -307,18 +313,15 @@ export default function PublishPage() {
             <input required value={form.floor} onChange={(e) => updateField('floor', e.target.value)} placeholder="ex: 3.º, R/C, Cave" />
           </div>
           <div className="field">
-            <label>Orientação solar <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
-            <select value={form.solar_orientation} onChange={(e) => updateField('solar_orientation', e.target.value)}>
-              <option value="">Não especificado</option>
-              {ORIENTACOES.map((o) => <option key={o}>{o}</option>)}
-            </select>
+            <label>Área bruta (m²)</label>
+            <input type="number" required value={form.area} onChange={(e) => updateField('area', e.target.value)} />
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>Área bruta (m²)</label>
-            <input type="number" required value={form.area} onChange={(e) => updateField('area', e.target.value)} />
+            <label>Área útil (m²)</label>
+            <input type="number" required value={form.area_util} onChange={(e) => updateField('area_util', e.target.value)} />
           </div>
           <div className="field">
             <label>Estado</label>
@@ -328,6 +331,26 @@ export default function PublishPage() {
               <option value="Para recuperar">Para recuperar</option>
               <option value="Usado">Usado</option>
             </select>
+          </div>
+        </div>
+
+        <div className="field">
+          <label>Orientação solar <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional, pode escolher mais do que uma)</span></label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {ORIENTACOES.map((o) => (
+              <span
+                key={o}
+                onClick={() => setSolarOrientations((cur) => (cur.includes(o) ? cur.filter((x) => x !== o) : [...cur, o]))}
+                style={{
+                  fontSize: 13, fontWeight: 500, padding: '8px 16px', borderRadius: 20, cursor: 'pointer',
+                  border: '1px solid var(--line)',
+                  background: solarOrientations.includes(o) ? 'var(--azulejo)' : 'var(--paper)',
+                  color: solarOrientations.includes(o) ? '#fff' : 'var(--text-soft)',
+                }}
+              >
+                {o}
+              </span>
+            ))}
           </div>
         </div>
 

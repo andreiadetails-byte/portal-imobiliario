@@ -208,7 +208,8 @@ export default function PropertyPage() {
           </div>
 
           <div style={{ display: 'flex', gap: 24, borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '18px 0', margin: '24px 0', flexWrap: 'wrap' }}>
-            <div><b>{property.area} m²</b><div className="meta">{t('property_area')}</div></div>
+            <div><b>{property.area} m²</b><div className="meta">Área bruta</div></div>
+            {property.area_util && <div><b>{property.area_util} m²</b><div className="meta">Área útil</div></div>}
             <div><b>{property.bedrooms}</b><div className="meta">{t('property_rooms')}</div></div>
             <div><b>{property.bathrooms}</b><div className="meta">{t('property_baths')}</div></div>
             <div><b>{property.energy_certificate || '—'}</b><div className="meta">{t('property_energy')}</div></div>
@@ -225,9 +226,9 @@ export default function PropertyPage() {
           <h3 className="display" style={{ fontSize: 19, marginBottom: 10 }}>{t('property_about')}</h3>
           <p style={{ color: 'var(--text-soft)', fontSize: 14.5 }}>{property.description}</p>
 
-          {property.solar_orientation && (
+          {property.solar_orientations?.length > 0 && (
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginTop: 10 }}>
-              <b style={{ color: 'var(--ink)' }}>Orientação solar:</b> {property.solar_orientation}
+              <b style={{ color: 'var(--ink)' }}>Orientação solar:</b> {property.solar_orientations.join(', ')}
             </p>
           )}
 
