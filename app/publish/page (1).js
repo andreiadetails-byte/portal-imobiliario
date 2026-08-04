@@ -16,6 +16,7 @@ const CARACTERISTICAS = [
 const TIPOS_IMOVEL = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Quarto'];
 const SUBTIPOS_MORADIA = ['Moradia bifamiliar', 'Moradia geminada', 'Moradia em banda', 'Moradia independente'];
 const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente'];
+const PISOS = ['R/C', '1º', '2º', '3º', '4º', '5º', '6º', '7º', '8º', '9º', '10º', 'Superior ao 10º'];
 
 function YesNoField({ label, value, onChange }) {
   return (
@@ -57,7 +58,7 @@ export default function PublishPage() {
     title: '', description: '', property_type: 'Apartamento', typology: 'T3',
     business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: 3, bathrooms: 2,
     state: 'Usado', energy_certificate: 'B', address: '', district: '', municipality: '', parish: '',
-    floor: '', area_util: '', house_subtype: '',
+    floor: '', area_util: '', house_subtype: '', is_top_floor: false,
     has_storage: null, has_parking: null, has_balcony: null,
     has_garden: null, has_pool: null, has_gym: null, has_coworking: null,
     show_full_address: null,
@@ -221,6 +222,7 @@ export default function PublishPage() {
       latitude,
       longitude,
       floor: form.floor,
+      is_top_floor: form.is_top_floor,
       area_util: Number(form.area_util),
       solar_orientations: solarOrientations.length > 0 ? solarOrientations : null,
       house_subtype: form.property_type === 'Moradia' ? form.house_subtype : null,
@@ -310,7 +312,14 @@ export default function PublishPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
             <label>Piso</label>
-            <input required value={form.floor} onChange={(e) => updateField('floor', e.target.value)} placeholder="ex: 3.º, R/C, Cave" />
+            <select required value={form.floor} onChange={(e) => updateField('floor', e.target.value)}>
+              <option value="">Escolha uma opção</option>
+              {PISOS.map((p) => <option key={p}>{p}</option>)}
+            </select>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, fontWeight: 400, fontSize: 13, cursor: 'pointer' }}>
+              <input type="checkbox" checked={form.is_top_floor} onChange={(e) => updateField('is_top_floor', e.target.checked)} />
+              É o último piso do prédio
+            </label>
           </div>
           <div className="field">
             <label>Área bruta (m²)</label>

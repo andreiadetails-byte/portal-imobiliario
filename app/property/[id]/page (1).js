@@ -213,7 +213,9 @@ export default function PropertyPage() {
             <div><b>{property.bedrooms}</b><div className="meta">{t('property_rooms')}</div></div>
             <div><b>{property.bathrooms}</b><div className="meta">{t('property_baths')}</div></div>
             <div><b>{property.energy_certificate || '—'}</b><div className="meta">{t('property_energy')}</div></div>
-            {property.floor && <div><b>{property.floor}</b><div className="meta">Piso</div></div>}
+            {property.floor && (
+              <div><b>{property.floor}{property.is_top_floor ? ' (último)' : ''}</b><div className="meta">Piso</div></div>
+            )}
             {property.state && <div><b>{property.state}</b><div className="meta">Estado</div></div>}
           </div>
 
