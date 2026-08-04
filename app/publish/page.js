@@ -210,7 +210,7 @@ export default function PublishPage() {
       business_type: form.business_type,
       price: Number(form.price),
       condo_fee: form.condo_fee ? Number(form.condo_fee) : null,
-      area: Number(form.area),
+      area: form.area ? Number(form.area) : null,
       bedrooms: Number(form.bedrooms),
       bathrooms: Number(form.bathrooms),
       state: form.state,
@@ -322,14 +322,14 @@ export default function PublishPage() {
             </label>
           </div>
           <div className="field">
-            <label>Área bruta (m²)</label>
-            <input type="number" required value={form.area} onChange={(e) => updateField('area', e.target.value)} />
+            <label>Área bruta (m²) <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+            <input type="number" value={form.area} onChange={(e) => updateField('area', e.target.value)} />
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>Área útil (m²)</label>
+            <label>Área útil (m²) <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>(obrigatório)</span></label>
             <input type="number" required value={form.area_util} onChange={(e) => updateField('area_util', e.target.value)} />
           </div>
           <div className="field">

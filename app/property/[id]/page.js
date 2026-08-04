@@ -208,7 +208,7 @@ export default function PropertyPage() {
           </div>
 
           <div style={{ display: 'flex', gap: 24, borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '18px 0', margin: '24px 0', flexWrap: 'wrap' }}>
-            <div><b>{property.area} m²</b><div className="meta">Área bruta</div></div>
+            {property.area && <div><b>{property.area} m²</b><div className="meta">Área bruta</div></div>}
             {property.area_util && <div><b>{property.area_util} m²</b><div className="meta">Área útil</div></div>}
             <div><b>{property.bedrooms}</b><div className="meta">{t('property_rooms')}</div></div>
             <div><b>{property.bathrooms}</b><div className="meta">{t('property_baths')}</div></div>
