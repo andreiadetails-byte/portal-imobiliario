@@ -14,11 +14,23 @@ const ESCALOES_HPP = [
   { limite: Infinity, taxa: 0.075, abater: 0 }, // taxa única, sem parcela a abater
 ];
 
+// Tabela IMT 2026 — Continente, Habitação Secundária (não HPP)
+// Mesmos escalões da tabela HPP, mas sem isenção no 1º escalão (1% em vez de 0%).
+const ESCALOES_SECUNDARIA = [
+  { limite: 106346, taxa: 0.01, abater: 0 },
+  { limite: 145470, taxa: 0.02, abater: 1063.46 },
+  { limite: 198347, taxa: 0.05, abater: 5427.56 },
+  { limite: 330539, taxa: 0.07, abater: 9394.50 },
+  { limite: 660982, taxa: 0.08, abater: 12699.89 },
+  { limite: 1150853, taxa: 0.06, abater: 0 },
+  { limite: Infinity, taxa: 0.075, abater: 0 },
+];
+
 const LIMITE_JOVEM_TOTAL = 330539;
 const LIMITE_JOVEM_PARCIAL = 660982;
 
-function calcularIMT(valor) {
-  const escalao = ESCALOES_HPP.find((e) => valor <= e.limite);
+function calcularIMT(valor, escaloes = ESCALOES_HPP) {
+  const escalao = escaloes.find((e) => valor <= e.limite);
   return Math.max(0, valor * escalao.taxa - escalao.abater);
 }
 
@@ -47,10 +59,12 @@ function PillGroup({ options, value, onChange }) {
 export default function ImtCalculator({ price }) {
   const [value, setValue] = useState(price);
   const [isResident, setIsResident] = useState('Sim');
+  const [finalidade, setFinalidade] = useState('Própria e permanente');
   const [under35, setUnder35] = useState('Não');
   const [firstHome, setFirstHome] = useState('Sim');
 
-  const isJovemElegivel = isResident === 'Sim' && under35 === 'Sim' && firstHome === 'Sim';
+  const isHPP = finalidade === 'Própria e permanente';
+  const isJovemElegivel = isResident === 'Sim' && isHPP && under35 === 'Sim' && firstHome === 'Sim';
 
   let imt;
   let selo;
@@ -68,11 +82,11 @@ export default function ImtCalculator({ price }) {
       imt = excedente * 0.08;
       selo = excedente * 0.008;
     } else {
-      imt = calcularIMT(value);
+      imt = calcularIMT(value, ESCALOES_HPP);
       selo = value * 0.008;
     }
   } else {
-    imt = calcularIMT(value);
+    imt = calcularIMT(value, isHPP ? ESCALOES_HPP : ESCALOES_SECUNDARIA);
     selo = value * 0.008;
   }
 
@@ -82,8 +96,7 @@ export default function ImtCalculator({ price }) {
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
       <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>Calculadora de IMT</h3>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
-        Estimativa para habitação própria e permanente no Continente, com base nas tabelas de 2026.
-        Para segunda habitação ou Açores/Madeira, confirme na Autoridade Tributária ou com o seu banco.
+        Estimativa para o Continente, com base nas tabelas de 2026. Para Açores/Madeira, confirme na Autoridade Tributária ou com o seu banco.
       </p>
 
       <div className="field">
@@ -95,6 +108,15 @@ export default function ImtCalculator({ price }) {
       </div>
 
       <div className="field">
+        <label>Finalidade</label>
+        <PillGroup
+          value={finalidade}
+          onChange={setFinalidade}
+          options={[{ value: 'Própria e permanente', label: 'Própria e permanente' }, { value: 'Secundária', label: 'Secundária' }]}
+        />
+      </div>
+
+      <div className="field">
         <label>É residente fiscal em Portugal?</label>
         <PillGroup value={isResident} onChange={setIsResident} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
       </div>
@@ -103,6 +125,10 @@ export default function ImtCalculator({ price }) {
         <p style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 12 }}>
           Desde maio de 2026, não residentes pagam uma taxa fixa de 7,5% de IMT na compra de habitação.
           Há exceções (ex: antigo residente fiscal, mudança de residência dentro do prazo legal, certos arrendamentos acessíveis) — confirme se alguma se aplica ao seu caso.
+        </p>
+      ) : !isHPP ? (
+        <p style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 12 }}>
+          Habitação secundária paga sempre mais IMT do que própria e permanente — não há isenção no primeiro escalão nem direito ao regime "IMT Jovem".
         </p>
       ) : (
         <>

@@ -107,6 +107,7 @@ export default function DashboardPage() {
                     ★ Destacar
                   </button>
                 )}
+                <Link href={`/publish?edit=${p.id}`} style={{ fontSize: 13, color: 'var(--telha)' }}>Editar</Link>
                 <Link href={`/property/${p.id}`} style={{ fontSize: 13, color: 'var(--telha)' }}>{t('dashboard_view')}</Link>
                 <button onClick={() => deleteProperty(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#8a3b2a' }}>
                   Apagar

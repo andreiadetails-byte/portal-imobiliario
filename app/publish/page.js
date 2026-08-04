@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
@@ -44,10 +44,15 @@ function YesNoField({ label, value, onChange }) {
   );
 }
 
-export default function PublishPage() {
+function PublishForm() {
   const { t } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('edit');
+  const isEditMode = !!editId;
   const [user, setUser] = useState(null);
+  const [loadingEdit, setLoadingEdit] = useState(isEditMode);
+  const [existingPhotoCount, setExistingPhotoCount] = useState(0);
   const [features, setFeatures] = useState(['Elevador', 'Garagem']);
   const [solarOrientations, setSolarOrientations] = useState([]);
   const [addressType, setAddressType] = useState('Rua');
@@ -70,11 +75,51 @@ export default function PublishPage() {
   });
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) { router.push('/login'); return; }
       setUser(data.user);
+
+      if (editId) {
+        const { data: prop } = await supabase.from('properties').select('*').eq('id', editId).single();
+        if (!prop || prop.owner_id !== data.user.id) {
+          router.push('/dashboard');
+          return;
+        }
+
+        // Tenta separar "Rua das Amoreiras" em tipo de via + resto
+        const tiposVia = ['Rua', 'Avenida', 'Travessa', 'Urb.', 'Praça', 'Largo', 'Alameda'];
+        const partes = (prop.address || '').split(' ');
+        const tipoEncontrado = tiposVia.find((t) => partes[0] === t);
+        if (tipoEncontrado) {
+          setAddressType(tipoEncontrado);
+          setAddressRest(partes.slice(1).join(' '));
+        } else {
+          setAddressRest(prop.address || '');
+        }
+
+        setForm({
+          title: prop.title || '', description: prop.description || '', property_type: prop.property_type || 'Apartamento',
+          typology: prop.typology || 'T3', business_type: prop.business_type || 'Venda',
+          price: prop.price ?? '', condo_fee: prop.condo_fee ?? '', area: prop.area ?? '',
+          bedrooms: prop.bedrooms ?? 3, bathrooms: prop.bathrooms ?? 2, state: prop.state || 'Usado',
+          energy_certificate: prop.energy_certificate || 'B', address: prop.address || '',
+          district: prop.district || '', municipality: prop.municipality || '', parish: prop.parish || '',
+          floor: prop.floor || '', area_util: prop.area_util ?? '', house_subtype: prop.house_subtype || '',
+          is_top_floor: !!prop.is_top_floor,
+          has_storage: prop.has_storage, has_parking: prop.has_parking, has_balcony: prop.has_balcony,
+          has_garden: prop.has_garden, has_pool: prop.has_pool, has_gym: prop.has_gym, has_coworking: prop.has_coworking,
+          show_full_address: prop.show_full_address,
+        });
+        setFeatures(prop.features || []);
+        setSolarOrientations(prop.solar_orientations || []);
+
+        const { count } = await supabase.from('property_photos').select('id', { count: 'exact', head: true }).eq('property_id', editId);
+        setExistingPhotoCount(count || 0);
+
+        setLoadingEdit(false);
+      }
     });
-  }, [router]);
+  }, [router, editId]);
 
   function updateField(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -133,7 +178,7 @@ export default function PublishPage() {
     return publicUrlData.publicUrl;
   }
 
-  async function uploadPhotos(propertyId) {
+  async function uploadPhotos(propertyId, startPosition = 0) {
     for (let i = 0; i < photos.length; i++) {
       const { file } = photos[i];
       const ext = file.name.split('.').pop();
@@ -147,7 +192,7 @@ export default function PublishPage() {
       await supabase.from('property_photos').insert({
         property_id: propertyId,
         url: publicUrlData.publicUrl,
-        position: i,
+        position: startPosition + i,
       });
     }
   }
@@ -156,11 +201,13 @@ export default function PublishPage() {
     e.preventDefault();
     setError('');
 
-    const { count: existingCount } = await supabase
-      .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', user.id);
-    if ((existingCount || 0) >= 50) {
-      setError('Já tem 50 anúncios publicados, que é o limite por utilizador. Apague um anúncio antigo no seu painel para poder publicar um novo.');
-      return;
+    if (!isEditMode) {
+      const { count: existingCount } = await supabase
+        .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', user.id);
+      if ((existingCount || 0) >= 50) {
+        setError('Já tem 50 anúncios publicados, que é o limite por utilizador. Apague um anúncio antigo no seu painel para poder publicar um novo.');
+        return;
+      }
     }
 
     if (!form.district || !form.municipality) {
@@ -193,13 +240,15 @@ export default function PublishPage() {
       return;
     }
 
-    if (!planFile) {
-      setError('Por favor, anexe a planta do imóvel.');
-      return;
-    }
-    if (photos.length < 6) {
-      setError(`Por favor, adicione pelo menos 6 fotografias (tem ${photos.length}).`);
-      return;
+    if (!isEditMode) {
+      if (!planFile) {
+        setError('Por favor, anexe a planta do imóvel.');
+        return;
+      }
+      if (photos.length < 6) {
+        setError(`Por favor, adicione pelo menos 6 fotografias (tem ${photos.length}).`);
+        return;
+      }
     }
 
     setSaving(true);
@@ -207,8 +256,7 @@ export default function PublishPage() {
     const fullAddress = [form.address, form.parish, form.municipality, form.district].filter(Boolean).join(', ');
     const { latitude, longitude } = await geocodeAddress(fullAddress);
 
-    const { data, error } = await supabase.from('properties').insert({
-      owner_id: user.id,
+    const propertyFields = {
       title: form.title || `${form.typology} · ${form.address}`,
       description: form.description,
       property_type: form.property_type,
@@ -241,8 +289,20 @@ export default function PublishPage() {
       has_coworking: form.has_coworking,
       show_full_address: form.show_full_address,
       features,
-      status: 'em_revisao',
-    }).select().single();
+    };
+
+    let propertyId = editId;
+    let error;
+
+    if (isEditMode) {
+      const { error: updateError } = await supabase.from('properties').update(propertyFields).eq('id', editId);
+      error = updateError;
+    } else {
+      const { data, error: insertError } = await supabase.from('properties')
+        .insert({ ...propertyFields, owner_id: user.id, status: 'em_revisao' }).select().single();
+      error = insertError;
+      propertyId = data?.id;
+    }
 
     if (error) { setError(error.message); setSaving(false); return; }
 
@@ -253,17 +313,17 @@ export default function PublishPage() {
     // A planta e as fotos continuam a ser enviadas em segundo plano,
     // sem o utilizador ter de esperar a fazer scroll parado no ecrã.
     (async () => {
-      const planUrl = await uploadPlan(data.id);
+      const planUrl = await uploadPlan(propertyId);
       if (planUrl) {
-        await supabase.from('properties').update({ floor_plan_url: planUrl }).eq('id', data.id);
+        await supabase.from('properties').update({ floor_plan_url: planUrl }).eq('id', propertyId);
       }
       if (photos.length > 0) {
-        await uploadPhotos(data.id);
+        await uploadPhotos(propertyId, existingPhotoCount);
       }
     })();
   }
 
-  if (!user) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div></>);
+  if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div></>);
 
   if (published) {
     return (
@@ -276,9 +336,13 @@ export default function PublishPage() {
           }}>
             ✓
           </div>
-          <h1 className="display" style={{ fontSize: 24, marginBottom: 10 }}>Anúncio publicado!</h1>
+          <h1 className="display" style={{ fontSize: 24, marginBottom: 10 }}>
+            {isEditMode ? 'Anúncio atualizado!' : 'Anúncio publicado!'}
+          </h1>
           <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
-            O seu imóvel está agora <b>em revisão</b> — assim que for aprovado, fica visível no site. Vamos levá-lo para o painel...
+            {isEditMode
+              ? 'As alterações foram guardadas. Vamos levá-lo para o painel...'
+              : (<>O seu imóvel está agora <b>em revisão</b> — assim que for aprovado, fica visível no site. Vamos levá-lo para o painel...</>)}
           </p>
           <Link href="/dashboard" className="btn btn-primary">Ver no meu painel agora</Link>
         </div>
@@ -291,7 +355,7 @@ export default function PublishPage() {
       <Header />
     <div className="wrap" style={{ maxWidth: 720, padding: '48px 32px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 className="display" style={{ fontSize: 28 }}>{t('publish_title')}</h1>
+        <h1 className="display" style={{ fontSize: 28 }}>{isEditMode ? 'Editar anúncio' : t('publish_title')}</h1>
       </div>
 
       <div className="card" style={{ padding: '16px 20px', marginBottom: 20, position: 'sticky', top: 76, zIndex: 5 }}>
@@ -546,7 +610,7 @@ export default function PublishPage() {
         </div>
 
         <div className="field">
-          <label>Planta do imóvel</label>
+          <label>Planta do imóvel {isEditMode && <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(só se quiser substituir a atual)</span>}</label>
           <label
             htmlFor="plan-input"
             style={{
@@ -560,7 +624,7 @@ export default function PublishPage() {
         </div>
 
         <div className="field">
-          <label>Fotografias</label>
+          <label>Fotografias {isEditMode && <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(já tem {existingPhotoCount} — o que adicionar aqui junta-se às existentes)</span>}</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <label
               htmlFor="photo-input"
@@ -569,7 +633,7 @@ export default function PublishPage() {
                 textAlign: 'center', color: 'var(--text-soft)', fontSize: 13.5, cursor: 'pointer',
               }}
             >
-              Clique para escolher fotografias (mínimo 6, máximo 25)
+              {isEditMode ? 'Clique para escolher fotografias' : 'Clique para escolher fotografias (mínimo 6, máximo 25)'}
             </label>
             <label
               htmlFor="camera-input"
@@ -591,7 +655,7 @@ export default function PublishPage() {
             onChange={handlePhotoSelect} style={{ display: 'none' }}
           />
 
-          {photos.length > 0 && (
+          {photos.length > 0 && !isEditMode && (
             <p style={{ fontSize: 12.5, marginTop: 8, color: photos.length < 6 ? '#8a3b2a' : 'var(--text-soft)' }}>
               {photos.length}/25 fotografias {photos.length < 6 && `(faltam pelo menos ${6 - photos.length})`}
             </p>
@@ -671,13 +735,23 @@ export default function PublishPage() {
         {error && <p className="error-text">{error}</p>}
 
         <button type="submit" className="btn btn-primary btn-block" disabled={saving}>
-          {saving ? t('publish_saving') : t('publish_submit')}
+          {saving ? 'A guardar...' : (isEditMode ? 'Guardar alterações' : t('publish_submit'))}
         </button>
-        <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
-          {t('publish_review_note')}
-        </p>
+        {!isEditMode && (
+          <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
+            {t('publish_review_note')}
+          </p>
+        )}
       </form>
     </div>
     </>
+  );
+}
+
+export default function PublishPage() {
+  return (
+    <Suspense fallback={<div className="wrap" style={{ padding: 60 }}>...</div>}>
+      <PublishForm />
+    </Suspense>
   );
 }
