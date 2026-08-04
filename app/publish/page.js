@@ -58,6 +58,8 @@ function PublishForm() {
   const [addressType, setAddressType] = useState('Rua');
   const [addressRest, setAddressRest] = useState('');
   const [dragIndex, setDragIndex] = useState(null);
+  const [municipalityManual, setMunicipalityManual] = useState(false);
+  const [parishManual, setParishManual] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [published, setPublished] = useState(false);
@@ -65,7 +67,7 @@ function PublishForm() {
   const [planFile, setPlanFile] = useState(null);
 
   const [form, setForm] = useState({
-    title: '', description: '', property_type: 'Apartamento', typology: 'T3',
+    title: '', internal_reference: '', description: '', property_type: 'Apartamento', typology: 'T3',
     business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: 3, bathrooms: 2,
     state: 'Usado', energy_certificate: 'B', address: '', district: '', municipality: '', parish: '',
     floor: '', area_util: '', house_subtype: '', is_top_floor: false,
@@ -98,7 +100,7 @@ function PublishForm() {
         }
 
         setForm({
-          title: prop.title || '', description: prop.description || '', property_type: prop.property_type || 'Apartamento',
+          title: prop.title || '', internal_reference: prop.internal_reference || '', description: prop.description || '', property_type: prop.property_type || 'Apartamento',
           typology: prop.typology || 'T3', business_type: prop.business_type || 'Venda',
           price: prop.price ?? '', condo_fee: prop.condo_fee ?? '', area: prop.area ?? '',
           bedrooms: prop.bedrooms ?? 3, bathrooms: prop.bathrooms ?? 2, state: prop.state || 'Usado',
@@ -112,6 +114,13 @@ function PublishForm() {
         });
         setFeatures(prop.features || []);
         setSolarOrientations(prop.solar_orientations || []);
+
+        if (prop.municipality && !(concelhosPorDistrito[prop.district] || []).includes(prop.municipality)) {
+          setMunicipalityManual(true);
+        }
+        if (prop.parish && !(freguesiasPorConcelho[prop.municipality] || []).includes(prop.parish)) {
+          setParishManual(true);
+        }
 
         const { count } = await supabase.from('property_photos').select('id', { count: 'exact', head: true }).eq('property_id', editId);
         setExistingPhotoCount(count || 0);
@@ -258,6 +267,7 @@ function PublishForm() {
 
     const propertyFields = {
       title: form.title || `${form.typology} · ${form.address}`,
+      internal_reference: form.internal_reference || null,
       description: form.description,
       property_type: form.property_type,
       typology: form.typology,
@@ -377,6 +387,11 @@ function PublishForm() {
         <div className="field">
           <label>Título do anúncio (opcional)</label>
           <input value={form.title} onChange={(e) => updateField('title', e.target.value)} placeholder="ex: T3 remodelado em Campo de Ourique" />
+        </div>
+
+        <div className="field">
+          <label>Referência interna <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional — aparece no anúncio, útil para identificar o imóvel)</span></label>
+          <input value={form.internal_reference} onChange={(e) => updateField('internal_reference', e.target.value)} placeholder="ex: AGD-2026-014" />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -507,25 +522,80 @@ function PublishForm() {
           </div>
           <div className="field">
             <label>Concelho</label>
-            <select
-              value={form.municipality}
-              onChange={(e) => { updateField('municipality', e.target.value); updateField('parish', ''); }}
-              disabled={!form.district}
-            >
-              <option value="">Escolha</option>
-              {(concelhosPorDistrito[form.district] || []).map((c) => <option key={c}>{c}</option>)}
-            </select>
+            {municipalityManual ? (
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input
+                  autoFocus
+                  value={form.municipality}
+                  onChange={(e) => updateField('municipality', e.target.value)}
+                  placeholder="Escreva o concelho"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setMunicipalityManual(false); updateField('municipality', ''); }}
+                  className="btn"
+                  style={{ fontSize: 12, padding: '0 10px', flexShrink: 0 }}
+                >
+                  Lista
+                </button>
+              </div>
+            ) : (
+              <select
+                value={form.municipality}
+                onChange={(e) => {
+                  if (e.target.value === '__outro__') {
+                    setMunicipalityManual(true);
+                    updateField('municipality', '');
+                    return;
+                  }
+                  updateField('municipality', e.target.value);
+                  updateField('parish', '');
+                }}
+                disabled={!form.district}
+              >
+                <option value="">Escolha</option>
+                {(concelhosPorDistrito[form.district] || []).map((c) => <option key={c}>{c}</option>)}
+                <option value="__outro__">✎ Não está na lista — escrever</option>
+              </select>
+            )}
           </div>
           <div className="field">
-            <label>Localidade / Freguesia</label>
-            <select
-              value={form.parish}
-              onChange={(e) => updateField('parish', e.target.value)}
-              disabled={!form.municipality}
-            >
-              <option value="">Escolha (se disponível)</option>
-              {(freguesiasPorConcelho[form.municipality] || []).map((f) => <option key={f}>{f}</option>)}
-            </select>
+            <label>Localidade / Freguesia <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+            {parishManual ? (
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input
+                  autoFocus
+                  value={form.parish}
+                  onChange={(e) => updateField('parish', e.target.value)}
+                  placeholder="Escreva a localidade"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setParishManual(false); updateField('parish', ''); }}
+                  className="btn"
+                  style={{ fontSize: 12, padding: '0 10px', flexShrink: 0 }}
+                >
+                  Lista
+                </button>
+              </div>
+            ) : (
+              <select
+                value={form.parish}
+                onChange={(e) => {
+                  if (e.target.value === '__outro__') {
+                    setParishManual(true);
+                    updateField('parish', '');
+                    return;
+                  }
+                  updateField('parish', e.target.value);
+                }}
+                disabled={!form.municipality}
+              >
+                <option value="">Escolha (se disponível)</option>
+                {(freguesiasPorConcelho[form.municipality] || []).map((f) => <option key={f}>{f}</option>)}
+                <option value="__outro__">✎ Não está na lista — escrever</option>
+              </select>
+            )}
           </div>
         </div>
 

@@ -161,6 +161,7 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <div className="meta">
+                    {p.internal_reference && `Ref. ${p.internal_reference} · `}
                     {Number(p.price).toLocaleString('pt-PT')} € · Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')} · {p.views_count || 0} visualizações
                   </div>
                   {p.status === 'anulado_suporte' && p.cancellation_reason && (

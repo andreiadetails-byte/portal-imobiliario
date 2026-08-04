@@ -198,7 +198,7 @@ export default function PropertyPage() {
           </div>
           <div className="addr" style={{ fontSize: 17 }}>{property.typology} · {displayAddress(property)}</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div className="meta">{property.district}</div>
+            <div className="meta">{property.district}{property.internal_reference && ` · Ref. ${property.internal_reference}`}</div>
             <button
               onClick={() => setReportModal(true)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-soft)', textDecoration: 'underline' }}
