@@ -50,6 +50,9 @@ export default function PublishPage() {
   const [user, setUser] = useState(null);
   const [features, setFeatures] = useState(['Elevador', 'Garagem']);
   const [solarOrientations, setSolarOrientations] = useState([]);
+  const [addressType, setAddressType] = useState('Rua');
+  const [addressRest, setAddressRest] = useState('');
+  const [dragIndex, setDragIndex] = useState(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [published, setPublished] = useState(false);
@@ -396,7 +399,27 @@ export default function PublishPage() {
 
         <div className="field">
           <label>Morada</label>
-          <input required value={form.address} onChange={(e) => updateField('address', e.target.value)} placeholder="Rua, número, freguesia" />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <select
+              value={addressType}
+              onChange={(e) => { setAddressType(e.target.value); updateField('address', `${e.target.value} ${addressRest}`.trim()); }}
+              style={{ flex: '0 0 140px' }}
+            >
+              {['Rua', 'Avenida', 'Travessa', 'Urb.', 'Praça', 'Largo', 'Alameda'].map((t) => <option key={t}>{t}</option>)}
+            </select>
+            <input
+              required
+              value={addressRest}
+              onChange={(e) => {
+                const v = e.target.value;
+                const capitalized = v.charAt(0).toUpperCase() + v.slice(1);
+                setAddressRest(capitalized);
+                updateField('address', `${addressType} ${capitalized}`.trim());
+              }}
+              placeholder="das Amoreiras, 12, Lisboa"
+              style={{ flex: 1 }}
+            />
+          </div>
         </div>
 
         <div className="field">
@@ -438,7 +461,7 @@ export default function PublishPage() {
 
         <div className="field">
           <label>Descrição <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(mínimo 50 caracteres)</span></label>
-          <textarea required rows={4} value={form.description} onChange={(e) => updateField('description', e.target.value)} />
+          <textarea required rows={9} style={{ minHeight: 180 }} value={form.description} onChange={(e) => updateField('description', e.target.value)} />
           <p style={{ fontSize: 11.5, marginTop: 4, color: form.description.length < 50 ? '#8a3b2a' : 'var(--text-soft)' }}>
             {form.description.length}/50 caracteres {form.description.length < 50 && `(faltam ${50 - form.description.length})`}
           </p>
@@ -524,13 +547,62 @@ export default function PublishPage() {
               {photos.length}/25 fotografias {photos.length < 6 && `(faltam pelo menos ${6 - photos.length})`}
             </p>
           )}
+          {photos.length > 1 && (
+            <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 4 }}>
+              Arraste as fotos para as reordenar. A primeira é a foto principal do anúncio.
+            </p>
+          )}
 
           {photos.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 12 }}>
               {photos.map((p, i) => (
-                <div key={i} style={{ position: 'relative', aspectRatio: '1', borderRadius: 6, overflow: 'hidden' }}>
+                <div
+                  key={p.file.name + i}
+                  draggable
+                  onDragStart={() => setDragIndex(i)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => {
+                    if (dragIndex === null || dragIndex === i) return;
+                    setPhotos((cur) => {
+                      const next = [...cur];
+                      const [moved] = next.splice(dragIndex, 1);
+                      next.splice(i, 0, moved);
+                      return next;
+                    });
+                    setDragIndex(null);
+                  }}
+                  style={{
+                    position: 'relative', aspectRatio: '1', borderRadius: 6, overflow: 'hidden', cursor: 'grab',
+                    border: i === 0 ? '2px solid var(--telha)' : '2px solid transparent',
+                  }}
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {i === 0 && (
+                    <span style={{
+                      position: 'absolute', bottom: 4, left: 4, fontSize: 9.5, fontWeight: 700, padding: '2px 7px',
+                      borderRadius: 8, background: 'var(--telha)', color: '#fff',
+                    }}>
+                      PRINCIPAL
+                    </span>
+                  )}
+                  {i !== 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setPhotos((cur) => {
+                        const next = [...cur];
+                        const [moved] = next.splice(i, 1);
+                        next.unshift(moved);
+                        return next;
+                      })}
+                      style={{
+                        position: 'absolute', bottom: 4, left: 4, fontSize: 9.5, fontWeight: 600, padding: '2px 7px',
+                        borderRadius: 8, background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', color: 'var(--ink)',
+                      }}
+                    >
+                      Definir principal
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => removePhoto(i)}
