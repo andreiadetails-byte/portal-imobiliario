@@ -8,6 +8,7 @@ import { useLanguage } from '../../../lib/i18n';
 import Header from '../../../components/Header';
 import { displayAddress } from '../../../lib/displayAddress';
 import MortgageSimulator from '../../../components/MortgageSimulator';
+import ImtCalculator from '../../../components/ImtCalculator';
 
 export default function PropertyPage() {
   const { id } = useParams();
@@ -26,6 +27,9 @@ export default function PropertyPage() {
   const [activePhoto, setActivePhoto] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [similar, setSimilar] = useState([]);
+  const [reportModal, setReportModal] = useState(false);
+  const [reportSent, setReportSent] = useState(false);
+  const [reportForm, setReportForm] = useState({ reason: 'Anúncio enganador ou falso', details: '', contact: '' });
 
   useEffect(() => {
     async function load() {
@@ -76,6 +80,17 @@ export default function PropertyPage() {
       setIsFavorite(true);
     }
     setFavLoading(false);
+  }
+
+  async function submitReport(e) {
+    e.preventDefault();
+    await supabase.from('reports').insert({
+      property_id: property.id,
+      reason: reportForm.reason,
+      details: reportForm.details,
+      reporter_contact: reportForm.contact,
+    });
+    setReportSent(true);
   }
 
   async function startConversation() {
@@ -182,7 +197,15 @@ export default function PropertyPage() {
             </div>
           </div>
           <div className="addr" style={{ fontSize: 17 }}>{property.typology} · {displayAddress(property)}</div>
-          <div className="meta">{property.district}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="meta">{property.district}</div>
+            <button
+              onClick={() => setReportModal(true)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-soft)', textDecoration: 'underline' }}
+            >
+              ⚑ Denunciar este anúncio
+            </button>
+          </div>
 
           <div style={{ display: 'flex', gap: 24, borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '18px 0', margin: '24px 0', flexWrap: 'wrap' }}>
             <div><b>{property.area} m²</b><div className="meta">{t('property_area')}</div></div>
@@ -248,7 +271,10 @@ export default function PropertyPage() {
           )}
 
           {property.business_type === 'Venda' && (
-            <MortgageSimulator price={Number(property.price)} />
+            <>
+              <MortgageSimulator price={Number(property.price)} />
+              <ImtCalculator price={Number(property.price)} />
+            </>
           )}
         </div>
 
@@ -350,6 +376,53 @@ export default function PropertyPage() {
         </div>
       )}
     </div>
+
+    {reportModal && (
+      <div
+        onClick={() => setReportModal(false)}
+        style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}
+      >
+        <div onClick={(e) => e.stopPropagation()} className="card" style={{ width: 400, padding: 26, maxHeight: '90vh', overflowY: 'auto' }}>
+          <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>⚑ Denunciar este anúncio</h3>
+
+          {reportSent ? (
+            <p style={{ fontSize: 14 }}>Obrigado. A nossa equipa vai analisar esta denúncia.</p>
+          ) : (
+            <form onSubmit={submitReport}>
+              <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16, background: 'var(--plaster)', padding: 12, borderRadius: 6 }}>
+                🔒 A sua identidade e contacto não são partilhados com o anunciante em momento nenhum — só a nossa equipa tem acesso a esta denúncia.
+              </p>
+
+              <div className="field">
+                <label>Motivo</label>
+                <select value={reportForm.reason} onChange={(e) => setReportForm({ ...reportForm, reason: e.target.value })}>
+                  <option>Anúncio enganador ou falso</option>
+                  <option>Imóvel não existe / fraude</option>
+                  <option>Preço ou dados incorretos</option>
+                  <option>Conteúdo discriminatório</option>
+                  <option>Conteúdo ilegal ou proibido</option>
+                  <option>Spam ou anúncio duplicado</option>
+                  <option>Outro motivo</option>
+                </select>
+              </div>
+
+              <div className="field">
+                <label>Detalhes <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+                <textarea rows={3} value={reportForm.details} onChange={(e) => setReportForm({ ...reportForm, details: e.target.value })} />
+              </div>
+
+              <div className="field">
+                <label>O seu contacto <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional, só para a nossa equipa)</span></label>
+                <input value={reportForm.contact} onChange={(e) => setReportForm({ ...reportForm, contact: e.target.value })} />
+              </div>
+
+              <button type="submit" className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>Enviar denúncia</button>
+              <button type="button" onClick={() => setReportModal(false)} className="btn btn-block">Cancelar</button>
+            </form>
+          )}
+        </div>
+      </div>
+    )}
 
     {lightbox && (
       <div

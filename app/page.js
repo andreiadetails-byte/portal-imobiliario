@@ -9,41 +9,39 @@ import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
 import { displayAddress } from '../lib/displayAddress';
 
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export default function HomePage() {
   const { t } = useLanguage();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState('');
   const [businessType, setBusinessType] = useState('Venda');
-  const [stats, setStats] = useState({ totalProperties: 0, totalDistricts: 0 });
   const [news, setNews] = useState([]);
 
   useEffect(() => {
     async function loadProperties() {
       const { data, error } = await supabase
         .from('properties')
-        .select('id, title, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, featured_status, property_photos(url, position)')
+        .select('id, title, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, featured_status, property_photos(url, position), profiles(avatar_url, full_name, agency_name)')
         .eq('status', 'ativo')
         .order('created_at', { ascending: false })
-        .limit(6);
+        .limit(60);
 
       if (!error) {
-        const sorted = [...(data || [])].sort((a, b) => (b.featured_status === 'active') - (a.featured_status === 'active'));
-        setProperties(sorted);
+        const all = data || [];
+        const featured = shuffle(all.filter((p) => p.featured_status === 'active'));
+        const rest = shuffle(all.filter((p) => p.featured_status !== 'active'));
+        setProperties([...featured, ...rest].slice(0, 6));
       }
       setLoading(false);
-    }
-
-    async function loadStats() {
-      const { count } = await supabase
-        .from('properties').select('id', { count: 'exact', head: true }).eq('status', 'ativo');
-
-      const { data: districtsData } = await supabase
-        .from('properties').select('district').eq('status', 'ativo');
-
-      const uniqueDistricts = new Set((districtsData || []).map((d) => d.district)).size;
-
-      setStats({ totalProperties: count || 0, totalDistricts: uniqueDistricts });
     }
 
     async function loadNews() {
@@ -53,7 +51,6 @@ export default function HomePage() {
     }
 
     loadProperties();
-    loadStats();
     loadNews();
   }, []);
 
@@ -127,19 +124,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div style={{ borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', background: 'var(--paper)' }}>
-        <div className="wrap" style={{ display: 'flex', gap: 48, padding: '24px 32px', flexWrap: 'wrap' }}>
-          <div>
-            <b className="display" style={{ fontSize: 24, display: 'block' }}>{stats.totalProperties}</b>
-            <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{t('home_stat_properties')}</span>
-          </div>
-          <div>
-            <b className="display" style={{ fontSize: 24, display: 'block' }}>{stats.totalDistricts}</b>
-            <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{t('home_stat_districts')}</span>
-          </div>
-        </div>
-      </div>
-
       <section style={{ padding: '48px 0 80px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 26, marginBottom: 24 }}>{t('home_featured')}</h2>
@@ -176,7 +160,24 @@ export default function HomePage() {
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
                     <div className="addr">{p.typology} · {displayAddress(p)}</div>
-                    <div className="meta">{p.district}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className="meta">{p.district}</div>
+                      {p.profiles && (
+                        <div title={p.profiles.agency_name || p.profiles.full_name} style={{ flexShrink: 0 }}>
+                          {p.profiles.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.profiles.avatar_url} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                          ) : (
+                            <div style={{
+                              width: 26, height: 26, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600,
+                            }}>
+                              {(p.profiles.agency_name || p.profiles.full_name || '?')[0].toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </Link>
               );
@@ -196,6 +197,23 @@ export default function HomePage() {
               <p style={{ fontSize: 14, color: '#5C4E2A', maxWidth: 420 }}>{t('home_valuation_sub')}</p>
             </div>
             <Link href="/valuation" className="btn btn-primary">{t('home_valuation_btn')}</Link>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '24px 28px' }}>
+              <h3 className="display" style={{ fontSize: 17, marginBottom: 6 }}>Simula aqui o teu crédito</h3>
+              <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 14 }}>
+                Descobre a prestação mensal, ou quanto podes pedir com o que consegues pagar.
+              </p>
+              <Link href="/simulador-credito" className="btn" style={{ fontSize: 13 }}>Simular crédito</Link>
+            </div>
+            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '24px 28px' }}>
+              <h3 className="display" style={{ fontSize: 17, marginBottom: 6 }}>Queres saber quanto vais pagar de IMT?</h3>
+              <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 14 }}>
+                Calcula o IMT e o Imposto do Selo antes de avançares para a escritura.
+              </p>
+              <Link href="/simulador-imt" className="btn" style={{ fontSize: 13 }}>Calcular IMT</Link>
+            </div>
           </div>
         </div>
       </section>

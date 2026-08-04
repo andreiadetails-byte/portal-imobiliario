@@ -66,7 +66,7 @@ function ResultsInner() {
 
     let query = supabase
       .from('properties')
-      .select('id, title, price, address, district, municipality, parish, show_full_address, typology, property_type, area, bedrooms, bathrooms, business_type, latitude, longitude, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, property_photos(url, position)', { count: 'exact' })
+      .select('id, title, price, address, district, municipality, parish, show_full_address, typology, property_type, area, bedrooms, bathrooms, business_type, latitude, longitude, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, property_photos(url, position), profiles(avatar_url, full_name, agency_name)', { count: 'exact' })
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
@@ -252,8 +252,25 @@ function ResultsInner() {
                       <div className="card-photo" style={{ height: '100%', minHeight: 110 }} />
                     )}
                     <div className="card-body">
-                      <div className="price mono">
-                        {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div className="price mono">
+                          {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+                        </div>
+                        {p.profiles && (
+                          <div title={p.profiles.agency_name || p.profiles.full_name} style={{ flexShrink: 0 }}>
+                            {p.profiles.avatar_url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={p.profiles.avatar_url} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                            ) : (
+                              <div style={{
+                                width: 26, height: 26, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600,
+                              }}>
+                                {(p.profiles.agency_name || p.profiles.full_name || '?')[0].toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
                       <div className="meta">{p.district} · {p.area} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>

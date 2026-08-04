@@ -18,6 +18,10 @@ export default function AdminPage() {
   const [savingNews, setSavingNews] = useState(false);
   const [featuredList, setFeaturedList] = useState([]);
   const [agencies, setAgencies] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [mortgageRate, setMortgageRate] = useState('');
+  const [savingRate, setSavingRate] = useState(false);
+  const [rateSaved, setRateSaved] = useState(false);
 
   useEffect(() => {
     async function checkAccess() {
@@ -33,10 +37,43 @@ export default function AdminPage() {
       loadNews();
       loadFeatured();
       loadAgencies();
+      loadMortgageRate();
     }
     checkAccess();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function loadMortgageRate() {
+    const { data } = await supabase.from('settings').select('mortgage_rate').eq('id', 1).single();
+    if (data) setMortgageRate(String(data.mortgage_rate));
+  }
+
+  async function saveMortgageRate(e) {
+    e.preventDefault();
+    setSavingRate(true);
+    await supabase.from('settings').update({ mortgage_rate: Number(mortgageRate), updated_at: new Date().toISOString() }).eq('id', 1);
+    setSavingRate(false);
+    setRateSaved(true);
+    setTimeout(() => setRateSaved(false), 2500);
+  }
+
+  useEffect(() => {
+    if (allowed) loadReports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowed]);
+
+  async function loadReports() {
+    const { data } = await supabase
+      .from('reports')
+      .select('id, reason, details, reporter_contact, status, created_at, properties(id, typology, address)')
+      .order('created_at', { ascending: false });
+    setReports(data || []);
+  }
+
+  async function resolveReport(id) {
+    await supabase.from('reports').update({ status: 'resolvida' }).eq('id', id);
+    setReports((cur) => cur.map((r) => (r.id === id ? { ...r, status: 'resolvida' } : r)));
+  }
 
   async function loadAgencies() {
     const { data } = await supabase.from('profiles').select('*').eq('account_type', 'agencia').order('agency_name');
@@ -141,7 +178,7 @@ export default function AdminPage() {
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>Administração</h1>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)' }}>
-        {[['anuncios', 'Anúncios'], ['destaques', 'Destaques'], ['agencias', 'Agências'], ['noticias', 'Notícias']].map(([value, label]) => (
+        {[['anuncios', 'Anúncios'], ['denuncias', 'Denúncias'], ['destaques', 'Destaques'], ['agencias', 'Agências'], ['noticias', 'Notícias'], ['definicoes', 'Definições']].map(([value, label]) => (
           <button
             key={value}
             onClick={() => setSection(value)}
@@ -205,6 +242,37 @@ export default function AdminPage() {
           </div>
         ))}
       </div>
+        </>
+      )}
+
+      {section === 'denuncias' && (
+        <>
+          {reports.length === 0 && <p className="empty-state">Não há denúncias.</p>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {reports.map((r) => (
+              <div key={r.id} className="card" style={{
+                padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16,
+                opacity: r.status === 'resolvida' ? 0.55 : 1,
+              }}>
+                <div>
+                  <b>{r.reason}</b>
+                  <div className="meta">
+                    {r.properties ? `${r.properties.typology} · ${r.properties.address}` : 'Imóvel removido'} · {r.status}
+                  </div>
+                  {r.details && <p style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 4, maxWidth: 460 }}>{r.details}</p>}
+                  {r.reporter_contact && <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 4 }}>Contacto: {r.reporter_contact}</p>}
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  {r.properties && (
+                    <a href={`/property/${r.properties.id}`} target="_blank" rel="noopener noreferrer" className="btn" style={{ fontSize: 13 }}>Ver</a>
+                  )}
+                  {r.status !== 'resolvida' && (
+                    <button onClick={() => resolveReport(r.id)} className="btn btn-primary" style={{ fontSize: 13 }}>Marcar resolvida</button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </>
       )}
 
@@ -327,6 +395,25 @@ export default function AdminPage() {
             ))}
           </div>
         </>
+      )}
+
+      {section === 'definicoes' && (
+        <div className="card" style={{ padding: 20, maxWidth: 400 }}>
+          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>Taxa de crédito habitação</h3>
+          <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+            Usada como ponto de partida no simulador de crédito, em todas as páginas de imóvel. Atualiza sempre que a taxa média do mercado mudar.
+          </p>
+          <form onSubmit={saveMortgageRate}>
+            <div className="field">
+              <label>Taxa de juro anual (%)</label>
+              <input type="number" step="0.1" required value={mortgageRate} onChange={(e) => setMortgageRate(e.target.value)} />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={savingRate}>
+              {savingRate ? 'A guardar...' : 'Guardar taxa'}
+            </button>
+            {rateSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 12 }}>✓ Guardado</span>}
+          </form>
+        </div>
       )}
     </div>
     </>
