@@ -30,7 +30,7 @@ export default function HomePage() {
     async function loadProperties() {
       const { data, error } = await supabase
         .from('properties')
-        .select('id, title, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, featured_status, property_photos(url, position), profiles(avatar_url, full_name, agency_name)')
+        .select('id, title, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, property_photos(url, position), profiles(avatar_url, full_name, agency_name)')
         .eq('status', 'ativo')
         .order('created_at', { ascending: false })
         .limit(60);
@@ -160,6 +160,11 @@ export default function HomePage() {
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
                     <div className="addr">{p.typology} · {displayAddress(p)}</div>
+                    <div className="meta" style={{ marginBottom: 10 }}>
+                      {p.property_type}{(p.area || p.area_util) ? ` · ${p.area || p.area_util} m²` : ''}
+                      {p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
+                      {p.bathrooms ? ` · ${p.bathrooms} wc` : ''}
+                    </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div className="meta">{p.district}</div>
                       {p.profiles && (

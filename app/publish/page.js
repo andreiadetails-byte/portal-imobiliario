@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
@@ -51,6 +52,7 @@ export default function PublishPage() {
   const [solarOrientations, setSolarOrientations] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [published, setPublished] = useState(false);
   const [photos, setPhotos] = useState([]); // { file, preview }
   const [planFile, setPlanFile] = useState(null);
 
@@ -250,10 +252,32 @@ export default function PublishPage() {
     }
 
     setSaving(false);
-    router.push('/dashboard');
+    setPublished(true);
+    setTimeout(() => router.push('/dashboard'), 2500);
   }
 
   if (!user) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div></>);
+
+  if (published) {
+    return (
+      <>
+        <Header />
+        <div className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center' }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, margin: '0 auto 20px',
+          }}>
+            ✓
+          </div>
+          <h1 className="display" style={{ fontSize: 24, marginBottom: 10 }}>Anúncio publicado!</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
+            O seu imóvel está agora <b>em revisão</b> — assim que for aprovado, fica visível no site. Vamos levá-lo para o painel...
+          </p>
+          <Link href="/dashboard" className="btn btn-primary">Ver no meu painel agora</Link>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
