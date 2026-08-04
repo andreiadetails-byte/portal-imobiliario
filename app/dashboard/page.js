@@ -73,8 +73,7 @@ export default function DashboardPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
         <h1 className="display" style={{ fontSize: 28 }}>{t('dashboard_hi')}, {profile?.full_name || ''}</h1>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Link href="/publish" className="btn btn-primary" style={{ marginRight: 12 }}>{t('dashboard_new')}</Link>
-          <button onClick={handleLogout} className="btn">{t('nav_logout')}</button>
+          <Link href="/publish" className="btn btn-primary">{t('dashboard_new')}</Link>
         </div>
       </div>
 
