@@ -195,7 +195,7 @@ export default function HomePage() {
               <h2 className="display" style={{ fontSize: 22, marginBottom: 6 }}>{t('home_valuation_title')}</h2>
               <p style={{ fontSize: 14, color: '#5C4E2A', maxWidth: 420 }}>{t('home_valuation_sub')}</p>
             </div>
-            <Link href="/publish" className="btn btn-primary">{t('home_valuation_btn')}</Link>
+            <Link href="/valuation" className="btn btn-primary">{t('home_valuation_btn')}</Link>
           </div>
         </div>
       </section>
