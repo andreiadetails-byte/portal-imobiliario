@@ -40,22 +40,31 @@ function ChatInner() {
   }, []);
 
   useEffect(() => {
-    if (!activeId) return;
+    if (!activeId || !user) return;
     async function loadMessages() {
       const { data } = await supabase
         .from('messages').select('*').eq('conversation_id', activeId).order('created_at', { ascending: true });
       setMessages(data || []);
+
+      // Marca como lidas as mensagens que não foram enviadas por mim
+      await supabase.from('messages').update({ read: true })
+        .eq('conversation_id', activeId).eq('read', false).neq('sender_id', user.id);
     }
     loadMessages();
 
     const channel = supabase
       .channel(`messages-${activeId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeId}` },
-        (payload) => setMessages((cur) => [...cur, payload.new]))
+        (payload) => {
+          setMessages((cur) => [...cur, payload.new]);
+          if (payload.new.sender_id !== user.id) {
+            supabase.from('messages').update({ read: true }).eq('id', payload.new.id);
+          }
+        })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [activeId]);
+  }, [activeId, user]);
 
   async function sendMessage(e) {
     e.preventDefault();

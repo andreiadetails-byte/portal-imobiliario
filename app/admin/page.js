@@ -23,6 +23,8 @@ export default function AdminPage() {
   const [mortgageRate, setMortgageRate] = useState('');
   const [savingRate, setSavingRate] = useState(false);
   const [rateSaved, setRateSaved] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const [supportReplyText, setSupportReplyText] = useState({});
 
   useEffect(() => {
     async function checkAccess() {
@@ -39,10 +41,16 @@ export default function AdminPage() {
       loadFeatured();
       loadAgencies();
       loadMortgageRate();
+      loadAllUsers();
     }
     checkAccess();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function loadAllUsers() {
+    const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+    setAllUsers(data || []);
+  }
 
   async function loadMortgageRate() {
     const { data } = await supabase.from('settings').select('mortgage_rate').eq('id', 1).single();
@@ -65,7 +73,23 @@ export default function AdminPage() {
 
   async function loadSupportMessages() {
     const { data } = await supabase.from('support_requests').select('*').order('created_at', { ascending: false });
-    setSupportMessages(data || []);
+    const withReplies = await Promise.all((data || []).map(async (m) => {
+      const { data: replies } = await supabase
+        .from('support_replies').select('*').eq('support_request_id', m.id).order('created_at', { ascending: true });
+      if (!m.read_by_admin) {
+        await supabase.from('support_requests').update({ read_by_admin: true }).eq('id', m.id);
+      }
+      return { ...m, replies: replies || [] };
+    }));
+    setSupportMessages(withReplies);
+  }
+
+  async function sendSupportReply(requestId) {
+    const text = (supportReplyText[requestId] || '').trim();
+    if (!text) return;
+    await supabase.from('support_replies').insert({ support_request_id: requestId, sender_role: 'admin', message: text });
+    setSupportReplyText((cur) => ({ ...cur, [requestId]: '' }));
+    loadSupportMessages();
   }
 
   async function resolveSupportMessage(id) {
@@ -168,6 +192,14 @@ export default function AdminPage() {
     setProperties((cur) => cur.filter((p) => p.id !== id));
   }
 
+  async function cancelProperty(id) {
+    const reason = prompt('Motivo da anulação (visível ao anunciante):');
+    if (!reason) return;
+    await supabase.from('properties').update({ status: 'anulado_suporte', cancellation_reason: reason }).eq('id', id);
+    setProperties((cur) => cur.filter((p) => p.id !== id));
+    alert('Anúncio anulado. O anunciante não pode republicá-lo — terá de criar um novo.');
+  }
+
   if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar acesso...</div></>);
 
   if (!allowed) {
@@ -189,7 +221,11 @@ export default function AdminPage() {
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>Administração</h1>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)' }}>
-        {[['anuncios', 'Anúncios'], ['denuncias', 'Denúncias'], ['suporte', 'Suporte'], ['destaques', 'Destaques'], ['agencias', 'Agências'], ['noticias', 'Notícias'], ['definicoes', 'Definições']].map(([value, label]) => (
+        {[
+          ['anuncios', '📋 Anúncios'], ['denuncias', '⚑ Denúncias'], ['suporte', '💬 Suporte'],
+          ['utilizadores', '👤 Utilizadores'], ['destaques', '★ Destaques'], ['agencias', '🏢 Agências'],
+          ['noticias', '📰 Notícias'], ['definicoes', '⚙ Definições'],
+        ].map(([value, label]) => (
           <button
             key={value}
             onClick={() => setSection(value)}
@@ -207,11 +243,13 @@ export default function AdminPage() {
 
       {section === 'anuncios' && (
         <>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
           ['em_revisao', 'Por rever'],
           ['ativo', 'Ativos'],
+          ['desativado', 'Desativados'],
           ['rejeitado', 'Rejeitados'],
+          ['anulado_suporte', 'Anulados'],
           ['todos', 'Todos'],
         ].map(([value, label]) => (
           <button
@@ -234,20 +272,23 @@ export default function AdminPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {properties.map((p) => (
-          <div key={p.id} className="card" style={{ padding: 18, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <div key={p.id} className="card" style={{ padding: 18, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <div>
               <b>{p.typology} · {p.address}</b>
               <div className="meta">
-                {Number(p.price).toLocaleString('pt-PT')} € · {p.property_type} · {p.district} · estado atual: {p.status}
+                {Number(p.price).toLocaleString('pt-PT')} € · {p.property_type} · {p.district} · publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')} · estado atual: {p.status}
               </div>
               <p style={{ fontSize: 13, color: 'var(--text-soft)', maxWidth: 500, marginTop: 4 }}>{p.description}</p>
             </div>
             <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-              {p.status !== 'ativo' && (
+              {p.status !== 'ativo' && p.status !== 'anulado_suporte' && (
                 <button onClick={() => updateStatus(p.id, 'ativo')} className="btn btn-primary" style={{ fontSize: 13 }}>Aprovar</button>
               )}
-              {p.status !== 'rejeitado' && (
+              {p.status !== 'rejeitado' && p.status !== 'anulado_suporte' && (
                 <button onClick={() => updateStatus(p.id, 'rejeitado')} className="btn" style={{ fontSize: 13 }}>Rejeitar</button>
+              )}
+              {p.status === 'ativo' && (
+                <button onClick={() => cancelProperty(p.id)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>Anular</button>
               )}
             </div>
           </div>
@@ -296,6 +337,9 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, flexWrap: 'wrap', gap: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <b style={{ fontSize: 14 }}>{m.name}</b>
+                    {!m.user_id && (
+                      <span style={{ fontSize: 10.5, color: 'var(--text-soft)' }}>(sem conta — não vai ver a resposta na app)</span>
+                    )}
                     <span style={{
                       fontSize: 10.5, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
                       background: m.status === 'resolvida' ? 'var(--line)' : 'rgba(126,143,106,0.18)',
@@ -308,26 +352,86 @@ export default function AdminPage() {
                     {new Date(m.created_at).toLocaleString('pt-PT')}
                   </span>
                 </div>
-                <div className="meta" style={{ marginBottom: 6 }}>
+                <div className="meta" style={{ marginBottom: 10 }}>
                   Falou com a "agente" {m.agent_name} · Contacto: {m.contact || 'não fornecido'}
                 </div>
-                <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 12 }}>{m.message}</p>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {m.contact && (
-                    <a
-                      href={m.contact.includes('@') ? `mailto:${m.contact}` : `tel:${m.contact}`}
-                      className="btn btn-primary"
-                      style={{ fontSize: 12.5 }}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
+                  <div style={{ alignSelf: 'flex-start', maxWidth: '80%', background: 'var(--plaster)', padding: '8px 12px', borderRadius: 10, fontSize: 13.5 }}>
+                    {m.message}
+                  </div>
+                  {(m.replies || []).map((rep) => (
+                    <div
+                      key={rep.id}
+                      style={{
+                        alignSelf: rep.sender_role === 'admin' ? 'flex-end' : 'flex-start',
+                        maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13.5,
+                        background: rep.sender_role === 'admin' ? 'var(--telha)' : 'var(--plaster)',
+                        color: rep.sender_role === 'admin' ? '#fff' : 'var(--ink)',
+                      }}
                     >
-                      Responder
-                    </a>
-                  )}
+                      {rep.message}
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input
+                    value={supportReplyText[m.id] || ''}
+                    onChange={(e) => setSupportReplyText((cur) => ({ ...cur, [m.id]: e.target.value }))}
+                    placeholder={m.user_id ? 'Escreva uma resposta...' : 'Sem conta associada — sem forma de responder na app'}
+                    disabled={!m.user_id}
+                    style={{ flex: 1, padding: '8px 12px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 13 }}
+                  />
+                  <button
+                    onClick={() => sendSupportReply(m.id)}
+                    className="btn btn-primary"
+                    style={{ fontSize: 12.5 }}
+                    disabled={!m.user_id}
+                  >
+                    Enviar
+                  </button>
                   {m.status !== 'resolvida' && (
                     <button onClick={() => resolveSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5 }}>
-                      Marcar como resolvida
+                      Marcar resolvida
                     </button>
                   )}
                 </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {section === 'utilizadores' && (
+        <>
+          {allUsers.length === 0 && <p className="empty-state">Ainda não há utilizadores.</p>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {allUsers.map((u) => (
+              <div key={u.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {u.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={u.avatar_url} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{
+                      width: 40, height: 40, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600,
+                    }}>
+                      {(u.agency_name || u.full_name || '?')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <b style={{ fontSize: 14 }}>{u.agency_name || u.full_name}</b>
+                    <div className="meta">
+                      {u.account_type === 'agencia' ? 'Agência' : 'Particular'}
+                      {u.is_admin && ' · Administrador'}
+                    </div>
+                  </div>
+                </div>
+                <a href={`/admin/utilizador/${u.id}`} className="btn btn-primary" style={{ fontSize: 13 }}>
+                  👤 Ver imóveis anunciados
+                </a>
               </div>
             ))}
           </div>

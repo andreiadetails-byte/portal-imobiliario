@@ -29,9 +29,11 @@ export default function SupportAgentWidget() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: '', contact: '', message: '' });
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     setAgentName(randomAgentName());
+    supabase.auth.getUser().then(({ data }) => setUser(data.user || null));
   }, []);
 
   if (!agentName) return null;
@@ -44,6 +46,7 @@ export default function SupportAgentWidget() {
       name: form.name,
       contact: form.contact,
       message: form.message,
+      user_id: user?.id || null,
     });
     setSending(false);
     setSent(true);
@@ -70,6 +73,9 @@ export default function SupportAgentWidget() {
           {sent ? (
             <p style={{ fontSize: 13.5 }}>
               Obrigada! A {agentName.split(' ')[0]} vai responder-lhe em breve.
+              {user
+                ? ' Pode ver a resposta no seu painel, em "As minhas mensagens de suporte".'
+                : ' Inicie sessão para poder ver a resposta na app.'}
             </p>
           ) : (
             <form onSubmit={handleSubmit}>
