@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
-import LocationAutocomplete from '../../components/LocationAutocomplete';
 import Header from '../../components/Header';
 import { geocodeAddress } from '../../lib/geocode';
+import { distritos, concelhosPorDistrito, freguesiasPorConcelho } from '../../lib/locations';
 
 const CARACTERISTICAS = [
   'Elevador', 'Cozinha equipada', 'Aquecimento central', 'Ar condicionado', 'Terraço',
@@ -111,6 +111,7 @@ export default function PublishPage() {
     const files = Array.from(e.target.files || []);
     const newPhotos = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
     setPhotos((cur) => [...cur, ...newPhotos].slice(0, 25)); // máximo 25 fotos
+    e.target.value = '';
   }
 
   function removePhoto(index) {
@@ -245,18 +246,21 @@ export default function PublishPage() {
 
     if (error) { setError(error.message); setSaving(false); return; }
 
-    const planUrl = await uploadPlan(data.id);
-    if (planUrl) {
-      await supabase.from('properties').update({ floor_plan_url: planUrl }).eq('id', data.id);
-    }
-
-    if (photos.length > 0) {
-      await uploadPhotos(data.id);
-    }
-
     setSaving(false);
     setPublished(true);
     setTimeout(() => router.push('/dashboard'), 2500);
+
+    // A planta e as fotos continuam a ser enviadas em segundo plano,
+    // sem o utilizador ter de esperar a fazer scroll parado no ecrã.
+    (async () => {
+      const planUrl = await uploadPlan(data.id);
+      if (planUrl) {
+        await supabase.from('properties').update({ floor_plan_url: planUrl }).eq('id', data.id);
+      }
+      if (photos.length > 0) {
+        await uploadPhotos(data.id);
+      }
+    })();
   }
 
   if (!user) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div></>);
@@ -422,17 +426,43 @@ export default function PublishPage() {
           </div>
         </div>
 
-        <div className="field">
-          <label>Localização</label>
-          <LocationAutocomplete
-            onLevels={({ distrito, concelho, freguesia }) => {
-              updateField('district', distrito || '');
-              updateField('municipality', concelho || '');
-              updateField('parish', freguesia || '');
-            }}
-            onChange={() => {}}
-            placeholder="Escreva o distrito"
-          />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+          <div className="field">
+            <label>Distrito</label>
+            <select
+              value={form.district}
+              onChange={(e) => {
+                updateField('district', e.target.value);
+                updateField('municipality', '');
+                updateField('parish', '');
+              }}
+            >
+              <option value="">Escolha</option>
+              {distritos.map((d) => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>Concelho</label>
+            <select
+              value={form.municipality}
+              onChange={(e) => { updateField('municipality', e.target.value); updateField('parish', ''); }}
+              disabled={!form.district}
+            >
+              <option value="">Escolha</option>
+              {(concelhosPorDistrito[form.district] || []).map((c) => <option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>Localidade / Freguesia</label>
+            <select
+              value={form.parish}
+              onChange={(e) => updateField('parish', e.target.value)}
+              disabled={!form.municipality}
+            >
+              <option value="">Escolha (se disponível)</option>
+              {(freguesiasPorConcelho[form.municipality] || []).map((f) => <option key={f}>{f}</option>)}
+            </select>
+          </div>
         </div>
 
         <div className="field">
@@ -531,16 +561,35 @@ export default function PublishPage() {
 
         <div className="field">
           <label>Fotografias</label>
-          <label
-            htmlFor="photo-input"
-            style={{
-              display: 'block', border: '1.5px dashed var(--line)', borderRadius: 6, padding: '28px 16px',
-              textAlign: 'center', color: 'var(--text-soft)', fontSize: 13.5, cursor: 'pointer',
-            }}
-          >
-            Clique para escolher fotografias (mínimo 6, máximo 25)
-          </label>
-          <input id="photo-input" type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <label
+              htmlFor="photo-input"
+              style={{
+                flex: 1, display: 'block', border: '1.5px dashed var(--line)', borderRadius: 6, padding: '28px 16px',
+                textAlign: 'center', color: 'var(--text-soft)', fontSize: 13.5, cursor: 'pointer',
+              }}
+            >
+              Clique para escolher fotografias (mínimo 6, máximo 25)
+            </label>
+            <label
+              htmlFor="camera-input"
+              style={{
+                flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                border: '1.5px dashed var(--line)', borderRadius: 6, padding: '28px 16px',
+                textAlign: 'center', color: 'var(--text-soft)', fontSize: 13.5, cursor: 'pointer', minWidth: 110,
+              }}
+            >
+              📷 Tirar foto
+            </label>
+          </div>
+          <input
+            id="photo-input" type="file" accept="image/*,.heic,.heif" multiple
+            onChange={handlePhotoSelect} style={{ display: 'none' }}
+          />
+          <input
+            id="camera-input" type="file" accept="image/*" capture="environment"
+            onChange={handlePhotoSelect} style={{ display: 'none' }}
+          />
 
           {photos.length > 0 && (
             <p style={{ fontSize: 12.5, marginTop: 8, color: photos.length < 6 ? '#8a3b2a' : 'var(--text-soft)' }}>
