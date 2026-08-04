@@ -19,6 +19,7 @@ export default function AdminPage() {
   const [featuredList, setFeaturedList] = useState([]);
   const [agencies, setAgencies] = useState([]);
   const [reports, setReports] = useState([]);
+  const [supportMessages, setSupportMessages] = useState([]);
   const [mortgageRate, setMortgageRate] = useState('');
   const [savingRate, setSavingRate] = useState(false);
   const [rateSaved, setRateSaved] = useState(false);
@@ -58,9 +59,14 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (allowed) loadReports();
+    if (allowed) { loadReports(); loadSupportMessages(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowed]);
+
+  async function loadSupportMessages() {
+    const { data } = await supabase.from('support_requests').select('*').order('created_at', { ascending: false });
+    setSupportMessages(data || []);
+  }
 
   async function loadReports() {
     const { data } = await supabase
@@ -178,7 +184,7 @@ export default function AdminPage() {
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>Administração</h1>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)' }}>
-        {[['anuncios', 'Anúncios'], ['denuncias', 'Denúncias'], ['destaques', 'Destaques'], ['agencias', 'Agências'], ['noticias', 'Notícias'], ['definicoes', 'Definições']].map(([value, label]) => (
+        {[['anuncios', 'Anúncios'], ['denuncias', 'Denúncias'], ['suporte', 'Suporte'], ['destaques', 'Destaques'], ['agencias', 'Agências'], ['noticias', 'Notícias'], ['definicoes', 'Definições']].map(([value, label]) => (
           <button
             key={value}
             onClick={() => setSection(value)}
@@ -270,6 +276,28 @@ export default function AdminPage() {
                     <button onClick={() => resolveReport(r.id)} className="btn btn-primary" style={{ fontSize: 13 }}>Marcar resolvida</button>
                   )}
                 </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {section === 'suporte' && (
+        <>
+          {supportMessages.length === 0 && <p className="empty-state">Ainda não chegou nenhuma mensagem.</p>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {supportMessages.map((m) => (
+              <div key={m.id} className="card" style={{ padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <b style={{ fontSize: 14 }}>{m.name}</b>
+                  <span style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
+                    {new Date(m.created_at).toLocaleString('pt-PT')}
+                  </span>
+                </div>
+                <div className="meta" style={{ marginBottom: 6 }}>
+                  Falou com a "agente" {m.agent_name} · Contacto: {m.contact || 'não fornecido'}
+                </div>
+                <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>{m.message}</p>
               </div>
             ))}
           </div>
