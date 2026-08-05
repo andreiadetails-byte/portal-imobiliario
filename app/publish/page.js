@@ -53,6 +53,7 @@ function PublishForm() {
   const [user, setUser] = useState(null);
   const [loadingEdit, setLoadingEdit] = useState(isEditMode);
   const [existingPhotoCount, setExistingPhotoCount] = useState(0);
+  const [limitReached, setLimitReached] = useState(false);
   const [features, setFeatures] = useState(['Elevador', 'Garagem']);
   const [solarOrientations, setSolarOrientations] = useState([]);
   const [addressType, setAddressType] = useState('Rua');
@@ -80,6 +81,15 @@ function PublishForm() {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) { router.push('/login'); return; }
       setUser(data.user);
+
+      if (!editId) {
+        const { count } = await supabase
+          .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', data.user.id);
+        if ((count || 0) >= 50) {
+          setLimitReached(true);
+          return;
+        }
+      }
 
       if (editId) {
         const { data: prop } = await supabase.from('properties').select('*').eq('id', editId).single();
@@ -343,6 +353,27 @@ function PublishForm() {
   }
 
   if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div></>);
+
+  if (limitReached) {
+    return (
+      <>
+        <Header />
+        <div className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center' }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: '50%', background: '#b8452f', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, margin: '0 auto 20px',
+          }}>
+            !
+          </div>
+          <h1 className="display" style={{ fontSize: 24, marginBottom: 10 }}>Chegou ao limite de 50 anúncios</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
+            Já tem 50 anúncios publicados na sua conta, que é o máximo permitido. Para publicar um novo, apague primeiro um anúncio antigo no seu painel.
+          </p>
+          <Link href="/dashboard" className="btn btn-primary">Ir para o meu painel</Link>
+        </div>
+      </>
+    );
+  }
 
   if (published) {
     return (
