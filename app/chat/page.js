@@ -18,6 +18,7 @@ function ChatInner() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('pendentes');
 
   useEffect(() => {
     async function init() {
@@ -28,7 +29,7 @@ function ChatInner() {
       const { data } = await supabase
         .from('conversations')
         .select(`
-          id, property_id, buyer_id, seller_id, properties (address, typology),
+          id, property_id, buyer_id, seller_id, status, properties (address, typology),
           buyer:profiles!conversations_buyer_id_fkey (full_name, agency_name),
           seller:profiles!conversations_seller_id_fkey (full_name, agency_name)
         `)
@@ -63,6 +64,11 @@ function ChatInner() {
           setMessages((cur) => [...cur, payload.new]);
           if (payload.new.sender_id !== user.id) {
             supabase.from('messages').update({ read: true }).eq('id', payload.new.id);
+            const conv = conversations.find((c) => c.id === activeId);
+            if (conv?.status === 'tratada') {
+              supabase.from('conversations').update({ status: 'aberta' }).eq('id', activeId);
+              setConversations((cur) => cur.map((c) => (c.id === activeId ? { ...c, status: 'aberta' } : c)));
+            }
           }
         })
       .subscribe();
@@ -77,7 +83,18 @@ function ChatInner() {
     setText('');
   }
 
+  async function toggleConversationStatus(convId, currentStatus) {
+    const newStatus = currentStatus === 'tratada' ? 'aberta' : 'tratada';
+    await supabase.from('conversations').update({ status: newStatus }).eq('id', convId);
+    setConversations((cur) => cur.map((c) => (c.id === convId ? { ...c, status: newStatus } : c)));
+  }
+
   const activeConversation = conversations.find((c) => c.id === activeId);
+  const filteredConversations = conversations.filter((c) => {
+    if (filter === 'todas') return true;
+    if (filter === 'tratadas') return c.status === 'tratada';
+    return c.status !== 'tratada'; // pendentes
+  });
 
   if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
 
@@ -85,8 +102,25 @@ function ChatInner() {
     <>
       <Header />
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <h1 className="display" style={{ fontSize: 26 }}>{t('chat_title')}</h1>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {[['pendentes', 'Pendentes'], ['tratadas', 'Tratadas'], ['todas', 'Todas']].map(([value, label]) => (
+            <button
+              key={value}
+              onClick={() => setFilter(value)}
+              className="btn"
+              style={{
+                fontSize: 12.5, padding: '7px 14px',
+                background: filter === value ? 'var(--telha)' : 'transparent',
+                color: filter === value ? '#fff' : 'var(--ink)',
+                borderColor: filter === value ? 'var(--telha)' : 'var(--ink)',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {conversations.length === 0 ? (
@@ -94,7 +128,10 @@ function ChatInner() {
       ) : (
         <div className="card" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: 520, overflow: 'hidden' }}>
           <div style={{ borderRight: '1px solid var(--line)', overflowY: 'auto' }}>
-            {conversations.map((c) => {
+            {filteredConversations.length === 0 && (
+              <p style={{ padding: 16, fontSize: 12.5, color: 'var(--text-soft)' }}>Nenhuma conversa neste filtro.</p>
+            )}
+            {filteredConversations.map((c) => {
               const otherPerson = c.buyer_id === user.id ? c.seller : c.buyer;
               const otherName = otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
               return (
@@ -106,7 +143,14 @@ function ChatInner() {
                     background: c.id === activeId ? 'var(--plaster)' : 'transparent',
                   }}
                 >
-                  <b style={{ fontSize: 13.5 }}>{otherName}</b>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+                    <b style={{ fontSize: 13.5 }}>{otherName}</b>
+                    {c.status === 'tratada' && (
+                      <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 7px', borderRadius: 8, background: 'var(--line)', color: 'var(--text-soft)' }}>
+                        TRATADA
+                      </span>
+                    )}
+                  </div>
                   <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 2 }}>
                     {c.properties?.typology} · {c.properties?.address}
                   </div>
@@ -116,12 +160,23 @@ function ChatInner() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--line)', fontSize: 13.5, fontWeight: 600 }}>
-              {activeConversation && (() => {
-                const otherPerson = activeConversation.buyer_id === user.id ? activeConversation.seller : activeConversation.buyer;
-                const otherName = otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
-                return `${otherName} · ${activeConversation.properties?.typology} · ${activeConversation.properties?.address}`;
-              })()}
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 13.5, fontWeight: 600 }}>
+                {activeConversation && (() => {
+                  const otherPerson = activeConversation.buyer_id === user.id ? activeConversation.seller : activeConversation.buyer;
+                  const otherName = otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
+                  return `${otherName} · ${activeConversation.properties?.typology} · ${activeConversation.properties?.address}`;
+                })()}
+              </span>
+              {activeConversation && (
+                <button
+                  onClick={() => toggleConversationStatus(activeConversation.id, activeConversation.status)}
+                  className="btn"
+                  style={{ fontSize: 12, padding: '6px 12px', flexShrink: 0 }}
+                >
+                  {activeConversation.status === 'tratada' ? '↺ Reabrir' : '✓ Marcar como tratada'}
+                </button>
+              )}
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto', padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
