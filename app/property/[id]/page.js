@@ -9,6 +9,9 @@ import Header from '../../../components/Header';
 import { displayAddress } from '../../../lib/displayAddress';
 import MortgageSimulator from '../../../components/MortgageSimulator';
 import ImtCalculator from '../../../components/ImtCalculator';
+import dynamic from 'next/dynamic';
+
+const PropertyLocationMap = dynamic(() => import('../../../components/PropertyLocationMap'), { ssr: false });
 
 export default function PropertyPage() {
   const { id } = useParams();
@@ -151,37 +154,6 @@ export default function PropertyPage() {
     <>
       <Header />
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
-      {photos.length > 0 ? (
-        <div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photos[activePhoto]}
-            alt=""
-            onClick={() => setLightbox(true)}
-            style={{ width: '100%', height: 320, objectFit: 'cover', borderRadius: 8, marginBottom: 8, cursor: 'zoom-in' }}
-          />
-          {photos.length > 1 && (
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto' }}>
-              {photos.map((url, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={i}
-                  src={url}
-                  alt=""
-                  onClick={() => setActivePhoto(i)}
-                  style={{
-                    width: 72, height: 56, objectFit: 'cover', borderRadius: 4, cursor: 'pointer', flexShrink: 0,
-                    border: i === activePhoto ? '2px solid var(--telha)' : '2px solid transparent',
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="card-photo" style={{ height: 320, borderRadius: 8, marginBottom: 24 }} />
-      )}
-
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -310,6 +282,37 @@ export default function PropertyPage() {
             );
           })()}
 
+          {photos.length > 0 ? (
+            <div style={{ marginTop: 24 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photos[activePhoto]}
+                alt=""
+                onClick={() => setLightbox(true)}
+                style={{ width: '100%', height: 380, objectFit: 'cover', borderRadius: 8, marginBottom: 8, cursor: 'zoom-in' }}
+              />
+              {photos.length > 1 && (
+                <div style={{ display: 'flex', gap: 8, marginBottom: 8, overflowX: 'auto' }}>
+                  {photos.map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={i}
+                      src={url}
+                      alt=""
+                      onClick={() => setActivePhoto(i)}
+                      style={{
+                        width: 72, height: 56, objectFit: 'cover', borderRadius: 4, cursor: 'pointer', flexShrink: 0,
+                        border: i === activePhoto ? '2px solid var(--telha)' : '2px solid transparent',
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="card-photo" style={{ height: 380, borderRadius: 8, marginTop: 24 }} />
+          )}
+
           {property.floor_plan_url && (
             <>
               <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>Planta do imóvel</h3>
@@ -325,6 +328,8 @@ export default function PropertyPage() {
               )}
             </>
           )}
+
+          <PropertyLocationMap latitude={property.latitude} longitude={property.longitude} address={displayAddress(property)} />
 
           {property.business_type === 'Venda' && (
             <>
