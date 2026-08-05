@@ -128,6 +128,18 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
           ))}
         </div>
       )}
+
+      {open && typed !== '' && suggestions.length === 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, zIndex: 20,
+          background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6,
+          boxShadow: '0 6px 18px rgba(51,46,34,0.14)', padding: '10px 14px',
+        }}>
+          <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
+            Não encontrada na lista — escreve aqui, a pesquisa vai usar exatamente o que escreveres.
+          </span>
+        </div>
+      )}
     </div>
   );
 }

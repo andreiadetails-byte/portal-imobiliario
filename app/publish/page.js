@@ -238,8 +238,8 @@ function PublishForm() {
       }
     }
 
-    if (!form.district || !form.municipality) {
-      setError('Por favor, escolha o distrito e o concelho na localização.');
+    if (!form.district || !form.municipality || !form.parish) {
+      setError('Por favor, escolha o distrito, o concelho e a localidade.');
       return;
     }
     if (!form.floor) {
@@ -587,7 +587,7 @@ function PublishForm() {
                   autoFocus
                   value={form.municipality}
                   onChange={(e) => updateField('municipality', e.target.value)}
-                  placeholder="Escreva o concelho"
+                  placeholder="Escreve aqui"
                 />
                 <button
                   type="button"
@@ -614,19 +614,20 @@ function PublishForm() {
               >
                 <option value="">Escolha</option>
                 {(concelhosPorDistrito[form.district] || []).map((c) => <option key={c}>{c}</option>)}
-                <option value="__outro__">✎ Não está na lista — escrever</option>
+                <option value="__outro__">✎ Não encontras o teu? Escreve aqui</option>
               </select>
             )}
           </div>
           <div className="field">
-            <label>Localidade / Freguesia <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+            <label>Localidade / Freguesia</label>
             {parishManual ? (
               <div style={{ display: 'flex', gap: 6 }}>
                 <input
                   autoFocus
+                  required
                   value={form.parish}
                   onChange={(e) => updateField('parish', e.target.value)}
-                  placeholder="Escreva a localidade"
+                  placeholder="Escreve aqui"
                 />
                 <button
                   type="button"
@@ -639,6 +640,7 @@ function PublishForm() {
               </div>
             ) : (
               <select
+                required
                 value={form.parish}
                 onChange={(e) => {
                   if (e.target.value === '__outro__') {
@@ -650,9 +652,9 @@ function PublishForm() {
                 }}
                 disabled={!form.municipality}
               >
-                <option value="">Escolha (se disponível)</option>
+                <option value="">Escolha uma opção</option>
                 {(freguesiasPorConcelho[form.municipality] || []).map((f) => <option key={f}>{f}</option>)}
-                <option value="__outro__">✎ Não está na lista — escrever</option>
+                <option value="__outro__">✎ Não encontras a tua? Escreve aqui</option>
               </select>
             )}
           </div>
