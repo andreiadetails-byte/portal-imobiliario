@@ -46,9 +46,12 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) { setError(error.message); return; }
+    if (data.user) {
+      await supabase.from('profiles').update({ email: data.user.email }).eq('id', data.user.id);
+    }
     router.push('/dashboard');
   }
 
@@ -74,7 +77,7 @@ export default function LoginPage() {
           avatar_url = publicUrlData.publicUrl;
         }
       }
-      await supabase.from('profiles').update({ account_type: accountType, ...(avatar_url && { avatar_url }) }).eq('id', data.user.id);
+      await supabase.from('profiles').update({ account_type: accountType, email: data.user.email, ...(avatar_url && { avatar_url }) }).eq('id', data.user.id);
     }
     setLoading(false);
     router.push('/dashboard');

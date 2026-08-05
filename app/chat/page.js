@@ -129,13 +129,24 @@ function ChatInner() {
                 <div
                   key={m.id}
                   style={{
-                    maxWidth: '70%', padding: '10px 14px', borderRadius: 12, fontSize: 13.5,
+                    maxWidth: '70%',
                     alignSelf: m.sender_id === user.id ? 'flex-end' : 'flex-start',
-                    background: m.sender_id === user.id ? 'var(--telha)' : 'var(--plaster)',
-                    color: m.sender_id === user.id ? '#fff' : 'var(--ink)',
                   }}
                 >
-                  {m.content}
+                  {m.sender_id !== user.id && (m.sender_name || m.sender_email) && (
+                    <div style={{ fontSize: 10.5, color: 'var(--text-soft)', marginBottom: 2, paddingLeft: 2 }}>
+                      {m.sender_name}{m.sender_name && m.sender_email && ' · '}{m.sender_email}
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      padding: '10px 14px', borderRadius: 12, fontSize: 13.5,
+                      background: m.sender_id === user.id ? 'var(--telha)' : 'var(--plaster)',
+                      color: m.sender_id === user.id ? '#fff' : 'var(--ink)',
+                    }}
+                  >
+                    {m.content}
+                  </div>
                 </div>
               ))}
             </div>

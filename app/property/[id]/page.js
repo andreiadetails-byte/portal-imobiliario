@@ -20,7 +20,7 @@ export default function PropertyPage() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sent, setSent] = useState(false);
-  const [lead, setLead] = useState({ name: '', phone: '', message: '' });
+  const [lead, setLead] = useState({ name: '', email: '', phone: '', message: '' });
 
   const [user, setUser] = useState(null);
   const [ownerProfile, setOwnerProfile] = useState(null);
@@ -67,6 +67,9 @@ export default function PropertyPage() {
         const { data: fav } = await supabase
           .from('favorites').select('id').eq('user_id', currentUser.id).eq('property_id', data.id).maybeSingle();
         setIsFavorite(!!fav);
+
+        const { data: myProfile } = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
+        setLead((cur) => ({ ...cur, name: myProfile?.full_name || '', email: currentUser.email || '' }));
       }
     }
     if (id) load();
@@ -122,26 +125,28 @@ export default function PropertyPage() {
   async function handleSendLead(e) {
     e.preventDefault();
 
-    // Guarda sempre como lead (garante o email de notificação e a lista no painel do anunciante)
-    await supabase.from('leads').insert({
-      property_id: property.id,
-      owner_id: property.owner_id,
-      name: lead.name,
-      phone: lead.phone,
-      message: lead.message,
-    });
-
-    // Se a pessoa tiver sessão iniciada, a mesma mensagem também fica visível no chat,
-    // já associada ao seu nome — em vez de ficar só isolada numa lista de leads.
     if (user && user.id !== property.owner_id) {
+      // Com sessão iniciada: um sistema só — vai diretamente para o chat, com o nome e email visíveis na conversa.
       const conversationId = await getOrCreateConversation();
       if (conversationId) {
         await supabase.from('messages').insert({
           conversation_id: conversationId,
           sender_id: user.id,
           content: lead.message,
+          sender_name: lead.name,
+          sender_email: lead.email,
         });
       }
+    } else {
+      // Sem sessão iniciada, não há forma de chat — fica como lead (com nome, email e contacto).
+      await supabase.from('leads').insert({
+        property_id: property.id,
+        owner_id: property.owner_id,
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        message: lead.message,
+      });
     }
 
     setSent(true);
@@ -371,40 +376,54 @@ export default function PropertyPage() {
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', textAlign: 'center', padding: '12px 0' }}>
               {t('property_own_listing')}
             </p>
-          ) : (
-            <>
-              <button onClick={startConversation} className="btn btn-block" style={{ marginBottom: 14 }}>
-                {t('property_chat_btn')}
-              </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 16px', fontSize: 11.5, color: 'var(--text-soft)' }}>
-                <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
-                {t('property_or_form')}
-                <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+          ) : sent ? (
+            <p style={{ fontSize: 14 }}>
+              {user ? (
+                <>Mensagem enviada! Pode continuar a conversa no <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>chat</Link>.</>
+              ) : t('property_sent')}
+            </p>
+          ) : user ? (
+            <form onSubmit={handleSendLead}>
+              <div className="field">
+                <label>O seu nome</label>
+                <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
               </div>
-
-              {sent ? (
-                <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
-              ) : (
-                <form onSubmit={handleSendLead}>
-                  <div className="field">
-                    <label>{t('property_name')}</label>
-                    <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
-                  </div>
-                  <div className="field">
-                    <label>{t('property_phone')}</label>
-                    <input required value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
-                  </div>
-                  <div className="field">
-                    <label>{t('property_message')}</label>
-                    <textarea rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
-                  </div>
-                  <button type="submit" className="btn btn-primary btn-block">{t('property_send')}</button>
-                  <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
-                    {t('property_privacy')}
-                  </p>
-                </form>
-              )}
-            </>
+              <div className="field">
+                <label>O seu email</label>
+                <input required type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>Mensagem para {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
+                <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} placeholder="Olá, tenho interesse neste imóvel..." />
+              </div>
+              <button type="submit" className="btn btn-primary btn-block">Enviar mensagem</button>
+              <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
+                A mensagem, o seu nome e email ficam visíveis no chat, associados a esta conversa.
+              </p>
+            </form>
+          ) : (
+            <form onSubmit={handleSendLead}>
+              <div className="field">
+                <label>{t('property_name')}</label>
+                <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>O seu email</label>
+                <input required type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>{t('property_phone')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+                <input value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>{t('property_message')}</label>
+                <textarea rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
+              </div>
+              <button type="submit" className="btn btn-primary btn-block">{t('property_send')}</button>
+              <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
+                {t('property_privacy')}
+              </p>
+            </form>
           )}
         </aside>
       </div>
