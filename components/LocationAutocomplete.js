@@ -87,7 +87,7 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
           <input
             type="text"
             value={typed}
-            onChange={(e) => { setTyped(e.target.value); setOpen(true); if (!distrito) onChange(e.target.value); }}
+            onChange={(e) => { setTyped(e.target.value); setOpen(true); onChange(e.target.value); }}
             onFocus={() => setOpen(true)}
             placeholder={distrito ? '' : placeholder}
             style={{ flex: 1, minWidth: 100, border: 'none', outline: 'none', padding: '6px 2px', fontSize: 14 }}

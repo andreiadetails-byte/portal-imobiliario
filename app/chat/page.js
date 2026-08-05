@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
@@ -29,7 +30,8 @@ function ChatInner() {
       const { data } = await supabase
         .from('conversations')
         .select(`
-          id, property_id, buyer_id, seller_id, status, properties (address, typology),
+          id, property_id, buyer_id, seller_id, status,
+          properties (id, address, typology, price, business_type, property_photos(url, position)),
           buyer:profiles!conversations_buyer_id_fkey (full_name, agency_name),
           seller:profiles!conversations_seller_id_fkey (full_name, agency_name)
         `)
@@ -134,25 +136,34 @@ function ChatInner() {
             {filteredConversations.map((c) => {
               const otherPerson = c.buyer_id === user.id ? c.seller : c.buyer;
               const otherName = otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
+              const photo = c.properties?.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
               return (
                 <div
                   key={c.id}
                   onClick={() => setActiveId(c.id)}
                   style={{
-                    padding: '14px 16px', borderBottom: '1px solid var(--line)', cursor: 'pointer',
+                    display: 'flex', gap: 10, padding: '14px 16px', borderBottom: '1px solid var(--line)', cursor: 'pointer',
                     background: c.id === activeId ? 'var(--plaster)' : 'transparent',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
-                    <b style={{ fontSize: 13.5 }}>{otherName}</b>
-                    {c.status === 'tratada' && (
-                      <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 7px', borderRadius: 8, background: 'var(--line)', color: 'var(--text-soft)' }}>
-                        TRATADA
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 2 }}>
-                    {c.properties?.typology} · {c.properties?.address}
+                  {photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={photo} alt="" style={{ width: 40, height: 32, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: 40, height: 32, borderRadius: 4, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
+                  )}
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+                      <b style={{ fontSize: 13.5 }}>{otherName}</b>
+                      {c.status === 'tratada' && (
+                        <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 7px', borderRadius: 8, background: 'var(--line)', color: 'var(--text-soft)', flexShrink: 0 }}>
+                          TRATADA
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {c.properties?.typology} · {c.properties?.address}
+                    </div>
                   </div>
                 </div>
               );
@@ -160,22 +171,48 @@ function ChatInner() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 13.5, fontWeight: 600 }}>
-                {activeConversation && (() => {
-                  const otherPerson = activeConversation.buyer_id === user.id ? activeConversation.seller : activeConversation.buyer;
-                  const otherName = otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
-                  return `${otherName} · ${activeConversation.properties?.typology} · ${activeConversation.properties?.address}`;
-                })()}
-              </span>
-              {activeConversation && (
-                <button
-                  onClick={() => toggleConversationStatus(activeConversation.id, activeConversation.status)}
-                  className="btn"
-                  style={{ fontSize: 12, padding: '6px 12px', flexShrink: 0 }}
+            <div style={{ borderBottom: '1px solid var(--line)' }}>
+              <div style={{ padding: '14px 18px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 13.5, fontWeight: 600 }}>
+                  {activeConversation && (() => {
+                    const otherPerson = activeConversation.buyer_id === user.id ? activeConversation.seller : activeConversation.buyer;
+                    return otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
+                  })()}
+                </span>
+                {activeConversation && (
+                  <button
+                    onClick={() => toggleConversationStatus(activeConversation.id, activeConversation.status)}
+                    className="btn"
+                    style={{ fontSize: 12, padding: '6px 12px', flexShrink: 0 }}
+                  >
+                    {activeConversation.status === 'tratada' ? '↺ Reabrir' : '✓ Marcar como tratada'}
+                  </button>
+                )}
+              </div>
+              {activeConversation?.properties && (
+                <Link
+                  href={`/property/${activeConversation.properties.id}`}
+                  target="_blank"
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 18px 12px' }}
                 >
-                  {activeConversation.status === 'tratada' ? '↺ Reabrir' : '✓ Marcar como tratada'}
-                </button>
+                  {(() => {
+                    const photo = activeConversation.properties.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+                    return photo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={photo} alt="" style={{ width: 44, height: 34, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                    ) : (
+                      <div style={{ width: 44, height: 34, borderRadius: 4, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
+                    );
+                  })()}
+                  <div style={{ fontSize: 12, lineHeight: 1.3 }}>
+                    <div style={{ fontWeight: 600 }}>
+                      {activeConversation.properties.typology} · {activeConversation.properties.address}
+                    </div>
+                    <div style={{ color: 'var(--text-soft)' }}>
+                      {Number(activeConversation.properties.price).toLocaleString('pt-PT')} {activeConversation.properties.business_type === 'Arrendamento' ? '€/mês' : '€'} · Ver anúncio ↗
+                    </div>
+                  </div>
+                </Link>
               )}
             </div>
 
