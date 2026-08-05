@@ -70,7 +70,12 @@ function ResultsInner() {
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
-    if (district) query = query.or(`district.ilike.%${district}%,address.ilike.%${district}%,municipality.ilike.%${district}%,parish.ilike.%${district}%`);
+    if (district) {
+      // Junta as palavras com "%" no meio, para "vila nova gaia" encontrar
+      // "Vila Nova de Gaia" sem ser preciso escrever o "de".
+      const pattern = `%${district.trim().split(/\s+/).filter(Boolean).join('%')}%`;
+      query = query.or(`district.ilike.${pattern},address.ilike.${pattern},municipality.ilike.${pattern},parish.ilike.${pattern}`);
+    }
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
