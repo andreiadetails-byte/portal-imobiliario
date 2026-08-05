@@ -122,46 +122,59 @@ function ResultsInner() {
 
             <div className="field">
               <label>{t('results_type')}</label>
-              {TIPOS.map((tp) => (
-                <label key={tp} style={{ display: 'flex', gap: 6, fontSize: 13, marginBottom: 5, fontWeight: 400 }}>
-                  <input
-                    type="checkbox"
-                    checked={selectedTypes.includes(tp)}
-                    onChange={() => toggleFromList(selectedTypes, setSelectedTypes, tp)}
-                  />
-                  {tp}
-                </label>
-              ))}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                {TIPOS.map((tp) => (
+                  <span
+                    key={tp}
+                    onClick={() => toggleFromList(selectedTypes, setSelectedTypes, tp)}
+                    style={{
+                      fontSize: 11.5, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer',
+                      border: '1px solid var(--line)',
+                      background: selectedTypes.includes(tp) ? 'var(--azulejo)' : 'var(--paper)',
+                      color: selectedTypes.includes(tp) ? '#fff' : 'var(--text-soft)',
+                    }}
+                  >
+                    {tp}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <div className="field">
               <label>{t('results_typology')}</label>
-              {TIPOLOGIAS.map((tp) => (
-                <label key={tp} style={{ display: 'flex', gap: 6, fontSize: 13, marginBottom: 5, fontWeight: 400 }}>
-                  <input
-                    type="checkbox"
-                    checked={selectedTypologies.includes(tp)}
-                    onChange={() => toggleFromList(selectedTypologies, setSelectedTypologies, tp)}
-                  />
-                  {tp}
-                </label>
-              ))}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                {TIPOLOGIAS.map((tp) => (
+                  <span
+                    key={tp}
+                    onClick={() => toggleFromList(selectedTypologies, setSelectedTypologies, tp)}
+                    style={{
+                      fontSize: 12, padding: '6px 0', textAlign: 'center', borderRadius: 5, cursor: 'pointer',
+                      border: '1px solid var(--line)',
+                      background: selectedTypologies.includes(tp) ? 'var(--azulejo)' : 'var(--paper)',
+                      color: selectedTypologies.includes(tp) ? '#fff' : 'var(--text-soft)',
+                    }}
+                  >
+                    {tp}
+                  </span>
+                ))}
+              </div>
             </div>
 
-            <div className="field">
-              <label>Quartos (mín.)</label>
-              <select value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)}>
-                <option value="">Qualquer</option>
-                {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}+</option>)}
-              </select>
-            </div>
-
-            <div className="field">
-              <label>Casas de banho (mín.)</label>
-              <select value={minBathrooms} onChange={(e) => setMinBathrooms(e.target.value)}>
-                <option value="">Qualquer</option>
-                {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}+</option>)}
-              </select>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div className="field">
+                <label>Quartos (mín.)</label>
+                <select value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)}>
+                  <option value="">Qualquer</option>
+                  {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}+</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label>WC (mín.)</label>
+                <select value={minBathrooms} onChange={(e) => setMinBathrooms(e.target.value)}>
+                  <option value="">Qualquer</option>
+                  {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}+</option>)}
+                </select>
+              </div>
             </div>
 
             <div className="field">
@@ -171,19 +184,25 @@ function ResultsInner() {
 
             <div className="field">
               <label>Características</label>
-              {[
-                ['has_storage', 'Arrumos'], ['has_parking', 'Estacionamento'], ['has_balcony', 'Varanda'],
-                ['has_garden', 'Jardim'], ['has_pool', 'Piscina'], ['has_gym', 'Ginásio'], ['has_coworking', 'Sala coworking'],
-              ].map(([col, label]) => (
-                <label key={col} style={{ display: 'flex', gap: 6, fontSize: 13, marginBottom: 5, fontWeight: 400 }}>
-                  <input
-                    type="checkbox"
-                    checked={selectedAmenities.includes(col)}
-                    onChange={() => toggleFromList(selectedAmenities, setSelectedAmenities, col)}
-                  />
-                  {label}
-                </label>
-              ))}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                {[
+                  ['has_storage', 'Arrumos'], ['has_parking', 'Estacion.'], ['has_balcony', 'Varanda'],
+                  ['has_garden', 'Jardim'], ['has_pool', 'Piscina'], ['has_gym', 'Ginásio'], ['has_coworking', 'Coworking'],
+                ].map(([col, label]) => (
+                  <span
+                    key={col}
+                    onClick={() => toggleFromList(selectedAmenities, setSelectedAmenities, col)}
+                    style={{
+                      fontSize: 11, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer',
+                      border: '1px solid var(--line)',
+                      background: selectedAmenities.includes(col) ? 'var(--azulejo)' : 'var(--paper)',
+                      color: selectedAmenities.includes(col) ? '#fff' : 'var(--text-soft)',
+                    }}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <button type="submit" className="btn btn-primary btn-block">{t('results_filter')}</button>

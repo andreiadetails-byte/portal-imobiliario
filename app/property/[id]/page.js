@@ -29,7 +29,7 @@ export default function PropertyPage() {
   const [similar, setSimilar] = useState([]);
   const [reportModal, setReportModal] = useState(false);
   const [reportSent, setReportSent] = useState(false);
-  const [reportForm, setReportForm] = useState({ reason: 'Anúncio enganador ou falso', details: '', contact: '' });
+  const [reportForm, setReportForm] = useState({ reason: 'Anúncio enganador ou falso', details: '', name: '', contact: '' });
 
   useEffect(() => {
     async function load() {
@@ -88,30 +88,38 @@ export default function PropertyPage() {
       property_id: property.id,
       reason: reportForm.reason,
       details: reportForm.details,
+      reporter_name: reportForm.name,
       reporter_contact: reportForm.contact,
     });
     setReportSent(true);
   }
 
-  async function startConversation() {
-    if (!user) { router.push('/login'); return; }
-    if (user.id === property.owner_id) return;
+  async function getOrCreateConversation() {
+    if (!user || user.id === property.owner_id) return null;
 
     const { data: existing } = await supabase
       .from('conversations').select('id').eq('property_id', property.id).eq('buyer_id', user.id).maybeSingle();
-
-    if (existing) { router.push(`/chat?c=${existing.id}`); return; }
+    if (existing) return existing.id;
 
     const { data: created, error } = await supabase
       .from('conversations')
       .insert({ property_id: property.id, buyer_id: user.id, seller_id: property.owner_id })
       .select().single();
 
-    if (!error) router.push(`/chat?c=${created.id}`);
+    return error ? null : created.id;
+  }
+
+  async function startConversation() {
+    if (!user) { router.push('/login'); return; }
+    if (user.id === property.owner_id) return;
+    const conversationId = await getOrCreateConversation();
+    if (conversationId) router.push(`/chat?c=${conversationId}`);
   }
 
   async function handleSendLead(e) {
     e.preventDefault();
+
+    // Guarda sempre como lead (garante o email de notificação e a lista no painel do anunciante)
     await supabase.from('leads').insert({
       property_id: property.id,
       owner_id: property.owner_id,
@@ -119,6 +127,20 @@ export default function PropertyPage() {
       phone: lead.phone,
       message: lead.message,
     });
+
+    // Se a pessoa tiver sessão iniciada, a mesma mensagem também fica visível no chat,
+    // já associada ao seu nome — em vez de ficar só isolada numa lista de leads.
+    if (user && user.id !== property.owner_id) {
+      const conversationId = await getOrCreateConversation();
+      if (conversationId) {
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: lead.message,
+        });
+      }
+    }
+
     setSent(true);
   }
 
@@ -199,6 +221,10 @@ export default function PropertyPage() {
           <div className="addr" style={{ fontSize: 17 }}>{property.typology} · {displayAddress(property)}</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div className="meta">{property.district}{property.internal_reference && ` · Ref. ${property.internal_reference}`}</div>
+            <div className="meta" style={{ marginTop: 4, display: 'flex', gap: 14 }}>
+              <span>📅 Publicado há {Math.max(0, Math.floor((Date.now() - new Date(property.created_at)) / 86400000))} dias</span>
+              <span>👁 {property.views_count || 0} visualizações</span>
+            </div>
             <button
               onClick={() => setReportModal(true)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-soft)', textDecoration: 'underline' }}
@@ -228,11 +254,38 @@ export default function PropertyPage() {
           <h3 className="display" style={{ fontSize: 19, marginBottom: 10 }}>{t('property_about')}</h3>
           <p style={{ color: 'var(--text-soft)', fontSize: 14.5 }}>{property.description}</p>
 
-          {property.solar_orientations?.length > 0 && (
-            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginTop: 10 }}>
-              <b style={{ color: 'var(--ink)' }}>Orientação solar:</b> {property.solar_orientations.join(', ')}
-            </p>
+          {ownerProfile && user?.id !== property.owner_id && (
+            <div
+              onClick={startConversation}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, padding: '12px 16px',
+                background: 'var(--plaster)', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              💬
+              <span style={{ fontSize: 13.5 }}>
+                Fale com <b>{ownerProfile.agency_name || ownerProfile.full_name}</b> sobre este imóvel, diretamente no chat.
+              </span>
+            </div>
           )}
+
+          <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[
+              property.area_util && ['Área útil', `${property.area_util} m²`],
+              property.floor && ['Piso', property.floor],
+              property.solar_orientations?.length > 0 && ['Orientação', property.solar_orientations.join(', ')],
+              property.energy_certificate && ['Classe energética', property.energy_certificate],
+              property.state && ['Estado do imóvel', property.state],
+              ['Elevador', property.features?.includes('Elevador') ? 'Sim' : 'Não'],
+              ['Estacionamento', property.has_parking ? 'Sim' : 'Não'],
+              ['Varanda', property.has_balcony ? 'Sim' : 'Não'],
+            ].filter(Boolean).map(([label, value]) => (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5, padding: '8px 0', borderBottom: '1px solid var(--line)' }}>
+                <span style={{ color: 'var(--text-soft)' }}>{label}</span>
+                <b>{value}</b>
+              </div>
+            ))}
+          </div>
 
           {(() => {
             const amenities = [
@@ -410,13 +463,18 @@ export default function PropertyPage() {
               </div>
 
               <div className="field">
+                <label>O seu nome</label>
+                <input required value={reportForm.name} onChange={(e) => setReportForm({ ...reportForm, name: e.target.value })} />
+              </div>
+
+              <div className="field">
                 <label>Detalhes <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
                 <textarea rows={3} value={reportForm.details} onChange={(e) => setReportForm({ ...reportForm, details: e.target.value })} />
               </div>
 
               <div className="field">
-                <label>O seu contacto <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional, só para a nossa equipa)</span></label>
-                <input value={reportForm.contact} onChange={(e) => setReportForm({ ...reportForm, contact: e.target.value })} />
+                <label>O seu contacto <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(email ou telefone, para vos podermos responder se for preciso)</span></label>
+                <input required value={reportForm.contact} onChange={(e) => setReportForm({ ...reportForm, contact: e.target.value })} />
               </div>
 
               <button type="submit" className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>Enviar denúncia</button>

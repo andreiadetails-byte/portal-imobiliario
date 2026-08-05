@@ -100,7 +100,7 @@ export default function AdminPage() {
   async function loadReports() {
     const { data } = await supabase
       .from('reports')
-      .select('id, reason, details, reporter_contact, status, created_at, properties(id, typology, address)')
+      .select('id, reason, details, reporter_name, reporter_contact, status, created_at, properties(id, typology, address)')
       .order('created_at', { ascending: false });
     setReports(data || []);
   }
@@ -192,11 +192,16 @@ export default function AdminPage() {
     setProperties((cur) => cur.filter((p) => p.id !== id));
   }
 
-  async function cancelProperty(id) {
+  async function cancelProperty(propObj) {
     const reason = prompt('Motivo da anulação (visível ao anunciante):');
     if (!reason) return;
-    await supabase.from('properties').update({ status: 'anulado_suporte', cancellation_reason: reason }).eq('id', id);
-    setProperties((cur) => cur.filter((p) => p.id !== id));
+    await supabase.from('properties').update({ status: 'anulado_suporte', cancellation_reason: reason }).eq('id', propObj.id);
+    await supabase.from('notifications').insert({
+      user_id: propObj.owner_id,
+      message: `O seu anúncio "${propObj.typology} · ${propObj.address}" foi anulado. Motivo: ${reason}`,
+      link: '/dashboard',
+    });
+    setProperties((cur) => cur.filter((p) => p.id !== propObj.id));
     alert('Anúncio anulado. O anunciante não pode republicá-lo — terá de criar um novo.');
   }
 
@@ -288,7 +293,7 @@ export default function AdminPage() {
                 <button onClick={() => updateStatus(p.id, 'rejeitado')} className="btn" style={{ fontSize: 13 }}>Rejeitar</button>
               )}
               {p.status === 'ativo' && (
-                <button onClick={() => cancelProperty(p.id)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>Anular</button>
+                <button onClick={() => cancelProperty(p)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>Anular</button>
               )}
             </div>
           </div>
@@ -312,7 +317,7 @@ export default function AdminPage() {
                     {r.properties ? `${r.properties.typology} · ${r.properties.address}` : 'Imóvel removido'} · {r.status}
                   </div>
                   {r.details && <p style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 4, maxWidth: 460 }}>{r.details}</p>}
-                  {r.reporter_contact && <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 4 }}>Contacto: {r.reporter_contact}</p>}
+                  {r.reporter_contact && <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 4 }}>De: {r.reporter_name || 'sem nome'} · Contacto: {r.reporter_contact}</p>}
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   {r.properties && (

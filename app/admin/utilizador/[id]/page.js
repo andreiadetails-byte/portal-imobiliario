@@ -50,11 +50,16 @@ export default function AdminUserPage() {
     checkAndLoad();
   }, [id, router]);
 
-  async function cancelProperty(propId) {
+  async function cancelProperty(propObj) {
     const reason = prompt('Motivo da anulação (visível ao anunciante):');
     if (!reason) return;
-    await supabase.from('properties').update({ status: 'anulado_suporte', cancellation_reason: reason }).eq('id', propId);
-    setProperties((cur) => cur.map((p) => (p.id === propId ? { ...p, status: 'anulado_suporte', cancellation_reason: reason } : p)));
+    await supabase.from('properties').update({ status: 'anulado_suporte', cancellation_reason: reason }).eq('id', propObj.id);
+    await supabase.from('notifications').insert({
+      user_id: profile.id,
+      message: `O seu anúncio "${propObj.typology} · ${propObj.address}" foi anulado. Motivo: ${reason}`,
+      link: '/dashboard',
+    });
+    setProperties((cur) => cur.map((p) => (p.id === propObj.id ? { ...p, status: 'anulado_suporte', cancellation_reason: reason } : p)));
   }
 
   if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar acesso...</div></>);
@@ -119,7 +124,7 @@ export default function AdminUserPage() {
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   <a href={`/property/${p.id}`} target="_blank" rel="noopener noreferrer" className="btn" style={{ fontSize: 13 }}>Ver anúncio</a>
                   {p.status === 'ativo' && (
-                    <button onClick={() => cancelProperty(p.id)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>
+                    <button onClick={() => cancelProperty(p)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>
                       Anular
                     </button>
                   )}

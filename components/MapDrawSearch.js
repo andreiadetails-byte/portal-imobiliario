@@ -89,7 +89,14 @@ export default function MapDrawSearch({ properties, onFilter }) {
       )}
 
       <div style={{ height: 340, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--line)' }}>
-        <MapContainer center={[39.5, -8.0]} zoom={7} style={{ height: '100%', width: '100%' }}>
+        <MapContainer
+          center={[39.5, -8.0]}
+          zoom={7}
+          minZoom={5}
+          maxBounds={[[29.0, -32.0], [43.5, -5.5]]}
+          maxBoundsViscosity={1.0}
+          style={{ height: '100%', width: '100%' }}
+        >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

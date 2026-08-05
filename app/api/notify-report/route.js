@@ -30,6 +30,7 @@ export async function POST(request) {
             <p><b>Imóvel:</b> ${property ? `${property.typology} · ${property.address}` : report.property_id}</p>
             <p><b>Motivo:</b> ${report.reason}</p>
             <p><b>Detalhes:</b> ${report.details || '—'}</p>
+            <p><b>Nome de quem denunciou:</b> ${report.reporter_name || 'não fornecido'}</p>
             <p><b>Contacto de quem denunciou (interno):</b> ${report.reporter_contact || 'não fornecido'}</p>
             <p style="margin-top:16px; font-size:12px; color:#8a3b2a;">
               Nota: os dados de quem denunciou não são partilhados com o anunciante.

@@ -163,8 +163,17 @@ function PublishForm() {
 
   function handlePhotoSelect(e) {
     const files = Array.from(e.target.files || []);
-    const newPhotos = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
-    setPhotos((cur) => [...cur, ...newPhotos].slice(0, 25)); // máximo 25 fotos
+    files.forEach((file) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        if (img.naturalWidth < 800 || img.naturalHeight < 600) {
+          setError(`A foto "${file.name}" tem resolução baixa (${img.naturalWidth}×${img.naturalHeight}px) e pode ficar desfocada no anúncio. Recomendamos pelo menos 800×600px.`);
+        }
+        setPhotos((cur) => [...cur, { file, preview: url }].slice(0, 25));
+      };
+      img.src = url;
+    });
     e.target.value = '';
   }
 
@@ -403,9 +412,28 @@ function PublishForm() {
           </div>
           <div className="field">
             <label>Tipologia</label>
-            <select value={form.typology} onChange={(e) => updateField('typology', e.target.value)}>
+            <select
+              value={form.typology}
+              onChange={(e) => {
+                const novaTipologia = e.target.value;
+                updateField('typology', novaTipologia);
+                const sugerido = { T0: 0, T1: 1, T2: 2, T3: 3, T4: 4, 'T5+': 5 }[novaTipologia];
+                if (sugerido !== undefined) updateField('bedrooms', sugerido);
+              }}
+            >
               {['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'].map((t) => <option key={t}>{t}</option>)}
             </select>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="field">
+            <label>Quartos</label>
+            <input type="number" min={0} required value={form.bedrooms} onChange={(e) => updateField('bedrooms', e.target.value)} />
+          </div>
+          <div className="field">
+            <label>Casas de banho (WC)</label>
+            <input type="number" min={0} required value={form.bathrooms} onChange={(e) => updateField('bathrooms', e.target.value)} />
           </div>
         </div>
 

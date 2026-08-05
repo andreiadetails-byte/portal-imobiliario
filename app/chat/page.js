@@ -27,7 +27,11 @@ function ChatInner() {
 
       const { data } = await supabase
         .from('conversations')
-        .select('id, property_id, buyer_id, seller_id, properties (address, typology)')
+        .select(`
+          id, property_id, buyer_id, seller_id, properties (address, typology),
+          buyer:profiles!conversations_buyer_id_fkey (full_name, agency_name),
+          seller:profiles!conversations_seller_id_fkey (full_name, agency_name)
+        `)
         .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
         .order('created_at', { ascending: false });
 
@@ -90,26 +94,34 @@ function ChatInner() {
       ) : (
         <div className="card" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: 520, overflow: 'hidden' }}>
           <div style={{ borderRight: '1px solid var(--line)', overflowY: 'auto' }}>
-            {conversations.map((c) => (
-              <div
-                key={c.id}
-                onClick={() => setActiveId(c.id)}
-                style={{
-                  padding: '14px 16px', borderBottom: '1px solid var(--line)', cursor: 'pointer',
-                  background: c.id === activeId ? 'var(--plaster)' : 'transparent',
-                }}
-              >
-                <b style={{ fontSize: 13.5 }}>{c.properties?.typology} · {c.properties?.address}</b>
-                <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 2 }}>
-                  {c.buyer_id === user.id ? t('chat_with_advertiser') : t('chat_with_interested')}
+            {conversations.map((c) => {
+              const otherPerson = c.buyer_id === user.id ? c.seller : c.buyer;
+              const otherName = otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => setActiveId(c.id)}
+                  style={{
+                    padding: '14px 16px', borderBottom: '1px solid var(--line)', cursor: 'pointer',
+                    background: c.id === activeId ? 'var(--plaster)' : 'transparent',
+                  }}
+                >
+                  <b style={{ fontSize: 13.5 }}>{otherName}</b>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 2 }}>
+                    {c.properties?.typology} · {c.properties?.address}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--line)', fontSize: 13.5, fontWeight: 600 }}>
-              {activeConversation ? `${activeConversation.properties?.typology} · ${activeConversation.properties?.address}` : ''}
+              {activeConversation && (() => {
+                const otherPerson = activeConversation.buyer_id === user.id ? activeConversation.seller : activeConversation.buyer;
+                const otherName = otherPerson?.agency_name || otherPerson?.full_name || 'Utilizador';
+                return `${otherName} · ${activeConversation.properties?.typology} · ${activeConversation.properties?.address}`;
+              })()}
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto', padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
