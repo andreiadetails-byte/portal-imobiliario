@@ -70,7 +70,7 @@ function ResultsInner() {
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
-    if (district) query = query.or(`district.ilike.%${district}%,address.ilike.%${district}%`);
+    if (district) query = query.or(`district.ilike.%${district}%,address.ilike.%${district}%,municipality.ilike.%${district}%,parish.ilike.%${district}%`);
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
