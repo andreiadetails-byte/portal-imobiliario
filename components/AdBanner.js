@@ -19,10 +19,7 @@ function AdItem({ ad }) {
         <img
           src={ad.image_url}
           alt={ad.title}
-          style={{
-            width: 130, height: 90, objectFit: 'contain', borderRadius: 6, flexShrink: 0,
-            background: '#fff', border: '1px solid var(--line)', padding: 4,
-          }}
+          style={{ width: 130, height: 90, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }}
         />
       ) : (
         <div style={{
