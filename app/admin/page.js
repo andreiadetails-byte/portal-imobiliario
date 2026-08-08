@@ -666,7 +666,25 @@ export default function AdminPage() {
               >
                 {adImage ? `🖼️ ${adImage.name}` : 'Clique para escolher uma imagem'}
               </label>
-              <input id="ad-image-input" type="file" accept="image/*" onChange={(e) => setAdImage(e.target.files?.[0] || null)} style={{ display: 'none' }} />
+              <input
+                id="ad-image-input"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const img = new Image();
+                  const url = URL.createObjectURL(file);
+                  img.onload = () => {
+                    if (img.naturalWidth < 300 || img.naturalHeight < 200) {
+                      alert(`Esta imagem tem resolução baixa (${img.naturalWidth}×${img.naturalHeight}px) e pode ficar desfocada. Recomendamos pelo menos 300×200px.`);
+                    }
+                    setAdImage(file);
+                  };
+                  img.src = url;
+                }}
+                style={{ display: 'none' }}
+              />
             </div>
             <button type="submit" className="btn btn-primary" disabled={savingAd}>
               {savingAd ? 'A publicar...' : 'Publicar banner'}

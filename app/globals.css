@@ -90,3 +90,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   50% { box-shadow: 0 0 0 3px rgba(216,201,163,0); border-color: var(--telha); }
 }
 .card-destaque{ animation: destaque-pulse 2.2s ease-in-out infinite; }
+
+@keyframes ad-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-33.333%); }
+}
