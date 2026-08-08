@@ -16,10 +16,17 @@ function AdItem({ ad }) {
     >
       {ad.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={ad.image_url} alt={ad.title} style={{ width: 96, height: 74, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+        <img
+          src={ad.image_url}
+          alt={ad.title}
+          style={{
+            width: 130, height: 90, objectFit: 'contain', borderRadius: 6, flexShrink: 0,
+            background: '#fff', border: '1px solid var(--line)', padding: 4,
+          }}
+        />
       ) : (
         <div style={{
-          width: 96, height: 74, borderRadius: 6, flexShrink: 0,
+          width: 130, height: 90, borderRadius: 6, flexShrink: 0,
           background: 'linear-gradient(135deg, var(--brass), #9C7A42)',
         }} />
       )}
