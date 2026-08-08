@@ -75,8 +75,13 @@ export default function HomePage() {
           backgroundImage: 'linear-gradient(rgba(30,26,18,0.62), rgba(30,26,18,0.42)), url(/hero.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          position: 'relative',
         }}
       >
+        <div style={{ position: 'absolute', top: 24, right: 32, zIndex: 2 }}>
+          <ThinkingCharacter />
+        </div>
+
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
@@ -90,10 +95,6 @@ export default function HomePage() {
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', maxWidth: 480, marginBottom: 24 }}>
             {t('home_lede')}
           </p>
-
-          <div style={{ marginBottom: 24 }}>
-            <ThinkingCharacter />
-          </div>
         </div>
 
         <div className="wrap">
