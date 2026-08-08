@@ -292,20 +292,20 @@ function ResultsInner() {
                   {i > 0 && i % 5 === 0 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '300px 1fr', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '380px 1fr', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
                     <div style={{ position: 'relative', height: '100%' }}>
                       {firstPhoto ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 230, objectFit: 'cover' }} />
+                        <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 210, objectFit: 'cover' }} />
                       ) : (
-                        <div className="card-photo" style={{ height: '100%', minHeight: 230 }} />
+                        <div className="card-photo" style={{ height: '100%', minHeight: 210 }} />
                       )}
 
                       {p.featured_status === 'active' && (
                         <span style={{
-                          position: 'absolute', top: 10, left: 10, fontSize: 11.5, fontWeight: 700,
+                          position: 'absolute', top: 10, left: 10, fontSize: 11, fontWeight: 700,
                           padding: '4px 10px', borderRadius: 10, background: 'var(--brass)', color: '#5C4E2A',
                         }}>
                           ★ DESTAQUE
@@ -316,8 +316,8 @@ function ResultsInner() {
                         onClick={(e) => toggleFavorite(e, p.id)}
                         aria-label="Guardar nos favoritos"
                         style={{
-                          position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: '50%',
-                          background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 17,
+                          position: 'absolute', top: 10, right: 10, width: 32, height: 32, borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 16,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           color: isFav ? '#b8452f' : 'var(--ink)',
                         }}
@@ -327,21 +327,21 @@ function ResultsInner() {
 
                       {sortedPhotos.length > 1 && (
                         <span style={{
-                          position: 'absolute', bottom: 10, right: 10, fontSize: 11, fontWeight: 600,
-                          padding: '3px 9px', borderRadius: 10, background: 'rgba(0,0,0,0.6)', color: '#fff',
+                          position: 'absolute', bottom: 10, right: 10, fontSize: 10.5, fontWeight: 600,
+                          padding: '3px 8px', borderRadius: 10, background: 'rgba(0,0,0,0.6)', color: '#fff',
                         }}>
                           📷 {sortedPhotos.length}
                         </span>
                       )}
                     </div>
 
-                    <div className="card-body" style={{ padding: 22, display: 'flex', flexDirection: 'column' }}>
-                      <div className="price mono" style={{ fontSize: 27 }}>
+                    <div className="card-body" style={{ padding: 18, display: 'flex', flexDirection: 'column' }}>
+                      <div className="price" style={{ fontSize: 19 }}>
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
-                      <div className="addr" style={{ fontSize: 20, marginTop: 6 }}>{p.typology} · {displayAddress(p)}</div>
+                      <div className="addr" style={{ fontSize: 14.5, marginTop: 4, fontWeight: 500 }}>{p.typology} · {displayAddress(p)}</div>
 
-                      <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: 14.5, color: 'var(--text-soft)' }}>
+                      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 12.5, color: 'var(--text-soft)' }}>
                         {(p.area || p.area_util) && <span>📐 {p.area || p.area_util} m²</span>}
                         <span>🛏 {p.bedrooms} {t('property_rooms').toLowerCase()}</span>
                         <span>🚿 {p.bathrooms} wc</span>
@@ -349,7 +349,7 @@ function ResultsInner() {
 
                       {p.description && (
                         <p style={{
-                          fontSize: 13.5, color: 'var(--text-soft)', marginTop: 12, lineHeight: 1.5,
+                          fontSize: 12, color: 'var(--text-soft)', marginTop: 10, lineHeight: 1.5,
                           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                         }}>
                           {p.description}
@@ -358,24 +358,24 @@ function ResultsInner() {
 
                       <div style={{ flex: 1 }} />
 
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                           {p.profiles?.avatar_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.profiles.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} />
+                            <img src={p.profiles.avatar_url} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
                           ) : (
                             <div style={{
-                              width: 28, height: 28, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600,
+                              width: 24, height: 24, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10.5, fontWeight: 600,
                             }}>
                               {(p.profiles?.agency_name || p.profiles?.full_name || '?')[0].toUpperCase()}
                             </div>
                           )}
-                          <span style={{ fontSize: 13, color: 'var(--text-soft)' }}>
+                          <span style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
                             {p.profiles?.agency_name || p.profiles?.full_name || 'Anunciante'}
                           </span>
                         </div>
-                        <span style={{ fontSize: 12, color: 'var(--text-soft)' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-soft)' }}>
                           {new Date(p.created_at).toLocaleDateString('pt-PT')}
                         </span>
                       </div>

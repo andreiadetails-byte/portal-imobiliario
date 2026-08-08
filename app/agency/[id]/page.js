@@ -88,7 +88,7 @@ export default function AgencyPage() {
             <Link key={p.id} href={`/property/${p.id}`} className="card">
               <div className="card-photo" />
               <div className="card-body">
-                <div className="price mono">
+                <div className="price">
                   {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                 </div>
                 <div className="addr">{p.typology} · {displayAddress(p)}</div>

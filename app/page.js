@@ -167,7 +167,7 @@ export default function HomePage() {
                     <div className="card-photo" />
                   )}
                   <div className="card-body">
-                    <div className="price mono">
+                    <div className="price">
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
                     <div className="addr">{p.typology} · {displayAddress(p)}</div>

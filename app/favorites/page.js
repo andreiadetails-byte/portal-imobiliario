@@ -100,7 +100,7 @@ export default function FavoritesPage() {
                   </Link>
                   <div className="card-body">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div className="price mono">
+                      <div className="price">
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
                       <button

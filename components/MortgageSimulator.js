@@ -155,7 +155,7 @@ export default function MortgageSimulator({ price }) {
           </div>
           <div>
             <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Prestação mensal estimada</div>
-            <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--telha)' }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
               {monthlyPayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function MortgageSimulator({ price }) {
           </div>
           <div>
             <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Preço máximo do imóvel</div>
-            <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--telha)' }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
               {maxPropertyPrice.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €
             </div>
           </div>

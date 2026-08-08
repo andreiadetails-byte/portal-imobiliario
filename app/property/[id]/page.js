@@ -163,7 +163,7 @@ export default function PropertyPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div className="price mono" style={{ fontSize: 30 }}>
+            <div className="price" style={{ fontSize: 30 }}>
               {Number(property.price).toLocaleString('pt-PT')} {property.business_type === 'Arrendamento' ? '€/mês' : '€'}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -448,7 +448,7 @@ export default function PropertyPage() {
                     <div className="card-photo" style={{ height: 150 }} />
                   )}
                   <div className="card-body">
-                    <div className="price mono">
+                    <div className="price">
                       {Number(s.price).toLocaleString('pt-PT')} {s.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
                     <div className="addr">{s.typology} · {s.address}</div>

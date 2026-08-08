@@ -163,7 +163,7 @@ export default function ImtCalculator({ price }) {
         </div>
         <div>
           <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Total a pagar antes da escritura</div>
-          <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--telha)' }}>
+          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
             {total.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €
           </div>
         </div>
