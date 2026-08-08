@@ -294,29 +294,49 @@ export default function PropertyPage() {
 
           {photos.length > 0 ? (
             <div style={{ marginTop: 24 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={photos[activePhoto]}
-                alt=""
-                onClick={() => setLightbox(true)}
-                style={{ width: '100%', height: 380, objectFit: 'cover', borderRadius: 8, marginBottom: 8, cursor: 'zoom-in' }}
-              />
-              {photos.length > 1 && (
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8, overflowX: 'auto' }}>
-                  {photos.map((url, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      key={i}
-                      src={url}
-                      alt=""
-                      onClick={() => setActivePhoto(i)}
-                      style={{
-                        width: 72, height: 56, objectFit: 'cover', borderRadius: 4, cursor: 'pointer', flexShrink: 0,
-                        border: i === activePhoto ? '2px solid var(--telha)' : '2px solid transparent',
-                      }}
-                    />
-                  ))}
+              {photos.length > 1 ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, height: 380, borderRadius: 8, overflow: 'hidden' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photos[activePhoto]}
+                    alt=""
+                    onClick={() => setLightbox(true)}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }}
+                  />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%' }}>
+                    {[1, 2].map((offset) => {
+                      const idx = (activePhoto + offset) % photos.length;
+                      const isLast = offset === 2;
+                      const remaining = photos.length - 3;
+                      return (
+                        <div
+                          key={offset}
+                          onClick={() => (isLast && remaining > 0 ? setLightbox(true) : setActivePhoto(idx))}
+                          style={{ position: 'relative', flex: 1, cursor: 'pointer', borderRadius: 4, overflow: 'hidden' }}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={photos[idx]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          {isLast && remaining > 0 && (
+                            <div style={{
+                              position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', color: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 600,
+                            }}>
+                              +{remaining} fotos
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={photos[0]}
+                  alt=""
+                  onClick={() => setLightbox(true)}
+                  style={{ width: '100%', height: 380, objectFit: 'cover', borderRadius: 8, cursor: 'zoom-in' }}
+                />
               )}
             </div>
           ) : (
