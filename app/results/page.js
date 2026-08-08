@@ -302,11 +302,11 @@ function ResultsInner() {
                           display: 'grid', gridTemplateColumns: '400px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
-                    <div style={{ position: 'relative', height: '100%', minHeight: 250 }}>
+                    <div style={{ position: 'relative', height: 260 }}>
                       {sortedPhotos.length > 1 ? (
                         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 4, height: '100%' }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 250, objectFit: 'cover' }} />
+                          <img src={firstPhoto} alt="" style={{ width: '100%', height: 260, objectFit: 'cover' }} />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, height: '100%' }}>
                             {[1, 2].map((offset) => {
                               const photo = sortedPhotos[offset % sortedPhotos.length];
@@ -331,9 +331,9 @@ function ResultsInner() {
                         </div>
                       ) : firstPhoto ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 250, objectFit: 'cover' }} />
+                        <img src={firstPhoto} alt="" style={{ width: '100%', height: 260, objectFit: 'cover' }} />
                       ) : (
-                        <div className="card-photo" style={{ height: '100%', minHeight: 250 }} />
+                        <div className="card-photo" style={{ height: 260 }} />
                       )}
 
                       {p.featured_status === 'active' && (
