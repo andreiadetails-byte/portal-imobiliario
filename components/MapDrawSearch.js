@@ -28,7 +28,7 @@ function DrawClickHandler({ drawing, onPoint }) {
   return null;
 }
 
-export default function MapDrawSearch({ properties, onFilter }) {
+export default function MapDrawSearch({ properties, onFilter, height = 260 }) {
   const [drawing, setDrawing] = useState(false);
   const [points, setPoints] = useState([]);
 
@@ -88,7 +88,7 @@ export default function MapDrawSearch({ properties, onFilter }) {
         </p>
       )}
 
-      <div style={{ height: 260, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--line)' }}>
+      <div style={{ height, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--line)' }}>
         <MapContainer
           center={[39.5, -8.0]}
           zoom={7}

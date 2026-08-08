@@ -143,6 +143,7 @@ function ResultsInner() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
 
+          <div>
           <form onSubmit={runSearch} className="card" style={{ padding: 18, position: 'sticky', top: 90, overflow: 'visible' }}>
             <div className="field">
               <label>{t('results_business')}</label>
@@ -250,6 +251,13 @@ function ResultsInner() {
             <button type="submit" className="btn btn-primary btn-block">{t('results_filter')}</button>
           </form>
 
+          {showMap && (
+            <div className="card" style={{ padding: 10, marginTop: 16 }}>
+              <MapDrawSearch properties={properties} onFilter={setMapFilterIds} height={200} />
+            </div>
+          )}
+          </div>
+
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
               <span style={{ fontSize: 13, color: 'var(--text-soft)' }}>
@@ -269,12 +277,6 @@ function ResultsInner() {
                 </select>
               </div>
             </div>
-
-            {showMap && (
-              <div style={{ marginBottom: 20 }}>
-                <MapDrawSearch properties={properties} onFilter={setMapFilterIds} />
-              </div>
-            )}
 
             {mapFilterIds && (
               <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 12 }}>
