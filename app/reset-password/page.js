@@ -37,7 +37,7 @@ export default function ResetPasswordPage() {
   return (
     <div style={{ maxWidth: 400, margin: '0 auto', padding: '60px 24px' }}>
       <div className="logo" style={{ textAlign: 'center', marginBottom: 32 }}>
-        more<span>&middot;</span>ada
+        More<span>&middot;</span>ada
       </div>
 
       <div className="card" style={{ padding: 32 }}>

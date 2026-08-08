@@ -93,7 +93,7 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="navbar">
-        <Link href="/" className="logo">more<span>&middot;</span>ada</Link>
+        <Link href="/" className="logo">More<span>&middot;</span>ada</Link>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <LanguageSwitcher />
 
@@ -185,22 +185,23 @@ export default function Header() {
       <div className="tile-strip" />
 
       <nav className="bottom-nav">
-        <Link href="/" className="bottom-nav-item">🏠<span>Início</span></Link>
-        <Link href="/results" className="bottom-nav-item">🔍<span>Pesquisar</span></Link>
-        <Link href="/favorites" className="bottom-nav-item">♡<span>Favoritos</span></Link>
+        <Link href="/" className="bottom-nav-item"><span style={{ fontSize: 21 }}>🏠</span><span>Início</span></Link>
+        <Link href="/results" className="bottom-nav-item"><span style={{ fontSize: 21 }}>🔍</span><span>Pesquisar</span></Link>
+        <Link href="/favorites" className="bottom-nav-item"><span style={{ fontSize: 21 }}>♡</span><span>Favoritos</span></Link>
         <Link href="/chat" className="bottom-nav-item" style={{ position: 'relative' }}>
-          💬<span>Chat</span>
+          <span style={{ fontSize: 21 }}>💬</span><span>Chat</span>
           {unreadChat > 0 && (
             <span style={{
-              position: 'absolute', top: 2, right: 18, minWidth: 14, height: 14, borderRadius: 7,
-              background: '#b8452f', color: '#fff', fontSize: 9, fontWeight: 700,
+              position: 'absolute', top: 0, right: 18, minWidth: 15, height: 15, borderRadius: 8,
+              background: 'var(--brass)', color: '#3E2E1A', fontSize: 9.5, fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px',
+              boxShadow: '0 0 0 2px var(--telha)',
             }}>
               {unreadChat > 9 ? '9+' : unreadChat}
             </span>
           )}
         </Link>
-        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item">☰<span>{user ? 'Painel' : 'Entrar'}</span></Link>
+        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item"><span style={{ fontSize: 21 }}>☰</span><span>{user ? 'Painel' : 'Entrar'}</span></Link>
       </nav>
     </header>
   );

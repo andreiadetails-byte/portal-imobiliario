@@ -9,6 +9,7 @@ import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
 import BigPromoBanner from '../components/BigPromoBanner';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
+import ThinkingCharacter from '../components/ThinkingCharacter';
 import dynamic from 'next/dynamic';
 
 const MiniMapPreview = dynamic(() => import('../components/MiniMapPreview'), { ssr: false });
@@ -78,7 +79,7 @@ export default function HomePage() {
       >
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
-            fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.08em',
+            fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
             textTransform: 'uppercase', color: 'var(--brass)', marginBottom: 18, display: 'block',
           }}>
             {t('home_eyebrow')}
@@ -86,9 +87,13 @@ export default function HomePage() {
           <h1 className="display" style={{ fontSize: 48, lineHeight: 1.08, letterSpacing: '-0.01em', marginBottom: 14, color: '#fff' }}>
             {t('home_title')}
           </h1>
-          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', maxWidth: 480, marginBottom: 36 }}>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', maxWidth: 480, marginBottom: 24 }}>
             {t('home_lede')}
           </p>
+
+          <div style={{ marginBottom: 24 }}>
+            <ThinkingCharacter />
+          </div>
         </div>
 
         <div className="wrap">
@@ -208,27 +213,32 @@ export default function HomePage() {
             background: 'var(--brass)', borderRadius: 10, padding: '36px 40px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 24, flexWrap: 'wrap',
           }}>
-            <div>
-              <h2 className="display" style={{ fontSize: 22, marginBottom: 6 }}>{t('home_valuation_title')}</h2>
-              <p style={{ fontSize: 14, color: '#5C4E2A', maxWidth: 420 }}>{t('home_valuation_sub')}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <span style={{ fontSize: 34, animation: 'icon-breathe 2.4s ease-in-out infinite' }}>🏷️</span>
+              <div>
+                <h2 className="display" style={{ fontSize: 22, marginBottom: 6 }}>{t('home_valuation_title')}</h2>
+                <p style={{ fontSize: 14, color: '#5C4E2A', maxWidth: 420 }}>{t('home_valuation_sub')}</p>
+              </div>
             </div>
             <Link href="/valuation" className="btn btn-primary">{t('home_valuation_btn')}</Link>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
-            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '24px 28px' }}>
-              <h3 className="display" style={{ fontSize: 17, marginBottom: 6 }}>Simula aqui o teu crédito</h3>
+            <div className="card-hover-lift" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '24px 28px' }}>
+              <span style={{ fontSize: 30, display: 'block', marginBottom: 8, animation: 'icon-breathe 2.4s ease-in-out infinite' }}>💶</span>
+              <h3 className="display" style={{ fontSize: 17, marginBottom: 6 }}>{t('home_credit_title')}</h3>
               <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 14 }}>
-                Descobre a prestação mensal, ou quanto podes pedir com o que consegues pagar.
+                {t('home_credit_sub')}
               </p>
-              <Link href="/simulador-credito" className="btn" style={{ fontSize: 13 }}>Simular crédito</Link>
+              <Link href="/simulador-credito" className="btn" style={{ fontSize: 13 }}>{t('home_credit_btn')}</Link>
             </div>
-            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '24px 28px' }}>
-              <h3 className="display" style={{ fontSize: 17, marginBottom: 6 }}>Queres saber quanto vais pagar de IMT?</h3>
+            <div className="card-hover-lift" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '24px 28px' }}>
+              <span style={{ fontSize: 30, display: 'block', marginBottom: 8, animation: 'icon-breathe 2.4s ease-in-out infinite 0.4s' }}>🧾</span>
+              <h3 className="display" style={{ fontSize: 17, marginBottom: 6 }}>{t('home_imt_title')}</h3>
               <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 14 }}>
-                Calcula o IMT e o Imposto do Selo antes de avançares para a escritura.
+                {t('home_imt_sub')}
               </p>
-              <Link href="/simulador-imt" className="btn" style={{ fontSize: 13 }}>Calcular IMT</Link>
+              <Link href="/simulador-imt" className="btn" style={{ fontSize: 13 }}>{t('home_imt_btn')}</Link>
             </div>
           </div>
         </div>
@@ -256,11 +266,11 @@ export default function HomePage() {
       <section style={{ padding: '0 0 64px' }}>
         <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           <div>
-            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>O que dizem de nós</h2>
+            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>{t('home_testimonials_title')}</h2>
             <TestimonialsCarousel />
           </div>
           <div>
-            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>Imóveis por todo o país</h2>
+            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>{t('home_map_title')}</h2>
             <MiniMapPreview />
           </div>
         </div>

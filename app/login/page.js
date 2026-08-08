@@ -109,7 +109,7 @@ export default function LoginPage() {
         <LanguageSwitcher />
       </div>
       <div className="logo" style={{ textAlign: 'center', marginBottom: 32 }}>
-        more<span>&middot;</span>ada
+        More<span>&middot;</span>ada
       </div>
 
       <div className="card" style={{ padding: 32 }}>
