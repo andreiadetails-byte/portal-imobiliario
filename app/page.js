@@ -306,7 +306,7 @@ export default function HomePage() {
 
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
         <div className="wrap" style={{ padding: '48px 32px 32px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, marginBottom: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 32 }}>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
                 {t('footer_search')}
@@ -320,6 +320,8 @@ export default function HomePage() {
               </h5>
               <Link href="/publish" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_publish')}</Link>
               <Link href="/dashboard" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_dashboard')}</Link>
+              <Link href="/simulador-credito" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Simulador de crédito</Link>
+              <Link href="/simulador-imt" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Calculadora de IMT</Link>
             </div>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
@@ -331,13 +333,26 @@ export default function HomePage() {
             </div>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
-                {t('footer_about')}
+                More·ada
               </h5>
+              <Link href="/sobre" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Sobre nós</Link>
+              <Link href="/trabalha-connosco" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Trabalha connosco</Link>
               <span style={{ display: 'block', fontSize: 13.5, padding: '5px 0', color: 'var(--text-soft)' }}>{t('footer_about_text')}</span>
+            </div>
+            <div>
+              <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
+                Ajuda
+              </h5>
+              <Link href="/faq" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Perguntas frequentes</Link>
+              <Link href="/seguranca" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Segurança online</Link>
+              <Link href="/contacto" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Contacta-nos</Link>
+              <Link href="/privacidade" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Privacidade</Link>
+              <Link href="/cookies" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Política de cookies</Link>
+              <Link href="/termos" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Condições gerais</Link>
             </div>
           </div>
           <div style={{ borderTop: '1px solid var(--line)', paddingTop: 20, fontSize: 13, color: 'var(--text-soft)' }}>
-            © 2026 morada — {t('footer_tagline')}
+            © 2026 More·ada — {t('footer_tagline')}
           </div>
         </div>
       </footer>

@@ -265,37 +265,37 @@ function ResultsInner() {
                   {i > 0 && i % 5 === 0 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '160px 1fr', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '220px 1fr', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
                     {p.featured_status === 'active' && (
                       <span style={{
-                        position: 'absolute', top: 8, left: 8, zIndex: 1, fontSize: 10.5, fontWeight: 700,
-                        padding: '3px 9px', borderRadius: 10, background: 'var(--brass)', color: '#5C4E2A',
+                        position: 'absolute', top: 8, left: 8, zIndex: 1, fontSize: 11.5, fontWeight: 700,
+                        padding: '4px 10px', borderRadius: 10, background: 'var(--brass)', color: '#5C4E2A',
                       }}>
                         ★ DESTAQUE
                       </span>
                     )}
                     {firstPhoto ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 110, objectFit: 'cover' }} />
+                      <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 170, objectFit: 'cover' }} />
                     ) : (
-                      <div className="card-photo" style={{ height: '100%', minHeight: 110 }} />
+                      <div className="card-photo" style={{ height: '100%', minHeight: 170 }} />
                     )}
-                    <div className="card-body">
+                    <div className="card-body" style={{ padding: 20 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div className="price mono">
+                        <div className="price mono" style={{ fontSize: 25 }}>
                           {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                         </div>
                         {p.profiles && (
                           <div title={p.profiles.agency_name || p.profiles.full_name} style={{ flexShrink: 0 }}>
                             {p.profiles.avatar_url ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={p.profiles.avatar_url} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                              <img src={p.profiles.avatar_url} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
                             ) : (
                               <div style={{
-                                width: 26, height: 26, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600,
+                                width: 32, height: 32, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 600,
                               }}>
                                 {(p.profiles.agency_name || p.profiles.full_name || '?')[0].toUpperCase()}
                               </div>
@@ -303,9 +303,9 @@ function ResultsInner() {
                           </div>
                         )}
                       </div>
-                      <div className="addr">{p.typology} · {displayAddress(p)}</div>
-                      <div className="meta">{p.district} · {p.area || p.area_util} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
-                      <div className="meta" style={{ marginTop: -8, fontSize: 11 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
+                      <div className="addr" style={{ fontSize: 19, marginTop: 6 }}>{p.typology} · {displayAddress(p)}</div>
+                      <div className="meta" style={{ fontSize: 14.5, marginTop: 4 }}>{p.district} · {p.area || p.area_util} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
+                      <div className="meta" style={{ marginTop: -4, fontSize: 12.5 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
                     </div>
                   </Link>
                   </React.Fragment>
