@@ -8,6 +8,10 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
 import BigPromoBanner from '../components/BigPromoBanner';
+import TestimonialsCarousel from '../components/TestimonialsCarousel';
+import dynamic from 'next/dynamic';
+
+const MiniMapPreview = dynamic(() => import('../components/MiniMapPreview'), { ssr: false });
 import { displayAddress } from '../lib/displayAddress';
 
 function shuffle(array) {
@@ -245,6 +249,19 @@ export default function HomePage() {
                 {d}
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '0 0 64px' }}>
+        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          <div>
+            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>O que dizem de nós</h2>
+            <TestimonialsCarousel />
+          </div>
+          <div>
+            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>Imóveis por todo o país</h2>
+            <MiniMapPreview />
           </div>
         </div>
       </section>
