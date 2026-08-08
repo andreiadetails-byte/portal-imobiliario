@@ -105,7 +105,7 @@ export default function HomePage() {
                   type="button"
                   onClick={() => setBusinessType(bt)}
                   style={{
-                    fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 600, padding: '8px 16px',
+                    fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 600, padding: '9px 18px',
                     border: 'none', background: 'transparent', cursor: 'pointer',
                     color: businessType === bt ? 'var(--ink)' : 'var(--text-soft)',
                     borderBottom: businessType === bt ? '2px solid var(--telha)' : '2px solid transparent',

@@ -90,7 +90,7 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
             onChange={(e) => { setTyped(e.target.value); setOpen(true); onChange(e.target.value); }}
             onFocus={() => setOpen(true)}
             placeholder={distrito ? '' : placeholder}
-            style={{ flex: 1, minWidth: 100, border: 'none', outline: 'none', padding: '6px 2px', fontSize: 14 }}
+            style={{ flex: 1, minWidth: 100, border: 'none', outline: 'none', padding: '8px 2px', fontSize: 16.5 }}
           />
         )}
         {!noMoreLevels && (

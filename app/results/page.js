@@ -299,15 +299,15 @@ function ResultsInner() {
                   {i > 0 && i % 5 === 0 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '260px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '320px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
                     <div style={{ position: 'relative', height: '100%' }}>
                       {firstPhoto ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 210, objectFit: 'cover' }} />
+                        <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 250, objectFit: 'cover' }} />
                       ) : (
-                        <div className="card-photo" style={{ height: '100%', minHeight: 210 }} />
+                        <div className="card-photo" style={{ height: '100%', minHeight: 250 }} />
                       )}
 
                       {p.featured_status === 'active' && (
@@ -343,12 +343,12 @@ function ResultsInner() {
                     </div>
 
                     <div className="card-body" style={{ padding: 18, display: 'flex', flexDirection: 'column', minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                      <div className="price" style={{ fontSize: 19 }}>
+                      <div className="price" style={{ fontSize: 23 }}>
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
-                      <div className="addr" style={{ fontSize: 14.5, marginTop: 4, fontWeight: 500 }}>{p.typology} · {displayAddress(p)}</div>
+                      <div className="addr" style={{ fontSize: 17, marginTop: 6, fontWeight: 500 }}>{p.typology} · {displayAddress(p)}</div>
 
-                      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 12.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 14, marginTop: 10, fontSize: 14, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
                         {(p.area || p.area_util) && <span>📐 {p.area || p.area_util} m²</span>}
                         <span>🛏 {p.bedrooms} {t('property_rooms').toLowerCase()}</span>
                         <span>🚿 {p.bathrooms} wc</span>
@@ -356,7 +356,7 @@ function ResultsInner() {
 
                       {p.description && (
                         <p style={{
-                          fontSize: 15, color: 'var(--ink)', marginTop: 10, lineHeight: 1.5,
+                          fontSize: 15.5, color: 'var(--ink)', marginTop: 12, lineHeight: 1.55,
                           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                         }}>
                           {p.description}
