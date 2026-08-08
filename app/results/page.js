@@ -134,7 +134,7 @@ function ResultsInner() {
       <div className="wrap" style={{ padding: '32px' }}>
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('results_title')}</h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 28, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 24, alignItems: 'start' }}>
 
           <form onSubmit={runSearch} className="card" style={{ padding: 18, position: 'sticky', top: 90, overflow: 'visible' }}>
             <div className="field">
@@ -292,7 +292,7 @@ function ResultsInner() {
                   {i > 0 && i % 5 === 0 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '380px 1fr', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '260px 1fr', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
                     <div style={{ position: 'relative', height: '100%' }}>
@@ -335,7 +335,7 @@ function ResultsInner() {
                       )}
                     </div>
 
-                    <div className="card-body" style={{ padding: 18, display: 'flex', flexDirection: 'column' }}>
+                    <div className="card-body" style={{ padding: 18, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                       <div className="price" style={{ fontSize: 19 }}>
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
@@ -349,7 +349,7 @@ function ResultsInner() {
 
                       {p.description && (
                         <p style={{
-                          fontSize: 12, color: 'var(--text-soft)', marginTop: 10, lineHeight: 1.5,
+                          fontSize: 15, color: 'var(--ink)', marginTop: 10, lineHeight: 1.5,
                           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                         }}>
                           {p.description}
