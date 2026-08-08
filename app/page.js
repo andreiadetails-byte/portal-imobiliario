@@ -7,7 +7,7 @@ import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
-import AdBanner from '../components/AdBanner';
+import BigPromoBanner from '../components/BigPromoBanner';
 import { displayAddress } from '../lib/displayAddress';
 
 function shuffle(array) {
@@ -142,7 +142,6 @@ export default function HomePage() {
               const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
               return (
                 <>
-                  {i === 3 && <AdBanner key="ad-banner" />}
                   <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span style={{
@@ -193,6 +192,9 @@ export default function HomePage() {
               );
             })}
           </div>
+        </div>
+        <div className="wrap" style={{ marginTop: 24 }}>
+          <BigPromoBanner />
         </div>
       </section>
 
