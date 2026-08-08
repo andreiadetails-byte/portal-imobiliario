@@ -299,11 +299,37 @@ function ResultsInner() {
                   {i > 0 && i % 5 === 0 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '320px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '400px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
-                    <div style={{ position: 'relative', height: '100%' }}>
-                      {firstPhoto ? (
+                    <div style={{ position: 'relative', height: '100%', minHeight: 250 }}>
+                      {sortedPhotos.length > 1 ? (
+                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 4, height: '100%' }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 250, objectFit: 'cover' }} />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, height: '100%' }}>
+                            {[1, 2].map((offset) => {
+                              const photo = sortedPhotos[offset % sortedPhotos.length];
+                              const isLast = offset === 2;
+                              const remaining = sortedPhotos.length - 3;
+                              return (
+                                <div key={offset} style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={photo.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  {isLast && remaining > 0 && (
+                                    <div style={{
+                                      position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', color: '#fff',
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600,
+                                    }}>
+                                      +{remaining}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : firstPhoto ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 250, objectFit: 'cover' }} />
                       ) : (
@@ -331,15 +357,6 @@ function ResultsInner() {
                       >
                         {isFav ? '♥' : '♡'}
                       </button>
-
-                      {sortedPhotos.length > 1 && (
-                        <span style={{
-                          position: 'absolute', bottom: 10, right: 10, fontSize: 10.5, fontWeight: 600,
-                          padding: '3px 8px', borderRadius: 10, background: 'rgba(0,0,0,0.6)', color: '#fff',
-                        }}>
-                          📷 {sortedPhotos.length}
-                        </span>
-                      )}
                     </div>
 
                     <div className="card-body" style={{ padding: 18, display: 'flex', flexDirection: 'column', minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
