@@ -230,7 +230,7 @@ export default function PropertyPage() {
           )}
 
           <h3 className="display" style={{ fontSize: 19, marginBottom: 10 }}>{t('property_about')}</h3>
-          <p style={{ color: 'var(--text-soft)', fontSize: 14.5 }}>{property.description}</p>
+          <p style={{ color: 'var(--text-soft)', fontSize: 14.5, whiteSpace: 'pre-line' }}>{property.description}</p>
 
           {ownerProfile && user?.id !== property.owner_id && (
             <div
