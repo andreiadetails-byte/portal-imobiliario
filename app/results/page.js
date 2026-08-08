@@ -251,11 +251,19 @@ function ResultsInner() {
             <button type="submit" className="btn btn-primary btn-block">{t('results_filter')}</button>
           </form>
 
-          {showMap && (
-            <div className="card" style={{ padding: 10, marginTop: 16 }}>
-              <MapDrawSearch properties={properties} onFilter={setMapFilterIds} height={200} />
+          <div style={{ marginTop: 16 }}>
+            <div
+              onClick={() => setShowMap((s) => !s)}
+              style={{ fontSize: 12.5, color: 'var(--telha)', cursor: 'pointer', marginBottom: 8, textAlign: 'center' }}
+            >
+              {showMap ? '✕ Esconder mapa' : '🗺️ Ver mapa'}
             </div>
-          )}
+            {showMap && (
+              <div className="card" style={{ padding: 10 }}>
+                <MapDrawSearch properties={properties} onFilter={setMapFilterIds} height={200} />
+              </div>
+            )}
+          </div>
           </div>
 
           <div>
@@ -266,9 +274,6 @@ function ResultsInner() {
               <div style={{ display: 'flex', gap: 10 }}>
                 <button type="button" onClick={saveSearch} className="btn" style={{ fontSize: 13 }}>
                   🔔 Guardar pesquisa
-                </button>
-                <button type="button" onClick={() => setShowMap((s) => !s)} className="btn" style={{ fontSize: 13 }}>
-                  {showMap ? '✕ Fechar mapa' : '🗺️ Ver no mapa'}
                 </button>
                 <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); runSearch(); }} style={{ padding: '8px 10px', border: '1px solid var(--line)', borderRadius: 5 }}>
                   <option value="recent">{t('results_sort_recent')}</option>
@@ -298,7 +303,7 @@ function ResultsInner() {
                 const isFav = favoriteIds.includes(p.id);
                 return (
                   <React.Fragment key={p.id}>
-                  {i > 0 && i % 5 === 0 && <AdBanner />}
+                  {i === 5 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
                           display: 'grid', gridTemplateColumns: '400px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
