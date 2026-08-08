@@ -20,7 +20,7 @@ export default function PropertyPage() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sent, setSent] = useState(false);
-  const [lead, setLead] = useState({ name: '', email: '', phone: '', message: '' });
+  const [lead, setLead] = useState({ name: '', email: '', phone: '', message: 'Gostaria de obter mais informações acerca deste imóvel.' });
 
   const [user, setUser] = useState(null);
   const [ownerProfile, setOwnerProfile] = useState(null);
@@ -135,6 +135,7 @@ export default function PropertyPage() {
           content: lead.message,
           sender_name: lead.name,
           sender_email: lead.email,
+          sender_phone: lead.phone || null,
         });
       }
     } else {
@@ -391,6 +392,10 @@ export default function PropertyPage() {
               <div className="field">
                 <label>O seu email</label>
                 <input required type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>Telefone <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+                <input value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
               </div>
               <div className="field">
                 <label>Mensagem para {ownerProfile?.agency_name || ownerProfile?.full_name}</label>

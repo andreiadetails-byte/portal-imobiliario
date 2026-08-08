@@ -46,7 +46,7 @@ function ChatInner() {
       if (ids.length > 0) {
         const { data: allMsgs } = await supabase
           .from('messages')
-          .select('conversation_id, content, sender_id, sender_name, sender_email, created_at, read')
+          .select('conversation_id, content, sender_id, sender_name, sender_email, sender_phone, created_at, read')
           .in('conversation_id', ids)
           .order('created_at', { ascending: true });
 
@@ -191,7 +191,7 @@ function ChatInner() {
                 const { name } = otherPersonOf(c);
                 const photo = c.properties?.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                 const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-                const contact = c.lastMessage?.sender_email || c.lastMessage?.sender_name;
+                const contact = [c.lastMessage?.sender_email, c.lastMessage?.sender_phone].filter(Boolean).join(' · ') || c.lastMessage?.sender_name;
                 const isUnread = c.unreadCount > 0;
                 return (
                   <div
@@ -319,7 +319,7 @@ function ChatInner() {
                 >
                   {m.sender_id !== user.id && (m.sender_name || m.sender_email) && (
                     <div style={{ fontSize: 10.5, color: 'var(--text-soft)', marginBottom: 2, paddingLeft: 2 }}>
-                      {m.sender_name}{m.sender_name && m.sender_email && ' · '}{m.sender_email}
+                      {m.sender_name}{m.sender_name && (m.sender_email || m.sender_phone) && ' · '}{m.sender_email}{m.sender_email && m.sender_phone && ' · '}{m.sender_phone}
                     </div>
                   )}
                   <div

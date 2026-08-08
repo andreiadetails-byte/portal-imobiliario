@@ -7,6 +7,7 @@ import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
+import AdBanner from '../components/AdBanner';
 import { displayAddress } from '../lib/displayAddress';
 
 function shuffle(array) {
@@ -137,10 +138,12 @@ export default function HomePage() {
           )}
 
           <div className="grid-listings">
-            {properties.map((p) => {
+            {properties.map((p, i) => {
               const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
               return (
-                <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined }}>
+                <>
+                  {i === 3 && <AdBanner key="ad-banner" />}
+                  <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span style={{
                       position: 'absolute', top: 10, left: 10, zIndex: 1, fontSize: 10.5, fontWeight: 700,
@@ -186,6 +189,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </Link>
+                </>
               );
             })}
           </div>

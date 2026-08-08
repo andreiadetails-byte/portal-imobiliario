@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -12,6 +12,7 @@ import dynamic from 'next/dynamic';
 
 const MapDrawSearch = dynamic(() => import('../../components/MapDrawSearch'), { ssr: false });
 import { displayAddress } from '../../lib/displayAddress';
+import AdBanner from '../../components/AdBanner';
 
 function ResultsInner() {
   const searchParams = useSearchParams();
@@ -257,10 +258,12 @@ function ResultsInner() {
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {(mapFilterIds ? properties.filter((p) => mapFilterIds.includes(p.id)) : properties).map((p) => {
+              {(mapFilterIds ? properties.filter((p) => mapFilterIds.includes(p.id)) : properties).map((p, i) => {
                 const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                 return (
-                  <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
+                  <React.Fragment key={p.id}>
+                  {i > 0 && i % 5 === 0 && <AdBanner />}
+                  <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
                           display: 'grid', gridTemplateColumns: '160px 1fr', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
@@ -305,6 +308,7 @@ function ResultsInner() {
                       <div className="meta" style={{ marginTop: -8, fontSize: 11 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
                     </div>
                   </Link>
+                  </React.Fragment>
                 );
               })}
             </div>

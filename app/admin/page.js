@@ -25,6 +25,10 @@ export default function AdminPage() {
   const [rateSaved, setRateSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [supportReplyText, setSupportReplyText] = useState({});
+  const [ads, setAds] = useState([]);
+  const [adForm, setAdForm] = useState({ title: '', link_url: '' });
+  const [adImage, setAdImage] = useState(null);
+  const [savingAd, setSavingAd] = useState(false);
 
   useEffect(() => {
     async function checkAccess() {
@@ -42,14 +46,68 @@ export default function AdminPage() {
       loadAgencies();
       loadMortgageRate();
       loadAllUsers();
+      loadAds();
     }
     checkAccess();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  async function loadAds() {
+    const { data } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
+    setAds(data || []);
+  }
+
+  async function createAd(e) {
+    e.preventDefault();
+    setSavingAd(true);
+
+    let image_url = null;
+    if (adImage) {
+      const ext = adImage.name.split('.').pop();
+      const path = `ads/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, adImage);
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
+        image_url = publicUrlData.publicUrl;
+      }
+    }
+
+    await supabase.from('ads').insert({
+      title: adForm.title,
+      link_url: adForm.link_url || null,
+      image_url,
+      active: true,
+    });
+
+    setAdForm({ title: '', link_url: '' });
+    setAdImage(null);
+    setSavingAd(false);
+    loadAds();
+  }
+
+  async function toggleAdActive(id, current) {
+    await supabase.from('ads').update({ active: !current }).eq('id', id);
+    setAds((cur) => cur.map((a) => (a.id === id ? { ...a, active: !current } : a)));
+  }
+
+  async function deleteAd(id) {
+    await supabase.from('ads').delete().eq('id', id);
+    setAds((cur) => cur.filter((a) => a.id !== id));
+  }
+
   async function loadAllUsers() {
     const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
     setAllUsers(data || []);
+  }
+
+  async function activateSubscription(userId) {
+    const paidUntil = new Date();
+    paidUntil.setDate(paidUntil.getDate() + 30);
+    await supabase.from('profiles').update({
+      subscription_status: 'active',
+      subscription_paid_until: paidUntil.toISOString().slice(0, 10),
+    }).eq('id', userId);
+    setAllUsers((cur) => cur.map((u) => (u.id === userId ? { ...u, subscription_status: 'active', subscription_paid_until: paidUntil.toISOString().slice(0, 10) } : u)));
   }
 
   async function loadMortgageRate() {
@@ -229,7 +287,7 @@ export default function AdminPage() {
         {[
           ['anuncios', '📋 Anúncios'], ['denuncias', '⚑ Denúncias'], ['suporte', '💬 Suporte'],
           ['utilizadores', '👤 Utilizadores'], ['destaques', '★ Destaques'], ['agencias', '🏢 Agências'],
-          ['noticias', '📰 Notícias'], ['definicoes', '⚙ Definições'],
+          ['noticias', '📰 Notícias'], ['publicidade', '📣 Publicidade'], ['definicoes', '⚙ Definições'],
         ].map(([value, label]) => (
           <button
             key={value}
@@ -431,12 +489,33 @@ export default function AdminPage() {
                     <div className="meta">
                       {u.account_type === 'agencia' ? 'Agência' : 'Particular'}
                       {u.is_admin && ' · Administrador'}
+                      {u.account_type === 'agencia' && (
+                        <>
+                          {' · '}
+                          <span style={{
+                            fontWeight: 700,
+                            color: u.subscription_status === 'active' ? 'var(--telha)' : u.subscription_status === 'pending' ? '#8a6a1f' : '#8a3b2a',
+                          }}>
+                            {u.subscription_status === 'active' ? `Ativa até ${u.subscription_paid_until ? new Date(u.subscription_paid_until).toLocaleDateString('pt-PT') : '—'}`
+                              : u.subscription_status === 'pending' ? 'Pagamento pendente'
+                              : u.subscription_status === 'expired' ? 'Expirada'
+                              : 'Sem subscrição'}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
-                <a href={`/admin/utilizador/${u.id}`} className="btn btn-primary" style={{ fontSize: 13 }}>
-                  👤 Ver imóveis anunciados
-                </a>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  {u.account_type === 'agencia' && u.subscription_status !== 'active' && (
+                    <button onClick={() => activateSubscription(u.id)} className="btn btn-primary" style={{ fontSize: 13 }}>
+                      Ativar por 30 dias
+                    </button>
+                  )}
+                  <a href={`/admin/utilizador/${u.id}`} className="btn" style={{ fontSize: 13 }}>
+                    👤 Ver imóveis
+                  </a>
+                </div>
               </div>
             ))}
           </div>
@@ -558,6 +637,65 @@ export default function AdminPage() {
                   <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
                 </div>
                 <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12, flexShrink: 0, height: 'fit-content' }}>Apagar</button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {section === 'publicidade' && (
+        <>
+          <form onSubmit={createAd} className="card" style={{ padding: 20, marginBottom: 28, overflow: 'visible' }}>
+            <h3 className="display" style={{ fontSize: 17, marginBottom: 14 }}>Novo banner</h3>
+            <div className="field">
+              <label>Título / texto do anúncio</label>
+              <input required value={adForm.title} onChange={(e) => setAdForm({ ...adForm, title: e.target.value })} placeholder="ex: Simule já o seu crédito habitação" />
+            </div>
+            <div className="field">
+              <label>Link <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+              <input value={adForm.link_url} onChange={(e) => setAdForm({ ...adForm, link_url: e.target.value })} placeholder="https://..." />
+            </div>
+            <div className="field">
+              <label>Imagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+              <label
+                htmlFor="ad-image-input"
+                style={{
+                  display: 'block', border: '1.5px dashed var(--line)', borderRadius: 6, padding: '16px', textAlign: 'center',
+                  color: 'var(--text-soft)', fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                {adImage ? `🖼️ ${adImage.name}` : 'Clique para escolher uma imagem'}
+              </label>
+              <input id="ad-image-input" type="file" accept="image/*" onChange={(e) => setAdImage(e.target.files?.[0] || null)} style={{ display: 'none' }} />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={savingAd}>
+              {savingAd ? 'A publicar...' : 'Publicar banner'}
+            </button>
+          </form>
+
+          {ads.length === 0 && <p className="empty-state">Ainda não criaste nenhum banner.</p>}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {ads.map((a) => (
+              <div key={a.id} className="card" style={{ padding: 16, display: 'flex', gap: 14, alignItems: 'center' }}>
+                {a.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={a.image_url} alt="" style={{ width: 64, height: 48, objectFit: 'cover', borderRadius: 5, flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 64, height: 48, borderRadius: 5, background: 'linear-gradient(135deg, var(--brass), #9C7A42)', flexShrink: 0 }} />
+                )}
+                <div style={{ flex: 1 }}>
+                  <b style={{ fontSize: 14 }}>{a.title}</b>
+                  <div className="meta">{a.link_url || 'sem link'} · {a.active ? 'ativo' : 'desativado'}</div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  <button onClick={() => toggleAdActive(a.id, a.active)} className="btn" style={{ fontSize: 12.5 }}>
+                    {a.active ? 'Desativar' : 'Ativar'}
+                  </button>
+                  <button onClick={() => deleteAd(a.id)} className="btn" style={{ fontSize: 12.5, borderColor: '#8a3b2a', color: '#8a3b2a' }}>
+                    Apagar
+                  </button>
+                </div>
               </div>
             ))}
           </div>
