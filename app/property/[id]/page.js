@@ -229,8 +229,12 @@ export default function PropertyPage() {
             </p>
           )}
 
-          <h3 className="display" style={{ fontSize: 19, marginBottom: 10 }}>{t('property_about')}</h3>
-          <p style={{ color: 'var(--text-soft)', fontSize: 14.5, whiteSpace: 'pre-line' }}>{property.description}</p>
+          <h3 className="display" style={{ fontSize: 19, marginBottom: 12 }}>{t('property_about')}</h3>
+          {property.description.split(/\n{2,}/).map((paragraph, i) => (
+            <p key={i} style={{ color: 'var(--ink)', fontSize: 16, lineHeight: 1.7, marginBottom: 16, whiteSpace: 'pre-line' }}>
+              {paragraph}
+            </p>
+          ))}
 
           {ownerProfile && user?.id !== property.owner_id && (
             <div
