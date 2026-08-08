@@ -37,6 +37,31 @@ function ResultsInner() {
   const [sortBy, setSortBy] = useState('recent');
   const [showMap, setShowMap] = useState(true);
   const [mapFilterIds, setMapFilterIds] = useState(null);
+  const [user, setUser] = useState(null);
+  const [favoriteIds, setFavoriteIds] = useState([]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (data.user) {
+        setUser(data.user);
+        const { data: favs } = await supabase.from('favorites').select('property_id').eq('user_id', data.user.id);
+        setFavoriteIds((favs || []).map((f) => f.property_id));
+      }
+    });
+  }, []);
+
+  async function toggleFavorite(e, propertyId) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) { window.location.href = '/login'; return; }
+    if (favoriteIds.includes(propertyId)) {
+      await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      setFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
+    } else {
+      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId });
+      setFavoriteIds((cur) => [...cur, propertyId]);
+    }
+  }
 
   useEffect(() => {
     runSearch();
@@ -67,7 +92,7 @@ function ResultsInner() {
 
     let query = supabase
       .from('properties')
-      .select('id, title, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, created_at, property_photos(url, position), profiles(avatar_url, full_name, agency_name)', { count: 'exact' })
+      .select('id, title, description, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, created_at, property_photos(url, position), profiles(avatar_url, full_name, agency_name)', { count: 'exact' })
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
@@ -257,55 +282,103 @@ function ResultsInner() {
               <div className="empty-state">{t('results_empty')}</div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               {(mapFilterIds ? properties.filter((p) => mapFilterIds.includes(p.id)) : properties).map((p, i) => {
-                const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+                const sortedPhotos = p.property_photos?.sort((a, b) => a.position - b.position) || [];
+                const firstPhoto = sortedPhotos[0]?.url;
+                const isFav = favoriteIds.includes(p.id);
                 return (
                   <React.Fragment key={p.id}>
                   {i > 0 && i % 5 === 0 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '220px 1fr', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '300px 1fr', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
-                    {p.featured_status === 'active' && (
-                      <span style={{
-                        position: 'absolute', top: 8, left: 8, zIndex: 1, fontSize: 11.5, fontWeight: 700,
-                        padding: '4px 10px', borderRadius: 10, background: 'var(--brass)', color: '#5C4E2A',
-                      }}>
-                        ★ DESTAQUE
-                      </span>
-                    )}
-                    {firstPhoto ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 170, objectFit: 'cover' }} />
-                    ) : (
-                      <div className="card-photo" style={{ height: '100%', minHeight: 170 }} />
-                    )}
-                    <div className="card-body" style={{ padding: 20 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div className="price mono" style={{ fontSize: 25 }}>
-                          {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
-                        </div>
-                        {p.profiles && (
-                          <div title={p.profiles.agency_name || p.profiles.full_name} style={{ flexShrink: 0 }}>
-                            {p.profiles.avatar_url ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={p.profiles.avatar_url} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
-                            ) : (
-                              <div style={{
-                                width: 32, height: 32, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 600,
-                              }}>
-                                {(p.profiles.agency_name || p.profiles.full_name || '?')[0].toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                    <div style={{ position: 'relative', height: '100%' }}>
+                      {firstPhoto ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={firstPhoto} alt="" style={{ width: '100%', height: '100%', minHeight: 230, objectFit: 'cover' }} />
+                      ) : (
+                        <div className="card-photo" style={{ height: '100%', minHeight: 230 }} />
+                      )}
+
+                      {p.featured_status === 'active' && (
+                        <span style={{
+                          position: 'absolute', top: 10, left: 10, fontSize: 11.5, fontWeight: 700,
+                          padding: '4px 10px', borderRadius: 10, background: 'var(--brass)', color: '#5C4E2A',
+                        }}>
+                          ★ DESTAQUE
+                        </span>
+                      )}
+
+                      <button
+                        onClick={(e) => toggleFavorite(e, p.id)}
+                        aria-label="Guardar nos favoritos"
+                        style={{
+                          position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 17,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: isFav ? '#b8452f' : 'var(--ink)',
+                        }}
+                      >
+                        {isFav ? '♥' : '♡'}
+                      </button>
+
+                      {sortedPhotos.length > 1 && (
+                        <span style={{
+                          position: 'absolute', bottom: 10, right: 10, fontSize: 11, fontWeight: 600,
+                          padding: '3px 9px', borderRadius: 10, background: 'rgba(0,0,0,0.6)', color: '#fff',
+                        }}>
+                          📷 {sortedPhotos.length}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="card-body" style={{ padding: 22, display: 'flex', flexDirection: 'column' }}>
+                      <div className="price mono" style={{ fontSize: 27 }}>
+                        {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
-                      <div className="addr" style={{ fontSize: 19, marginTop: 6 }}>{p.typology} · {displayAddress(p)}</div>
-                      <div className="meta" style={{ fontSize: 14.5, marginTop: 4 }}>{p.district} · {p.area || p.area_util} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
-                      <div className="meta" style={{ marginTop: -4, fontSize: 12.5 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
+                      <div className="addr" style={{ fontSize: 20, marginTop: 6 }}>{p.typology} · {displayAddress(p)}</div>
+
+                      <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: 14.5, color: 'var(--text-soft)' }}>
+                        {(p.area || p.area_util) && <span>📐 {p.area || p.area_util} m²</span>}
+                        <span>🛏 {p.bedrooms} {t('property_rooms').toLowerCase()}</span>
+                        <span>🚿 {p.bathrooms} wc</span>
+                      </div>
+
+                      {p.description && (
+                        <p style={{
+                          fontSize: 13.5, color: 'var(--text-soft)', marginTop: 12, lineHeight: 1.5,
+                          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                        }}>
+                          {p.description}
+                        </p>
+                      )}
+
+                      <div style={{ flex: 1 }} />
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {p.profiles?.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.profiles.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} />
+                          ) : (
+                            <div style={{
+                              width: 28, height: 28, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600,
+                            }}>
+                              {(p.profiles?.agency_name || p.profiles?.full_name || '?')[0].toUpperCase()}
+                            </div>
+                          )}
+                          <span style={{ fontSize: 13, color: 'var(--text-soft)' }}>
+                            {p.profiles?.agency_name || p.profiles?.full_name || 'Anunciante'}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: 12, color: 'var(--text-soft)' }}>
+                          {new Date(p.created_at).toLocaleDateString('pt-PT')}
+                        </span>
+                      </div>
                     </div>
                   </Link>
                   </React.Fragment>
