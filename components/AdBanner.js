@@ -3,28 +3,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
-function AdItem({ ad }) {
-  return (
-    <a
-      href={ad.link_url || '#'}
-      target="_blank"
-      rel="noopener noreferrer sponsored"
-      style={{
-        display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, padding: '0 40px', textDecoration: 'none',
-      }}
-    >
-      {ad.image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={ad.image_url} alt={ad.title} style={{ height: 60, maxWidth: 110, objectFit: 'contain', flexShrink: 0 }} />
-      ) : null}
-      <div>
-        <span style={{ fontSize: 9.5, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)' }}>Publicidade</span>
-        <div style={{ fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>{ad.title}</div>
-      </div>
-    </a>
-  );
-}
-
 export default function AdBanner() {
   const [ad, setAd] = useState(null);
 
@@ -39,12 +17,29 @@ export default function AdBanner() {
   if (!ad) return null;
 
   return (
-    <div className="card" style={{ overflow: 'hidden', padding: '10px 0' }}>
-      <div style={{ display: 'flex', width: 'max-content', animation: 'ad-scroll-single 12s linear infinite' }}>
-        <AdItem ad={ad} />
-        <AdItem ad={ad} />
-        <AdItem ad={ad} />
-        <AdItem ad={ad} />
+    <div className="card" style={{ overflow: 'hidden', padding: 0, position: 'relative', height: 82 }}>
+      <div
+        style={{
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center',
+          animation: 'ad-slide-once 9s linear infinite',
+        }}
+      >
+        <a
+          href={ad.link_url || '#'}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          style={{ display: 'flex', alignItems: 'center', gap: 14, textDecoration: 'none', whiteSpace: 'nowrap' }}
+        >
+          {ad.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={ad.image_url} alt={ad.title} style={{ height: 60, maxWidth: 110, objectFit: 'contain', flexShrink: 0 }} />
+          ) : null}
+          <div>
+            <span style={{ fontSize: 9.5, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)' }}>Publicidade</span>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>{ad.title}</div>
+          </div>
+        </a>
       </div>
     </div>
   );
