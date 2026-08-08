@@ -103,9 +103,9 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 }
 
 @keyframes ad-slide-once {
-  0% { transform: translateX(40%); }
-  12% { transform: translateX(0%); }
-  88% { transform: translateX(-70%); }
+  0% { transform: translateX(40%); animation-timing-function: ease-out; }
+  15% { transform: translateX(0%); animation-timing-function: linear; }
+  85% { transform: translateX(-70%); animation-timing-function: ease-in; }
   100% { transform: translateX(-110%); }
 }
 

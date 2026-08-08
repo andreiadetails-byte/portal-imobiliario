@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
-export default function AdBanner() {
+export default function AdBanner({ animated = true }) {
   const [ad, setAd] = useState(null);
 
   useEffect(() => {
@@ -20,9 +20,10 @@ export default function AdBanner() {
     <div style={{ overflow: 'hidden', position: 'relative', height: 110 }}>
       <div
         style={{
-          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-          display: 'flex', alignItems: 'center',
-          animation: 'ad-slide-once 8s linear infinite',
+          position: animated ? 'absolute' : 'relative',
+          top: 0, left: 0, width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: animated ? 'flex-start' : 'center',
+          animation: animated ? 'ad-slide-once 8s linear infinite' : 'none',
         }}
       >
         <a
