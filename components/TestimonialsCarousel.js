@@ -27,21 +27,33 @@ export default function TestimonialsCarousel() {
   const t = TESTEMUNHOS[index];
 
   return (
-    <div className="card" style={{ padding: 28, textAlign: 'center' }}>
-      <div style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.35s ease', minHeight: 96 }}>
-        <p className="display" style={{ fontSize: 17, lineHeight: 1.5, marginBottom: 14 }}>
-          &ldquo;{t.texto}&rdquo;
+    <div style={{
+      position: 'relative', overflow: 'hidden', borderRadius: 10, padding: '32px 30px',
+      background: 'linear-gradient(135deg, var(--azulejo) 0%, var(--telha) 100%)',
+      minHeight: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+    }}>
+      <span style={{
+        position: 'absolute', top: -18, left: 14, fontFamily: 'Fraunces, serif', fontSize: 130,
+        color: 'rgba(255,255,255,0.12)', lineHeight: 1, userSelect: 'none',
+      }}>
+        &ldquo;
+      </span>
+
+      <div style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.35s ease', position: 'relative' }}>
+        <p className="display" style={{ fontSize: 18, lineHeight: 1.5, marginBottom: 16, color: '#fff' }}>
+          {t.texto}
         </p>
-        <div style={{ fontSize: 13.5, fontWeight: 600 }}>{t.nome}</div>
-        <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t.papel}</div>
+        <div style={{ fontSize: 13.5, fontWeight: 600, color: '#fff' }}>{t.nome}</div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>{t.papel}</div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 18 }}>
+
+      <div style={{ display: 'flex', gap: 6, marginTop: 20, position: 'relative' }}>
         {TESTEMUNHOS.map((_, i) => (
           <span
             key={i}
             style={{
               width: 6, height: 6, borderRadius: '50%',
-              background: i === index ? 'var(--telha)' : 'var(--line)',
+              background: i === index ? '#fff' : 'rgba(255,255,255,0.35)',
             }}
           />
         ))}
