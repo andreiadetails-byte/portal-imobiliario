@@ -4,17 +4,34 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 export default function AdBanner() {
-  const [ad, setAd] = useState(null);
+  const [ads, setAds] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     supabase.from('ads').select('*').eq('active', true).then(({ data }) => {
       if (data && data.length > 0) {
-        setAd(data[Math.floor(Math.random() * data.length)]);
+        // começa num banner aleatório, para não mostrar sempre o mesmo primeiro a todos
+        setIndex(Math.floor(Math.random() * data.length));
+        setAds(data);
       }
     });
   }, []);
 
-  if (!ad) return null;
+  useEffect(() => {
+    if (ads.length < 2) return;
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % ads.length);
+        setVisible(true);
+      }, 400); // tempo do desvanecer antes de trocar
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [ads]);
+
+  if (ads.length === 0) return null;
+  const ad = ads[index];
 
   return (
     <a
@@ -22,22 +39,23 @@ export default function AdBanner() {
       target="_blank"
       rel="noopener noreferrer sponsored"
       className="card"
-      style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none' }}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12, padding: 10, textDecoration: 'none',
+        opacity: visible ? 1 : 0, transition: 'opacity 0.4s ease',
+      }}
     >
       {ad.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={ad.image_url} alt={ad.title} style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+        <img src={ad.image_url} alt={ad.title} style={{ width: 70, height: 54, objectFit: 'cover', borderRadius: 5, flexShrink: 0 }} />
       ) : (
         <div style={{
-          height: 170, background: 'linear-gradient(135deg, var(--brass), #9C7A42)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#5C4E2A', fontWeight: 600, padding: 16, textAlign: 'center',
-        }}>
-          {ad.title}
-        </div>
+          width: 70, height: 54, borderRadius: 5, flexShrink: 0,
+          background: 'linear-gradient(135deg, var(--brass), #9C7A42)',
+        }} />
       )}
-      <div style={{ padding: '10px 14px' }}>
-        <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)' }}>Publicidade</span>
-        <div style={{ fontSize: 13.5, fontWeight: 600, marginTop: 2 }}>{ad.title}</div>
+      <div style={{ minWidth: 0 }}>
+        <span style={{ fontSize: 9.5, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)' }}>Publicidade</span>
+        <div style={{ fontSize: 13, fontWeight: 600, marginTop: 1 }}>{ad.title}</div>
       </div>
     </a>
   );
