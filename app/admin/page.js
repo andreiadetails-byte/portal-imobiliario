@@ -29,6 +29,9 @@ export default function AdminPage() {
   const [adForm, setAdForm] = useState({ title: '', link_url: '' });
   const [adImage, setAdImage] = useState(null);
   const [savingAd, setSavingAd] = useState(false);
+  const [editingAdId, setEditingAdId] = useState(null);
+  const [editAdForm, setEditAdForm] = useState({ title: '', link_url: '' });
+  const [editAdImage, setEditAdImage] = useState(null);
 
   useEffect(() => {
     async function checkAccess() {
@@ -93,6 +96,30 @@ export default function AdminPage() {
   async function deleteAd(id) {
     await supabase.from('ads').delete().eq('id', id);
     setAds((cur) => cur.filter((a) => a.id !== id));
+  }
+
+  function startEditAd(ad) {
+    setEditingAdId(ad.id);
+    setEditAdForm({ title: ad.title, link_url: ad.link_url || '' });
+    setEditAdImage(null);
+  }
+
+  async function saveEditAd(id) {
+    let image_url;
+    if (editAdImage) {
+      const ext = editAdImage.name.split('.').pop();
+      const path = `ads/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, editAdImage);
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
+        image_url = publicUrlData.publicUrl;
+      }
+    }
+
+    const updates = { title: editAdForm.title, link_url: editAdForm.link_url || null, ...(image_url && { image_url }) };
+    await supabase.from('ads').update(updates).eq('id', id);
+    setAds((cur) => cur.map((a) => (a.id === id ? { ...a, ...updates } : a)));
+    setEditingAdId(null);
   }
 
   async function loadAllUsers() {
@@ -695,25 +722,58 @@ export default function AdminPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {ads.map((a) => (
-              <div key={a.id} className="card" style={{ padding: 16, display: 'flex', gap: 14, alignItems: 'center' }}>
-                {a.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={a.image_url} alt="" style={{ width: 64, height: 48, objectFit: 'cover', borderRadius: 5, flexShrink: 0 }} />
+              <div key={a.id} className="card" style={{ padding: 16 }}>
+                {editingAdId === a.id ? (
+                  <div>
+                    <div className="field">
+                      <label>Título / texto</label>
+                      <input value={editAdForm.title} onChange={(e) => setEditAdForm({ ...editAdForm, title: e.target.value })} />
+                    </div>
+                    <div className="field">
+                      <label>Link</label>
+                      <input value={editAdForm.link_url} onChange={(e) => setEditAdForm({ ...editAdForm, link_url: e.target.value })} placeholder="https://..." />
+                    </div>
+                    <div className="field">
+                      <label>Imagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(deixe em branco para manter a atual)</span></label>
+                      <label
+                        htmlFor={`edit-ad-image-${a.id}`}
+                        style={{
+                          display: 'block', border: '1.5px dashed var(--line)', borderRadius: 6, padding: '12px', textAlign: 'center',
+                          color: 'var(--text-soft)', fontSize: 12.5, cursor: 'pointer',
+                        }}
+                      >
+                        {editAdImage ? `🖼️ ${editAdImage.name}` : 'Clique para trocar a imagem'}
+                      </label>
+                      <input id={`edit-ad-image-${a.id}`} type="file" accept="image/*" onChange={(e) => setEditAdImage(e.target.files?.[0] || null)} style={{ display: 'none' }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => saveEditAd(a.id)} className="btn btn-primary" style={{ fontSize: 12.5 }}>Guardar</button>
+                      <button onClick={() => setEditingAdId(null)} className="btn" style={{ fontSize: 12.5 }}>Cancelar</button>
+                    </div>
+                  </div>
                 ) : (
-                  <div style={{ width: 64, height: 48, borderRadius: 5, background: 'linear-gradient(135deg, var(--brass), #9C7A42)', flexShrink: 0 }} />
+                  <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                    {a.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={a.image_url} alt="" style={{ width: 64, height: 48, objectFit: 'contain', background: '#fff', border: '1px solid var(--line)', borderRadius: 5, flexShrink: 0 }} />
+                    ) : (
+                      <div style={{ width: 64, height: 48, borderRadius: 5, background: 'linear-gradient(135deg, var(--brass), #9C7A42)', flexShrink: 0 }} />
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <b style={{ fontSize: 14 }}>{a.title}</b>
+                      <div className="meta">{a.link_url || 'sem link'} · {a.active ? 'ativo' : 'desativado'}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button onClick={() => startEditAd(a)} className="btn" style={{ fontSize: 12.5 }}>Editar</button>
+                      <button onClick={() => toggleAdActive(a.id, a.active)} className="btn" style={{ fontSize: 12.5 }}>
+                        {a.active ? 'Desativar' : 'Ativar'}
+                      </button>
+                      <button onClick={() => deleteAd(a.id)} className="btn" style={{ fontSize: 12.5, borderColor: '#8a3b2a', color: '#8a3b2a' }}>
+                        Apagar
+                      </button>
+                    </div>
+                  </div>
                 )}
-                <div style={{ flex: 1 }}>
-                  <b style={{ fontSize: 14 }}>{a.title}</b>
-                  <div className="meta">{a.link_url || 'sem link'} · {a.active ? 'ativo' : 'desativado'}</div>
-                </div>
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                  <button onClick={() => toggleAdActive(a.id, a.active)} className="btn" style={{ fontSize: 12.5 }}>
-                    {a.active ? 'Desativar' : 'Ativar'}
-                  </button>
-                  <button onClick={() => deleteAd(a.id)} className="btn" style={{ fontSize: 12.5, borderColor: '#8a3b2a', color: '#8a3b2a' }}>
-                    Apagar
-                  </button>
-                </div>
               </div>
             ))}
           </div>
