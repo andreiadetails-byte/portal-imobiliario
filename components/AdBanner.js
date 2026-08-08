@@ -3,24 +3,49 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
-function AdItem({ ad }) {
+export default function AdBanner() {
+  const [ads, setAds] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    supabase.from('ads').select('*').eq('active', true).then(({ data }) => {
+      if (data && data.length > 0) {
+        setIndex(Math.floor(Math.random() * data.length));
+        setAds(data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (ads.length < 2) return;
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % ads.length);
+        setVisible(true);
+      }, 400);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [ads]);
+
+  if (ads.length === 0) return null;
+  const ad = ads[index];
+
   return (
     <a
       href={ad.link_url || '#'}
       target="_blank"
       rel="noopener noreferrer sponsored"
+      className="card"
       style={{
-        display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', textDecoration: 'none',
-        flexShrink: 0, minWidth: 260,
+        display: 'flex', alignItems: 'center', gap: 12, padding: 10, textDecoration: 'none',
+        opacity: visible ? 1 : 0, transition: 'opacity 0.4s ease',
       }}
     >
       {ad.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={ad.image_url}
-          alt={ad.title}
-          style={{ width: 130, height: 90, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }}
-        />
+        <img src={ad.image_url} alt={ad.title} style={{ width: 130, height: 90, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }} />
       ) : (
         <div style={{
           width: 130, height: 90, borderRadius: 6, flexShrink: 0,
@@ -32,34 +57,5 @@ function AdItem({ ad }) {
         <div style={{ fontSize: 13.5, fontWeight: 600, marginTop: 1 }}>{ad.title}</div>
       </div>
     </a>
-  );
-}
-
-export default function AdBanner() {
-  const [ads, setAds] = useState([]);
-
-  useEffect(() => {
-    supabase.from('ads').select('*').eq('active', true).then(({ data }) => {
-      setAds(data || []);
-    });
-  }, []);
-
-  if (ads.length === 0) return null;
-
-  // Repete a lista para o movimento parecer contínuo, sem cortes visíveis.
-  const track = [...ads, ...ads, ...ads];
-
-  return (
-    <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
-      <div
-        style={{
-          display: 'flex',
-          width: 'max-content',
-          animation: `ad-scroll ${ads.length * 6}s linear infinite`,
-        }}
-      >
-        {track.map((ad, i) => <AdItem key={`${ad.id}-${i}`} ad={ad} />)}
-      </div>
-    </div>
   );
 }
