@@ -66,7 +66,7 @@ function ResultsInner() {
 
     let query = supabase
       .from('properties')
-      .select('id, title, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, property_photos(url, position), profiles(avatar_url, full_name, agency_name)', { count: 'exact' })
+      .select('id, title, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, created_at, property_photos(url, position), profiles(avatar_url, full_name, agency_name)', { count: 'exact' })
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
@@ -90,7 +90,11 @@ function ResultsInner() {
 
     const { data, count: total, error } = await query;
     if (!error) {
-      const sorted = [...(data || [])].sort((a, b) => (b.featured_status === 'active') - (a.featured_status === 'active'));
+      // Os destaques só "saltam" para a frente quando se vê por mais recentes.
+      // Ao ordenar por preço, respeita-se sempre a ordem real de preços.
+      const sorted = sortBy === 'recent'
+        ? [...(data || [])].sort((a, b) => (b.featured_status === 'active') - (a.featured_status === 'active'))
+        : (data || []);
       setProperties(sorted);
       setCount(total || 0);
     }
@@ -298,6 +302,7 @@ function ResultsInner() {
                       </div>
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
                       <div className="meta">{p.district} · {p.area || p.area_util} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
+                      <div className="meta" style={{ marginTop: -8, fontSize: 11 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
                     </div>
                   </Link>
                 );
