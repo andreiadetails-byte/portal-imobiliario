@@ -303,7 +303,7 @@ function ResultsInner() {
                 const isFav = favoriteIds.includes(p.id);
                 return (
                   <React.Fragment key={p.id}>
-                  {i === 5 && <AdBanner />}
+                  {i > 0 && i % 5 === 0 && <AdBanner key={`ad-${i}`} />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
                           display: 'grid', gridTemplateColumns: '400px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
