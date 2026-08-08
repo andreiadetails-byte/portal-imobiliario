@@ -39,6 +39,8 @@ function ResultsInner() {
   const [mapFilterIds, setMapFilterIds] = useState(null);
   const [user, setUser] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState([]);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 25;
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -86,9 +88,12 @@ function ResultsInner() {
     if (!error) alert(`Pesquisa guardada! Vai receber um email sempre que aparecer um imóvel novo que corresponda.`);
   }
 
-  async function runSearch(e) {
+  async function runSearch(e, targetPage) {
     if (e) e.preventDefault();
+    const goToPage = targetPage || 1;
+    setPage(goToPage);
     setLoading(true);
+    if (typeof window !== 'undefined' && targetPage) window.scrollTo({ top: 0, behavior: 'smooth' });
 
     let query = supabase
       .from('properties')
@@ -113,6 +118,8 @@ function ResultsInner() {
     query = sortBy === 'price_asc' ? query.order('price', { ascending: true })
       : sortBy === 'price_desc' ? query.order('price', { ascending: false })
       : query.order('created_at', { ascending: false });
+
+    query = query.range((goToPage - 1) * PAGE_SIZE, goToPage * PAGE_SIZE - 1);
 
     const { data, count: total, error } = await query;
     if (!error) {
@@ -385,6 +392,42 @@ function ResultsInner() {
                 );
               })}
             </div>
+
+            {count > PAGE_SIZE && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 28, flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => runSearch(null, Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="btn"
+                  style={{ fontSize: 13, padding: '8px 14px', opacity: page === 1 ? 0.4 : 1 }}
+                >
+                  &larr;
+                </button>
+                {Array.from({ length: Math.ceil(count / PAGE_SIZE) }, (_, i) => i + 1).map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => runSearch(null, n)}
+                    className="btn"
+                    style={{
+                      fontSize: 13, padding: '8px 13px', minWidth: 38,
+                      background: n === page ? 'var(--telha)' : 'transparent',
+                      color: n === page ? '#fff' : 'var(--ink)',
+                      borderColor: n === page ? 'var(--telha)' : 'var(--ink)',
+                    }}
+                  >
+                    {n}
+                  </button>
+                ))}
+                <button
+                  onClick={() => runSearch(null, Math.min(Math.ceil(count / PAGE_SIZE), page + 1))}
+                  disabled={page === Math.ceil(count / PAGE_SIZE)}
+                  className="btn"
+                  style={{ fontSize: 13, padding: '8px 14px', opacity: page === Math.ceil(count / PAGE_SIZE) ? 0.4 : 1 }}
+                >
+                  &rarr;
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
