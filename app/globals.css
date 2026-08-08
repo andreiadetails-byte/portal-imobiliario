@@ -102,6 +102,11 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   to { transform: translateX(-33.333%); }
 }
 
+@keyframes ad-scroll-single {
+  from { transform: translateX(0); }
+  to { transform: translateX(-25%); }
+}
+
 @keyframes promo-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-25%); }
