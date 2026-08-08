@@ -335,7 +335,7 @@ function ResultsInner() {
                       )}
                     </div>
 
-                    <div className="card-body" style={{ padding: 18, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <div className="card-body" style={{ padding: 18, display: 'flex', flexDirection: 'column', minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                       <div className="price" style={{ fontSize: 19 }}>
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
