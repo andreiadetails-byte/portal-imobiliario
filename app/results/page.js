@@ -141,7 +141,7 @@ function ResultsInner() {
       <div className="wrap" style={{ padding: '32px' }}>
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('results_title')}</h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 24, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
 
           <form onSubmit={runSearch} className="card" style={{ padding: 18, position: 'sticky', top: 90, overflow: 'visible' }}>
             <div className="field">
@@ -299,7 +299,7 @@ function ResultsInner() {
                   {i > 0 && i % 5 === 0 && <AdBanner />}
                   <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '260px 1fr', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '260px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
                     <div style={{ position: 'relative', height: '100%' }}>
@@ -348,7 +348,7 @@ function ResultsInner() {
                       </div>
                       <div className="addr" style={{ fontSize: 14.5, marginTop: 4, fontWeight: 500 }}>{p.typology} · {displayAddress(p)}</div>
 
-                      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 12.5, color: 'var(--text-soft)' }}>
+                      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 12.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
                         {(p.area || p.area_util) && <span>📐 {p.area || p.area_util} m²</span>}
                         <span>🛏 {p.bedrooms} {t('property_rooms').toLowerCase()}</span>
                         <span>🚿 {p.bathrooms} wc</span>
