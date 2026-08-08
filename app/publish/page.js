@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
 import { geocodeAddress } from '../../lib/geocode';
+import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { distritos, concelhosPorDistrito, freguesiasPorConcelho } from '../../lib/locations';
 
 const CARACTERISTICAS = [
@@ -81,6 +82,14 @@ function PublishForm() {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) { router.push('/login'); return; }
       setUser(data.user);
+
+      const { data: myProfile } = await supabase.from('profiles').select('account_type, subscription_status, subscription_paid_until').eq('id', data.user.id).single();
+      if (PAYMENT_INFO.subscriptionEnforced && myProfile?.account_type === 'agencia') {
+        const isActive = myProfile.subscription_status === 'active'
+          && myProfile.subscription_paid_until
+          && new Date(myProfile.subscription_paid_until) >= new Date();
+        if (!isActive) { router.push('/assinatura'); return; }
+      }
 
       if (!editId) {
         const { count } = await supabase

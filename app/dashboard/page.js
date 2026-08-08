@@ -41,6 +41,13 @@ export default function DashboardPage() {
       const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setProfile(profileData);
 
+      if (PAYMENT_INFO.subscriptionEnforced && profileData?.account_type === 'agencia') {
+        const isActive = profileData.subscription_status === 'active'
+          && profileData.subscription_paid_until
+          && new Date(profileData.subscription_paid_until) >= new Date();
+        if (!isActive) { router.push('/assinatura'); return; }
+      }
+
       const { data: propsData } = await supabase
         .from('properties')
         .select('*, property_photos(url, position)')
@@ -104,6 +111,12 @@ export default function DashboardPage() {
   }
 
   async function requestFeatured(id) {
+    const currentFeaturedCount = properties.filter((p) => p.featured_status === 'pending' || p.featured_status === 'active').length;
+    if (currentFeaturedCount >= 3) {
+      alert('Só pode ter até 3 anúncios em destaque ao mesmo tempo. Termine ou aguarde que outro deixe de estar em destaque antes de pedir mais um.');
+      setFeaturedModal(null);
+      return;
+    }
     await supabase.from('properties').update({
       featured_status: 'pending',
       featured_requested_at: new Date().toISOString(),

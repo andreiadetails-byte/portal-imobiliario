@@ -256,7 +256,7 @@ function ResultsInner() {
               {(mapFilterIds ? properties.filter((p) => mapFilterIds.includes(p.id)) : properties).map((p) => {
                 const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                 return (
-                  <Link key={p.id} href={`/property/${p.id}`} className="card"
+                  <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
                           display: 'grid', gridTemplateColumns: '160px 1fr', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,

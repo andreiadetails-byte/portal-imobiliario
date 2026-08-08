@@ -84,3 +84,9 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   }
   body{ padding-bottom:56px; }
 }
+
+@keyframes destaque-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(216,201,163,0.55); border-color: var(--brass); }
+  50% { box-shadow: 0 0 0 6px rgba(216,201,163,0); border-color: var(--telha); }
+}
+.card-destaque{ animation: destaque-pulse 2.2s ease-in-out infinite; }

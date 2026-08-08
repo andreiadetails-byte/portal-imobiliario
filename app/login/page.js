@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import { PAYMENT_INFO } from '../../lib/paymentInfo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,6 +52,20 @@ export default function LoginPage() {
     if (error) { setError(error.message); return; }
     if (data.user) {
       await supabase.from('profiles').update({ email: data.user.email }).eq('id', data.user.id);
+
+      const { data: profile } = await supabase.from('profiles').select('account_type, subscription_status, subscription_paid_until').eq('id', data.user.id).single();
+      if (PAYMENT_INFO.subscriptionEnforced && profile?.account_type === 'agencia') {
+        const isActive = profile.subscription_status === 'active'
+          && profile.subscription_paid_until
+          && new Date(profile.subscription_paid_until) >= new Date();
+        if (!isActive) {
+          if (profile.subscription_status === 'active') {
+            await supabase.from('profiles').update({ subscription_status: 'expired' }).eq('id', data.user.id);
+          }
+          router.push('/assinatura');
+          return;
+        }
+      }
     }
     router.push('/dashboard');
   }
@@ -77,10 +92,15 @@ export default function LoginPage() {
           avatar_url = publicUrlData.publicUrl;
         }
       }
-      await supabase.from('profiles').update({ account_type: accountType, email: data.user.email, ...(avatar_url && { avatar_url }) }).eq('id', data.user.id);
+      await supabase.from('profiles').update({
+        account_type: accountType,
+        email: data.user.email,
+        ...(PAYMENT_INFO.subscriptionEnforced && accountType === 'agencia' && { subscription_status: 'pending' }),
+        ...(avatar_url && { avatar_url }),
+      }).eq('id', data.user.id);
     }
     setLoading(false);
-    router.push('/dashboard');
+    router.push(PAYMENT_INFO.subscriptionEnforced && accountType === 'agencia' ? '/assinatura' : '/dashboard');
   }
 
   return (
