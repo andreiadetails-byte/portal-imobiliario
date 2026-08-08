@@ -110,10 +110,35 @@ export default function DashboardPage() {
     setProperties((cur) => cur.map((p) => (p.id === id ? { ...p, status: 'em_revisao' } : p)));
   }
 
+  async function cancelFeatured(id) {
+    await supabase.from('properties').update({ featured_status: 'none' }).eq('id', id);
+    setProperties((cur) => cur.map((p) => (p.id === id ? { ...p, featured_status: 'none' } : p)));
+  }
+
+  function countFeatured() {
+    return properties.filter((p) => p.featured_status === 'pending' || p.featured_status === 'active').length;
+  }
+
+  async function toggleFeaturedButtonClick(id) {
+    if (countFeatured() >= 3) {
+      alert('Só pode ter até 3 anúncios em destaque ao mesmo tempo. Tem de anular o destaque de um deles antes de destacar outro.');
+      return;
+    }
+    if (PAYMENT_INFO.featuredEnforced) {
+      setFeaturedModal(id);
+      return;
+    }
+    // Destaque grátis por agora: ativa logo, sem pedir pagamento.
+    await supabase.from('properties').update({
+      featured_status: 'active',
+      featured_activated_at: new Date().toISOString(),
+    }).eq('id', id);
+    setProperties((cur) => cur.map((p) => (p.id === id ? { ...p, featured_status: 'active' } : p)));
+  }
+
   async function requestFeatured(id) {
-    const currentFeaturedCount = properties.filter((p) => p.featured_status === 'pending' || p.featured_status === 'active').length;
-    if (currentFeaturedCount >= 3) {
-      alert('Só pode ter até 3 anúncios em destaque ao mesmo tempo. Termine ou aguarde que outro deixe de estar em destaque antes de pedir mais um.');
+    if (countFeatured() >= 3) {
+      alert('Só pode ter até 3 anúncios em destaque ao mesmo tempo. Tem de anular o destaque de um deles antes de destacar outro.');
       setFeaturedModal(null);
       return;
     }
@@ -183,8 +208,13 @@ export default function DashboardPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
                   {!isLocked && p.featured_status === 'none' && p.status === 'ativo' && (
-                    <button onClick={() => setFeaturedModal(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--telha)' }}>
+                    <button onClick={() => toggleFeaturedButtonClick(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--telha)' }}>
                       ★ Destacar
+                    </button>
+                  )}
+                  {(p.featured_status === 'active' || p.featured_status === 'pending') && (
+                    <button onClick={() => cancelFeatured(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#8a3b2a' }}>
+                      ✕ Anular destaque
                     </button>
                   )}
                   {!isLocked && p.status === 'ativo' && (
