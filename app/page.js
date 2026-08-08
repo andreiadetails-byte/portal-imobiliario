@@ -283,21 +283,31 @@ export default function HomePage() {
           {news.length === 0 ? (
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>Ainda não há notícias publicadas.</p>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {news.map((n) => (
-                <div key={n.id} style={{ borderTop: '2px solid var(--line)', paddingTop: 14 }}>
+                <div key={n.id} className="card" style={{
+                  display: 'grid', gridTemplateColumns: n.cover_image_url ? '220px 1fr' : '1fr',
+                  overflow: 'hidden',
+                }}>
                   {n.cover_image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={n.cover_image_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 6, marginBottom: 12 }} />
+                    <img src={n.cover_image_url} alt="" style={{ width: '100%', height: '100%', minHeight: 150, objectFit: 'cover' }} />
                   )}
-                  <span style={{
-                    fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, textTransform: 'uppercase',
-                    letterSpacing: '0.05em', color: 'var(--telha)', display: 'block', marginBottom: 8,
-                  }}>
-                    {n.category}
-                  </span>
-                  <h4 style={{ fontSize: 15.5, fontWeight: 500, marginBottom: 6, lineHeight: 1.35 }}>{n.title}</h4>
-                  <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
+                  <div style={{ padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <span style={{
+                      fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, textTransform: 'uppercase',
+                      letterSpacing: '0.05em', color: 'var(--telha)', display: 'block', marginBottom: 8,
+                    }}>
+                      {n.category}
+                    </span>
+                    <h4 style={{ fontSize: 17, fontWeight: 600, marginBottom: 8, lineHeight: 1.3 }}>{n.title}</h4>
+                    <p style={{
+                      fontSize: 13.5, color: 'var(--text-soft)', lineHeight: 1.55,
+                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                    }}>
+                      {n.body}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
