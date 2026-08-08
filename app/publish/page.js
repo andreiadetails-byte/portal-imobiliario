@@ -55,6 +55,7 @@ function PublishForm() {
   const [loadingEdit, setLoadingEdit] = useState(isEditMode);
   const [existingPhotoCount, setExistingPhotoCount] = useState(0);
   const [limitReached, setLimitReached] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [features, setFeatures] = useState(['Elevador', 'Garagem']);
   const [solarOrientations, setSolarOrientations] = useState([]);
   const [addressType, setAddressType] = useState('Rua');
@@ -83,7 +84,8 @@ function PublishForm() {
       if (!data.user) { router.push('/login'); return; }
       setUser(data.user);
 
-      const { data: myProfile } = await supabase.from('profiles').select('account_type, subscription_status, subscription_paid_until').eq('id', data.user.id).single();
+      const { data: myProfile } = await supabase.from('profiles').select('account_type, subscription_status, subscription_paid_until, is_admin').eq('id', data.user.id).single();
+      setIsAdmin(!!myProfile?.is_admin);
       if (PAYMENT_INFO.subscriptionEnforced && myProfile?.account_type === 'agencia') {
         const isActive = myProfile.subscription_status === 'active'
           && myProfile.subscription_paid_until
@@ -91,7 +93,7 @@ function PublishForm() {
         if (!isActive) { router.push('/assinatura'); return; }
       }
 
-      if (!editId) {
+      if (!editId && !myProfile?.is_admin) {
         const { count } = await supabase
           .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', data.user.id);
         if ((count || 0) >= 50) {
@@ -238,7 +240,7 @@ function PublishForm() {
     e.preventDefault();
     setError('');
 
-    if (!isEditMode) {
+    if (!isEditMode && !isAdmin) {
       const { count: existingCount } = await supabase
         .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', user.id);
       if ((existingCount || 0) >= 50) {

@@ -160,7 +160,7 @@ export default function PropertyPage() {
     <>
       <Header />
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
+      <div className="property-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div className="price" style={{ fontSize: 30 }}>
@@ -295,7 +295,7 @@ export default function PropertyPage() {
           {photos.length > 0 ? (
             <div style={{ marginTop: 24 }}>
               {photos.length > 1 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, height: 380, borderRadius: 8, overflow: 'hidden' }}>
+                <div className="property-gallery" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, height: 380, borderRadius: 8, overflow: 'hidden' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photos[activePhoto]}

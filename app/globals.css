@@ -129,3 +129,26 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   from { opacity: 0; transform: translateY(6px) scale(0.94); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ===== Ajustes para telemóvel ===== */
+@media (max-width: 900px){
+  .property-layout{ grid-template-columns: 1fr !important; }
+  .results-grid{ grid-template-columns: 1fr !important; }
+  .footer-grid{ grid-template-columns: repeat(2, 1fr) !important; }
+  .two-col-stack{ grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 680px){
+  .wrap{ padding: 0 16px; }
+  .navbar{ padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+  .hero-title{ font-size: 30px !important; }
+  .result-card{ grid-template-columns: 1fr !important; }
+  .result-card-photo{ height: 200px !important; }
+  .property-gallery{ grid-template-columns: 1fr !important; height: auto !important; }
+  .property-gallery > img{ height: 240px !important; }
+  .search-box-row{ flex-direction: column; }
+  .grid-listings{ gap: 14px; }
+  .card-body{ padding: 14px !important; }
+  .news-card{ grid-template-columns: 1fr !important; }
+  .news-card img{ height: 160px !important; }
+}

@@ -9,7 +9,6 @@ import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
 import BigPromoBanner from '../components/BigPromoBanner';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
-import ThinkingCharacter from '../components/ThinkingCharacter';
 import dynamic from 'next/dynamic';
 
 const MiniMapPreview = dynamic(() => import('../components/MiniMapPreview'), { ssr: false });
@@ -78,10 +77,6 @@ export default function HomePage() {
           position: 'relative',
         }}
       >
-        <div style={{ position: 'absolute', top: 24, right: 32, zIndex: 2 }}>
-          <ThinkingCharacter />
-        </div>
-
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
@@ -89,7 +84,7 @@ export default function HomePage() {
           }}>
             {t('home_eyebrow')}
           </span>
-          <h1 className="display" style={{ fontSize: 48, lineHeight: 1.08, letterSpacing: '-0.01em', marginBottom: 14, color: '#fff' }}>
+          <h1 className="display hero-title" style={{ fontSize: 48, lineHeight: 1.08, letterSpacing: '-0.01em', marginBottom: 14, color: '#fff' }}>
             {t('home_title')}
           </h1>
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', maxWidth: 480, marginBottom: 24 }}>
@@ -117,7 +112,7 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div className="search-box-row" style={{ display: 'flex', gap: 12 }}>
               <LocationAutocomplete onChange={setLocation} placeholder={t('home_search_placeholder')} />
               <button type="submit" className="btn btn-primary">{t('home_search_btn')}</button>
             </div>
@@ -265,7 +260,7 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: '0 0 64px' }}>
-        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>{t('home_testimonials_title')}</h2>
             <TestimonialsCarousel />
@@ -285,7 +280,7 @@ export default function HomePage() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {news.map((n) => (
-                <div key={n.id} className="card" style={{
+                <div key={n.id} className="card news-card" style={{
                   display: 'grid', gridTemplateColumns: n.cover_image_url ? '220px 1fr' : '1fr',
                   overflow: 'hidden',
                 }}>
@@ -317,7 +312,7 @@ export default function HomePage() {
 
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
         <div className="wrap" style={{ padding: '48px 32px 32px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 32 }}>
+          <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 32 }}>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
                 {t('footer_search')}

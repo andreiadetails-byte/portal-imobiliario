@@ -141,7 +141,7 @@ function ResultsInner() {
       <div className="wrap" style={{ padding: '32px' }}>
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('results_title')}</h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
+        <div className="results-grid" style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
 
           <div>
           <form onSubmit={runSearch} className="card" style={{ padding: 18, position: 'sticky', top: 90, overflow: 'visible' }}>
@@ -304,12 +304,12 @@ function ResultsInner() {
                 return (
                   <React.Fragment key={p.id}>
                   {i > 0 && i % 5 === 0 && <AdBanner key={`ad-${i}`} animated={(i / 5) % 2 === 1} />}
-                  <Link href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
+                  <Link href={`/property/${p.id}`} className={`card result-card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
                           display: 'grid', gridTemplateColumns: '400px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
                           border: p.featured_status === 'active' ? '1.5px solid var(--brass)' : undefined,
                         }}>
-                    <div style={{ position: 'relative', height: 260 }}>
+                    <div className="result-card-photo" style={{ position: 'relative', height: 260 }}>
                       {sortedPhotos.length > 1 ? (
                         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 4, height: '100%' }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
