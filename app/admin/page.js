@@ -310,7 +310,7 @@ export default function AdminPage() {
     <div className="wrap" style={{ padding: '40px 32px 80px' }}>
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>Administração</h1>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)' }}>
+      <div className="admin-tabs" style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)', overflowX: 'auto' }}>
         {[
           ['anuncios', '📋 Anúncios'], ['denuncias', '⚑ Denúncias'], ['suporte', '💬 Suporte'],
           ['utilizadores', '👤 Utilizadores'], ['destaques', '★ Destaques'], ['agencias', '🏢 Agências'],
@@ -393,7 +393,7 @@ export default function AdminPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {reports.map((r) => (
               <div key={r.id} className="card" style={{
-                padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16,
+                padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap',
                 opacity: r.status === 'resolvida' ? 0.55 : 1,
               }}>
                 <div>
@@ -498,7 +498,7 @@ export default function AdminPage() {
           {allUsers.length === 0 && <p className="empty-state">Ainda não há utilizadores.</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {allUsers.map((u) => (
-              <div key={u.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+              <div key={u.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   {u.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -554,7 +554,7 @@ export default function AdminPage() {
           {featuredList.length === 0 && <p className="empty-state">Não há pedidos de destaque.</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {featuredList.map((p) => (
-              <div key={p.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+              <div key={p.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <div>
                   <b>{p.typology} · {p.address}</b>
                   <div className="meta">
@@ -585,7 +585,7 @@ export default function AdminPage() {
           {agencies.length === 0 && <p className="empty-state">Ainda não há agências registadas.</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {agencies.map((a) => (
-              <div key={a.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+              <div key={a.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <div>
                   <b>{a.agency_name || a.full_name}</b>
                   <div className="meta">{a.agency_license || 'sem licença AMI registada'}</div>
@@ -653,7 +653,7 @@ export default function AdminPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {news.map((n) => (
-              <div key={n.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+              <div key={n.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                 {n.cover_image_url && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={n.cover_image_url} alt="" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />

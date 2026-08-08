@@ -151,4 +151,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .card-body{ padding: 14px !important; }
   .news-card{ grid-template-columns: 1fr !important; }
   .news-card img{ height: 160px !important; }
+  .chat-grid{ grid-template-columns: 1fr !important; height: calc(100vh - 220px) !important; min-height: 420px; }
+  .chat-list-col{ border-right: none !important; }
+  .chat-hide-mobile{ display: none !important; }
+  .chat-back-btn{ display: inline-block !important; }
 }

@@ -155,8 +155,8 @@ function ChatInner() {
       {conversations.length === 0 ? (
         <div className="empty-state">{t('chat_empty')}</div>
       ) : (
-        <div className="card" style={{ display: 'grid', gridTemplateColumns: '460px 1fr', height: 560, overflow: 'hidden' }}>
-          <div style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
+        <div className="card chat-grid" style={{ display: 'grid', gridTemplateColumns: '460px 1fr', height: 560, overflow: 'hidden' }}>
+          <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: 14, borderBottom: '1px solid var(--line)' }}>
               <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
                 {[['todas', 'Todos'], ['nao_lidos', 'Não lidos'], ['pendentes', 'Por gerir'], ['tratadas', 'Tratadas']].map(([value, label]) => (
@@ -265,10 +265,17 @@ function ChatInner() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className={`chat-thread-col${activeId ? '' : ' chat-hide-mobile'}`} style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ borderBottom: '1px solid var(--line)' }}>
               <div style={{ padding: '14px 18px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 13.5, fontWeight: 600 }}>
+                <span style={{ fontSize: 13.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button
+                    onClick={() => setActiveId(null)}
+                    className="chat-back-btn"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, display: 'none' }}
+                  >
+                    ←
+                  </button>
                   {activeConversation && otherPersonOf(activeConversation).name}
                 </span>
                 {activeConversation && (
