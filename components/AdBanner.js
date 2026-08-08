@@ -23,7 +23,7 @@ export default function AdBanner({ animated = true }) {
           position: animated ? 'absolute' : 'relative',
           top: 0, left: 0, width: '100%', height: '100%',
           display: 'flex', alignItems: 'center', justifyContent: animated ? 'flex-start' : 'center',
-          animation: animated ? 'ad-slide-once 9s cubic-bezier(0.15, 0.75, 0.4, 1) infinite' : 'none',
+          animation: animated ? 'ad-slide-once 16s linear infinite' : 'none',
         }}
       >
         <a

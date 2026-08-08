@@ -103,8 +103,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 }
 
 @keyframes ad-slide-once {
-  0% { transform: translateX(30%); }
-  100% { transform: translateX(-110%); }
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
 }
 
 @keyframes promo-scroll {
