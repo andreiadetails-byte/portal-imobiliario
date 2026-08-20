@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -87,13 +88,30 @@ export default function LoginPage() {
       setError('Indique o número de licença AMI da sua agência.');
       return;
     }
+    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha ? window.grecaptcha.getResponse() : '';
+    if (!recaptchaToken) {
+      setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
+      return;
+    }
     setLoading(true);
+    const verifyRes = await fetch('/api/verify-recaptcha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: recaptchaToken }),
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyData.success) {
+      setError('Não foi possível confirmar que não é um robô. Tente novamente.');
+      if (window.grecaptcha) window.grecaptcha.reset();
+      setLoading(false);
+      return;
+    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName, account_type: accountType } },
     });
-    if (error) { setError(error.message); setLoading(false); return; }
+    if (error) { setError(error.message); setLoading(false); if (window.grecaptcha) window.grecaptcha.reset(); return; }
 
     // O Supabase não devolve um erro claro quando o email já existe (por segurança,
     // para não revelar quais emails já têm conta) — em vez disso, devolve uma resposta
@@ -346,6 +364,7 @@ export default function LoginPage() {
               <input type="password" required minLength={6} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
+            <div className="g-recaptcha" data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} style={{ marginBottom: 16 }} />
             <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
               {t('login_signup_btn')}
             </button>
@@ -356,6 +375,7 @@ export default function LoginPage() {
       <p style={{ textAlign: 'center', marginTop: 20 }}>
         <Link href="/" style={{ fontSize: 13, color: 'var(--text-soft)' }}>&larr; {t('login_back')}</Link>
       </p>
+      <Script src="https://www.google.com/recaptcha/api.js" strategy="lazyOnload" />
     </main>
   );
 }
