@@ -197,7 +197,7 @@ export default function HomePage() {
           )}
 
           <div className="grid-listings">
-            {properties.map((p, i) => {
+            {properties.slice(0, 3).map((p, i) => {
               const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
               return (
                   <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
@@ -271,8 +271,86 @@ export default function HomePage() {
             })}
           </div>
         </div>
-        <div className="wrap" style={{ marginTop: 24 }}>
+
+        <div className="wrap" style={{ marginTop: 40, marginBottom: 40 }}>
           <BigPromoBanner />
+        </div>
+
+        <div className="wrap">
+          <div className="grid-listings">
+            {properties.slice(3, 6).map((p, i) => {
+              const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+              return (
+                  <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
+                  {p.featured_status === 'active' && (
+                    <span style={{
+                      position: 'absolute', top: 10, left: 10, zIndex: 1, fontSize: 10.5, fontWeight: 700,
+                      padding: '3px 9px', borderRadius: 10, background: 'var(--gold-strong)', color: '#fff',
+                    }}>
+                      ★ DESTAQUE
+                    </span>
+                  )}
+                  <button
+                    onClick={(e) => toggleFavorite(e, p.id)}
+                    aria-label="Guardar nos favoritos"
+                    style={{
+                      position: 'absolute', top: 10, right: 10, zIndex: 1, width: 30, height: 30, borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 15,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: favoriteIds.includes(p.id) ? '#b8452f' : 'var(--ink)',
+                    }}
+                  >
+                    {favoriteIds.includes(p.id) ? '♥' : '♡'}
+                  </button>
+                  {firstPhoto ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                  ) : (
+                    <div className="card-photo" />
+                  )}
+                  <div className="card-body">
+                    <div className="price">
+                      {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+                    </div>
+                    <div className="addr">{p.typology} · {displayAddress(p)}</div>
+                    <div className="meta" style={{ marginBottom: 4 }}>
+                      {p.property_type}{(p.area || p.area_util) ? ` · ${p.area || p.area_util} m²` : ''}
+                      {p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
+                      {p.bathrooms ? ` · ${p.bathrooms} wc` : ''}
+                    </div>
+                    <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                      <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}</div>
+                      {p.profiles && (
+                        <div title={p.display_name || p.profiles.agency_name || p.profiles.full_name} style={{ flexShrink: 0 }}>
+                          {p.profiles.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.profiles.avatar_url} alt="" loading="lazy" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                          ) : (
+                            <div style={{
+                              width: 26, height: 26, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600,
+                            }}>
+                              {(p.display_name || p.profiles.agency_name || p.profiles.full_name || '?')[0].toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {p.profiles?.phone_public && (
+                      <a
+                        href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
+                      >
+                        📞 {p.profiles.phone_public}
+                      </a>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -287,7 +365,6 @@ export default function HomePage() {
               background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
             }} />
             <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>🏷️</span>
               <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
               <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
               <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
