@@ -263,14 +263,23 @@ function AdminInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowed]);
 
+  // Só marca as mensagens de suporte como lidas quando a pessoa abre mesmo essa aba
+  // (antes marcava logo ao carregar a página, mesmo sem ver nada — o aviso vermelho nunca aparecia).
+  useEffect(() => {
+    if (section !== 'suporte' || supportMessages.length === 0) return;
+    const unreadIds = supportMessages.filter((m) => !m.read_by_admin).map((m) => m.id);
+    if (unreadIds.length === 0) return;
+    supabase.from('support_requests').update({ read_by_admin: true }).in('id', unreadIds).then(() => {
+      setSupportMessages((cur) => cur.map((m) => (unreadIds.includes(m.id) ? { ...m, read_by_admin: true } : m)));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section]);
+
   async function loadSupportMessages() {
     const { data } = await supabase.from('support_requests').select('*').order('created_at', { ascending: false });
     const withReplies = await Promise.all((data || []).map(async (m) => {
       const { data: replies } = await supabase
         .from('support_replies').select('*').eq('support_request_id', m.id).order('created_at', { ascending: true });
-      if (!m.read_by_admin) {
-        await supabase.from('support_requests').update({ read_by_admin: true }).eq('id', m.id);
-      }
       return { ...m, replies: replies || [] };
     }));
 
@@ -443,21 +452,31 @@ function AdminInner() {
 
       <div className="admin-tabs" style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)', overflowX: 'auto' }}>
         {[
-          ['anuncios', '📋 Anúncios'], ['denuncias', '⚑ Denúncias'], ['suporte', '💬 Suporte'],
-          ['utilizadores', '👤 Utilizadores'], ['destaques', '★ Destaques'], ['agencias', '🏢 Agências'],
-          ['noticias', '📰 Notícias'], ['publicidade', '📣 Publicidade'], ['definicoes', '⚙ Definições'],
-        ].map(([value, label]) => (
+          ['anuncios', '📋 Anúncios', 0],
+          ['denuncias', '⚑ Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
+          ['suporte', '💬 Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
+          ['utilizadores', '👤 Utilizadores', 0], ['destaques', '★ Destaques', 0], ['agencias', '🏢 Agências', 0],
+          ['noticias', '📰 Notícias', 0], ['publicidade', '📣 Publicidade', 0], ['definicoes', '⚙ Definições', 0],
+        ].map(([value, label, count]) => (
           <button
             key={value}
             onClick={() => setSection(value)}
             style={{
               background: 'none', border: 'none', padding: '0 4px 12px', marginRight: 24, fontWeight: 600,
-              fontSize: 14, cursor: 'pointer',
+              fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
               color: section === value ? 'var(--ink)' : 'var(--text-soft)',
               borderBottom: section === value ? '2px solid var(--telha)' : '2px solid transparent',
             }}
           >
             {label}
+            {count > 0 && (
+              <span style={{
+                background: '#b8452f', color: '#fff', fontSize: 11, fontWeight: 700, borderRadius: 10,
+                padding: '1px 7px', minWidth: 18, textAlign: 'center', lineHeight: 1.5,
+              }}>
+                {count > 9 ? '9+' : count}
+              </span>
+            )}
           </button>
         ))}
       </div>
