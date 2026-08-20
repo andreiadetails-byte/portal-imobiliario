@@ -167,6 +167,16 @@ export default function NaturalSearchBox() {
       startingRef.current = true;
       try {
         recognitionRef.current.start();
+        // Rede de segurança: se o browser pedir permissão para o microfone e a
+        // pessoa não reparar/responder a tempo, a gravação nunca chega a começar,
+        // e ficava sem nenhuma explicação. Isto avisa a pessoa ao fim de alguns segundos.
+        setTimeout(() => {
+          if (startingRef.current) {
+            startingRef.current = false;
+            try { recognitionRef.current.stop(); } catch (err2) { /* nada a fazer */ }
+            setVoiceError('O microfone não começou a gravar. Verifica se apareceu um pedido de permissão do browser (pode estar escondido junto da barra de endereço), e tenta outra vez.');
+          }
+        }, 4000);
       } catch (err) {
         // Já estava a começar (clique duplo) — para tudo e deixa a pessoa tentar de novo.
         startingRef.current = false;
