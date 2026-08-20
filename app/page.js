@@ -202,12 +202,7 @@ export default function HomePage() {
               return (
                   <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
-                    <span style={{
-                      position: 'absolute', top: 10, left: 10, zIndex: 1, fontSize: 10.5, fontWeight: 700,
-                      padding: '3px 9px', borderRadius: 10, background: 'var(--gold-strong)', color: '#fff',
-                    }}>
-                      ★ DESTAQUE
-                    </span>
+                    <span className="destaque-strip">★ DESTAQUE</span>
                   )}
                   <button
                     onClick={(e) => toggleFavorite(e, p.id)}
@@ -283,12 +278,7 @@ export default function HomePage() {
               return (
                   <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
-                    <span style={{
-                      position: 'absolute', top: 10, left: 10, zIndex: 1, fontSize: 10.5, fontWeight: 700,
-                      padding: '3px 9px', borderRadius: 10, background: 'var(--gold-strong)', color: '#fff',
-                    }}>
-                      ★ DESTAQUE
-                    </span>
+                    <span className="destaque-strip">★ DESTAQUE</span>
                   )}
                   <button
                     onClick={(e) => toggleFavorite(e, p.id)}

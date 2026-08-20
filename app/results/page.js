@@ -475,12 +475,7 @@ function ResultsInner() {
                       )}
 
                       {p.featured_status === 'active' && (
-                        <span style={{
-                          position: 'absolute', top: 10, left: 10, fontSize: 11, fontWeight: 700,
-                          padding: '4px 10px', borderRadius: 10, background: 'var(--gold-strong)', color: '#fff',
-                        }}>
-                          ★ DESTAQUE
-                        </span>
+                        <span className="destaque-strip">★ DESTAQUE</span>
                       )}
 
                       <label

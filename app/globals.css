@@ -110,6 +110,23 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   100% { transform: translateX(-100%); }
 }
 
+.destaque-strip {
+  position: absolute; top: 12px; left: 0; z-index: 1; width: 62%; overflow: hidden;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+  padding: 5px 14px 5px 12px; background: var(--gold-strong); color: #fff;
+  border-radius: 0 6px 6px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.destaque-strip::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+  animation: destaque-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes destaque-shimmer {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  60%, 100% { transform: translateX(320%) skewX(-20deg); }
+}
+
 @keyframes promo-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-25%); }
