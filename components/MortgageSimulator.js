@@ -34,6 +34,8 @@ export default function MortgageSimulator({ price }) {
   const [years, setYears] = useState(35);
   const [rateType, setRateType] = useState('Fixa');
   const [rate, setRate] = useState(3.5);
+  const [mixedFixedYears, setMixedFixedYears] = useState(5);
+  const [mixedVariableRate, setMixedVariableRate] = useState(4);
   const [houseType, setHouseType] = useState('Principal');
   const [under35, setUnder35] = useState('Sim');
   const [rateUpdatedAt, setRateUpdatedAt] = useState(null);
@@ -65,7 +67,28 @@ export default function MortgageSimulator({ price }) {
       : (monthlyBudget * (Math.pow(1 + monthlyRate, months) - 1)) / (monthlyRate * Math.pow(1 + monthlyRate, months));
     const maxPropertyPrice = maxLoan / (1 - downPaymentPct / 100);
 
-    setResult({ loanAmount, monthlyPayment, maxLoan, maxPropertyPrice });
+    let mixedResult = null;
+    if (rateType === 'Mista') {
+      // Fase 1 — anos com taxa fixa: prestação calculada normalmente para o prazo todo.
+      const fixedMonths = Math.min(mixedFixedYears * 12, months);
+      // Saldo em dívida no fim da fase fixa, usando a fórmula de amortização.
+      const balanceAfterFixed = monthlyRate === 0
+        ? loanAmount - monthlyPayment * fixedMonths
+        : loanAmount * Math.pow(1 + monthlyRate, fixedMonths) - monthlyPayment * ((Math.pow(1 + monthlyRate, fixedMonths) - 1) / monthlyRate);
+
+      // Fase 2 — resto do prazo à taxa variável, sobre o saldo em dívida remanescente.
+      const remainingMonths = months - fixedMonths;
+      const variableMonthlyRate = mixedVariableRate / 100 / 12;
+      const variablePayment = remainingMonths <= 0 ? 0 : (
+        variableMonthlyRate === 0
+          ? balanceAfterFixed / remainingMonths
+          : (balanceAfterFixed * variableMonthlyRate * Math.pow(1 + variableMonthlyRate, remainingMonths)) / (Math.pow(1 + variableMonthlyRate, remainingMonths) - 1)
+      );
+
+      mixedResult = { fixedYears: mixedFixedYears, fixedPayment: monthlyPayment, variablePayment, remainingYears: remainingMonths / 12 };
+    }
+
+    setResult({ loanAmount, monthlyPayment, maxLoan, maxPropertyPrice, mixedResult });
     setHasCalculated(true);
   }
 
@@ -128,14 +151,30 @@ export default function MortgageSimulator({ price }) {
         <PillGroup
           value={rateType}
           onChange={setRateType}
-          options={[{ value: 'Fixa', label: 'Fixa' }, { value: 'Variável', label: 'Variável' }]}
+          options={[{ value: 'Fixa', label: 'Fixa' }, { value: 'Variável', label: 'Variável' }, { value: 'Mista', label: 'Mista' }]}
         />
       </div>
 
       <div className="field">
-        <label>Taxa de juro anual (%)</label>
+        <label>{rateType === 'Mista' ? 'Taxa fixa inicial (%)' : 'Taxa de juro anual (%)'}</label>
         <input type="number" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} min={0} />
       </div>
+
+      {rateType === 'Mista' && (
+        <>
+          <div className="field">
+            <label>Anos com taxa fixa</label>
+            <input type="number" value={mixedFixedYears} onChange={(e) => setMixedFixedYears(Number(e.target.value))} min={1} max={years} />
+            <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 6 }}>
+              As ofertas mais comuns em Portugal são 2, 5, 7 ou 10 anos de taxa fixa.
+            </p>
+          </div>
+          <div className="field">
+            <label>Taxa variável estimada depois (%)</label>
+            <input type="number" step="0.1" value={mixedVariableRate} onChange={(e) => setMixedVariableRate(Number(e.target.value))} min={0} />
+          </div>
+        </>
+      )}
 
       <div className="field">
         <label>Tipo de casa</label>
@@ -171,18 +210,42 @@ export default function MortgageSimulator({ price }) {
 
       {hasCalculated && result && (
         mode === 'prestacao' ? (
-          <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-            <div>
-              <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Montante financiado</div>
-              <div style={{ fontSize: 15, fontWeight: 600 }}>{result.loanAmount.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
+          result.mixedResult ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>Montante financiado</div>
+                <div style={{ fontSize: 15, fontWeight: 600 }}>{result.loanAmount.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
+              </div>
+              <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>Primeiros {result.mixedResult.fixedYears} anos (taxa fixa)</div>
+                <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
+                  {result.mixedResult.fixedPayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
+                </div>
+              </div>
+              <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>Restantes {result.mixedResult.remainingYears.toFixed(0)} anos (taxa variável estimada)</div>
+                <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
+                  {result.mixedResult.variablePayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
+                </div>
+              </div>
+              <p style={{ fontSize: 11, color: 'var(--text-soft)' }}>
+                A prestação da fase variável é só uma estimativa — o valor real depende da taxa em vigor nessa altura.
+              </p>
             </div>
-            <div>
-              <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Prestação mensal estimada</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
-                {result.monthlyPayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
+          ) : (
+            <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Montante financiado</div>
+                <div style={{ fontSize: 15, fontWeight: 600 }}>{result.loanAmount.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Prestação mensal estimada</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
+                  {result.monthlyPayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
+                </div>
               </div>
             </div>
-          </div>
+          )
         ) : (
           <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
             <div>
@@ -195,6 +258,11 @@ export default function MortgageSimulator({ price }) {
                 {result.maxPropertyPrice.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €
               </div>
             </div>
+            {rateType === 'Mista' && (
+              <p style={{ fontSize: 11, color: 'var(--text-soft)', width: '100%' }}>
+                Cálculo baseado na taxa fixa inicial (mais previsível). A prestação pode variar depois de {mixedFixedYears} anos.
+              </p>
+            )}
           </div>
         )
       )}
