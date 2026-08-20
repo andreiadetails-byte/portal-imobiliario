@@ -68,7 +68,10 @@ function ChatInner() {
       }));
 
       setConversations(enriched);
-      if (!activeId && enriched.length > 0) setActiveId(enriched[0].id);
+      // Em computador, mostra logo a primeira conversa (lista e mensagens lado a lado).
+      // Em telemóvel, mostra primeiro só a lista — a pessoa escolhe qual quer abrir.
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth > 900;
+      if (!activeId && isDesktop && enriched.length > 0) setActiveId(enriched[0].id);
       setLoading(false);
     }
     init();
