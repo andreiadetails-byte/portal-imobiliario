@@ -30,7 +30,7 @@ export default function TestimonialsCarousel() {
     <div style={{
       position: 'relative', overflow: 'hidden', borderRadius: 10, padding: '32px 30px',
       background: 'linear-gradient(135deg, var(--azulejo) 0%, var(--telha) 100%)',
-      minHeight: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      height: 260, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center',
     }}>
       <span style={{
         position: 'absolute', top: -18, left: 14, fontFamily: 'Fraunces, serif', fontSize: 130,
