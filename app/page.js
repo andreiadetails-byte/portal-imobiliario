@@ -371,7 +371,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginTop: 72 }}>
+          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginTop: 110 }}>
             <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: 150, backgroundImage: 'url(/images/simulador-arrendar.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
               <div style={{ padding: '30px 30px 36px' }}>
