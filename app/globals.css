@@ -168,8 +168,9 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .navbar{ padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
   .navbar-links{ flex-wrap: wrap !important; row-gap: 8px; width: 100%; justify-content: flex-start !important; }
   .hero-title{ font-size: 30px !important; }
-  .result-card{ grid-template-columns: 1fr !important; }
-  .result-card-photo{ height: 280px !important; }
+  .result-card{ grid-template-columns: 1fr !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+  .result-card-photo{ height: 280px !important; width: 100% !important; }
+  .result-card *{ min-width: 0 !important; overflow-wrap: break-word !important; word-break: break-word !important; }
   .property-gallery{ grid-template-columns: 1fr !important; height: 260px !important; }
   .property-gallery-side{ display: none !important; }
   .property-gallery-main{ height: 260px !important; }
