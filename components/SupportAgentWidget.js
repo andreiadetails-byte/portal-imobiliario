@@ -3,13 +3,16 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
-const NOMES = ['Beatriz', 'Inês', 'Mariana', 'Catarina', 'Carolina', 'Sofia', 'Joana', 'Rita', 'Leonor', 'Matilde'];
+const NOMES_F = ['Beatriz', 'Inês', 'Mariana', 'Catarina', 'Carolina', 'Sofia', 'Joana', 'Rita', 'Leonor', 'Matilde'];
+const NOMES_M = ['Tiago', 'Rui', 'André', 'Miguel', 'Diogo', 'Bruno', 'Pedro', 'Ricardo', 'Nuno', 'Gonçalo'];
 const APELIDOS = ['Ferreira', 'Costa', 'Santos', 'Silva', 'Pereira', 'Oliveira', 'Rodrigues', 'Martins'];
 
 function randomAgentName() {
-  const nome = NOMES[Math.floor(Math.random() * NOMES.length)];
+  const isFemale = Math.random() < 0.5;
+  const nomes = isFemale ? NOMES_F : NOMES_M;
+  const nome = nomes[Math.floor(Math.random() * nomes.length)];
   const apelido = APELIDOS[Math.floor(Math.random() * APELIDOS.length)];
-  return `${nome} ${apelido}`;
+  return { fullName: `${nome} ${apelido}`, isFemale };
 }
 
 // Avatar ilustrado simples (não é uma foto real de ninguém)
@@ -42,7 +45,7 @@ export default function SupportAgentWidget() {
     e.preventDefault();
     setSending(true);
     await supabase.from('support_requests').insert({
-      agent_name: agentName,
+      agent_name: agentName.fullName,
       name: form.name,
       contact: form.contact,
       message: form.message,
@@ -65,14 +68,14 @@ export default function SupportAgentWidget() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
             <AgentAvatar />
             <div>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{agentName}</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{agentName.fullName}</div>
               <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>Apoio ao cliente · Morada</div>
             </div>
           </div>
 
           {sent ? (
             <p style={{ fontSize: 13.5 }}>
-              Obrigada! A {agentName.split(' ')[0]} vai responder-lhe em breve.
+              Obrigada! {agentName.isFemale ? 'A' : 'O'} {agentName.fullName.split(' ')[0]} vai responder-lhe em breve.
               {user
                 ? ' Pode ver a resposta no seu painel, em "As minhas mensagens de suporte".'
                 : ' Inicie sessão para poder ver a resposta na app.'}
@@ -113,7 +116,7 @@ export default function SupportAgentWidget() {
       >
         <AgentAvatar size={36} />
         <span className="support-widget-text" style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>
-          {open ? 'Fechar' : `Fale com a ${agentName.split(' ')[0]}`}
+          {open ? 'Fechar' : `Fale com ${agentName.isFemale ? 'a' : 'o'} ${agentName.fullName.split(' ')[0]}`}
         </span>
       </button>
     </div>
