@@ -1,0 +1,252 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '../../lib/supabaseClient';
+import Header from '../../components/Header';
+import { useLanguage } from '../../lib/i18n';
+
+export default function PerfilPage() {
+  const router = useRouter();
+  const { t } = useLanguage();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [fullName, setFullName] = useState('');
+  const [agencyName, setAgencyName] = useState('');
+  const [amiLicense, setAmiLicense] = useState('');
+  const [accountType, setAccountType] = useState('particular');
+  const [phone, setPhone] = useState('');
+  const [showPhonePublic, setShowPhonePublic] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [avatarRemoved, setAvatarRemoved] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSaved, setPasswordSaved] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) { router.push('/login'); return; }
+      setUser(currentUser);
+
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+      if (profile) {
+        setFullName(profile.full_name || '');
+        setAgencyName(profile.agency_name || '');
+        setAmiLicense(profile.agency_license || '');
+        setAccountType(profile.account_type || 'particular');
+        setPhone(profile.phone_real || '');
+        setShowPhonePublic(!!profile.show_phone_public);
+        setAvatarPreview(profile.avatar_url || null);
+      }
+      setLoading(false);
+    }
+    load();
+  }, [router]);
+
+  function handleAvatarSelect(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+    setAvatarRemoved(false);
+  }
+
+  function handleRemoveAvatar() {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setAvatarRemoved(true);
+  }
+
+  async function saveProfile(e) {
+    e.preventDefault();
+    setSavingProfile(true);
+    setProfileSaved(false);
+
+    let avatar_url;
+    if (avatarFile) {
+      const ext = avatarFile.name.split('.').pop();
+      const path = `${user.id}/avatar.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, avatarFile, { upsert: true });
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
+        avatar_url = publicUrlData.publicUrl;
+      }
+    }
+
+    const updates = {
+      full_name: fullName,
+      agency_name: accountType === 'agencia' ? agencyName : null,
+      agency_license: accountType === 'agencia' ? amiLicense : null,
+      phone_real: phone || null,
+      show_phone_public: showPhonePublic,
+    };
+    if (avatar_url) updates.avatar_url = avatar_url;
+    else if (avatarRemoved) updates.avatar_url = null;
+
+    await supabase.from('profiles').update(updates).eq('id', user.id);
+
+    setSavingProfile(false);
+    setAvatarRemoved(false);
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 3000);
+  }
+
+  async function savePassword(e) {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSaved(false);
+
+    if (newPassword.length < 6) {
+      setPasswordError(t('perfil_password_too_short'));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError(t('perfil_passwords_dont_match'));
+      return;
+    }
+
+    setSavingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setSavingPassword(false);
+
+    if (error) {
+      setPasswordError(error.message);
+      return;
+    }
+    setNewPassword('');
+    setConfirmPassword('');
+    setPasswordSaved(true);
+    setTimeout(() => setPasswordSaved(false), 3000);
+  }
+
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('perfil_loading')}</div></>);
+
+  return (
+    <>
+      <Header />
+      <main id="main-content" className="wrap" style={{ maxWidth: 560, paddingTop: 48, paddingBottom: 80 }}>
+        <h1 className="display" style={{ fontSize: 26, marginBottom: 28 }}>{t('perfil_title')}</h1>
+
+        <form onSubmit={saveProfile} className="card" style={{ padding: 24, marginBottom: 24 }}>
+          <h2 className="display" style={{ fontSize: 18, marginBottom: 18 }}>{t('perfil_profile')}</h2>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+            {avatarPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatarPreview} alt="A tua foto de perfil" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{
+                width: 72, height: 72, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 600,
+              }}>
+                {(fullName || '?')[0].toUpperCase()}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <label htmlFor="avatar-input" className="btn" style={{ fontSize: 13, cursor: 'pointer' }}>
+                {t('perfil_change_photo')}
+              </label>
+              <input id="avatar-input" type="file" accept="image/*" onChange={handleAvatarSelect} style={{ display: 'none' }} />
+              {avatarPreview && (
+                <button type="button" onClick={handleRemoveAvatar} className="btn" style={{ fontSize: 13, color: '#8a3b2a', borderColor: '#8a3b2a' }}>
+                  {t('perfil_remove_photo')}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="field">
+            <label htmlFor="full-name-input">{t('perfil_fullname')}</label>
+            <input id="full-name-input" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+          </div>
+
+          {accountType === 'agencia' && (
+            <>
+              <div className="field">
+                <label htmlFor="agency-name-input">{t('perfil_agency_name')}</label>
+                <input id="agency-name-input" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} />
+              </div>
+              <div className="field">
+                <label htmlFor="ami-input">{t('perfil_ami')}</label>
+                <input id="ami-input" value={amiLicense} onChange={(e) => setAmiLicense(e.target.value)} placeholder="ex: 12345" />
+              </div>
+            </>
+          )}
+
+          <div className="field">
+            <label>{t('perfil_email')}</label>
+            <input value={user.email} disabled style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+          </div>
+
+          <div className="field">
+            <label htmlFor="phone-input">{t('perfil_phone')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('perfil_phone_optional')}</span></label>
+            <input id="phone-input" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="912 345 678" />
+            {phone && (
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowPhonePublic(true)}
+                  className="btn"
+                  style={{
+                    fontSize: 12.5, flex: 1,
+                    background: showPhonePublic ? 'var(--azulejo)' : 'transparent',
+                    color: showPhonePublic ? '#fff' : 'var(--ink)',
+                    borderColor: showPhonePublic ? 'var(--azulejo)' : 'var(--line)',
+                  }}
+                >
+                  {t('perfil_show_phone')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPhonePublic(false)}
+                  className="btn"
+                  style={{
+                    fontSize: 12.5, flex: 1,
+                    background: !showPhonePublic ? 'var(--azulejo)' : 'transparent',
+                    color: !showPhonePublic ? '#fff' : 'var(--ink)',
+                    borderColor: !showPhonePublic ? 'var(--azulejo)' : 'var(--line)',
+                  }}
+                >
+                  {t('perfil_hide_phone')}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <button type="submit" className="btn btn-primary" disabled={savingProfile}>
+            {savingProfile ? t('perfil_saving') : t('perfil_save')}
+          </button>
+          {profileSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 12 }}>✓ {t('perfil_saved')}</span>}
+        </form>
+
+        <form onSubmit={savePassword} className="card" style={{ padding: 24 }}>
+          <h2 className="display" style={{ fontSize: 18, marginBottom: 18 }}>{t('perfil_change_password')}</h2>
+
+          <div className="field">
+            <label htmlFor="new-password-input">{t('perfil_new_password')}</label>
+            <input id="new-password-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t('perfil_password_min')} />
+          </div>
+          <div className="field">
+            <label htmlFor="confirm-password-input">{t('perfil_confirm_password')}</label>
+            <input id="confirm-password-input" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          </div>
+
+          {passwordError && <p className="error-text">{passwordError}</p>}
+
+          <button type="submit" className="btn btn-primary" disabled={savingPassword}>
+            {savingPassword ? t('perfil_saving') : t('perfil_change_password_btn')}
+          </button>
+          {passwordSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 12 }}>✓ {t('perfil_password_changed')}</span>}
+        </form>
+      </main>
+    </>
+  );
+}

@@ -1,0 +1,50 @@
+
+=== Início da tradução em lote — 13/08/2026, 23:46:53 ===
+Encontrados 460 anúncios por traduzir.
+
+=== Início da tradução em lote — 13/08/2026, 23:47:31 ===
+Encontrados 455 anúncios por traduzir.
+
+=== Início da tradução em lote — 13/08/2026, 23:50:52 ===
+Encontrados 449 anúncios por traduzir.
+Progresso: 10/449 (✓ 10  ✗ 0)
+Progresso: 20/449 (✓ 20  ✗ 0)
+❌ Falhou (imóvel 4903c377-b99c-49eb-ba89-8c4df727c31c): DeepL HTTP 429: 
+Progresso: 30/449 (✓ 29  ✗ 1)
+Progresso: 40/449 (✓ 39  ✗ 1)
+❌ Falhou (imóvel 86c8b7ea-f603-425f-b424-eb091b447342): DeepL HTTP 429: 
+Progresso: 50/449 (✓ 48  ✗ 2)
+❌ Falhou (imóvel d8016757-0806-4405-8dec-a93aac9229ec): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel fa6c46d2-8e77-43e8-8dbf-7c220f8d3ba8): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel e0e47a2e-e278-477b-bf00-c975a8b81b87): DeepL HTTP 456: {"message":"Quota exceeded"}
+Progresso: 60/449 (✓ 55  ✗ 5)
+❌ Falhou (imóvel 4ae7244b-e78e-42ff-b46c-407dec4b3d49): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 528e3f08-3b18-4796-a78a-5be041190c7d): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel d3bf323c-6952-4944-8b51-7822f93b31a1): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel bb1b5213-05f7-4aaa-bcc4-a5be8a956ebc): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 8e2e8a3f-9bce-495c-afee-fd5459acd775): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel ef151372-7808-4a2b-ba54-6c07145ac864): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 979a2d2e-a715-4625-81b8-f11c4e400b97): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel b53fb970-5794-4e3a-9135-f40af4307073): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 934cf7ea-66a6-4c61-9a8c-14c1fc2beb21): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel d0476bc0-f08e-4348-9b18-930fa39783aa): DeepL HTTP 456: {"message":"Quota exceeded"}
+Progresso: 70/449 (✓ 55  ✗ 15)
+❌ Falhou (imóvel b18941c0-a72e-476b-8cb0-4c8af7bada1a): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 31553541-246f-4210-a715-6947c27bc4d9): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 13135730-96f7-4c17-99ed-2eb6b0826af3): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 4b04f745-f2a0-4ef6-8c11-a273e2f07749): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 71b01450-d98f-467d-b7a3-5fd6089942b4): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 2e3ab6c9-f785-4dcc-9a24-f370583b201e): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 00e832e8-f982-4579-8865-7106d037c326): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 7e362b06-ac00-4cc9-a063-6996d313a5d2): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 1221b2a9-7c02-47b4-96a1-8b9f2d136a40): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel af3cc88a-730f-4471-b20c-ceb224dfd52c): DeepL HTTP 456: {"message":"Quota exceeded"}
+Progresso: 80/449 (✓ 55  ✗ 25)
+❌ Falhou (imóvel 707aa25f-4df3-4081-9d6c-70fb56f57771): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 6fd0dce7-db95-473a-9548-867b6b91a659): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel c152327e-c344-4bd1-944d-0068d9882eaa): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 03ef3278-80ee-4e46-b065-db9fbcb4b7e6): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel eb805c4f-fb97-410f-87ea-dea4bfc93a48): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 9ed88c0a-1ee3-456e-804d-417244e86790): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel 54425f1d-8ed9-4753-b97b-fc1f889b886f): DeepL HTTP 456: {"message":"Quota exceeded"}
+❌ Falhou (imóvel fb6126e1-bb13-4ec6-953d-11d67cade68d): DeepL HTTP 456: {"message":"Quota exceeded"}

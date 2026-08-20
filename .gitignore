@@ -1,0 +1,19 @@
+# Dependências (reinstaladas com "npm install", nunca devem ir para o GitHub)
+/node_modules
+
+# Ficheiros de build/compilação do Next.js
+/.next
+/out
+
+# Variáveis de ambiente (contêm chaves secretas — nunca partilhar)
+.env
+.env.local
+.env*.local
+
+# Ficheiros do sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
