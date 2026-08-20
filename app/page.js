@@ -200,10 +200,10 @@ export default function HomePage() {
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https%3A%2F%2Fportalimobiliario.netlify.app"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fportalimobiliario.netlify.app"
               alt="Código QR para abrir o More·ada no telemóvel"
-              width={76}
-              height={76}
+              width={104}
+              height={104}
               style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
             />
             <div>
