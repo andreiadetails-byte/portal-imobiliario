@@ -318,14 +318,14 @@ export default function NaturalSearchBox() {
   const ui = UI_TEXT[lang] || UI_TEXT.pt;
 
   return (
-    <form onSubmit={handleSubmit} className="card" style={{ padding: 24 }}>
-      <h3 className="display" style={{ fontSize: 24, marginBottom: 8, fontWeight: 600 }}>{ui.title}</h3>
-      <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 16 }}>
+    <form onSubmit={handleSubmit} className="card" style={{ padding: 18 }}>
+      <h3 className="display" style={{ fontSize: 19, marginBottom: 5, fontWeight: 600 }}>{ui.title}</h3>
+      <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 12 }}>
         {ui.sub(voiceSupported)}
       </p>
-      <div style={{ position: 'relative', marginTop: 30 }}>
+      <div style={{ position: 'relative', marginTop: 26 }}>
         <div style={{
-          position: 'absolute', top: -34, left: 0, right: 0, height: 24,
+          position: 'absolute', top: -30, left: 0, right: 0, height: 22,
           display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600,
           cursor: listening ? 'pointer' : 'default',
           color: listening ? '#b8452f' : voiceError ? '#8a3b2a' : 'transparent',
@@ -345,13 +345,13 @@ export default function NaturalSearchBox() {
           )}
         </div>
         <textarea
-          rows={4}
+          rows={2}
           value={listening && interimText ? `${text}${text ? ' ' : ''}${interimText}` : text}
           onChange={(e) => { setText(e.target.value); baseTextRef.current = e.target.value; }}
           placeholder={ui.placeholder}
           style={{
-            width: '100%', padding: 14, paddingRight: voiceSupported ? 52 : 14, border: listening ? '2px solid #b8452f' : '1px solid var(--line)', borderRadius: 6,
-            fontFamily: 'Inter, sans-serif', fontSize: 15.5, resize: 'vertical', boxSizing: 'border-box', marginBottom: 12,
+            width: '100%', padding: 12, paddingRight: voiceSupported ? 52 : 12, border: listening ? '2px solid #b8452f' : '1px solid var(--line)', borderRadius: 6,
+            fontFamily: 'Inter, sans-serif', fontSize: 14.5, resize: 'vertical', boxSizing: 'border-box', marginBottom: 10,
           }}
         />
         {voiceSupported && (
