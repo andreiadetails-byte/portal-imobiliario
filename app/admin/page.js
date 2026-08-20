@@ -96,6 +96,7 @@ function AdminInner() {
   const [savingRate, setSavingRate] = useState(false);
   const [rateSaved, setRateSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+  const [allLeads, setAllLeads] = useState([]);
   const [userSearch, setUserSearch] = useState('');
   const [supportReplyText, setSupportReplyText] = useState({});
   const [ads, setAds] = useState([]);
@@ -122,6 +123,7 @@ function AdminInner() {
       loadAgencies();
       loadMortgageRate();
       loadAllUsers();
+      loadAllLeads();
       loadAds();
     }
     checkAccess();
@@ -198,6 +200,14 @@ function AdminInner() {
   async function loadAllUsers() {
     const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
     setAllUsers(data || []);
+  }
+
+  async function loadAllLeads() {
+    const { data } = await supabase
+      .from('leads')
+      .select('*, properties(id, typology, address, district, owner_id, profiles(id, full_name, agency_name))')
+      .order('created_at', { ascending: false });
+    setAllLeads(data || []);
   }
 
   async function activateSubscription(userId) {
@@ -468,7 +478,7 @@ function AdminInner() {
           ['anuncios', '📋 Anúncios', 0],
           ['denuncias', '⚑ Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
           ['suporte', '💬 Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
-          ['utilizadores', '👤 Utilizadores', 0], ['atividade', '👣 Atividade', 0], ['destaques', '★ Destaques', 0], ['agencias', '🏢 Agências', 0],
+          ['utilizadores', '👤 Utilizadores', 0], ['leads', '📩 Leads', allLeads.filter((l) => l.status === 'novo').length], ['atividade', '👣 Atividade', 0], ['destaques', '★ Destaques', 0], ['agencias', '🏢 Agências', 0],
           ['noticias', '📰 Notícias', 0], ['publicidade', '📣 Publicidade', 0], ['definicoes', '⚙ Definições', 0],
         ].map(([value, label, count]) => (
           <button
@@ -794,6 +804,47 @@ function AdminInner() {
                       </button>
                     </>
                   )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {section === 'leads' && (
+        <>
+          <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
+            Todas as mensagens de contacto (leads) enviadas através dos anúncios, de todos os utilizadores.
+          </p>
+          {allLeads.length === 0 && <p className="empty-state">Ainda não há leads.</p>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {allLeads.map((l) => (
+              <div key={l.id} className="card" style={{ padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+                  <div>
+                    <b style={{ fontSize: 14 }}>{l.name}</b>
+                    <div className="meta">
+                      {l.email}{l.phone ? ` · 📞 ${l.phone}` : ''}
+                    </div>
+                  </div>
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 12, flexShrink: 0,
+                    background: l.status === 'novo' ? 'rgba(126,143,106,0.18)' : 'var(--line)',
+                    color: l.status === 'novo' ? 'var(--telha)' : 'var(--text-soft)',
+                  }}>
+                    {l.status === 'novo' ? 'Nova' : 'Respondida'}
+                  </span>
+                </div>
+                <p style={{ fontSize: 13.5, marginBottom: 10 }}>{l.message}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                  {l.properties ? (
+                    <a href={`/property/${l.properties.id}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: 'var(--telha)' }}>
+                      {l.properties.typology} · {l.properties.district} — anunciante: {l.properties.profiles?.agency_name || l.properties.profiles?.full_name || '—'}
+                    </a>
+                  ) : (
+                    <span className="meta">Anúncio já não existe</span>
+                  )}
+                  <span className="meta">{new Date(l.created_at).toLocaleDateString('pt-PT')}</span>
                 </div>
               </div>
             ))}
