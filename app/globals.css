@@ -74,7 +74,6 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 @media (max-width: 900px){ .grid-listings{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 640px){
   .grid-listings{ grid-template-columns:1fr; }
-  .investor-badge{ position: static !important; max-width: 100% !important; margin: 0 16px 20px; }
 }
 
 .error-text{ color:#8a3b2a; font-size:13px; margin-top:8px; }

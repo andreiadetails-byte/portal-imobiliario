@@ -125,24 +125,6 @@ export default function HomePage() {
           position: 'relative',
         }}
       >
-        <Link
-          href="/simulador-investimento"
-          className="investor-badge"
-          style={{
-            position: 'absolute', top: 24, right: 24, zIndex: 2, maxWidth: 240,
-            background: 'rgba(255,255,255,0.96)', borderRadius: 10, padding: '14px 16px',
-            boxShadow: '0 6px 20px rgba(0,0,0,0.25)', textDecoration: 'none', display: 'flex', gap: 10, alignItems: 'flex-start',
-          }}
-        >
-          <span style={{ fontSize: 22, flexShrink: 0 }}>📈</span>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginBottom: 2 }}>És investidor?</div>
-            <div style={{ fontSize: 11.5, color: 'var(--text-soft)', lineHeight: 1.4 }}>
-              Calcula o teu lucro na revenda do imóvel →
-            </div>
-          </div>
-        </Link>
-
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
@@ -201,6 +183,34 @@ export default function HomePage() {
       <section style={{ padding: '0 0 32px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <NaturalSearchBox />
+        </div>
+      </section>
+
+      <section style={{ padding: '0 0 32px' }}>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <Link
+            href="/simulador-investimento"
+            style={{
+              borderRadius: 12, padding: '22px 26px', background: 'linear-gradient(135deg, var(--azulejo) 0%, var(--telha) 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', textDecoration: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <span style={{ fontSize: 34, flexShrink: 0 }}>📈</span>
+              <div>
+                <div className="display" style={{ fontSize: 19, fontWeight: 600, color: '#fff', marginBottom: 3 }}>És investidor?</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)' }}>
+                  Calcula o teu lucro na revenda de um imóvel, com todos os impostos incluídos.
+                </div>
+              </div>
+            </div>
+            <span style={{
+              background: '#fff', color: 'var(--ink)', fontSize: 13.5, fontWeight: 600,
+              padding: '11px 22px', borderRadius: 6, whiteSpace: 'nowrap',
+            }}>
+              Calcular agora →
+            </span>
+          </Link>
         </div>
       </section>
 
