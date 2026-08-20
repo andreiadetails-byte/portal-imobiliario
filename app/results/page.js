@@ -29,6 +29,9 @@ function ResultsInner() {
   const isFromNaturalSearch = searchParams.get('nlsearch') === '1';
 
   const [district, setDistrict] = useState(searchParams.get('location') || '');
+  const [agencyQuery, setAgencyQuery] = useState('');
+  const [agencySuggestions, setAgencySuggestions] = useState([]);
+  const [selectedAgency, setSelectedAgency] = useState(null);
   const [businessType, setBusinessType] = useState(searchParams.get('business') || 'Venda');
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedStates, setSelectedStates] = useState([]);
@@ -84,6 +87,30 @@ function ResultsInner() {
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
   }
 
+  async function searchAgencies(query) {
+    setAgencyQuery(query);
+    if (query.trim().length < 2) { setAgencySuggestions([]); return; }
+    const { data } = await supabase
+      .from('profiles_public')
+      .select('id, agency_name, full_name, avatar_url')
+      .eq('account_type', 'agencia')
+      .or(`agency_name.ilike.%${query}%,full_name.ilike.%${query}%`)
+      .limit(6);
+    setAgencySuggestions(data || []);
+  }
+
+  function pickAgency(agency) {
+    setSelectedAgency(agency);
+    setAgencyQuery(agency.agency_name || agency.full_name);
+    setAgencySuggestions([]);
+  }
+
+  function clearAgency() {
+    setSelectedAgency(null);
+    setAgencyQuery('');
+    setAgencySuggestions([]);
+  }
+
   async function saveSearch() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = '/login'; return; }
@@ -92,7 +119,7 @@ function ResultsInner() {
       ? `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} em ${district}`
       : `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} imóvel`;
 
-    const filters = { district, businessType, selectedTypes, selectedStates, selectedTypologies, maxPrice, minBedrooms, minBathrooms, minArea, selectedAmenities };
+    const filters = { district, businessType, selectedTypes, selectedStates, selectedAgency, selectedTypologies, maxPrice, minBedrooms, minBathrooms, minArea, selectedAmenities };
 
     const { error } = await supabase.from('saved_searches').insert({ user_id: user.id, name, filters, notify: true });
     if (!error) alert(`Pesquisa guardada! Vai receber um email sempre que aparecer um imóvel novo que corresponda.`);
@@ -115,6 +142,7 @@ function ResultsInner() {
     }
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
     if (selectedStates.length > 0) query = query.in('state', selectedStates);
+    if (selectedAgency) query = query.eq('owner_id', selectedAgency.id);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
     if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
@@ -169,6 +197,7 @@ function ResultsInner() {
     }
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
     if (selectedStates.length > 0) query = query.in('state', selectedStates);
+    if (selectedAgency) query = query.eq('owner_id', selectedAgency.id);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
     if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
@@ -254,6 +283,42 @@ function ResultsInner() {
                   </span>
                 ))}
               </div>
+            </div>
+
+            <div className="field" style={{ position: 'relative' }}>
+              <label>Só uma agência específica</label>
+              <input
+                value={agencyQuery}
+                onChange={(e) => { if (selectedAgency) clearAgency(); searchAgencies(e.target.value); }}
+                placeholder="Escreva o nome da agência..."
+                style={{ paddingRight: selectedAgency ? 30 : undefined }}
+              />
+              {selectedAgency && (
+                <button
+                  onClick={clearAgency}
+                  aria-label="Remover filtro de agência"
+                  style={{ position: 'absolute', right: 10, top: 33, background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text-soft)' }}
+                >
+                  ✕
+                </button>
+              )}
+              {agencySuggestions.length > 0 && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, marginTop: 2,
+                  background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 8,
+                  boxShadow: '0 6px 18px rgba(51,46,34,0.15)', maxHeight: 220, overflowY: 'auto',
+                }}>
+                  {agencySuggestions.map((a) => (
+                    <div
+                      key={a.id}
+                      onClick={() => pickAgency(a)}
+                      style={{ padding: '9px 12px', fontSize: 13, cursor: 'pointer', borderBottom: '1px solid var(--line)' }}
+                    >
+                      {a.agency_name || a.full_name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="field">
