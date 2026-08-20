@@ -8,6 +8,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
 import BigPromoBanner from '../components/BigPromoBanner';
+import PricePerM2Lookup from '../components/PricePerM2Lookup';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import { distritos } from '../lib/locations';
 import NaturalSearchBox from '../components/NaturalSearchBox';
@@ -394,6 +395,12 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '0 0 88px' }}>
+        <div className="wrap" style={{ maxWidth: 620 }}>
+          <PricePerM2Lookup />
         </div>
       </section>
 
