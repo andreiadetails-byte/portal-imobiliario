@@ -95,6 +95,15 @@ export default function LoginPage() {
     });
     if (error) { setError(error.message); setLoading(false); return; }
 
+    // O Supabase não devolve um erro claro quando o email já existe (por segurança,
+    // para não revelar quais emails já têm conta) — em vez disso, devolve uma resposta
+    // de "sucesso" mas com uma lista de identidades vazia. É assim que detetamos isto.
+    if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      setError('Já existe uma conta registada com este email. Se é sua, experimente entrar em vez de criar uma nova conta.');
+      setLoading(false);
+      return;
+    }
+
     if (data.user) {
       let avatar_url = null;
       if (avatarFile) {
