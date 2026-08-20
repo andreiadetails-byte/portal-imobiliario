@@ -3,6 +3,24 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { distritos, concelhosPorDistrito, freguesiasPorConcelho } from '../lib/locations';
 
+// Remove acentos e pequenas palavras de ligação ("de", "da", "do", "dos", "das", "e"),
+// para que escrever "vila nova gaia" encontre "Vila Nova de Gaia" sem precisar de
+// escrever a palavra "de".
+const STOPWORDS = new Set(['de', 'da', 'do', 'dos', 'das', 'e']);
+function normalize(text) {
+  return text
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((word) => word && !STOPWORDS.has(word))
+    .join(' ');
+}
+function matchesQuery(label, query) {
+  const normalizedQuery = normalize(query);
+  if (!normalizedQuery) return true;
+  return normalize(label).includes(normalizedQuery);
+}
+
 export default function LocationAutocomplete({ onChange, onLevels, placeholder = 'Distrito, concelho ou freguesia' }) {
   const [distrito, setDistrito] = useState(null);
   const [concelho, setConcelho] = useState(null);
@@ -50,7 +68,7 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
   }
 
   const suggestions = currentList()
-    .filter((item) => typed === '' || item.label.toLowerCase().includes(typed.toLowerCase()))
+    .filter((item) => matchesQuery(item.label, typed))
     .slice(0, 40);
 
   function handleSelect(item) {
