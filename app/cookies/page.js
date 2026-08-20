@@ -13,7 +13,7 @@ export default function CookiesPage() {
       </p>
       <ul style={{ marginBottom: 16, paddingLeft: 20 }}>
         <li style={{ marginBottom: 6 }}>Manter a sua sessão iniciada, para não ter de fazer login em cada página.</li>
-        <li style={{ marginBottom: 6 }}>Guardar o idioma que escolheu (português, inglês ou espanhol).</li>
+        <li style={{ marginBottom: 6 }}>Guardar o idioma que escolheu (português, inglês, espanhol, francês, alemão, holandês ou russo).</li>
         <li style={{ marginBottom: 6 }}>Guardar a sua escolha sobre esta política de cookies, para não voltarmos a perguntar a cada visita.</li>
       </ul>
       <p style={{ marginBottom: 16 }}>
