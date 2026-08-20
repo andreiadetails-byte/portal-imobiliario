@@ -1,5 +1,10 @@
 import TextPage from '../../components/TextPage';
 
+export const metadata = {
+  title: 'Perguntas frequentes',
+  description: 'Tire as suas dúvidas sobre como publicar, comprar ou arrendar imóveis no More·ada — preços, limites de anúncios, e como funciona a plataforma.',
+};
+
 const FAQS = [
   { p: 'Como publico um imóvel?', r: 'Crie uma conta, clique em "Publicar imóvel" e preencha o formulário. O seu anúncio fica "em revisão" até ser aprovado pela nossa equipa.' },
   { p: 'É grátis publicar?', r: 'Para utilizadores particulares, sim — é gratuito publicar até 3 anúncios. Para agências, a publicação tem um custo de 15 € por mês, com direito a até 50 anúncios simultâneos.' },

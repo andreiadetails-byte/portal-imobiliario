@@ -1,7 +1,10 @@
-'use client';
-
 import Header from '../../components/Header';
 import MortgageSimulator from '../../components/MortgageSimulator';
+
+export const metadata = {
+  title: 'Simulador de Crédito Habitação',
+  description: 'Calcule gratuitamente a prestação mensal do seu crédito habitação, ou descubra quanto pode pedir emprestado com base no que consegue pagar por mês.',
+};
 
 export default function SimuladorCreditoPage() {
   return (

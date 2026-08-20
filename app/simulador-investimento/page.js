@@ -1,7 +1,10 @@
-'use client';
-
 import Header from '../../components/Header';
 import InvestmentProfitCalculator from '../../components/InvestmentProfitCalculator';
+
+export const metadata = {
+  title: 'Calculadora de Lucro em Investimento Imobiliário',
+  description: 'Calcule o lucro esperado ao comprar e revender um imóvel em Portugal, incluindo despesas, IMT, Imposto do Selo, e o imposto sobre a mais-valia.',
+};
 
 export default function SimuladorInvestimentoPage() {
   return (

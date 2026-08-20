@@ -14,6 +14,13 @@ export const metadata = {
     siteName: 'More·ada',
     locale: 'pt_PT',
     type: 'website',
+    images: [{ url: '/hero.jpg', width: 1200, height: 630, alt: 'More·ada — Portal imobiliário Portugal' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'More·ada — Portal imobiliário Portugal',
+    description: 'Compre, arrende ou publique o seu imóvel diretamente em Portugal — sem intermediários obrigatórios.',
+    images: ['/hero.jpg'],
   },
 };
 

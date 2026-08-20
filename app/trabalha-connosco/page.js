@@ -1,5 +1,10 @@
 import TextPage from '../../components/TextPage';
 
+export const metadata = {
+  title: 'Trabalha Connosco',
+  description: 'Junta-te à equipa do More·ada.',
+};
+
 export default function TrabalhaConnoscoPage() {
   return (
     <TextPage title="Trabalha connosco">
