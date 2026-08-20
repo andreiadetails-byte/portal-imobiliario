@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { logVisitIfNeeded } from '../lib/logVisit';
+import { Bell, Home, Search, Heart, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -133,7 +134,7 @@ export default function Header({ minimal = false }) {
                 style={{ position: 'relative', padding: '11px 14px' }}
                 aria-label="Notificações"
               >
-                🔔
+                <Bell size={18} />
                 {unreadNotifCount > 0 && (
                   <span style={{
                     position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
@@ -245,11 +246,11 @@ export default function Header({ minimal = false }) {
       <div className="tile-strip" />
 
       <nav className="bottom-nav">
-        <Link href="/" className="bottom-nav-item"><span style={{ fontSize: 21 }}>🏠</span><span>Início</span></Link>
-        <Link href="/results" className="bottom-nav-item"><span style={{ fontSize: 21 }}>🔍</span><span>Pesquisar</span></Link>
-        <Link href="/favorites" className="bottom-nav-item"><span style={{ fontSize: 21 }}>♡</span><span>Favoritos</span></Link>
+        <Link href="/" className="bottom-nav-item"><Home size={21} /><span>Início</span></Link>
+        <Link href="/results" className="bottom-nav-item"><Search size={21} /><span>Pesquisar</span></Link>
+        <Link href="/favorites" className="bottom-nav-item"><Heart size={21} /><span>Favoritos</span></Link>
         <Link href="/chat" className="bottom-nav-item" style={{ position: 'relative' }}>
-          <span style={{ fontSize: 21 }}>💬</span><span>Chat</span>
+          <MessageCircle size={21} /><span>Chat</span>
           {unreadChat > 0 && (
             <span style={{
               position: 'absolute', top: 0, right: 18, minWidth: 15, height: 15, borderRadius: 8,

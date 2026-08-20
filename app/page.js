@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { TrendingUp } from 'lucide-react';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import Header from '../components/Header';
 import BigPromoBanner from '../components/BigPromoBanner';
@@ -226,7 +227,7 @@ export default function HomePage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontSize: 34, flexShrink: 0 }}>📈</span>
+              <span style={{ flexShrink: 0, color: '#fff' }}><TrendingUp size={34} /></span>
               <div>
                 <div className="display" style={{ fontSize: 19, fontWeight: 600, color: '#fff', marginBottom: 3 }}>És investidor?</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)' }}>

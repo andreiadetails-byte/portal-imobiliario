@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings } from 'lucide-react';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -475,12 +476,12 @@ function AdminInner() {
 
       <div className="admin-tabs" style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)', overflowX: 'auto' }}>
         {[
-          ['anuncios', '📋 Anúncios', 0],
-          ['denuncias', '⚑ Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
-          ['suporte', '💬 Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
-          ['utilizadores', '👤 Utilizadores', 0], ['leads', '📩 Leads', allLeads.filter((l) => l.status === 'novo').length], ['atividade', '👣 Atividade', 0], ['destaques', '★ Destaques', 0], ['agencias', '🏢 Agências', 0],
-          ['noticias', '📰 Notícias', 0], ['publicidade', '📣 Publicidade', 0], ['definicoes', '⚙ Definições', 0],
-        ].map(([value, label, count]) => (
+          ['anuncios', ClipboardList, 'Anúncios', 0],
+          ['denuncias', Flag, 'Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
+          ['suporte', MessageCircle, 'Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
+          ['utilizadores', Users, 'Utilizadores', 0], ['leads', Mail, 'Leads', allLeads.filter((l) => l.status === 'novo').length], ['atividade', Footprints, 'Atividade', 0], ['destaques', Star, 'Destaques', 0], ['agencias', Building2, 'Agências', 0],
+          ['noticias', Newspaper, 'Notícias', 0], ['publicidade', Megaphone, 'Publicidade', 0], ['definicoes', Settings, 'Definições', 0],
+        ].map(([value, Icon, label, count]) => (
           <button
             key={value}
             onClick={() => setSection(value)}
@@ -491,6 +492,7 @@ function AdminInner() {
               borderBottom: section === value ? '2px solid var(--telha)' : '2px solid transparent',
             }}
           >
+            <Icon size={16} />
             {label}
             {count > 0 && (
               <span style={{

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
+import { Trash2 } from 'lucide-react';
 
 function ChatInner() {
   const router = useRouter();
@@ -329,7 +330,7 @@ function ChatInner() {
                         fontSize: 14, padding: 4, flexShrink: 0, alignSelf: 'flex-start',
                       }}
                     >
-                      🗑
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 );
@@ -367,7 +368,7 @@ function ChatInner() {
                       title="Apagar conversa definitivamente"
                       style={{ fontSize: 12, padding: '6px 10px', color: '#8a3b2a', borderColor: '#8a3b2a' }}
                     >
-                      🗑
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 )}

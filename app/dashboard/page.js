@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
+import { X, Gift } from 'lucide-react';
 import ViewsChart from '../../components/ViewsChart';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 
@@ -199,10 +200,10 @@ function DashboardInner() {
             aria-label="Fechar aviso"
             style={{ position: 'absolute', top: 14, right: 16, background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16 }}
           >
-            ✕
+            <X size={16} />
           </button>
-          <div className="display" style={{ fontSize: 19, fontWeight: 600, marginBottom: 6 }}>
-            🎁 Bem-vinda! O seu primeiro mês é grátis
+          <div className="display" style={{ fontSize: 19, fontWeight: 600, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Gift size={20} /> Bem-vinda! O seu primeiro mês é grátis
           </div>
           <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.9)', maxWidth: 560 }}>
             Como conta de agência, tem acesso total ao painel durante 1 mês, sem qualquer custo. Depois desse período,
