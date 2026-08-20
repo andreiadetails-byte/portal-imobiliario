@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -24,17 +24,18 @@ export default function FavoritesPage() {
 
       const { data: favIds, error: favError } = await supabase
         .from('favorites')
-        .select('property_id')
+        .select('property_id, notes')
         .eq('user_id', user.id);
 
       let favProperties = [];
       if (!favError && favIds && favIds.length > 0) {
         const ids = favIds.map((f) => f.property_id);
+        const notesById = Object.fromEntries(favIds.map((f) => [f.property_id, f.notes || '']));
         const { data: propsData } = await supabase
           .from('properties')
           .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, position)')
           .in('id', ids);
-        favProperties = propsData || [];
+        favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '' }));
         setProperties(favProperties);
       } else {
         setProperties([]);
@@ -76,6 +77,17 @@ export default function FavoritesPage() {
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
     setProperties((cur) => cur.filter((p) => p.id !== propertyId));
+  }
+
+  const notesTimers = useRef({});
+  function updateNote(propertyId, value) {
+    setProperties((cur) => cur.map((p) => (p.id === propertyId ? { ...p, notes: value } : p)));
+    clearTimeout(notesTimers.current[propertyId]);
+    notesTimers.current[propertyId] = setTimeout(async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from('favorites').update({ notes: value }).eq('user_id', user.id).eq('property_id', propertyId);
+    }, 800);
   }
 
   async function addSuggestionToFavorites(e, propertyId) {
@@ -170,6 +182,17 @@ export default function FavoritesPage() {
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
                       <div className="meta">{p.district} · {p.area || p.area_util} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
                     </Link>
+                    <textarea
+                      value={p.notes || ''}
+                      onChange={(e) => updateNote(p.id, e.target.value)}
+                      placeholder="📝 Escreve aqui uma nota sobre este imóvel (só tu vês)..."
+                      rows={2}
+                      style={{
+                        width: '100%', marginTop: 10, fontSize: 12.5, padding: '8px 10px', borderRadius: 6,
+                        border: '1px solid var(--line)', background: 'var(--plaster)', resize: 'vertical',
+                        fontFamily: 'inherit', color: 'var(--ink)',
+                      }}
+                    />
                   </div>
                 </div>
                 );
