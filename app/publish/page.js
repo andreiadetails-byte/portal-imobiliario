@@ -77,7 +77,7 @@ function PublishForm() {
   const [form, setForm] = useState({
     title: '', internal_reference: '', description: '', property_type: 'Apartamento', typology: 'T3',
     business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: 3, bathrooms: 2,
-    state: 'Usado', energy_certificate: 'B', address: '', district: '', municipality: '', parish: '',
+    state: '', energy_certificate: 'B', address: '', district: '', municipality: '', parish: '',
     floor: '', area_util: '', house_subtype: '', is_top_floor: false,
     has_storage: null, has_parking: null, has_balcony: null,
     has_garden: null, has_pool: null, has_gym: null, has_coworking: null,
@@ -134,7 +134,7 @@ function PublishForm() {
           title: prop.title || '', internal_reference: prop.internal_reference || '', display_name: prop.display_name || '', description: prop.description || '', property_type: prop.property_type || 'Apartamento',
           typology: prop.typology || 'T3', business_type: prop.business_type || 'Venda',
           price: prop.price ?? '', condo_fee: prop.condo_fee ?? '', area: prop.area ?? '',
-          bedrooms: prop.bedrooms ?? 3, bathrooms: prop.bathrooms ?? 2, state: prop.state || 'Usado',
+          bedrooms: prop.bedrooms ?? 3, bathrooms: prop.bathrooms ?? 2, state: prop.state || '',
           energy_certificate: prop.energy_certificate || 'B', address: prop.address || '',
           district: prop.district || '', municipality: prop.municipality || '', parish: prop.parish || '',
           floor: prop.floor || '', area_util: prop.area_util ?? '', house_subtype: prop.house_subtype || '',
@@ -669,8 +669,9 @@ function PublishForm() {
             <input type="number" required value={form.area_util} onChange={(e) => updateField('area_util', e.target.value)} />
           </div>
           <div className="field">
-            <label>Estado</label>
-            <select value={form.state} onChange={(e) => updateField('state', e.target.value)}>
+            <label>Estado <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>(obrigatório)</span></label>
+            <select required value={form.state} onChange={(e) => updateField('state', e.target.value)}>
+              <option value="">Escolha uma opção</option>
               <option value="Novo">Novo</option>
               <option value="Em construção">Em construção</option>
               <option value="Para recuperar">Para recuperar</option>

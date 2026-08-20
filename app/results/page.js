@@ -31,6 +31,7 @@ function ResultsInner() {
   const [district, setDistrict] = useState(searchParams.get('location') || '');
   const [businessType, setBusinessType] = useState(searchParams.get('business') || 'Venda');
   const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedStates, setSelectedStates] = useState([]);
   const [selectedTypologies, setSelectedTypologies] = useState(
     searchParams.get('typologies') ? searchParams.get('typologies').split(',') : []
   );
@@ -90,7 +91,7 @@ function ResultsInner() {
       ? `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} em ${district}`
       : `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} imóvel`;
 
-    const filters = { district, businessType, selectedTypes, selectedTypologies, maxPrice, minBedrooms, minBathrooms, minArea, selectedAmenities };
+    const filters = { district, businessType, selectedTypes, selectedStates, selectedTypologies, maxPrice, minBedrooms, minBathrooms, minArea, selectedAmenities };
 
     const { error } = await supabase.from('saved_searches').insert({ user_id: user.id, name, filters, notify: true });
     if (!error) alert(`Pesquisa guardada! Vai receber um email sempre que aparecer um imóvel novo que corresponda.`);
@@ -112,6 +113,7 @@ function ResultsInner() {
       query = query.or(`district.ilike.${pattern},address.ilike.${pattern},municipality.ilike.${pattern},parish.ilike.${pattern}`);
     }
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
+    if (selectedStates.length > 0) query = query.in('state', selectedStates);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
     if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
@@ -165,6 +167,7 @@ function ResultsInner() {
       query = query.or(`district.ilike.${pattern},address.ilike.${pattern},municipality.ilike.${pattern},parish.ilike.${pattern}`);
     }
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
+    if (selectedStates.length > 0) query = query.in('state', selectedStates);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
     if (maxPrice) query = query.lte('price', Number(maxPrice));
     if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
@@ -247,6 +250,38 @@ function ResultsInner() {
                     }}
                   >
                     {tp}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="field">
+              <label>Estado do imóvel</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 6 }}>
+                <span
+                  onClick={() => setSelectedStates([])}
+                  style={{
+                    fontSize: 11.5, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer',
+                    border: '1px solid var(--line)',
+                    background: selectedStates.length === 0 ? 'var(--azulejo)' : 'var(--paper)',
+                    color: selectedStates.length === 0 ? '#fff' : 'var(--text-soft)',
+                    gridColumn: '1 / -1',
+                  }}
+                >
+                  Todos
+                </span>
+                {['Novo', 'Em construção', 'Para recuperar', 'Usado'].map((st) => (
+                  <span
+                    key={st}
+                    onClick={() => toggleFromList(selectedStates, setSelectedStates, st)}
+                    style={{
+                      fontSize: 11.5, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer',
+                      border: '1px solid var(--line)',
+                      background: selectedStates.includes(st) ? 'var(--azulejo)' : 'var(--paper)',
+                      color: selectedStates.includes(st) ? '#fff' : 'var(--text-soft)',
+                    }}
+                  >
+                    {st}
                   </span>
                 ))}
               </div>
