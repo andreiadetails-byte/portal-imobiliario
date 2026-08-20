@@ -182,7 +182,13 @@ export default function HomePage() {
 
       <section style={{ padding: '0 0 32px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
-          <NaturalSearchBox />
+          <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
+            <div className="tile-strip" />
+            <div style={{ padding: 18 }}>
+              <NaturalSearchBox />
+            </div>
+            <div className="tile-strip" />
+          </div>
         </div>
       </section>
 
