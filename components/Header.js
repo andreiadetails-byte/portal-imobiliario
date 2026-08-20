@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
+import { logVisitIfNeeded } from '../lib/logVisit';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -45,6 +46,7 @@ export default function Header({ minimal = false }) {
         setIsAdmin(!!profile?.is_admin);
         loadUnreadChat(data.user.id);
         loadNotifications(data.user.id);
+        logVisitIfNeeded(supabase, data.user.id);
         if (profile?.is_admin) loadAdminPending();
       } else {
         setUser(null);

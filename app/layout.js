@@ -4,6 +4,7 @@ import SupportAgentWidget from '../components/SupportAgentWidget';
 import ImageProtection from '../components/ImageProtection';
 import CookieConsent from '../components/CookieConsent';
 import CompareBar from '../components/CompareBar';
+import GoogleAnalytics from '../components/GoogleAnalytics';
 
 export const metadata = {
   metadataBase: new URL('https://portalimobiliario.netlify.app'),
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
           <ImageProtection />
           <CookieConsent />
           <CompareBar />
+          <GoogleAnalytics />
         </LanguageProvider>
       </body>
     </html>

@@ -15,6 +15,7 @@ export default function CookieConsent() {
 
   function accept() {
     localStorage.setItem(STORAGE_KEY, 'accepted');
+    window.dispatchEvent(new Event('morada-cookie-consent-changed'));
     setVisible(false);
   }
 
@@ -22,6 +23,7 @@ export default function CookieConsent() {
     // Regista a escolha, mas o site continua a usar apenas os cookies essenciais
     // (sessão de login, preferências) — nunca analíticos/publicidade sem consentimento.
     localStorage.setItem(STORAGE_KEY, 'rejected');
+    window.dispatchEvent(new Event('morada-cookie-consent-changed'));
     setVisible(false);
   }
 

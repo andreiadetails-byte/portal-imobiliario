@@ -468,7 +468,7 @@ function AdminInner() {
           ['anuncios', '📋 Anúncios', 0],
           ['denuncias', '⚑ Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
           ['suporte', '💬 Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
-          ['utilizadores', '👤 Utilizadores', 0], ['destaques', '★ Destaques', 0], ['agencias', '🏢 Agências', 0],
+          ['utilizadores', '👤 Utilizadores', 0], ['atividade', '👣 Atividade', 0], ['destaques', '★ Destaques', 0], ['agencias', '🏢 Agências', 0],
           ['noticias', '📰 Notícias', 0], ['publicidade', '📣 Publicidade', 0], ['definicoes', '⚙ Definições', 0],
         ].map(([value, label, count]) => (
           <button
@@ -797,6 +797,54 @@ function AdminInner() {
                 </div>
               </div>
             ))}
+          </div>
+        </>
+      )}
+
+      {section === 'atividade' && (
+        <>
+          <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
+            Última vez que cada utilizador com conta visitou o site (atualizado no máximo de hora a hora, por visita).
+            Visitantes sem conta não aparecem aqui — para esses, usa o Google Analytics.
+          </p>
+          {allUsers.filter((u) => u.last_seen_at).length === 0 && (
+            <p className="empty-state">Ainda não há registos de visitas.</p>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[...allUsers]
+              .filter((u) => u.last_seen_at)
+              .sort((a, b) => new Date(b.last_seen_at) - new Date(a.last_seen_at))
+              .map((u) => {
+                const diffMs = Date.now() - new Date(u.last_seen_at).getTime();
+                const diffMin = Math.floor(diffMs / 60000);
+                const diffH = Math.floor(diffMin / 60);
+                const diffD = Math.floor(diffH / 24);
+                const label = diffMin < 5 ? 'agora mesmo' : diffMin < 60 ? `há ${diffMin} min` : diffH < 24 ? `há ${diffH}h` : `há ${diffD} ${diffD === 1 ? 'dia' : 'dias'}`;
+                return (
+                  <div key={u.id} className="card" style={{ padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {u.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={u.avatar_url} alt="" loading="lazy" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{
+                          width: 32, height: 32, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13,
+                        }}>
+                          {(u.agency_name || u.full_name || '?')[0].toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <b style={{ fontSize: 13.5 }}>{u.agency_name || u.full_name}</b>
+                        <div className="meta">{u.email}</div>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: 12.5, color: diffMin < 30 ? 'var(--telha)' : 'var(--text-soft)', fontWeight: diffMin < 30 ? 600 : 400 }}>
+                      {diffMin < 30 && '🟢 '}{label}
+                    </span>
+                  </div>
+                );
+              })}
           </div>
         </>
       )}

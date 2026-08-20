@@ -22,7 +22,7 @@ export default function CookiesPage() {
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Cookies de publicidade ou análise</h2>
       <p style={{ marginBottom: 16 }}>
-        Atualmente, o More·ada <b>não usa</b> cookies de publicidade de terceiros nem ferramentas de análise de tráfego (como o Google Analytics). Se isso mudar no futuro, esta página será atualizada e voltaremos a pedir a sua autorização.
+        O More·ada usa o Google Analytics para perceber quantas pessoas visitam o site e quais as páginas mais vistas — mas <b>só depois de autorizar</b>, através da faixa de cookies que aparece na primeira visita. Se recusar, ou só aceitar os cookies essenciais, o Google Analytics não é carregado, e continuamos sem saber quem é, apenas quantas visitas houve no total (de forma anónima, com o endereço IP encurtado).
       </p>
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Como gerir os cookies</h2>
