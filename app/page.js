@@ -493,6 +493,7 @@ export default function HomePage() {
               <Link href="/dashboard" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_dashboard')}</Link>
               <Link href="/simulador-credito" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Simulador de crédito</Link>
               <Link href="/simulador-imt" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Calculadora de IMT</Link>
+              <Link href="/simulador-investimento" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Lucro em investimento</Link>
             </div>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
