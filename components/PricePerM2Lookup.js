@@ -4,17 +4,59 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import LocationAutocomplete from './LocationAutocomplete';
 
+// Regiões usadas pelo INE que não são distrito/concelho/freguesia (não existem
+// nessa hierarquia), mas que as pessoas costumam escrever à procura de preços.
+const INE_REGIONS = ['Algarve', 'Grande Lisboa', 'Área Metropolitana do Porto', 'Península de Setúbal', 'Região Autónoma da Madeira', 'Portugal'];
+
 export default function PricePerM2Lookup() {
   const [levels, setLevels] = useState(null);
+  const [typedQuery, setTypedQuery] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState(null);
   const [businessType, setBusinessType] = useState('Venda');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [searched, setSearched] = useState(false);
 
+  const matchingRegions = typedQuery.trim().length >= 2
+    ? INE_REGIONS.filter((r) => r.toLowerCase().includes(typedQuery.trim().toLowerCase()))
+    : [];
+
+  function handleLocationChange(text) {
+    setTypedQuery(text);
+    if (selectedRegion) setSelectedRegion(null);
+  }
+
+  function handleLocationLevels(newLevels) {
+    setLevels(newLevels);
+    setSelectedRegion(null);
+  }
+
+  function pickRegion(region) {
+    setSelectedRegion(region);
+    setLevels(null);
+    setTypedQuery('');
+  }
+
   async function handleSearch() {
-    if (!levels || (!levels.freguesia && !levels.concelho && !levels.distrito)) return;
+    const hasSelection = selectedRegion || (levels && (levels.freguesia || levels.concelho || levels.distrito));
+    if (!hasSelection) return;
     setLoading(true);
     setSearched(true);
+
+    if (selectedRegion) {
+      // Regiões do INE não têm imóveis do site associados diretamente — vai
+      // sempre buscar o valor de referência oficial.
+      const { data: ineData } = await supabase
+        .from('ine_reference_prices')
+        .select('*')
+        .ilike('geo_name', selectedRegion)
+        .eq('business_type', businessType === 'Arrendamento' ? 'Arrendamento' : 'Venda')
+        .limit(1)
+        .maybeSingle();
+      setResult({ count: 0, ine: ineData || null });
+      setLoading(false);
+      return;
+    }
 
     let query = supabase
       .from('properties')
@@ -61,7 +103,7 @@ export default function PricePerM2Lookup() {
     setLoading(false);
   }
 
-  const areaLabel = levels?.freguesia || levels?.concelho || levels?.distrito || '';
+  const areaLabel = selectedRegion || levels?.freguesia || levels?.concelho || levels?.distrito || '';
 
   return (
     <div className="card" style={{ padding: 24 }}>
@@ -88,14 +130,44 @@ export default function PricePerM2Lookup() {
         ))}
       </div>
 
-      <LocationAutocomplete onChange={() => {}} onLevels={setLevels} placeholder="Escreve uma freguesia, concelho ou distrito..." />
+      <div style={{ position: 'relative' }}>
+        <LocationAutocomplete onChange={handleLocationChange} onLevels={handleLocationLevels} placeholder="Escreve uma freguesia, concelho, distrito ou região (ex: Algarve)..." />
+        {matchingRegions.length > 0 && (
+          <div style={{
+            position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, zIndex: 20,
+            background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6,
+            boxShadow: '0 6px 18px rgba(51,46,34,0.14)',
+          }}>
+            {matchingRegions.map((r) => (
+              <div
+                key={r}
+                onClick={() => pickRegion(r)}
+                style={{ padding: '9px 14px', fontSize: 13.5, cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
+              >
+                <span>{r}</span>
+                <span style={{ fontSize: 10.5, color: 'var(--text-soft)' }}>região</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {selectedRegion && (
+        <div style={{ marginTop: 8 }}>
+          <span style={{
+            fontSize: 12.5, fontWeight: 500, background: 'var(--plaster)', borderRadius: 12,
+            padding: '4px 10px', cursor: 'pointer',
+          }} onClick={() => setSelectedRegion(null)}>
+            {selectedRegion} ✕
+          </span>
+        </div>
+      )}
 
       <button
         type="button"
         onClick={handleSearch}
         className="btn btn-primary btn-block"
         style={{ marginTop: 12 }}
-        disabled={loading || !levels}
+        disabled={loading || (!levels && !selectedRegion)}
       >
         {loading ? 'A calcular...' : 'Ver preço por m²'}
       </button>
