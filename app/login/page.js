@@ -188,9 +188,9 @@ export default function LoginPage() {
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
         <LanguageSwitcher />
       </div>
-      <div className="logo" style={{ textAlign: 'center', marginBottom: 32 }}>
+      <Link href="/" className="logo" style={{ display: 'block', textAlign: 'center', marginBottom: 32 }}>
         More<span>&middot;</span>ada
-      </div>
+      </Link>
 
       <div className="card" style={{ padding: 32 }}>
         {!forgotMode && (

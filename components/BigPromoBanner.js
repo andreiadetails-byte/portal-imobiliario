@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useLanguage } from '../lib/i18n';
 
 function PromoItem({ title, sub }) {
@@ -7,7 +8,7 @@ function PromoItem({ title, sub }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 18, flexShrink: 0, padding: '0 60px',
     }}>
-      <div className="logo" style={{ fontSize: 32, color: '#fff' }}>More<span style={{ color: 'var(--brass)' }}>&middot;</span>ada</div>
+      <Link href="/" className="logo" style={{ fontSize: 32, color: '#fff', textDecoration: 'none' }}>More<span style={{ color: 'var(--brass)' }}>&middot;</span>ada</Link>
       <div>
         <div className="display" style={{ fontSize: 20, color: '#fff', fontWeight: 600, whiteSpace: 'nowrap' }}>{title}</div>
         <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.8)', marginTop: 4 }}>{sub}</div>

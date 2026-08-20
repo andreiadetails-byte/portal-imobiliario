@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function ResetPasswordPage() {
@@ -36,9 +37,9 @@ export default function ResetPasswordPage() {
 
   return (
     <div style={{ maxWidth: 400, margin: '0 auto', padding: '60px 24px' }}>
-      <div className="logo" style={{ textAlign: 'center', marginBottom: 32 }}>
+      <Link href="/" className="logo" style={{ display: 'block', textAlign: 'center', marginBottom: 32 }}>
         More<span>&middot;</span>ada
-      </div>
+      </Link>
 
       <div className="card" style={{ padding: 32 }}>
         <h2 style={{ fontSize: 18, marginBottom: 6 }}>Definir nova palavra-passe</h2>
