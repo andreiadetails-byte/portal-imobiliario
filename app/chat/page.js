@@ -431,7 +431,7 @@ function ChatInner() {
                       )}
                       <div
                         style={{
-                          padding: '10px 14px', borderRadius: 12, fontSize: 13.5,
+                          padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                           background: isMine ? 'var(--telha)' : 'var(--plaster)',
                           color: isMine ? '#fff' : 'var(--ink)',
                         }}
@@ -454,7 +454,7 @@ function ChatInner() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder={t('chat_placeholder')}
-                style={{ flex: 1, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)' }}
+                style={{ flex: 1, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 16 }}
               />
               <button type="submit" className="btn btn-primary" style={{ borderRadius: '50%', width: 40, height: 40, padding: 0 }}>&rarr;</button>
             </form>
