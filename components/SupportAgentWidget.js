@@ -32,6 +32,7 @@ export default function SupportAgentWidget() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: '', contact: '', message: '' });
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function SupportAgentWidget() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!acceptedPolicy) return;
     setSending(true);
     await supabase.from('support_requests').insert({
       agent_name: agentName.fullName,
@@ -97,7 +99,26 @@ export default function SupportAgentWidget() {
                 <label>Mensagem</label>
                 <textarea required rows={3} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
               </div>
-              <button type="submit" className="btn btn-primary btn-block" disabled={sending}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  required
+                  checked={acceptedPolicy}
+                  onChange={(e) => setAcceptedPolicy(e.target.checked)}
+                  style={{ marginTop: 2, flexShrink: 0 }}
+                />
+                <span>
+                  Li e aceito a{' '}
+                  <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                    Política de Privacidade
+                  </a>{' '}
+                  e os{' '}
+                  <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                    Termos e Condições
+                  </a>.
+                </span>
+              </label>
+              <button type="submit" className="btn btn-primary btn-block" disabled={sending || !acceptedPolicy}>
                 {sending ? 'A enviar...' : 'Enviar mensagem'}
               </button>
             </form>
