@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { distritos, concelhosPorDistrito, freguesiasPorConcelho } from '../lib/locations';
 
 export default function LocationAutocomplete({ onChange, onLevels, placeholder = 'Distrito, concelho ou freguesia' }) {
@@ -20,36 +20,55 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
   }, []);
 
   function emitChange(d, c, f) {
-    // O valor mais específico escolhido é o que usamos para pesquisar
     const value = f || c || d || '';
     onChange(value);
     if (onLevels) onLevels({ distrito: d, concelho: c, freguesia: f });
   }
 
+  // Índice com TODOS os locais (distritos + concelhos + freguesias), para se poder
+  // escrever diretamente "Vila Nova de Gaia" ou uma freguesia, sem escolher primeiro
+  // o distrito. Cada entrada já sabe a que distrito/concelho pertence.
+  const allLocations = useMemo(() => {
+    const list = [];
+    distritos.forEach((d) => {
+      list.push({ label: d, level: 'distrito', distrito: d, concelho: null, freguesia: null });
+      (concelhosPorDistrito[d] || []).forEach((c) => {
+        list.push({ label: c, level: 'concelho', distrito: d, concelho: c, freguesia: null });
+        (freguesiasPorConcelho[c] || []).forEach((f) => {
+          list.push({ label: f, level: 'freguesia', distrito: d, concelho: c, freguesia: f });
+        });
+      });
+    });
+    return list;
+  }, []);
+
   function currentList() {
-    if (!distrito) return distritos;
-    if (!concelho) return concelhosPorDistrito[distrito] || [];
-    if (!freguesia) return freguesiasPorConcelho[concelho] || [];
+    if (!distrito) return allLocations;
+    if (!concelho) return (concelhosPorDistrito[distrito] || []).map((c) => ({ label: c, level: 'concelho' }));
+    if (!freguesia) return (freguesiasPorConcelho[concelho] || []).map((f) => ({ label: f, level: 'freguesia' }));
     return [];
   }
 
-  const suggestions = currentList().filter((item) =>
-    typed === '' || item.toLowerCase().includes(typed.toLowerCase())
-  );
+  const suggestions = currentList()
+    .filter((item) => typed === '' || item.label.toLowerCase().includes(typed.toLowerCase()))
+    .slice(0, 40);
 
   function handleSelect(item) {
     if (!distrito) {
-      setDistrito(item);
-      emitChange(item, null, null);
+      setDistrito(item.distrito || item.label);
+      setConcelho(item.concelho || null);
+      setFreguesia(item.freguesia || null);
+      emitChange(item.distrito || item.label, item.concelho || null, item.freguesia || null);
+      if (item.level !== 'distrito') { setTyped(''); setOpen(false); return; }
     } else if (!concelho) {
-      setConcelho(item);
-      emitChange(distrito, item, null);
+      setConcelho(item.label);
+      emitChange(distrito, item.label, null);
     } else if (!freguesia) {
-      setFreguesia(item);
-      emitChange(distrito, concelho, item);
+      setFreguesia(item.label);
+      emitChange(distrito, concelho, item.label);
     }
     setTyped('');
-    setOpen(true); // fica aberto para o próximo nível, se houver
+    setOpen(true);
   }
 
   function removeChip(level) {
@@ -115,16 +134,21 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, zIndex: 20,
           background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6,
-          boxShadow: '0 6px 18px rgba(51,46,34,0.14)', maxHeight: 220, overflowY: 'auto',
+          boxShadow: '0 6px 18px rgba(51,46,34,0.14)', maxHeight: 260, overflowY: 'auto',
         }}>
-          {suggestions.map((item) => (
+          {suggestions.map((item, i) => (
             <div
-              key={item}
+              key={`${item.label}-${i}`}
               onClick={() => handleSelect(item)}
-              style={{ padding: '9px 14px', fontSize: 13.5, cursor: 'pointer' }}
+              style={{ padding: '9px 14px', fontSize: 13.5, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', gap: 8 }}
               onMouseDown={(e) => e.preventDefault()}
             >
-              {item}
+              <span>{item.label}</span>
+              {!distrito && (
+                <span style={{ fontSize: 10.5, color: 'var(--text-soft)', flexShrink: 0 }}>
+                  {item.level === 'distrito' ? 'distrito' : item.level === 'concelho' ? item.distrito : `${item.concelho}, ${item.distrito}`}
+                </span>
+              )}
             </div>
           ))}
         </div>
