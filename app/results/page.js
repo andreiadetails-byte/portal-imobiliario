@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
-import { useCompareList } from '../../lib/useCompareList';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
 import Header from '../../components/Header';
@@ -18,7 +17,6 @@ import AdBanner from '../../components/AdBanner';
 function ResultsInner() {
   const searchParams = useSearchParams();
   const { t, lang } = useLanguage();
-  const { ids: compareIds, toggle: toggleCompare } = useCompareList();
 
   const TIPOS = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório', 'Quarto'];
   const TIPOLOGIAS = ['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'];
@@ -578,23 +576,6 @@ function ResultsInner() {
                       {p.featured_status === 'active' && (
                         <span className="destaque-strip">★ DESTAQUE</span>
                       )}
-
-                      <label
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          position: 'absolute', bottom: 10, left: 10, display: 'flex', alignItems: 'center', gap: 6,
-                          fontSize: 12, fontWeight: 600, padding: '5px 10px', borderRadius: 8, cursor: 'pointer',
-                          background: 'rgba(255,255,255,0.92)', color: 'var(--ink)',
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={compareIds.includes(p.id)}
-                          onChange={(e) => { e.preventDefault(); toggleCompare(p.id); }}
-                          style={{ cursor: 'pointer' }}
-                        />
-                        Comparar
-                      </label>
 
                       <button
                         onClick={(e) => toggleFavorite(e, p.id)}

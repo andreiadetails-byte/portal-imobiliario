@@ -33,7 +33,7 @@ const ROWS = [
 export default function CompararPage() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { toggle } = useCompareList();
+  const { toggle, clear } = useCompareList();
 
   useEffect(() => {
     async function load() {
@@ -49,6 +49,12 @@ export default function CompararPage() {
       setLoading(false);
     }
     load();
+
+    // Ao sair desta página (voltar atrás, ou ir para outro sítio do site), a
+    // seleção de comparação limpa-se sozinha — evita ficar sempre com "2 imóveis
+    // em comparação" marcado, mesmo depois de já ter comparado e seguido em frente.
+    return () => clear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function removeFromCompare(id) {

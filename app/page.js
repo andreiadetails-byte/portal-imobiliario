@@ -125,22 +125,6 @@ export default function HomePage() {
           position: 'relative',
         }}
       >
-        <div className="hero-qr" style={{
-          position: 'absolute', bottom: 16, right: 16, zIndex: 2,
-          background: 'rgba(255,255,255,0.95)', borderRadius: 8, padding: 8,
-          display: 'flex', alignItems: 'center', gap: 8,
-        }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fportalimobiliario.netlify.app"
-            alt="Código QR para abrir o More·ada no telemóvel"
-            width={44}
-            height={44}
-            style={{ borderRadius: 3, display: 'block' }}
-          />
-          <span style={{ fontSize: 10, color: 'var(--ink)', maxWidth: 62, lineHeight: 1.3 }}>Abrir no telemóvel</span>
-        </div>
-
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
@@ -199,6 +183,30 @@ export default function HomePage() {
       <section style={{ padding: '0 0 32px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <NaturalSearchBox />
+        </div>
+      </section>
+
+      <section style={{ padding: '0 0 14px' }}>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <div style={{
+            background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap',
+          }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https%3A%2F%2Fportalimobiliario.netlify.app"
+              alt="Código QR para abrir o More·ada no telemóvel"
+              width={76}
+              height={76}
+              style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
+            />
+            <div>
+              <div className="display" style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>Continua no telemóvel</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
+                Aponta a câmara e leva o More·ada contigo, onde quer que estejas.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
