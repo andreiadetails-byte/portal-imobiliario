@@ -200,7 +200,6 @@ export default function HomePage() {
             {properties.map((p, i) => {
               const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
               return (
-                <>
                   <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span style={{
@@ -268,7 +267,6 @@ export default function HomePage() {
                     )}
                   </div>
                 </Link>
-                </>
               );
             })}
           </div>
@@ -281,18 +279,18 @@ export default function HomePage() {
       <section style={{ padding: '0 0 88px' }}>
         <div className="wrap">
           <div style={{
-            maxWidth: 460, margin: '0 auto', borderRadius: 14, overflow: 'hidden',
-            background: 'var(--paper)', border: '1px solid var(--line)', textAlign: 'center',
+            position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220,
+            backgroundImage: 'url(/images/avaliacao-foto.jpg)', backgroundSize: 'cover', backgroundPosition: 'center center',
           }}>
             <div style={{
-              height: 220, backgroundImage: 'url(/images/avaliacao-foto.jpg)',
-              backgroundSize: 'cover', backgroundPosition: 'center center',
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
             }} />
-            <div style={{ padding: '32px 36px 40px' }}>
-              <span style={{ fontSize: 30, display: 'block', marginBottom: 10 }}>🏷️</span>
-              <h2 className="display" style={{ fontSize: 22, marginBottom: 8 }}>{t('home_valuation_title')}</h2>
-              <p style={{ fontSize: 14.5, color: 'var(--text-soft)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
-              <Link href="/valuation" className="btn btn-primary">{t('home_valuation_btn')}</Link>
+            <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>🏷️</span>
+              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
+              <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
+              <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
             </div>
           </div>
 
