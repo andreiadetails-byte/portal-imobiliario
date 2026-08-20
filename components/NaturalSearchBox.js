@@ -216,56 +216,93 @@ export default function NaturalSearchBox() {
     window.location.href = `/results?${params.toString()}`;
   }
 
-  // Lista de concelhos para o texto de exemplo — muda aleatoriamente a cada visita,
-  // para não estar sempre a mostrar o mesmo. O russo usa uma transliteração à parte,
-  // porque o alfabeto é diferente.
+  // Vários elementos do texto de exemplo mudam aleatoriamente a cada visita, para nunca
+  // mostrar sempre a mesma frase. Cada lista está alinhada por posição entre idiomas
+  // (o índice 2, por exemplo, é sempre a mesma combinação em todas as línguas).
+  // O russo usa listas próprias, porque o alfabeto e a gramática são diferentes.
   const EXAMPLE_CITIES = ['Vila Nova de Gaia', 'Porto', 'Lisboa', 'Cascais', 'Braga', 'Sintra', 'Coimbra', 'Faro', 'Aveiro', 'Setúbal'];
   const EXAMPLE_CITIES_RU = ['Вила-Нова-де-Гайя', 'Порту', 'Лиссабон', 'Кашкайш', 'Брага', 'Синтра', 'Коимбра', 'Фару', 'Авейру', 'Сетубал'];
-  const [cityIndex] = useState(() => Math.floor(Math.random() * EXAMPLE_CITIES.length));
-  const exampleCity = EXAMPLE_CITIES[cityIndex];
-  const exampleCityRu = EXAMPLE_CITIES_RU[cityIndex];
+
+  const EXAMPLE_TYPOLOGIES = ['T2 ou T3', 'T1 ou T2', 'T3 ou T4', 'T2'];
+  const EXAMPLE_TYPOLOGIES_EN = ['T2 or T3', 'T1 or T2', 'T3 or T4', 'T2'];
+  const EXAMPLE_TYPOLOGIES_DE = ['2- oder 3-Zimmer-Wohnung', '1- oder 2-Zimmer-Wohnung', '3- oder 4-Zimmer-Wohnung', '2-Zimmer-Wohnung'];
+  const EXAMPLE_TYPOLOGIES_NL = ['2- of 3-kamerwoning', '1- of 2-kamerwoning', '3- of 4-kamerwoning', '2-kamerwoning'];
+  const EXAMPLE_TYPOLOGIES_RU = ['2- или 3-комнатную квартиру', '1- или 2-комнатную квартиру', '3- или 4-комнатную квартиру', '2-комнатную квартиру'];
+
+  const EXAMPLE_PRICES = ['350 000', '250 000', '450 000', '180 000'];
+
+  const EXAMPLE_AMENITIES = ['varanda e lugar de garagem', 'jardim e piscina', 'elevador e arrumos', 'terraço e vista mar'];
+  const EXAMPLE_AMENITIES_EN = ['a balcony and parking', 'a garden and a pool', 'a lift and storage', 'a terrace and sea view'];
+  const EXAMPLE_AMENITIES_ES = ['balcón y garaje', 'jardín y piscina', 'ascensor y trastero', 'terraza y vista al mar'];
+  const EXAMPLE_AMENITIES_FR = ['balcon et parking', 'jardin et piscine', 'ascenseur et rangement', 'terrasse et vue mer'];
+  const EXAMPLE_AMENITIES_DE = ['Balkon und Stellplatz', 'Garten und Pool', 'Aufzug und Abstellraum', 'Terrasse und Meerblick'];
+  const EXAMPLE_AMENITIES_NL = ['balkon en parkeerplaats', 'tuin en zwembad', 'lift en berging', 'terras en zeezicht'];
+  const EXAMPLE_AMENITIES_RU = ['балконом и парковкой', 'садом и бассейном', 'лифтом и кладовой', 'террасой и видом на море'];
+
+  const [exampleSeed] = useState(() => ({
+    city: Math.floor(Math.random() * EXAMPLE_CITIES.length),
+    typology: Math.floor(Math.random() * EXAMPLE_TYPOLOGIES.length),
+    price: Math.floor(Math.random() * EXAMPLE_PRICES.length),
+    amenity: Math.floor(Math.random() * EXAMPLE_AMENITIES.length),
+  }));
+
+  const exampleCity = EXAMPLE_CITIES[exampleSeed.city];
+  const exampleCityRu = EXAMPLE_CITIES_RU[exampleSeed.city];
+  const exampleTypology = EXAMPLE_TYPOLOGIES[exampleSeed.typology];
+  const exampleTypologyEn = EXAMPLE_TYPOLOGIES_EN[exampleSeed.typology];
+  const exampleTypologyDe = EXAMPLE_TYPOLOGIES_DE[exampleSeed.typology];
+  const exampleTypologyNl = EXAMPLE_TYPOLOGIES_NL[exampleSeed.typology];
+  const exampleTypologyRu = EXAMPLE_TYPOLOGIES_RU[exampleSeed.typology];
+  const examplePrice = EXAMPLE_PRICES[exampleSeed.price];
+  const exampleAmenity = EXAMPLE_AMENITIES[exampleSeed.amenity];
+  const exampleAmenityEn = EXAMPLE_AMENITIES_EN[exampleSeed.amenity];
+  const exampleAmenityEs = EXAMPLE_AMENITIES_ES[exampleSeed.amenity];
+  const exampleAmenityFr = EXAMPLE_AMENITIES_FR[exampleSeed.amenity];
+  const exampleAmenityDe = EXAMPLE_AMENITIES_DE[exampleSeed.amenity];
+  const exampleAmenityNl = EXAMPLE_AMENITIES_NL[exampleSeed.amenity];
+  const exampleAmenityRu = EXAMPLE_AMENITIES_RU[exampleSeed.amenity];
 
   const UI_TEXT = {
     pt: {
       title: 'O que procuras numa casa?',
       sub: (v) => `Escreve${v ? ' ou fala' : ''} — nós encontramos.`,
-      placeholder: `Gostava de comprar um T2 ou T3 até 350 000€, recente ou novo, em ${exampleCity}, com varanda e lugar de garagem.`,
+      placeholder: `Gostava de comprar um ${exampleTypology} até ${examplePrice}€, recente ou novo, em ${exampleCity}, com ${exampleAmenity}.`,
       button: 'Tens o que procuro? 🔍',
     },
     en: {
       title: 'What are you looking for?',
       sub: (v) => `Type${v ? ' or speak' : ''} — we\u2019ll find it.`,
-      placeholder: `I\u2019d like to buy a T2 or T3 up to €350,000, new or recent, in ${exampleCity}, with a balcony and parking.`,
+      placeholder: `I\u2019d like to buy a ${exampleTypologyEn} up to €${examplePrice}, new or recent, in ${exampleCity}, with ${exampleAmenityEn}.`,
       button: 'Do you have what I\u2019m looking for? 🔍',
     },
     es: {
       title: '¿Qué buscas en una casa?',
       sub: (v) => `Escribe${v ? ' o habla' : ''} — nosotros lo encontramos.`,
-      placeholder: `Me gustaría comprar un T2 o T3 hasta 350.000€, nuevo o reciente, en ${exampleCity}, con balcón y garaje.`,
+      placeholder: `Me gustaría comprar un ${exampleTypology} hasta ${examplePrice}€, nuevo o reciente, en ${exampleCity}, con ${exampleAmenityEs}.`,
       button: '¿Tienes lo que busco? 🔍',
     },
     fr: {
       title: 'Que recherchez-vous dans une maison ?',
       sub: (v) => `Écrivez${v ? ' ou parlez' : ''} — nous trouvons.`,
-      placeholder: `Je voudrais acheter un T2 ou T3 jusqu\u2019à 350 000€, neuf ou récent, à ${exampleCity}, avec balcon et parking.`,
+      placeholder: `Je voudrais acheter un ${exampleTypology} jusqu\u2019à ${examplePrice}€, neuf ou récent, à ${exampleCity}, avec ${exampleAmenityFr}.`,
       button: 'Avez-vous ce que je cherche ? 🔍',
     },
     de: {
       title: 'Was suchen Sie in einem Zuhause?',
       sub: (v) => `Schreiben${v ? ' oder sprechen' : ''} Sie — wir finden es.`,
-      placeholder: `Ich möchte eine 2- oder 3-Zimmer-Wohnung bis 350.000€ kaufen, neu oder neuwertig, in ${exampleCity}, mit Balkon und Stellplatz.`,
+      placeholder: `Ich möchte eine ${exampleTypologyDe} bis ${examplePrice}€ kaufen, neu oder neuwertig, in ${exampleCity}, mit ${exampleAmenityDe}.`,
       button: 'Haben Sie, was ich suche? 🔍',
     },
     nl: {
       title: 'Wat zoekt u in een huis?',
       sub: (v) => `Typ${v ? ' of spreek' : ''} — wij vinden het.`,
-      placeholder: `Ik zou graag een 2- of 3-kamerwoning kopen tot €350.000, nieuw of recent, in ${exampleCity}, met balkon en parkeerplaats.`,
+      placeholder: `Ik zou graag een ${exampleTypologyNl} kopen tot €${examplePrice}, nieuw of recent, in ${exampleCity}, met ${exampleAmenityNl}.`,
       button: 'Heeft u wat ik zoek? 🔍',
     },
     ru: {
       title: 'Что вы ищете в доме?',
       sub: (v) => `Напишите${v ? ' или скажите' : ''} — мы найдём.`,
-      placeholder: `Я хотел бы купить 2- или 3-комнатную квартиру до 350 000€, новую или недавнюю, в ${exampleCityRu}, с балконом и парковкой.`,
+      placeholder: `Я хотел бы купить ${exampleTypologyRu} до ${examplePrice}€, новую или недавнюю, в ${exampleCityRu}, с ${exampleAmenityRu}.`,
       button: 'Есть ли у вас то, что я ищу? 🔍',
     },
   };
