@@ -118,7 +118,7 @@ function DashboardInner() {
   }
 
   async function republishProperty(id) {
-    const limit = profile?.account_type === 'agencia' ? 50 : 5;
+    const limit = profile?.account_type === 'agencia' ? 50 : 3;
     if (!profile?.is_admin && activeCount >= limit) {
       alert(`Já tem ${limit} anúncios ativos, que é o limite da sua conta. Apague ou desative outro anúncio primeiro.`);
       return;
@@ -217,8 +217,8 @@ function DashboardInner() {
         {profile?.is_admin ? (
           <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{activeCount} anúncios · sem limite</span>
         ) : (
-          <span style={{ fontSize: 12.5, color: activeCount >= (profile?.account_type === 'agencia' ? 50 : 5) ? '#8a3b2a' : 'var(--text-soft)' }}>
-            {activeCount}/{profile?.account_type === 'agencia' ? 50 : 5} anúncios
+          <span style={{ fontSize: 12.5, color: activeCount >= (profile?.account_type === 'agencia' ? 50 : 3) ? '#8a3b2a' : 'var(--text-soft)' }}>
+            {activeCount}/{profile?.account_type === 'agencia' ? 50 : 3} anúncios
           </span>
         )}
       </div>

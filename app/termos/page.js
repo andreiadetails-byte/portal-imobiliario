@@ -5,7 +5,7 @@ export default function TermosPage() {
   return (
     <TextPage title="Condições gerais">
       <p style={{ marginBottom: 16 }}>
-        O More·ada é operado por <b>Palavras Rápidas Unipessoal, Lda</b>, NIPC {PAYMENT_INFO.companyNipc}. Ao criar conta ou usar o site, está a aceitar estas condições.
+        O More·ada é operado pelo <b>More·ada</b>, NIPC {PAYMENT_INFO.companyNipc}. Ao criar conta ou usar o site, está a aceitar estas condições.
       </p>
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Natureza da plataforma</h2>
@@ -15,12 +15,12 @@ export default function TermosPage() {
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Contas de utilizador</h2>
       <p style={{ marginBottom: 16 }}>
-        Existem dois tipos de conta: <b>particular</b> (até 5 anúncios ativos) e <b>agência</b> (até 50 anúncios ativos, mediante licença AMI válida). É responsável por manter a confidencialidade da sua palavra-passe e por toda a atividade realizada através da sua conta. Reservamo-nos o direito de bloquear ou eliminar contas que violem estas condições.
+        Existem dois tipos de conta: <b>particular</b> (até 3 anúncios ativos) e <b>agência</b> (até 50 anúncios ativos, mediante licença AMI válida). É responsável por manter a confidencialidade da sua palavra-passe e por toda a atividade realizada através da sua conta. Reservamo-nos o direito de bloquear ou eliminar contas que violem estas condições.
       </p>
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Subscrição de agências</h2>
       <p style={{ marginBottom: 16 }}>
-        Contas de agência têm direito a um primeiro mês gratuito. Após esse período, a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €, paga por transferência bancária mediante envio do respetivo comprovativo. A subscrição é válida por um mês exato a contar da data de confirmação do pagamento; caso não seja renovada, o acesso ao painel e à publicação de novos anúncios fica suspenso até à confirmação de um novo pagamento. Não há fidelização — a subscrição pode ser cancelada a qualquer momento.
+        Contas de agência têm direito a um primeiro mês gratuito. Após esse período, a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €, paga através de uma Entidade e Referência Multibanco gerada diretamente na plataforma. A subscrição é válida por um mês exato a contar da data de confirmação do pagamento; caso não seja renovada, o acesso ao painel e à publicação de novos anúncios fica suspenso até à confirmação de um novo pagamento. Não há fidelização — a subscrição pode ser cancelada a qualquer momento.
       </p>
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Conteúdo dos anúncios</h2>
