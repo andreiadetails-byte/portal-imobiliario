@@ -216,47 +216,56 @@ export default function NaturalSearchBox() {
     window.location.href = `/results?${params.toString()}`;
   }
 
+  // Lista de concelhos para o texto de exemplo — muda aleatoriamente a cada visita,
+  // para não estar sempre a mostrar o mesmo. O russo usa uma transliteração à parte,
+  // porque o alfabeto é diferente.
+  const EXAMPLE_CITIES = ['Vila Nova de Gaia', 'Porto', 'Lisboa', 'Cascais', 'Braga', 'Sintra', 'Coimbra', 'Faro', 'Aveiro', 'Setúbal'];
+  const EXAMPLE_CITIES_RU = ['Вила-Нова-де-Гайя', 'Порту', 'Лиссабон', 'Кашкайш', 'Брага', 'Синтра', 'Коимбра', 'Фару', 'Авейру', 'Сетубал'];
+  const [cityIndex] = useState(() => Math.floor(Math.random() * EXAMPLE_CITIES.length));
+  const exampleCity = EXAMPLE_CITIES[cityIndex];
+  const exampleCityRu = EXAMPLE_CITIES_RU[cityIndex];
+
   const UI_TEXT = {
     pt: {
       title: 'O que procuras numa casa?',
       sub: (v) => `Escreve${v ? ' ou fala' : ''} — nós encontramos.`,
-      placeholder: 'Gostava de comprar um T2 ou T3 até 350 000€, recente ou novo, em Vila Nova de Gaia, com varanda e lugar de garagem.',
+      placeholder: `Gostava de comprar um T2 ou T3 até 350 000€, recente ou novo, em ${exampleCity}, com varanda e lugar de garagem.`,
       button: 'Tens o que procuro? 🔍',
     },
     en: {
       title: 'What are you looking for?',
       sub: (v) => `Type${v ? ' or speak' : ''} — we\u2019ll find it.`,
-      placeholder: 'I\u2019d like to buy a T2 or T3 up to €350,000, new or recent, in Vila Nova de Gaia, with a balcony and parking.',
+      placeholder: `I\u2019d like to buy a T2 or T3 up to €350,000, new or recent, in ${exampleCity}, with a balcony and parking.`,
       button: 'Do you have what I\u2019m looking for? 🔍',
     },
     es: {
       title: '¿Qué buscas en una casa?',
       sub: (v) => `Escribe${v ? ' o habla' : ''} — nosotros lo encontramos.`,
-      placeholder: 'Me gustaría comprar un T2 o T3 hasta 350.000€, nuevo o reciente, en Vila Nova de Gaia, con balcón y garaje.',
+      placeholder: `Me gustaría comprar un T2 o T3 hasta 350.000€, nuevo o reciente, en ${exampleCity}, con balcón y garaje.`,
       button: '¿Tienes lo que busco? 🔍',
     },
     fr: {
       title: 'Que recherchez-vous dans une maison ?',
       sub: (v) => `Écrivez${v ? ' ou parlez' : ''} — nous trouvons.`,
-      placeholder: 'Je voudrais acheter un T2 ou T3 jusqu\u2019à 350 000€, neuf ou récent, à Vila Nova de Gaia, avec balcon et parking.',
+      placeholder: `Je voudrais acheter un T2 ou T3 jusqu\u2019à 350 000€, neuf ou récent, à ${exampleCity}, avec balcon et parking.`,
       button: 'Avez-vous ce que je cherche ? 🔍',
     },
     de: {
       title: 'Was suchen Sie in einem Zuhause?',
       sub: (v) => `Schreiben${v ? ' oder sprechen' : ''} Sie — wir finden es.`,
-      placeholder: 'Ich möchte eine 2- oder 3-Zimmer-Wohnung bis 350.000€ kaufen, neu oder neuwertig, in Vila Nova de Gaia, mit Balkon und Stellplatz.',
+      placeholder: `Ich möchte eine 2- oder 3-Zimmer-Wohnung bis 350.000€ kaufen, neu oder neuwertig, in ${exampleCity}, mit Balkon und Stellplatz.`,
       button: 'Haben Sie, was ich suche? 🔍',
     },
     nl: {
       title: 'Wat zoekt u in een huis?',
       sub: (v) => `Typ${v ? ' of spreek' : ''} — wij vinden het.`,
-      placeholder: 'Ik zou graag een 2- of 3-kamerwoning kopen tot €350.000, nieuw of recent, in Vila Nova de Gaia, met balkon en parkeerplaats.',
+      placeholder: `Ik zou graag een 2- of 3-kamerwoning kopen tot €350.000, nieuw of recent, in ${exampleCity}, met balkon en parkeerplaats.`,
       button: 'Heeft u wat ik zoek? 🔍',
     },
     ru: {
       title: 'Что вы ищете в доме?',
       sub: (v) => `Напишите${v ? ' или скажите' : ''} — мы найдём.`,
-      placeholder: 'Я хотел бы купить 2- или 3-комнатную квартиру до 350 000€, новую или недавнюю, в Вила-Нова-де-Гайя, с балконом и парковкой.',
+      placeholder: `Я хотел бы купить 2- или 3-комнатную квартиру до 350 000€, новую или недавнюю, в ${exampleCityRu}, с балконом и парковкой.`,
       button: 'Есть ли у вас то, что я ищу? 🔍',
     },
   };
