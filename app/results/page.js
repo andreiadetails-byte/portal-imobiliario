@@ -20,7 +20,7 @@ function ResultsInner() {
   const { t, lang } = useLanguage();
   const { ids: compareIds, toggle: toggleCompare } = useCompareList();
 
-  const TIPOS = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório'];
+  const TIPOS = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório', 'Quarto'];
   const TIPOLOGIAS = ['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'];
 
   const [properties, setProperties] = useState([]);

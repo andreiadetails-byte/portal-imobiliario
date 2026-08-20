@@ -15,7 +15,7 @@ const CARACTERISTICAS = [
   'Mobilado', 'Painéis solares', 'Vista de mar', 'Vista de rio', 'Portaria / segurança', 'Lareira',
 ];
 
-const TIPOS_IMOVEL = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Quarto'];
+const TIPOS_IMOVEL = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório', 'Quarto'];
 const SUBTIPOS_MORADIA = ['Moradia bifamiliar', 'Moradia geminada', 'Moradia em banda', 'Moradia independente'];
 const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente'];
 const PISOS = ['R/C', '1º', '2º', '3º', '4º', '5º', '6º', '7º', '8º', '9º', '10º', 'Superior ao 10º'];
@@ -598,7 +598,13 @@ function PublishForm() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
             <label>Tipo de imóvel</label>
-            <select value={form.property_type} onChange={(e) => updateField('property_type', e.target.value)}>
+            <select
+              value={form.property_type}
+              onChange={(e) => {
+                updateField('property_type', e.target.value);
+                if (e.target.value === 'Quarto') updateField('business_type', 'Arrendamento');
+              }}
+            >
               {TIPOS_IMOVEL.map((t) => <option key={t}>{t}</option>)}
             </select>
           </div>
@@ -900,10 +906,17 @@ function PublishForm() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
             <label>Tipo de negócio</label>
-            <select value={form.business_type} onChange={(e) => updateField('business_type', e.target.value)}>
-              <option value="Venda">Venda</option>
+            <select
+              value={form.business_type}
+              disabled={form.property_type === 'Quarto'}
+              onChange={(e) => updateField('business_type', e.target.value)}
+            >
+              <option value="Venda" disabled={form.property_type === 'Quarto'}>Venda</option>
               <option value="Arrendamento">Arrendamento</option>
             </select>
+            {form.property_type === 'Quarto' && (
+              <span className="hint" style={{ fontSize: 12, color: 'var(--text-soft)' }}>Quartos só podem ser publicados para arrendamento.</span>
+            )}
           </div>
           <div className="field">
             <label>Preço (€)</label>
