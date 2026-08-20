@@ -239,12 +239,21 @@ export default function NaturalSearchBox() {
   const EXAMPLE_AMENITIES_NL = ['balkon en parkeerplaats', 'tuin en zwembad', 'lift en berging', 'terras en zeezicht'];
   const EXAMPLE_AMENITIES_RU = ['балконом и парковкой', 'садом и бассейном', 'лифтом и кладовой', 'террасой и видом на море'];
 
-  const [exampleSeed] = useState(() => ({
-    city: Math.floor(Math.random() * EXAMPLE_CITIES.length),
-    typology: Math.floor(Math.random() * EXAMPLE_TYPOLOGIES.length),
-    price: Math.floor(Math.random() * EXAMPLE_PRICES.length),
-    amenity: Math.floor(Math.random() * EXAMPLE_AMENITIES.length),
-  }));
+  // Começa sempre com a combinação 0 (evita a página piscar/mudar de texto ao carregar),
+  // e só escolhe a combinação a sério depois de estar mesmo no browser da pessoa — a
+  // página inicial é pré-construída uma vez antes de publicar, por isso escolher a
+  // combinação "cedo demais" fazia com que ficasse sempre igual para toda a gente.
+  const [exampleSeed, setExampleSeed] = useState({ city: 0, typology: 0, price: 0, amenity: 0 });
+
+  useEffect(() => {
+    setExampleSeed({
+      city: Math.floor(Math.random() * EXAMPLE_CITIES.length),
+      typology: Math.floor(Math.random() * EXAMPLE_TYPOLOGIES.length),
+      price: Math.floor(Math.random() * EXAMPLE_PRICES.length),
+      amenity: Math.floor(Math.random() * EXAMPLE_AMENITIES.length),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const exampleCity = EXAMPLE_CITIES[exampleSeed.city];
   const exampleCityRu = EXAMPLE_CITIES_RU[exampleSeed.city];
