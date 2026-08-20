@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
 import { displayAddress } from '../../lib/displayAddress';
+import { useCompareList } from '../../lib/useCompareList';
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function FavoritesPage() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('favoritos');
+  const { ids: compareIds, toggle: toggleCompare } = useCompareList();
 
   useEffect(() => {
     async function load() {
@@ -24,18 +26,19 @@ export default function FavoritesPage() {
 
       const { data: favIds, error: favError } = await supabase
         .from('favorites')
-        .select('property_id, notes')
+        .select('property_id, notes, price_at_save')
         .eq('user_id', user.id);
 
       let favProperties = [];
       if (!favError && favIds && favIds.length > 0) {
         const ids = favIds.map((f) => f.property_id);
         const notesById = Object.fromEntries(favIds.map((f) => [f.property_id, f.notes || '']));
+        const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
         const { data: propsData } = await supabase
           .from('properties')
           .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, position)')
           .in('id', ids);
-        favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '' }));
+        favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '', price_at_save: priceAtSaveById[p.id] }));
         setProperties(favProperties);
       } else {
         setProperties([]);
@@ -95,7 +98,8 @@ export default function FavoritesPage() {
     e.stopPropagation();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = '/login'; return; }
-    await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId });
+    const prop = suggestions.find((p) => p.id === propertyId);
+    await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
     setSuggestions((cur) => cur.filter((p) => p.id !== propertyId));
     // Vai buscar o próprio imóvel para o juntar à lista principal de favoritos, sem precisar de recarregar a página.
     const { data: newFav } = await supabase
@@ -178,10 +182,22 @@ export default function FavoritesPage() {
                         ♥
                       </button>
                     </div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', marginBottom: 4 }}>
+                      <input type="checkbox" checked={compareIds.includes(p.id)} onChange={() => toggleCompare(p.id)} style={{ cursor: 'pointer' }} />
+                      Comparar
+                    </label>
                     <Link href={`/property/${p.id}`}>
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
                       <div className="meta">{p.district} · {p.area || p.area_util} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
                     </Link>
+                    {p.price_at_save && Number(p.price_at_save) > Number(p.price) && (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 12, fontWeight: 600,
+                        color: 'var(--telha)', background: 'rgba(126,143,106,0.14)', padding: '5px 9px', borderRadius: 6,
+                      }}>
+                        ↓ Desceu {(Number(p.price_at_save) - Number(p.price)).toLocaleString('pt-PT')} € desde que guardaste
+                      </div>
+                    )}
                     <textarea
                       value={p.notes || ''}
                       onChange={(e) => updateNote(p.id, e.target.value)}

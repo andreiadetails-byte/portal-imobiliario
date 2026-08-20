@@ -136,7 +136,7 @@ export default function PropertyClient() {
       await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', property.id);
       setIsFavorite(false);
     } else {
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: property.id });
+      await supabase.from('favorites').insert({ user_id: user.id, property_id: property.id, price_at_save: property.price ?? null });
       setIsFavorite(true);
     }
     setFavLoading(false);
@@ -150,7 +150,8 @@ export default function PropertyClient() {
       await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
       setSimilarFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
     } else {
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId });
+      const prop = similar.find((p) => p.id === propertyId);
+      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
       setSimilarFavoriteIds((cur) => [...cur, propertyId]);
     }
   }

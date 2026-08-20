@@ -62,7 +62,8 @@ export default function HomePage() {
       await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
       setFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
     } else {
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId });
+      const prop = properties.find((p) => p.id === propertyId);
+      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
       setFavoriteIds((cur) => [...cur, propertyId]);
     }
   }
