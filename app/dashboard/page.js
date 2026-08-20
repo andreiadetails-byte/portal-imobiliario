@@ -34,6 +34,7 @@ function DashboardInner() {
   const [replyText, setReplyText] = useState({});
   const [loading, setLoading] = useState(true);
   const [featuredModal, setFeaturedModal] = useState(null);
+  const [featuredPaymentMethod, setFeaturedPaymentMethod] = useState('transferencia');
   const [viewsChartId, setViewsChartId] = useState(null);
   const [userId, setUserId] = useState(null);
   const [page, setPage] = useState(1);
@@ -156,6 +157,7 @@ function DashboardInner() {
       return;
     }
     if (PAYMENT_INFO.featuredEnforced && !profile?.is_admin) {
+      setFeaturedPaymentMethod('transferencia');
       setFeaturedModal(id);
       return;
     }
@@ -408,21 +410,56 @@ function DashboardInner() {
             </div>
           </div>
 
-          <p style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6 }}>Pagamento por transferência bancária:</p>
-          <div style={{ fontSize: 13, marginBottom: 6 }}>
-            <div><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
-            <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
-            <div><b>Titular:</b> {PAYMENT_INFO.accountHolder}</div>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+            <button
+              onClick={() => setFeaturedPaymentMethod('transferencia')}
+              className={featuredPaymentMethod === 'transferencia' ? 'btn btn-primary' : 'btn'}
+              style={{ flex: 1, fontSize: 13 }}
+            >
+              Transferência
+            </button>
+            <button
+              onClick={() => setFeaturedPaymentMethod('referencia')}
+              className={featuredPaymentMethod === 'referencia' ? 'btn btn-primary' : 'btn'}
+              style={{ flex: 1, fontSize: 13 }}
+            >
+              Entidade e Referência
+            </button>
           </div>
-          <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 18 }}>
-            Indique o número de referência <b>{featuredModal.slice(0, 8)}</b> na descrição da transferência.
-            Depois de recebermos o pagamento, o destaque é ativado manualmente (normalmente em 1 dia útil).
-          </p>
 
-          <button onClick={() => requestFeatured(featuredModal)} className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>
-            Já fiz a transferência
-          </button>
-          <button onClick={() => setFeaturedModal(null)} className="btn btn-block">Cancelar</button>
+          {featuredPaymentMethod === 'referencia' ? (
+            <>
+              <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, marginBottom: 18, textAlign: 'center' }}>
+                <p style={{ fontSize: 13, marginBottom: 4 }}>🚧 Brevemente disponível</p>
+                <p style={{ fontSize: 12, color: 'var(--text-soft)' }}>
+                  Em breve vai poder gerar aqui uma Entidade e Referência Multibanco, para pagar em qualquer caixa
+                  ATM ou homebanking, com ativação automática. Por agora, use a transferência bancária.
+                </p>
+              </div>
+              <button onClick={() => setFeaturedPaymentMethod('transferencia')} className="btn btn-block" style={{ marginBottom: 8 }}>
+                Usar transferência bancária
+              </button>
+              <button onClick={() => setFeaturedModal(null)} className="btn btn-block">Cancelar</button>
+            </>
+          ) : (
+            <>
+              <p style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6 }}>Pagamento por transferência bancária:</p>
+              <div style={{ fontSize: 13, marginBottom: 6 }}>
+                <div><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
+                <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
+                <div><b>Titular:</b> {PAYMENT_INFO.accountHolder}</div>
+              </div>
+              <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 18 }}>
+                Indique o número de referência <b>{featuredModal.slice(0, 8)}</b> na descrição da transferência.
+                Depois de recebermos o pagamento, o destaque é ativado manualmente (normalmente em 1 dia útil).
+              </p>
+
+              <button onClick={() => requestFeatured(featuredModal)} className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>
+                Já fiz a transferência
+              </button>
+              <button onClick={() => setFeaturedModal(null)} className="btn btn-block">Cancelar</button>
+            </>
+          )}
         </div>
       </div>
     )}
