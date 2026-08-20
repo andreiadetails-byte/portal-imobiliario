@@ -2,8 +2,17 @@
 
 import { useState } from 'react';
 
-// Reutiliza a mesma tabela de IMT da calculadora de IMT (habitação secundária,
-// já que um imóvel comprado para revender não costuma ser habitação própria).
+// As duas tabelas de IMT — a pessoa escolhe qual se aplica ao imóvel que está a comprar.
+const ESCALOES_HPP = [
+  { limite: 106346, taxa: 0, abater: 0 },
+  { limite: 145470, taxa: 0.02, abater: 2126.92 },
+  { limite: 198347, taxa: 0.05, abater: 6491.02 },
+  { limite: 330539, taxa: 0.07, abater: 10457.96 },
+  { limite: 660982, taxa: 0.08, abater: 13763.35 },
+  { limite: 1150853, taxa: 0.06, abater: 0 },
+  { limite: Infinity, taxa: 0.075, abater: 0 },
+];
+
 const ESCALOES_SECUNDARIA = [
   { limite: 106346, taxa: 0.01, abater: 0 },
   { limite: 145470, taxa: 0.02, abater: 1063.46 },
@@ -14,8 +23,9 @@ const ESCALOES_SECUNDARIA = [
   { limite: Infinity, taxa: 0.075, abater: 0 },
 ];
 
-function calcularIMT(valor) {
-  const escalao = ESCALOES_SECUNDARIA.find((e) => valor <= e.limite);
+function calcularIMT(valor, isHPP) {
+  const escaloes = isHPP ? ESCALOES_HPP : ESCALOES_SECUNDARIA;
+  const escalao = escaloes.find((e) => valor <= e.limite);
   return Math.max(0, valor * escalao.taxa - escalao.abater);
 }
 
@@ -56,6 +66,7 @@ function EuroField({ label, value, onChange, hint }) {
 
 export default function InvestmentProfitCalculator() {
   const [investorType, setInvestorType] = useState('Particular');
+  const [homeType, setHomeType] = useState('Secundária');
   const [purchasePrice, setPurchasePrice] = useState(200000);
   const [resalePrice, setResalePrice] = useState(260000);
 
@@ -72,7 +83,7 @@ export default function InvestmentProfitCalculator() {
 
   const [hasCalculated, setHasCalculated] = useState(false);
 
-  const imt = calcularIMT(purchasePrice);
+  const imt = calcularIMT(purchasePrice, homeType === 'Própria e permanente');
   const stampDutyPurchase = purchasePrice * 0.008;
   const stampDutyLoan = financed === 'Sim' ? loanAmount * 0.006 : 0;
 
@@ -111,6 +122,19 @@ export default function InvestmentProfitCalculator() {
       </div>
 
       <EuroField label="Valor do imóvel adquirido" value={purchasePrice} onChange={setPurchasePrice} />
+
+      <div className="field">
+        <label>Este imóvel foi adquirido como</label>
+        <PillGroup
+          value={homeType}
+          onChange={setHomeType}
+          options={[{ value: 'Secundária', label: 'Habitação secundária' }, { value: 'Própria e permanente', label: 'Própria e permanente' }]}
+        />
+        <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 4 }}>
+          Determina a tabela de IMT usada — habitação própria e permanente paga menos IMT, mas exige viver lá e tem consequências se não cumprires os requisitos legais.
+        </p>
+      </div>
+
       <EuroField label="Valor de revenda do imóvel" value={resalePrice} onChange={setResalePrice} />
 
       <div className="field">
