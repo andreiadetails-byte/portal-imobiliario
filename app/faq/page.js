@@ -15,14 +15,27 @@ const FAQS = [
 ];
 
 export default function FaqPage() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((f) => ({
+      '@type': 'Question',
+      name: f.p,
+      acceptedAnswer: { '@type': 'Answer', text: f.r },
+    })),
+  };
+
   return (
-    <TextPage title="Perguntas frequentes">
-      {FAQS.map((f, i) => (
-        <div key={i} style={{ marginBottom: 22 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{f.p}</div>
-          <div>{f.r}</div>
-        </div>
-      ))}
-    </TextPage>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <TextPage title="Perguntas frequentes">
+        {FAQS.map((f, i) => (
+          <div key={i} style={{ marginBottom: 22 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{f.p}</div>
+            <div>{f.r}</div>
+          </div>
+        ))}
+      </TextPage>
+    </>
   );
 }
