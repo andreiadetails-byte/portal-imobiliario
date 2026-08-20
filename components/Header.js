@@ -93,13 +93,18 @@ export default function Header({ minimal = false }) {
   }
 
   async function toggleNotifications() {
+    const wasOpen = notifOpen;
     setNotifOpen((o) => !o);
-    if (!notifOpen && user) {
+    if (!wasOpen && user) {
       const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
       if (unreadIds.length > 0) {
         await supabase.from('notifications').update({ read: true }).in('id', unreadIds);
         setNotifications((cur) => cur.map((n) => ({ ...n, read: true })));
       }
+    } else if (wasOpen) {
+      // Ao fechar o sino, as notificações já lidas desaparecem da lista —
+      // só ficam visíveis enquanto a pessoa as está mesmo a ver.
+      setNotifications((cur) => cur.filter((n) => !n.read));
     }
   }
 
@@ -150,7 +155,7 @@ export default function Header({ minimal = false }) {
                       <Link
                         key={n.id}
                         href={n.link || '#'}
-                        onClick={() => setNotifOpen(false)}
+                        onClick={() => { setNotifOpen(false); setNotifications((cur) => cur.filter((x) => x.id !== n.id)); }}
                         style={{ display: 'block', padding: '12px 14px', borderBottom: '1px solid var(--line)', fontSize: 12.5 }}
                       >
                         {n.message}

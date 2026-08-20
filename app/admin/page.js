@@ -317,6 +317,13 @@ function AdminInner() {
     setSupportMessages((cur) => cur.map((m) => (m.id === id ? { ...m, status: 'resolvida' } : m)));
   }
 
+  async function deleteSupportMessage(id) {
+    if (!confirm('Apagar esta mensagem de suporte? Esta ação não pode ser desfeita.')) return;
+    await supabase.from('support_replies').delete().eq('support_request_id', id);
+    await supabase.from('support_requests').delete().eq('id', id);
+    setSupportMessages((cur) => cur.filter((m) => m.id !== id));
+  }
+
   async function loadReports() {
     const { data } = await supabase
       .from('reports')
@@ -328,6 +335,12 @@ function AdminInner() {
   async function resolveReport(id) {
     await supabase.from('reports').update({ status: 'resolvida' }).eq('id', id);
     setReports((cur) => cur.map((r) => (r.id === id ? { ...r, status: 'resolvida' } : r)));
+  }
+
+  async function deleteReport(id) {
+    if (!confirm('Apagar esta denúncia? Esta ação não pode ser desfeita.')) return;
+    await supabase.from('reports').delete().eq('id', id);
+    setReports((cur) => cur.filter((r) => r.id !== id));
   }
 
   async function loadAgencies() {
@@ -581,6 +594,9 @@ function AdminInner() {
                   {r.status !== 'resolvida' && (
                     <button onClick={() => resolveReport(r.id)} className="btn btn-primary" style={{ fontSize: 13 }}>Marcar resolvida</button>
                   )}
+                  {r.status === 'resolvida' && (
+                    <button onClick={() => deleteReport(r.id)} className="btn" style={{ fontSize: 13, color: '#b8452f' }}>🗑 Apagar</button>
+                  )}
                 </div>
               </div>
             )}
@@ -658,6 +674,11 @@ function AdminInner() {
                   {m.status !== 'resolvida' && (
                     <button onClick={() => resolveSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5 }}>
                       Marcar resolvida
+                    </button>
+                  )}
+                  {m.status === 'resolvida' && (
+                    <button onClick={() => deleteSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5, color: '#b8452f' }}>
+                      🗑 Apagar
                     </button>
                   )}
                 </div>
