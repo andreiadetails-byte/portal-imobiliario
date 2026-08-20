@@ -74,6 +74,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 @media (max-width: 900px){ .grid-listings{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 640px){
   .grid-listings{ grid-template-columns:1fr; }
+  .hero-qr{ position: static !important; margin: 16px auto 0 !important; width: fit-content; }
 }
 
 .error-text{ color:#8a3b2a; font-size:13px; margin-top:8px; }

@@ -125,6 +125,22 @@ export default function HomePage() {
           position: 'relative',
         }}
       >
+        <div className="hero-qr" style={{
+          position: 'absolute', bottom: 16, right: 16, zIndex: 2,
+          background: 'rgba(255,255,255,0.95)', borderRadius: 8, padding: 8,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fportalimobiliario.netlify.app"
+            alt="Código QR para abrir o More·ada no telemóvel"
+            width={44}
+            height={44}
+            style={{ borderRadius: 3, display: 'block' }}
+          />
+          <span style={{ fontSize: 10, color: 'var(--ink)', maxWidth: 62, lineHeight: 1.3 }}>Abrir no telemóvel</span>
+        </div>
+
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
@@ -505,7 +521,7 @@ export default function HomePage() {
 
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
         <div className="wrap" style={{ padding: '48px 32px 32px' }}>
-          <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) auto', gap: 32, marginBottom: 32 }}>
+          <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 32 }}>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
                 {t('footer_search')}
@@ -549,22 +565,6 @@ export default function HomePage() {
               <Link href="/privacidade" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Privacidade</Link>
               <Link href="/cookies" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Política de cookies</Link>
               <Link href="/termos" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Condições gerais</Link>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
-                Abrir no telemóvel
-              </h5>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=https%3A%2F%2Fportalimobiliario.netlify.app"
-                alt="Código QR para abrir o More·ada no telemóvel"
-                width={110}
-                height={110}
-                style={{ borderRadius: 6, border: '1px solid var(--line)' }}
-              />
-              <p style={{ fontSize: 11, color: 'var(--text-soft)', marginTop: 8, maxWidth: 110 }}>
-                Aponta a câmara do telemóvel
-              </p>
             </div>
           </div>
           <div style={{ borderTop: '1px solid var(--line)', paddingTop: 20, fontSize: 13, color: 'var(--text-soft)' }}>
