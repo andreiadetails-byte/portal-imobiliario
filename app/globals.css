@@ -72,7 +72,10 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 .grid-listings{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
 .grid-listings-owner{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:18px; }
 @media (max-width: 900px){ .grid-listings{ grid-template-columns:1fr 1fr; } }
-@media (max-width: 640px){ .grid-listings{ grid-template-columns:1fr; } }
+@media (max-width: 640px){
+  .grid-listings{ grid-template-columns:1fr; }
+  .investor-badge{ position: static !important; max-width: 100% !important; margin: 0 16px 20px; }
+}
 
 .error-text{ color:#8a3b2a; font-size:13px; margin-top:8px; }
 .empty-state{ text-align:center; padding:60px 20px; color:var(--text-soft); }

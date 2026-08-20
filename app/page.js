@@ -125,6 +125,24 @@ export default function HomePage() {
           position: 'relative',
         }}
       >
+        <Link
+          href="/simulador-investimento"
+          className="investor-badge"
+          style={{
+            position: 'absolute', top: 24, right: 24, zIndex: 2, maxWidth: 240,
+            background: 'rgba(255,255,255,0.96)', borderRadius: 10, padding: '14px 16px',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.25)', textDecoration: 'none', display: 'flex', gap: 10, alignItems: 'flex-start',
+          }}
+        >
+          <span style={{ fontSize: 22, flexShrink: 0 }}>📈</span>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginBottom: 2 }}>És investidor?</div>
+            <div style={{ fontSize: 11.5, color: 'var(--text-soft)', lineHeight: 1.4 }}>
+              Calcula o teu lucro na revenda do imóvel →
+            </div>
+          </div>
+        </Link>
+
         <div className="wrap" style={{ maxWidth: 760 }}>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
