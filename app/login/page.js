@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -12,6 +12,9 @@ export default function LoginPage() {
   const router = useRouter();
   const { t } = useLanguage();
   const [mode, setMode] = useState('login');
+  const recaptchaRef = useRef(null);
+  const recaptchaWidgetId = useRef(null);
+  const [recaptchaScriptReady, setRecaptchaScriptReady] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -81,6 +84,18 @@ export default function LoginPage() {
     router.push('/');
   }
 
+  // Desenha a caixa "Não sou um robô" à mão, só quando o formulário de registo
+  // está mesmo visível — o Google não a encontra sozinho porque só existe depois
+  // de a pessoa clicar em "Registar" (o site troca entre Login e Registar).
+  useEffect(() => {
+    if (mode !== 'signup' || !recaptchaScriptReady || !recaptchaRef.current) return;
+    if (recaptchaWidgetId.current !== null) return; // já desenhada, não repetir
+    if (typeof window === 'undefined' || !window.grecaptcha || !window.grecaptcha.render) return;
+    recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+      sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+    });
+  }, [mode, recaptchaScriptReady]);
+
   async function handleSignup(e) {
     e.preventDefault();
     setError('');
@@ -88,7 +103,9 @@ export default function LoginPage() {
       setError('Indique o número de licença AMI da sua agência.');
       return;
     }
-    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha ? window.grecaptcha.getResponse() : '';
+    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha && recaptchaWidgetId.current !== null
+      ? window.grecaptcha.getResponse(recaptchaWidgetId.current)
+      : '';
     if (!recaptchaToken) {
       setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
       return;
@@ -102,7 +119,7 @@ export default function LoginPage() {
     const verifyData = await verifyRes.json();
     if (!verifyData.success) {
       setError('Não foi possível confirmar que não é um robô. Tente novamente.');
-      if (window.grecaptcha) window.grecaptcha.reset();
+      if (window.grecaptcha && recaptchaWidgetId.current !== null) window.grecaptcha.reset(recaptchaWidgetId.current);
       setLoading(false);
       return;
     }
@@ -111,7 +128,7 @@ export default function LoginPage() {
       password,
       options: { data: { full_name: fullName, account_type: accountType } },
     });
-    if (error) { setError(error.message); setLoading(false); if (window.grecaptcha) window.grecaptcha.reset(); return; }
+    if (error) { setError(error.message); setLoading(false); if (window.grecaptcha && recaptchaWidgetId.current !== null) window.grecaptcha.reset(recaptchaWidgetId.current); return; }
 
     // O Supabase não devolve um erro claro quando o email já existe (por segurança,
     // para não revelar quais emails já têm conta) — em vez disso, devolve uma resposta
@@ -364,7 +381,7 @@ export default function LoginPage() {
               <input type="password" required minLength={6} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
-            <div className="g-recaptcha" data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} style={{ marginBottom: 16 }} />
+            <div ref={recaptchaRef} style={{ marginBottom: 16 }} />
             <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
               {t('login_signup_btn')}
             </button>
@@ -375,7 +392,11 @@ export default function LoginPage() {
       <p style={{ textAlign: 'center', marginTop: 20 }}>
         <Link href="/" style={{ fontSize: 13, color: 'var(--text-soft)' }}>&larr; {t('login_back')}</Link>
       </p>
-      <Script src="https://www.google.com/recaptcha/api.js" strategy="lazyOnload" />
+      <Script
+        src="https://www.google.com/recaptcha/api.js?render=explicit"
+        strategy="lazyOnload"
+        onLoad={() => setRecaptchaScriptReady(true)}
+      />
     </main>
   );
 }
