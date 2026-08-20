@@ -70,6 +70,8 @@ function PublishForm() {
   const [published, setPublished] = useState(false);
   const [photos, setPhotos] = useState([]); // { file, preview }
   const [planFile, setPlanFile] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoError, setVideoError] = useState('');
   const [documentFile, setDocumentFile] = useState(null);
 
   const [form, setForm] = useState({
@@ -268,6 +270,29 @@ function PublishForm() {
     if (file) setPlanFile(file);
   }
 
+  function handleVideoSelect(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const MAX_VIDEO_MB = 100;
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+      setVideoError(`O vídeo é demasiado grande (máximo ${MAX_VIDEO_MB}MB). Tente gravar um vídeo mais curto, ou reduza a qualidade nas definições da câmara do telemóvel.`);
+      e.target.value = '';
+      return;
+    }
+    setVideoError('');
+    setVideoFile(file);
+  }
+
+  async function uploadVideo(propertyId) {
+    if (!videoFile) return null;
+    const ext = videoFile.name.split('.').pop();
+    const path = `${user.id}/${propertyId}/video.${ext}`;
+    const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, videoFile, { upsert: true });
+    if (uploadError) return null;
+    const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
+    return publicUrlData.publicUrl;
+  }
+
   async function uploadPlan(propertyId) {
     if (!planFile) return null;
     const ext = planFile.name.split('.').pop();
@@ -450,6 +475,10 @@ function PublishForm() {
         await supabase.from('properties').update({
           document_url: documentUrl, document_submitted_at: new Date().toISOString(), document_verified: false,
         }).eq('id', propertyId);
+      }
+      const videoUrl = await uploadVideo(propertyId);
+      if (videoUrl) {
+        await supabase.from('properties').update({ video_url: videoUrl }).eq('id', propertyId);
       }
       if (photos.length > 0) {
         await uploadPhotos(propertyId, existingPhotoCount);
@@ -894,6 +923,21 @@ function PublishForm() {
             {planFile ? `📄 ${planFile.name}` : 'Clique para anexar a planta (imagem ou PDF)'}
           </label>
           <input id="plan-input" type="file" accept="image/*,.pdf" onChange={handlePlanSelect} style={{ display: 'none' }} />
+        </div>
+
+        <div className="field">
+          <label>Vídeo do imóvel <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{isEditMode ? '(só se quiser substituir o atual)' : '(opcional, máx. 100MB)'}</span></label>
+          <label
+            htmlFor="video-input"
+            style={{
+              display: 'block', border: '1.5px dashed var(--line)', borderRadius: 6, padding: '20px 16px',
+              textAlign: 'center', color: 'var(--text-soft)', fontSize: 13.5, cursor: 'pointer',
+            }}
+          >
+            {videoFile ? `🎬 ${videoFile.name}` : 'Clique para anexar um vídeo (gravado pelo telemóvel, por exemplo)'}
+          </label>
+          <input id="video-input" type="file" accept="video/*" onChange={handleVideoSelect} style={{ display: 'none' }} />
+          {videoError && <p className="error-text" style={{ marginTop: 6 }}>{videoError}</p>}
         </div>
 
         <div className="field">

@@ -487,6 +487,21 @@ export default function PropertyClient() {
             );
           })()}
 
+          {property.video_url && (
+            <>
+              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>Vídeo do imóvel</h3>
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              <video
+                controls
+                preload="metadata"
+                style={{ width: '100%', maxHeight: 480, borderRadius: 8, border: '1px solid var(--line)', background: '#000' }}
+              >
+                <source src={property.video_url} />
+                O seu browser não suporta a reprodução de vídeo.
+              </video>
+            </>
+          )}
+
           {property.floor_plan_url && (
             <>
               <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>Planta do imóvel</h3>
