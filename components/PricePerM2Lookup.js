@@ -58,28 +58,45 @@ export default function PricePerM2Lookup() {
       return;
     }
 
-    let query = supabase
-      .from('properties')
-      .select('price, area, area_util')
-      .eq('status', 'ativo')
-      .eq('business_type', businessType);
+    // Tenta o nível mais específico primeiro (freguesia), e se não houver imóveis
+    // suficientes, alarga automaticamente para o concelho, depois para o distrito —
+    // assim aparecem sempre resultados reais do site sempre que possível, em vez de
+    // saltar logo para o valor do INE só porque uma freguesia tem poucos anúncios.
+    const levelsToTry = [
+      levels.freguesia && { column: 'parish', value: levels.freguesia, label: levels.freguesia },
+      levels.concelho && { column: 'municipality', value: levels.concelho, label: levels.concelho },
+      levels.distrito && { column: 'district', value: levels.distrito, label: levels.distrito },
+    ].filter(Boolean);
 
-    // Usa o nível mais específico que a pessoa escolheu: freguesia > concelho > distrito.
-    if (levels.freguesia) query = query.eq('parish', levels.freguesia);
-    else if (levels.concelho) query = query.eq('municipality', levels.concelho);
-    else query = query.eq('district', levels.distrito);
+    const MIN_RESULTS = 3;
+    let bestMatch = null;
 
-    const { data } = await query;
+    for (const { column, value, label } of levelsToTry) {
+      const { data } = await supabase
+        .from('properties')
+        .select('price, area, area_util')
+        .eq('status', 'ativo')
+        .eq('business_type', businessType)
+        .eq(column, value);
 
-    const pricesPerM2 = (data || [])
-      .map((p) => {
-        const area = p.area || p.area_util;
-        return area > 0 ? Number(p.price) / Number(area) : null;
-      })
-      .filter((v) => v != null && v > 0 && Number.isFinite(v));
+      const pricesPerM2 = (data || [])
+        .map((p) => {
+          const area = p.area || p.area_util;
+          return area > 0 ? Number(p.price) / Number(area) : null;
+        })
+        .filter((v) => v != null && v > 0 && Number.isFinite(v));
 
-    if (pricesPerM2.length === 0) {
-      // Sem imóveis suficientes no site — tenta um valor de referência oficial do INE.
+      if (pricesPerM2.length > 0 && (!bestMatch || pricesPerM2.length > bestMatch.pricesPerM2.length)) {
+        bestMatch = { pricesPerM2, label, widened: column !== levelsToTry[0].column };
+      }
+      if (pricesPerM2.length >= MIN_RESULTS) {
+        bestMatch = { pricesPerM2, label, widened: column !== levelsToTry[0].column };
+        break;
+      }
+    }
+
+    if (!bestMatch) {
+      // Sem imóveis suficientes em nenhum nível — tenta um valor de referência oficial do INE.
       const geoNamesToTry = [levels.freguesia, levels.concelho, levels.distrito].filter(Boolean);
       let ineMatch = null;
       for (const name of geoNamesToTry) {
@@ -94,11 +111,12 @@ export default function PricePerM2Lookup() {
       }
       setResult({ count: 0, ine: ineMatch });
     } else {
+      const { pricesPerM2, label, widened } = bestMatch;
       const avg = pricesPerM2.reduce((sum, v) => sum + v, 0) / pricesPerM2.length;
       const sorted = [...pricesPerM2].sort((a, b) => a - b);
       const min = sorted[0];
       const max = sorted[sorted.length - 1];
-      setResult({ count: pricesPerM2.length, avg, min, max });
+      setResult({ count: pricesPerM2.length, avg, min, max, widenedLabel: widened ? label : null });
     }
     setLoading(false);
   }
@@ -196,7 +214,10 @@ export default function PricePerM2Lookup() {
           ) : (
             <>
               <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 4 }}>
-                Preço médio em {areaLabel} ({result.count} {result.count === 1 ? 'imóvel' : 'imóveis'})
+                Preço médio em {result.widenedLabel || areaLabel} ({result.count} {result.count === 1 ? 'imóvel' : 'imóveis'})
+                {result.widenedLabel && (
+                  <> — ainda não há imóveis suficientes só em {areaLabel}, por isso alargámos a pesquisa</>
+                )}
               </div>
               <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
                 {Math.round(result.avg).toLocaleString('pt-PT')} €/m²
