@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { sendEmail } from '../../../lib/sendEmail';
 
 export async function POST(request) {
   try {
@@ -14,35 +15,26 @@ export async function POST(request) {
 
     const notifyEmail = process.env.SUPPORT_NOTIFY_EMAIL || 'geral@moreada.pt';
 
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Morada <onboarding@resend.dev>',
-        to: notifyEmail,
-        subject: `⚠️ Denúncia de anúncio — ${property ? property.address : report.property_id}`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 480px;">
-            <h2 style="color: #332E22;">Nova denúncia de anúncio</h2>
-            <p><b>Imóvel:</b> ${property ? `${property.typology} · ${property.address}` : report.property_id}</p>
-            <p><b>Motivo:</b> ${report.reason}</p>
-            <p><b>Detalhes:</b> ${report.details || '—'}</p>
-            <p><b>Nome de quem denunciou:</b> ${report.reporter_name || 'não fornecido'}</p>
-            <p><b>Contacto de quem denunciou (interno):</b> ${report.reporter_contact || 'não fornecido'}</p>
-            <p style="margin-top:16px; font-size:12px; color:#8a3b2a;">
-              Nota: os dados de quem denunciou não são partilhados com o anunciante.
-            </p>
-          </div>
-        `,
-      }),
+    const result = await sendEmail({
+      to: notifyEmail,
+      subject: `⚠️ Denúncia de anúncio — ${property ? property.address : report.property_id}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <h2 style="color: #332E22;">Nova denúncia de anúncio</h2>
+          <p><b>Imóvel:</b> ${property ? `${property.typology} · ${property.address}` : report.property_id}</p>
+          <p><b>Motivo:</b> ${report.reason}</p>
+          <p><b>Detalhes:</b> ${report.details || '—'}</p>
+          <p><b>Nome de quem denunciou:</b> ${report.reporter_name || 'não fornecido'}</p>
+          <p><b>Contacto de quem denunciou (interno):</b> ${report.reporter_contact || 'não fornecido'}</p>
+          <p style="margin-top:16px; font-size:12px; color:#8a3b2a;">
+            Nota: os dados de quem denunciou não são partilhados com o anunciante.
+          </p>
+        </div>
+      `,
     });
 
-    if (!resendResponse.ok) {
-      const errText = await resendResponse.text();
-      return Response.json({ error: 'Falha ao enviar email', details: errText }, { status: 500 });
+    if (result.error) {
+      return Response.json({ error: 'Falha ao enviar email', details: result.error }, { status: 500 });
     }
 
     return Response.json({ success: true });

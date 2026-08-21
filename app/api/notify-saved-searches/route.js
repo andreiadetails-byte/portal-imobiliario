@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { sendEmail } from '../../../lib/sendEmail';
 
 // Chamada pelo Supabase (Database Webhook) sempre que um imóvel é atualizado.
 // Só age quando o estado passa a "ativo" (aprovado), para não enviar alertas repetidos.
@@ -43,22 +44,17 @@ export async function POST(request) {
       const email = userAuth?.user?.email;
       if (!email) continue;
 
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from: 'Morada <onboarding@resend.dev>',
-          to: email,
-          subject: `Novo imóvel na sua pesquisa "${search.name}"`,
-          html: `
-            <div style="font-family: sans-serif; max-width: 480px;">
-              <h2 style="color: #332E22;">Novo imóvel que corresponde à sua pesquisa</h2>
-              <p><b>${property.typology} · ${property.address}</b></p>
-              <p>${Number(property.price).toLocaleString('pt-PT')} €</p>
-              <p><a href="https://portalimobiliario.netlify.app/property/${property.id}" style="color:#5A6B49;">Ver imóvel</a></p>
-            </div>
-          `,
-        }),
+      await sendEmail({
+        to: email,
+        subject: `Novo imóvel na sua pesquisa "${search.name}"`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 480px;">
+            <h2 style="color: #332E22;">Novo imóvel que corresponde à sua pesquisa</h2>
+            <p><b>${property.typology} · ${property.address}</b></p>
+            <p>${Number(property.price).toLocaleString('pt-PT')} €</p>
+            <p><a href="https://portalimobiliario.netlify.app/property/${property.id}" style="color:#5A6B49;">Ver imóvel</a></p>
+          </div>
+        `,
       });
       sent++;
     }
