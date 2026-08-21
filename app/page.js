@@ -253,19 +253,21 @@ export default function HomePage() {
           <div className="card" style={{ padding: '26px 28px' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>Tens dúvidas?</h3>
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16 }}>
-              Sobre o processo de compra, o processo de venda, documentos ou impostos — pergunta, e respondemos.
+              Sobre compra, venda, arrendamento, crédito, documentos, impostos, ou como usar a plataforma — pergunta, e respondemos.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
-              {['Processo de compra', 'Processo de venda', 'Documentos', 'Impostos'].map((tema) => (
-                <span
+              {['Processo de compra', 'Processo de venda', 'Arrendamento', 'Crédito habitação', 'Documentos', 'Escritura', 'Impostos', 'Publicar anúncio'].map((tema) => (
+                <button
                   key={tema}
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('morada-open-support', { detail: tema }))}
                   style={{
-                    fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 14,
-                    background: 'var(--plaster)', color: 'var(--text-soft)',
+                    fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 14, cursor: 'pointer',
+                    background: 'var(--plaster)', color: 'var(--text-soft)', border: '1px solid var(--line)',
                   }}
                 >
                   {tema}
-                </span>
+                </button>
               ))}
             </div>
             <button

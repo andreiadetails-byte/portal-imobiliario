@@ -40,8 +40,13 @@ export default function SupportAgentWidget() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user || null));
 
     // Permite que outros sítios do site (ex: a secção de dúvidas na página
-    // inicial) abram este balão diretamente, sem duplicar o formulário.
-    function handleOpenRequest() { setOpen(true); }
+    // inicial) abram este balão diretamente, sem duplicar o formulário —
+    // e opcionalmente já com um tema pré-preenchido (event.detail).
+    function handleOpenRequest(e) {
+      setOpen(true);
+      const tema = e?.detail;
+      if (tema) setForm((f) => ({ ...f, message: `Tenho uma dúvida sobre: ${tema}. ` }));
+    }
     window.addEventListener('morada-open-support', handleOpenRequest);
     return () => window.removeEventListener('morada-open-support', handleOpenRequest);
   }, []);
