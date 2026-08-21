@@ -74,6 +74,22 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 @media (max-width: 900px){ .grid-listings{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 640px){
   .grid-listings{ grid-template-columns:1fr; }
+
+  /* Rede de segurança geral: em ecrãs de telemóvel, nada deve conseguir ficar
+     mais largo do que o próprio ecrã, seja qual for a causa exata — em vez de
+     ir corrigindo caso a caso, isto apanha qualquer situação nova que apareça. */
+  body, main, .wrap, section, div, form {
+    max-width: 100vw;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  img, video, iframe, table {
+    max-width: 100%;
+    height: auto;
+  }
+  * {
+    min-width: 0;
+  }
 }
 
 .error-text{ color:#8a3b2a; font-size:13px; margin-top:8px; }
