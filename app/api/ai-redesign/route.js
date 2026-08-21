@@ -67,7 +67,7 @@ export async function POST(request) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Erro do Gemini:', errText);
-      return Response.json({ error: 'Não foi possível gerar a imagem. Tente novamente.' }, { status: 500 });
+      return Response.json({ error: `Erro da Google: ${errText.slice(0, 300)}` }, { status: 500 });
     }
 
     const geminiData = await geminiRes.json();
