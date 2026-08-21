@@ -10,7 +10,7 @@ export default function TermosPage() {
   return (
     <TextPage title="Condições gerais">
       <p style={{ marginBottom: 16 }}>
-        O More·ada é operado pelo <b>More·ada</b>, NIPC {PAYMENT_INFO.companyNipc}. Ao criar conta ou usar o site, está a aceitar estas condições.
+        O More·ada é operado pela equipa More·ada. Ao criar conta ou usar o site, está a aceitar estas condições.
       </p>
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Natureza da plataforma</h2>

@@ -88,7 +88,6 @@ export default function AssinaturaPage() {
         <div style={{ fontSize: 13, marginBottom: 6 }}>
           <div><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
           <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
-          <div><b>Titular:</b> {PAYMENT_INFO.accountHolder}</div>
         </div>
         <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 18 }}>
           Indique o seu nome ou email na descrição da transferência, para identificarmos o pagamento.
@@ -133,8 +132,7 @@ export default function AssinaturaPage() {
               </p>
               <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, marginBottom: 20 }}>
                 <div style={{ fontSize: 13, marginBottom: 4 }}><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
-                <div style={{ fontSize: 13, marginBottom: 4 }}><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
-                <div style={{ fontSize: 13 }}><b>Titular:</b> {PAYMENT_INFO.accountHolder}</div>
+                <div style={{ fontSize: 13 }}><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
               </div>
               <button onClick={handleLogout} className="btn btn-block">Terminar sessão</button>
             </>

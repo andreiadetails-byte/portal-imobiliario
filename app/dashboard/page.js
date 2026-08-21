@@ -448,7 +448,6 @@ function DashboardInner() {
               <div style={{ fontSize: 13, marginBottom: 6 }}>
                 <div><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
                 <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
-                <div><b>Titular:</b> {PAYMENT_INFO.accountHolder}</div>
               </div>
               <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 18 }}>
                 Indique o número de referência <b>{featuredModal.slice(0, 8)}</b> na descrição da transferência.

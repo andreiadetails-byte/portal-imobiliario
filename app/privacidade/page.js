@@ -1,5 +1,4 @@
 import TextPage from '../../components/TextPage';
-import { PAYMENT_INFO } from '../../lib/paymentInfo';
 
 export const metadata = {
   title: 'Política de Privacidade',
@@ -10,7 +9,7 @@ export default function PrivacidadePage() {
   return (
     <TextPage title="Política de privacidade">
       <p style={{ marginBottom: 16 }}>
-        O responsável pelo tratamento dos seus dados pessoais é o <b>More·ada</b>, NIPC {PAYMENT_INFO.companyNipc}.
+        O responsável pelo tratamento dos seus dados pessoais é o <b>More·ada</b>.
         Esta política explica que dados recolhemos, para quê, e quais os seus direitos.
       </p>
 
