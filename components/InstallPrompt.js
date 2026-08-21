@@ -12,6 +12,11 @@ export default function InstallPrompt() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    // Isto só faz sentido em telemóvel — em computador, "instalar uma app" não é
+    // um conceito que as pessoas esperem ver.
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640;
+    if (!isMobile) return;
+
     const alreadyDismissed = localStorage.getItem('morada_install_dismissed');
     if (alreadyDismissed) { setDismissed(true); }
 

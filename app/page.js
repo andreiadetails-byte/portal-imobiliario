@@ -207,9 +207,13 @@ export default function HomePage() {
               style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
             />
             <div>
-              <div className="display" style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>Continua no telemóvel</div>
-              <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
-                Aponta a câmara e leva o More·ada contigo, onde quer que estejas.
+              <div className="display" style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>Instala o More·ada como app</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 6 }}>
+                Aponta a câmara para abrir no telemóvel, e depois:
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-soft)', lineHeight: 1.6 }}>
+                <b>Android (Chrome):</b> toca em "Instalar" quando aparecer, ou nos 3 pontinhos → "Instalar aplicação"<br />
+                <b>iPhone (Safari):</b> toca em Partilhar → "Adicionar ao Ecrã Principal"
               </div>
             </div>
           </div>
