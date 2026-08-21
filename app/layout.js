@@ -5,11 +5,18 @@ import ImageProtection from '../components/ImageProtection';
 import CookieConsent from '../components/CookieConsent';
 import CompareBar from '../components/CompareBar';
 import GoogleAnalytics from '../components/GoogleAnalytics';
+import InstallPrompt from '../components/InstallPrompt';
 
 export const metadata = {
   metadataBase: new URL('https://portalimobiliario.netlify.app'),
   title: { default: 'More·ada — Portal imobiliário Portugal', template: '%s' },
   description: 'Compre, arrende ou publique o seu imóvel diretamente em Portugal — sem intermediários obrigatórios. Milhares de imóveis, chat direto com anunciantes, simuladores de crédito e IMT.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'More·ada',
+  },
   openGraph: {
     siteName: 'More·ada',
     locale: 'pt_PT',
@@ -28,6 +35,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  themeColor: '#5A6B49',
 };
 
 export default function RootLayout({ children }) {
@@ -42,6 +50,7 @@ export default function RootLayout({ children }) {
           <CookieConsent />
           <CompareBar />
           <GoogleAnalytics />
+          <InstallPrompt />
         </LanguageProvider>
       </body>
     </html>
