@@ -66,6 +66,9 @@ export default function CompararPage() {
     <>
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 1180, padding: '48px 32px 100px' }}>
+        <Link href="/favorites" style={{ display: 'inline-block', fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
+          ← Voltar aos favoritos
+        </Link>
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Comparar imóveis</h1>
         <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 28 }}>
           Veja lado a lado as diferenças entre os imóveis que selecionou.
