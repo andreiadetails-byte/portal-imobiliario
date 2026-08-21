@@ -13,7 +13,16 @@ export default function InstallPrompt() {
 
   useEffect(() => {
     const alreadyDismissed = localStorage.getItem('morada_install_dismissed');
-    if (alreadyDismissed) { setDismissed(true); return; }
+    if (alreadyDismissed) { setDismissed(true); }
+
+    // O Chrome só considera o site "instalável" se houver um service worker
+    // registado — sem isto, o aviso de instalação nunca aparece sozinho.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        // Se falhar, não faz mal — o site continua a funcionar normalmente,
+        // só não vai mostrar o aviso automático de instalação.
+      });
+    }
 
     function handler(e) {
       e.preventDefault();
