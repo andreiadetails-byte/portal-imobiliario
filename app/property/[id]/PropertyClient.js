@@ -773,7 +773,7 @@ export default function PropertyClient() {
     )}
 
     {showAiRedesign && (
-      <AiRedesignModal photoUrl={photos[activePhoto]} onClose={() => setShowAiRedesign(false)} />
+      <AiRedesignModal photos={photos} initialPhotoIndex={activePhoto} onClose={() => setShowAiRedesign(false)} />
     )}
 
     {showQr && (

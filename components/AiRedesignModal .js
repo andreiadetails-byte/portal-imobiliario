@@ -10,7 +10,9 @@ const SUGGESTIONS = [
   'Adicionar mobília de sala de estar',
 ];
 
-export default function AiRedesignModal({ photoUrl, onClose }) {
+export default function AiRedesignModal({ photos, initialPhotoIndex = 0, onClose }) {
+  const [selectedIndex, setSelectedIndex] = useState(initialPhotoIndex);
+  const photoUrl = photos[selectedIndex];
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -68,9 +70,27 @@ export default function AiRedesignModal({ photoUrl, onClose }) {
 
         {!resultImage ? (
           <>
-            <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 14 }}>
-              Descreva a alteração que gostaria de ver simulada nesta foto — pintura, mobília, remodelação, etc.
+            <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 10 }}>
+              Escolha a foto que quer simular, e descreva a alteração — pintura, mobília, remodelação, etc.
             </p>
+
+            {photos.length > 1 && (
+              <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 12, paddingBottom: 4 }}>
+                {photos.map((p, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={i}
+                    src={p}
+                    alt={`Foto ${i + 1}`}
+                    onClick={() => setSelectedIndex(i)}
+                    style={{
+                      width: 62, height: 46, objectFit: 'cover', borderRadius: 5, cursor: 'pointer', flexShrink: 0,
+                      border: i === selectedIndex ? '2.5px solid var(--telha)' : '2.5px solid transparent', opacity: i === selectedIndex ? 1 : 0.7,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={photoUrl} alt="Foto original do imóvel" style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 8, marginBottom: 14 }} />

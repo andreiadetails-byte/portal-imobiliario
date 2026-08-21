@@ -57,6 +57,9 @@ export async function POST(request) {
               { inline_data: { mime_type: mimeType, data: imageBase64 } },
             ],
           }],
+          generationConfig: {
+            responseModalities: ['TEXT', 'IMAGE'],
+          },
         }),
       }
     );
