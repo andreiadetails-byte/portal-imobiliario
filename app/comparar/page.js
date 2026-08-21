@@ -66,7 +66,7 @@ export default function CompararPage() {
     <>
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 1180, padding: '48px 32px 100px' }}>
-        <Link href="/favorites" style={{ display: 'inline-block', fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
+        <Link href="/favorites" className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 600, marginBottom: 20, padding: '10px 18px' }}>
           ← Voltar aos favoritos
         </Link>
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Comparar imóveis</h1>
