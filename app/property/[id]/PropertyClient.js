@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import Header from '../../../components/Header';
-import AiRedesignModal from '../../../components/AiRedesignModal';
 import { displayAddress } from '../../../lib/displayAddress';
 import MortgageSimulator from '../../../components/MortgageSimulator';
 import ImtCalculator from '../../../components/ImtCalculator';
@@ -33,7 +32,6 @@ export default function PropertyClient() {
   const [photos, setPhotos] = useState([]);
   const [activePhoto, setActivePhoto] = useState(0);
   const [lightbox, setLightbox] = useState(false);
-  const [showAiRedesign, setShowAiRedesign] = useState(false);
   const [similar, setSimilar] = useState([]);
   const [zoneAvgPrice, setZoneAvgPrice] = useState(null);
   const [reportModal, setReportModal] = useState(false);
@@ -237,16 +235,6 @@ export default function PropertyClient() {
         <div>
           {photos.length > 0 ? (
             <div style={{ marginBottom: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-                <button
-                  type="button"
-                  onClick={() => setShowAiRedesign(true)}
-                  className="btn"
-                  style={{ fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6 }}
-                >
-                  ✨ Redesenhar com IA
-                </button>
-              </div>
               {photos.length > 1 ? (
                 <div className="property-gallery" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, height: 380, borderRadius: 8, overflow: 'hidden' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -770,10 +758,6 @@ export default function PropertyClient() {
           ✕
         </button>
       </div>
-    )}
-
-    {showAiRedesign && (
-      <AiRedesignModal photos={photos} initialPhotoIndex={activePhoto} onClose={() => setShowAiRedesign(false)} />
     )}
 
     {showQr && (
