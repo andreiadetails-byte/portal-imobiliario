@@ -1,4 +1,5 @@
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import MortgageSimulator from '../../components/MortgageSimulator';
 
 export const metadata = {
@@ -11,6 +12,7 @@ export default function SimuladorCreditoPage() {
     <>
       <Header />
       <div className="wrap" style={{ maxWidth: 560, padding: '48px 32px 80px' }}>
+        <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Simulador de crédito habitação</h1>
         <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 8 }}>
           Descubra qual seria a prestação mensal, ou quanto pode pedir emprestado com base no que consegue pagar por mês.

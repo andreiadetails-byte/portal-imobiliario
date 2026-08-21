@@ -231,6 +231,13 @@ export default function PropertyClient() {
     <>
       <Header />
     <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
+      <button
+        onClick={() => (typeof window !== 'undefined' && window.history.length > 1 ? router.back() : router.push('/results'))}
+        className="btn"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px' }}
+      >
+        ← Voltar
+      </button>
       <div className="property-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
         <div>
           {photos.length > 0 ? (

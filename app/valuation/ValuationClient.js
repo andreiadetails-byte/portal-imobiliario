@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 
 export default function ValuationClient() {
   const [sent, setSent] = useState(false);
@@ -37,6 +38,7 @@ export default function ValuationClient() {
         backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
       }} />
       <div className="wrap" style={{ maxWidth: 560, padding: '48px 32px 80px' }}>
+        <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Avalie o seu imóvel</h1>
         <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
           Descreva o seu imóvel e entramos em contacto consigo com uma avaliação, sem compromisso.
