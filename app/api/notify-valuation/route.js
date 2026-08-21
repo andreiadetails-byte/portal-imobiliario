@@ -7,7 +7,7 @@ export async function POST(request) {
       return Response.json({ error: 'Sem dados' }, { status: 400 });
     }
 
-    const notifyEmail = process.env.SUPPORT_NOTIFY_EMAIL || 'andreiadetails@gmail.com';
+    const notifyEmail = process.env.SUPPORT_NOTIFY_EMAIL || 'geral@moreada.pt';
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',

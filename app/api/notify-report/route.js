@@ -12,7 +12,7 @@ export async function POST(request) {
     const { data: property } = await supabaseAdmin
       .from('properties').select('typology, address, owner_id').eq('id', report.property_id).single();
 
-    const notifyEmail = process.env.SUPPORT_NOTIFY_EMAIL || 'andreiadetails@gmail.com';
+    const notifyEmail = process.env.SUPPORT_NOTIFY_EMAIL || 'geral@moreada.pt';
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
