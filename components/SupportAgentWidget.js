@@ -38,6 +38,12 @@ export default function SupportAgentWidget() {
   useEffect(() => {
     setAgentName(randomAgentName());
     supabase.auth.getUser().then(({ data }) => setUser(data.user || null));
+
+    // Permite que outros sítios do site (ex: a secção de dúvidas na página
+    // inicial) abram este balão diretamente, sem duplicar o formulário.
+    function handleOpenRequest() { setOpen(true); }
+    window.addEventListener('morada-open-support', handleOpenRequest);
+    return () => window.removeEventListener('morada-open-support', handleOpenRequest);
   }, []);
 
   if (!agentName) return null;

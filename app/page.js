@@ -248,6 +248,38 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section style={{ padding: '0 0 32px' }}>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <div className="card" style={{ padding: '26px 28px' }}>
+            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>Tens dúvidas?</h3>
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+              Sobre o processo de compra, o processo de venda, documentos ou impostos — pergunta, e respondemos.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
+              {['Processo de compra', 'Processo de venda', 'Documentos', 'Impostos'].map((tema) => (
+                <span
+                  key={tema}
+                  style={{
+                    fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 14,
+                    background: 'var(--plaster)', color: 'var(--text-soft)',
+                  }}
+                >
+                  {tema}
+                </span>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('morada-open-support'))}
+              className="btn btn-primary"
+              style={{ fontSize: 13.5 }}
+            >
+              Tirar uma dúvida →
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section style={{ padding: '48px 0 80px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 26, marginBottom: 24 }}>{t('home_featured')}</h2>
