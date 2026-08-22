@@ -28,6 +28,15 @@ export default function LoginPage() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [recaptchaAlreadyOk, setRecaptchaAlreadyOk] = useState(false);
+
+  useEffect(() => {
+    const RECAPTCHA_VALID_HOURS = 24;
+    const lastVerified = typeof window !== 'undefined' ? localStorage.getItem('morada_recaptcha_ok') : null;
+    if (lastVerified && (Date.now() - Number(lastVerified)) < RECAPTCHA_VALID_HOURS * 60 * 60 * 1000) {
+      setRecaptchaAlreadyOk(true);
+    }
+  }, []);
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [signupEmailSent, setSignupEmailSent] = useState(false);
@@ -56,28 +65,40 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
 
-    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha && loginRecaptchaWidgetId.current !== null
-      ? window.grecaptcha.getResponse(loginRecaptchaWidgetId.current)
-      : '';
-    if (!recaptchaToken) {
-      setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
-      return;
+    // Só pede para confirmar "não sou um robô" uma vez por dia — depois de
+    // confirmado, os logins seguintes nesse dia entram diretamente. Continua
+    // a proteger contra tentativas automáticas em massa (que nunca teriam
+    // essa confirmação guardada), sem incomodar quem entra várias vezes.
+    const RECAPTCHA_VALID_HOURS = 24;
+    const lastVerified = typeof window !== 'undefined' ? localStorage.getItem('morada_recaptcha_ok') : null;
+    const stillValid = lastVerified && (Date.now() - Number(lastVerified)) < RECAPTCHA_VALID_HOURS * 60 * 60 * 1000;
+
+    if (!stillValid) {
+      const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha && loginRecaptchaWidgetId.current !== null
+        ? window.grecaptcha.getResponse(loginRecaptchaWidgetId.current)
+        : '';
+      if (!recaptchaToken) {
+        setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
+        return;
+      }
+
+      setLoading(true);
+      const verifyRes = await fetch('/api/verify-recaptcha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: recaptchaToken }),
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyData.success) {
+        setError('Não foi possível confirmar que não é um robô. Tente novamente.');
+        if (window.grecaptcha && loginRecaptchaWidgetId.current !== null) window.grecaptcha.reset(loginRecaptchaWidgetId.current);
+        setLoading(false);
+        return;
+      }
+      localStorage.setItem('morada_recaptcha_ok', String(Date.now()));
     }
 
     setLoading(true);
-    const verifyRes = await fetch('/api/verify-recaptcha', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: recaptchaToken }),
-    });
-    const verifyData = await verifyRes.json();
-    if (!verifyData.success) {
-      setError('Não foi possível confirmar que não é um robô. Tente novamente.');
-      if (window.grecaptcha && loginRecaptchaWidgetId.current !== null) window.grecaptcha.reset(loginRecaptchaWidgetId.current);
-      setLoading(false);
-      return;
-    }
-
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
@@ -165,7 +186,7 @@ export default function LoginPage() {
   // O mesmo, mas para o formulário de login — protege contra alguém tentar
   // adivinhar passwords em massa (ataques de "força bruta").
   useEffect(() => {
-    if (mode !== 'login' || !recaptchaScriptReady) return;
+    if (mode !== 'login' || !recaptchaScriptReady || recaptchaAlreadyOk) return;
     if (loginRecaptchaWidgetId.current !== null) return;
 
     let attempts = 0;
@@ -182,7 +203,7 @@ export default function LoginPage() {
       }
     }, 250);
     return () => clearInterval(interval);
-  }, [mode, recaptchaScriptReady]);
+  }, [mode, recaptchaScriptReady, recaptchaAlreadyOk]);
 
   async function handleSignup(e) {
     e.preventDefault();
@@ -368,7 +389,7 @@ export default function LoginPage() {
               <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
-            <div ref={loginRecaptchaRef} style={{ marginBottom: 16 }} />
+            {!recaptchaAlreadyOk && <div ref={loginRecaptchaRef} style={{ marginBottom: 16 }} />}
             <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
               {t('login_login')}
             </button>
