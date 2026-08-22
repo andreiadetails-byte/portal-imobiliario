@@ -8,6 +8,7 @@ import { logVisitIfNeeded } from '../lib/logVisit';
 import { Bell, Home, Search, Heart, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
+import { isProfessionalAccount } from '../lib/accountTypes';
 
 export default function Header({ minimal = false }) {
   const { t } = useLanguage();
@@ -39,7 +40,7 @@ export default function Header({ minimal = false }) {
           return;
         }
 
-        if (profile?.account_type === 'agencia' && profile.subscription_status === 'active' && profile.subscription_paid_until) {
+        if (isProfessionalAccount(profile?.account_type) && profile.subscription_status === 'active' && profile.subscription_paid_until) {
           const paidUntil = new Date(profile.subscription_paid_until);
           const daysLeft = Math.ceil((paidUntil - new Date()) / (1000 * 60 * 60 * 24));
           if (daysLeft <= 2) setSubReminder({ daysLeft, paidUntil });

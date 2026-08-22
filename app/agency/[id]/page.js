@@ -8,6 +8,7 @@ import { useLanguage } from '../../../lib/i18n';
 import Header from '../../../components/Header';
 import BackButton from '../../../components/BackButton';
 import { displayAddress } from '../../../lib/displayAddress';
+import { accountTypeLabel } from '../../../lib/accountTypes';
 
 export default function AgencyPage() {
   const { id } = useParams();
@@ -119,7 +120,7 @@ export default function AgencyPage() {
               )}
             </h1>
             <div className="meta" style={{ marginTop: 4 }}>
-              {profile.account_type === 'agencia' ? t('agency_type') : t('agency_individual_type')}
+              {accountTypeLabel(profile.account_type)}
               {profile.is_verified && ' · Verificado pelo Morada'}
               {profile.agency_license && ` · ${profile.agency_license}`}
               {memberSince && ` · No Morada desde ${memberSince}`}

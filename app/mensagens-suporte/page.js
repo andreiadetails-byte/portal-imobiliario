@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
+import { agentLabel } from '../../lib/agentNames';
 
 export default function MensagensSuportePage() {
   const router = useRouter();
@@ -31,9 +32,15 @@ export default function MensagensSuportePage() {
     const withReplies = await Promise.all((requests || []).map(async (r) => {
       const { data: replies } = await supabase
         .from('support_replies').select('*').eq('support_request_id', r.id).order('created_at', { ascending: true });
-      // marca respostas do admin como lidas ao abrir a página
-      await supabase.from('support_replies').update({ read_by_user: true })
-        .eq('support_request_id', r.id).eq('sender_role', 'admin').eq('read_by_user', false);
+      // Marca como lidas (com a hora exata) as respostas do admin que a
+      // pessoa ainda não tinha visto — igual ao que o chat já faz.
+      const now = new Date().toISOString();
+      const unseenAdminReplies = (replies || []).filter((rep) => rep.sender_role === 'admin' && !rep.read_at);
+      if (unseenAdminReplies.length > 0) {
+        await supabase.from('support_replies').update({ read_at: now, read_by_user: true })
+          .in('id', unseenAdminReplies.map((rep) => rep.id));
+        unseenAdminReplies.forEach((rep) => { rep.read_at = now; });
+      }
       return { ...r, replies: replies || [] };
     }));
     setSupportThreads(withReplies);
@@ -48,10 +55,23 @@ export default function MensagensSuportePage() {
   }
 
   async function deleteThread(requestId) {
-    if (!confirm('Apagar esta conversa? Esta ação não pode ser desfeita.')) return;
+    if (!confirm('Apagar esta conversa inteira? Esta ação não pode ser desfeita.')) return;
     await supabase.from('support_replies').delete().eq('support_request_id', requestId);
     await supabase.from('support_requests').delete().eq('id', requestId);
     setSupportThreads((cur) => cur.filter((r) => r.id !== requestId));
+  }
+
+  async function deleteInitialMessage(requestId) {
+    // Apagar a mensagem inicial apaga a conversa toda, já que tudo depende dela.
+    await deleteThread(requestId);
+  }
+
+  async function deleteReply(requestId, replyId) {
+    if (!confirm('Apagar esta mensagem? Esta ação não pode ser desfeita.')) return;
+    await supabase.from('support_replies').delete().eq('id', replyId);
+    setSupportThreads((cur) => cur.map((r) => (
+      r.id === requestId ? { ...r, replies: r.replies.filter((rep) => rep.id !== replyId) } : r
+    )));
   }
 
   function formatTime(dateStr) {
@@ -76,23 +96,18 @@ export default function MensagensSuportePage() {
               <div key={r.id} className="card" style={{ padding: 20 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <span style={{ fontSize: 15, fontWeight: 600 }}>
-                    Conversa com {r.agent_name}
+                    Conversa com {agentLabel(r.agent_name)}
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 12.5, color: r.read_by_admin ? 'var(--azulejo)' : 'var(--text-soft)', fontWeight: r.read_by_admin ? 600 : 400 }}>
-                      {r.read_by_admin ? '✓ Visto' : 'Ainda não visto'}
-                    </span>
-                    {!r.read_by_admin && (
-                      <button
-                        onClick={() => deleteThread(r.id)}
-                        aria-label="Apagar conversa"
-                        title="Apagar conversa (ainda não foi vista)"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a', fontSize: 15 }}
-                      >
-                        🗑
-                      </button>
-                    )}
-                  </div>
+                  {!r.read_by_admin && (
+                    <button
+                      onClick={() => deleteInitialMessage(r.id)}
+                      aria-label="Apagar conversa"
+                      title="Apagar conversa (ainda não foi vista)"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a', fontSize: 15 }}
+                    >
+                      🗑
+                    </button>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
@@ -102,21 +117,38 @@ export default function MensagensSuportePage() {
                     </div>
                     <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 3, textAlign: 'right', paddingRight: 2 }}>
                       {formatTime(r.created_at)}
+                      {' · '}
+                      {r.read_by_admin ? `Visto${r.read_by_admin_at ? ` às ${new Date(r.read_by_admin_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}` : ''}` : 'Ainda não visto'}
                     </div>
                   </div>
                   {r.replies.map((rep) => (
                     <div key={rep.id} style={{ alignSelf: rep.sender_role === 'admin' ? 'flex-start' : 'flex-end', maxWidth: '80%' }}>
-                      <div
-                        style={{
-                          padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
-                          background: rep.sender_role === 'admin' ? 'var(--plaster)' : 'var(--telha)',
-                          color: rep.sender_role === 'admin' ? 'var(--ink)' : '#fff',
-                        }}
-                      >
-                        {rep.message}
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, flexDirection: rep.sender_role === 'admin' ? 'row' : 'row-reverse' }}>
+                        <div
+                          style={{
+                            padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
+                            background: rep.sender_role === 'admin' ? 'var(--plaster)' : 'var(--telha)',
+                            color: rep.sender_role === 'admin' ? 'var(--ink)' : '#fff',
+                          }}
+                        >
+                          {rep.message}
+                        </div>
+                        {rep.sender_role === 'user' && !rep.read_at && (
+                          <button
+                            onClick={() => deleteReply(r.id, rep.id)}
+                            aria-label="Apagar mensagem"
+                            title="Apagar mensagem (ainda não foi vista)"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a', fontSize: 13, flexShrink: 0 }}
+                          >
+                            🗑
+                          </button>
+                        )}
                       </div>
                       <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 3, textAlign: rep.sender_role === 'admin' ? 'left' : 'right', paddingLeft: rep.sender_role === 'admin' ? 2 : 0, paddingRight: rep.sender_role === 'admin' ? 0 : 2 }}>
                         {formatTime(rep.created_at)}
+                        {rep.sender_role === 'user' && (
+                          <>{' · '}{rep.read_at ? `Visto às ${new Date(rep.read_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}` : 'Ainda não visto'}</>
+                        )}
                       </div>
                     </div>
                   ))}

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../../lib/supabaseClient';
 import Header from '../../../../components/Header';
+import { accountTypeLabel } from '../../../../lib/accountTypes';
 
 const STATUS_LABELS = {
   ativo: { label: 'Publicado', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
@@ -87,7 +88,7 @@ export default function AdminUserPage() {
           <div>
             <h1 className="display" style={{ fontSize: 24 }}>{profile.agency_name || profile.full_name}</h1>
             <div className="meta">
-              {profile.account_type === 'agencia' ? 'Agência' : 'Particular'}
+              {accountTypeLabel(profile.account_type)}
               {profile.agency_license && ` · ${profile.agency_license}`} · {properties.length} imóveis no total
             </div>
           </div>

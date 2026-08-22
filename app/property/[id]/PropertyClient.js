@@ -7,6 +7,7 @@ import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import Header from '../../../components/Header';
 import { displayAddress } from '../../../lib/displayAddress';
+import { accountTypeLabel } from '../../../lib/accountTypes';
 import MortgageSimulator from '../../../components/MortgageSimulator';
 import ImtCalculator from '../../../components/ImtCalculator';
 import RentVsBuyCalculator from '../../../components/RentVsBuyCalculator';
@@ -533,7 +534,7 @@ export default function PropertyClient() {
                   )}
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
-                  {ownerProfile.account_type === 'agencia' ? t('agency_type') : t('agency_individual_type')}
+                  {accountTypeLabel(ownerProfile.account_type)}
                 </div>
                 {ownerProfile.phone_public && (
                   <a

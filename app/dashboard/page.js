@@ -10,6 +10,7 @@ import BackButton from '../../components/BackButton';
 import { X, Gift } from 'lucide-react';
 import ViewsChart from '../../components/ViewsChart';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
+import { isProfessionalAccount } from '../../lib/accountTypes';
 
 const STATUS_LABELS = {
   ativo: { label: 'Publicado', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
@@ -31,8 +32,8 @@ function DashboardInner() {
   const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
   const [properties, setProperties] = useState([]);
-  const [listingFilters, setListingFilters] = useState({ address: '', price: '', parish: '', municipality: '' });
-  const [appliedListingFilters, setAppliedListingFilters] = useState({ address: '', price: '', parish: '', municipality: '' });
+  const [listingFilters, setListingFilters] = useState({ address: '', minPrice: '', maxPrice: '', parish: '', municipality: '' });
+  const [appliedListingFilters, setAppliedListingFilters] = useState({ address: '', minPrice: '', maxPrice: '', parish: '', municipality: '' });
   const [listingPages, setListingPages] = useState({});
   const LISTINGS_PER_PAGE = 15;
 
@@ -44,11 +45,10 @@ function DashboardInner() {
     setAppliedListingFilters(listingFilters);
   }
   function clearListingSearch() {
-    const empty = { address: '', price: '', parish: '', municipality: '' };
+    const empty = { address: '', minPrice: '', maxPrice: '', parish: '', municipality: '' };
     setListingFilters(empty);
     setAppliedListingFilters(empty);
   }
-  const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [featuredModal, setFeaturedModal] = useState(null);
   const [featuredPaymentMethod, setFeaturedPaymentMethod] = useState('transferencia');
@@ -69,7 +69,7 @@ function DashboardInner() {
       const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setProfile(profileData);
 
-      if (PAYMENT_INFO.subscriptionEnforced && profileData?.account_type === 'agencia' && !profileData?.is_admin) {
+      if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(profileData?.account_type) && !profileData?.is_admin) {
         const isActive = profileData.subscription_status === 'active'
           && profileData.subscription_paid_until
           && new Date(profileData.subscription_paid_until) >= new Date();
@@ -77,10 +77,6 @@ function DashboardInner() {
       }
 
       await loadProperties(user.id);
-
-      const { data: leadsData } = await supabase
-        .from('leads').select('*').eq('owner_id', user.id).order('created_at', { ascending: false }).limit(10);
-      setLeads(leadsData || []);
 
       setLoading(false);
     }
@@ -100,17 +96,6 @@ function DashboardInner() {
     setActiveCount(activeOnly);
   }
 
-  async function markLeadReplied(leadId) {
-    await supabase.from('leads').update({ status: 'respondido' }).eq('id', leadId);
-    setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, status: 'respondido' } : l)));
-  }
-
-  async function deleteLead(leadId) {
-    if (!confirm('Apagar esta mensagem? Esta ação não pode ser desfeita.')) return;
-    await supabase.from('leads').delete().eq('id', leadId);
-    setLeads((cur) => cur.filter((l) => l.id !== leadId));
-  }
-
   async function deleteProperty(id) {
     if (!confirm('Tem a certeza que quer apagar este anúncio? Pode voltar a publicá-lo mais tarde, se mudar de ideias.')) return;
     await supabase.from('properties').update({ status: 'eliminado' }).eq('id', id);
@@ -119,7 +104,7 @@ function DashboardInner() {
   }
 
   async function republishProperty(id) {
-    const limit = profile?.account_type === 'agencia' ? 50 : 3;
+    const limit = isProfessionalAccount(profile?.account_type) ? 50 : 3;
     if (!profile?.is_admin && activeCount >= limit) {
       alert(`Já tem ${limit} anúncios ativos, que é o limite da sua conta. Apague ou desative outro anúncio primeiro.`);
       return;
@@ -222,8 +207,8 @@ function DashboardInner() {
         {profile?.is_admin ? (
           <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{activeCount} anúncios · sem limite</span>
         ) : (
-          <span style={{ fontSize: 12.5, color: activeCount >= (profile?.account_type === 'agencia' ? 50 : 3) ? '#8a3b2a' : 'var(--text-soft)' }}>
-            {activeCount}/{profile?.account_type === 'agencia' ? 50 : 3} anúncios
+          <span style={{ fontSize: 12.5, color: activeCount >= (isProfessionalAccount(profile?.account_type) ? 50 : 3) ? '#8a3b2a' : 'var(--text-soft)' }}>
+            {activeCount}/{isProfessionalAccount(profile?.account_type) ? 50 : 3} anúncios
           </span>
         )}
       </div>
@@ -237,7 +222,11 @@ function DashboardInner() {
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
               <label style={{ fontSize: 12 }}>Preço</label>
-              <input type="text" value={listingFilters.price} onChange={(e) => updateListingFilter('price', e.target.value)} placeholder="Ex: 250000" />
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input type="number" value={listingFilters.minPrice} onChange={(e) => updateListingFilter('minPrice', e.target.value)} placeholder="Desde" />
+                <span style={{ color: 'var(--text-soft)', fontSize: 12 }}>—</span>
+                <input type="number" value={listingFilters.maxPrice} onChange={(e) => updateListingFilter('maxPrice', e.target.value)} placeholder="Até" />
+              </div>
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
               <label style={{ fontSize: 12 }}>Freguesia</label>
@@ -265,9 +254,10 @@ function DashboardInner() {
             { key: 'outros', title: 'Recusados ou anulados', match: (p) => ['rejeitado', 'anulado_suporte'].includes(p.status) },
           ].map(({ key, title, match }) => {
             const matchesSearch = (p) => {
-              const { address, price, parish, municipality } = appliedListingFilters;
+              const { address, minPrice, maxPrice, parish, municipality } = appliedListingFilters;
               if (address && !(p.address || '').toLowerCase().includes(address.trim().toLowerCase())) return false;
-              if (price && !String(p.price || '').includes(price.trim())) return false;
+              if (minPrice && Number(p.price || 0) < Number(minPrice)) return false;
+              if (maxPrice && Number(p.price || 0) > Number(maxPrice)) return false;
               if (parish && !(p.parish || '').toLowerCase().includes(parish.trim().toLowerCase())) return false;
               if (municipality && !(p.municipality || '').toLowerCase().includes(municipality.trim().toLowerCase())) return false;
               return true;
@@ -385,45 +375,15 @@ function DashboardInner() {
         </div>
       )}
       {properties.length > 0 && Object.values(appliedListingFilters).some(Boolean) && properties.filter((p) => {
-        const { address, price, parish, municipality } = appliedListingFilters;
+        const { address, minPrice, maxPrice, parish, municipality } = appliedListingFilters;
         if (address && !(p.address || '').toLowerCase().includes(address.trim().toLowerCase())) return false;
-        if (price && !String(p.price || '').includes(price.trim())) return false;
+        if (minPrice && Number(p.price || 0) < Number(minPrice)) return false;
+        if (maxPrice && Number(p.price || 0) > Number(maxPrice)) return false;
         if (parish && !(p.parish || '').toLowerCase().includes(parish.trim().toLowerCase())) return false;
         if (municipality && !(p.municipality || '').toLowerCase().includes(municipality.trim().toLowerCase())) return false;
         return true;
       }).length === 0 && (
         <p className="empty-state">Nenhum anúncio corresponde à pesquisa.</p>
-      )}
-
-      <h2 className="display" style={{ fontSize: 18, marginBottom: 14 }}>{t('dashboard_recent_leads')}</h2>
-      {leads.length === 0 ? (
-        <p className="empty-state">{t('dashboard_none_leads')}</p>
-      ) : (
-        <div className="card" style={{ marginBottom: 40 }}>
-          {leads.map((l) => (
-            <div key={l.id} style={{ padding: '14px 18px', borderBottom: '1px solid var(--line)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <b>{l.name}</b>
-                <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 12,
-                               background: l.status === 'novo' ? 'rgba(126,143,106,0.18)' : 'var(--line)',
-                               color: l.status === 'novo' ? 'var(--telha)' : 'var(--text-soft)' }}>
-                  {l.status === 'novo' ? t('dashboard_new_status') : t('dashboard_done_status')}
-                </span>
-              </div>
-              <p style={{ fontSize: 13, color: 'var(--text-soft)', margin: '4px 0' }}>{l.message}</p>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {l.status === 'novo' && (
-                  <button onClick={() => markLeadReplied(l.id)} className="btn" style={{ fontSize: 12, padding: '6px 12px' }}>
-                    {t('dashboard_mark_replied')}
-                  </button>
-                )}
-                <button onClick={() => deleteLead(l.id)} className="btn" style={{ fontSize: 12, padding: '6px 12px' }}>
-                  Apagar
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
       )}
 
     </main>

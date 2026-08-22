@@ -6,6 +6,8 @@ import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
+import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes';
+import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send } from 'lucide-react';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
@@ -323,9 +325,16 @@ function AdminInner() {
     if (section !== 'suporte' || supportMessages.length === 0) return;
     const unreadIds = supportMessages.filter((m) => !m.read_by_admin).map((m) => m.id);
     if (unreadIds.length === 0) return;
-    supabase.from('support_requests').update({ read_by_admin: true }).in('id', unreadIds).then(() => {
-      setSupportMessages((cur) => cur.map((m) => (unreadIds.includes(m.id) ? { ...m, read_by_admin: true } : m)));
+    const now = new Date().toISOString();
+    supabase.from('support_requests').update({ read_by_admin: true, read_by_admin_at: now }).in('id', unreadIds).then(() => {
+      setSupportMessages((cur) => cur.map((m) => (unreadIds.includes(m.id) ? { ...m, read_by_admin: true, read_by_admin_at: now } : m)));
     });
+    // Marca também as respostas do próprio utilizador (não do admin) como lidas, com a hora exata.
+    supabase.from('support_replies').select('id').in('support_request_id', unreadIds).eq('sender_role', 'user').is('read_at', null)
+      .then(({ data }) => {
+        const replyIds = (data || []).map((r) => r.id);
+        if (replyIds.length > 0) supabase.from('support_replies').update({ read_at: now }).in('id', replyIds);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section]);
 
@@ -772,7 +781,7 @@ function AdminInner() {
                   </span>
                 </div>
                 <div className="meta" style={{ marginBottom: 10 }}>
-                  Falou com a "agente" {m.agent_name} · Contacto: {m.contact || 'não fornecido'}
+                  Falou com {agentLabel(m.agent_name)} · Contacto: {m.contact || 'não fornecido'}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
@@ -848,6 +857,8 @@ function AdminInner() {
               ['todos', 'Todos'],
               ['particular', `Particulares (${allUsers.filter((u) => u.account_type === 'particular').length})`],
               ['agencia', `Agências (${allUsers.filter((u) => u.account_type === 'agencia').length})`],
+              ['consultor', `Consultores (${allUsers.filter((u) => u.account_type === 'consultor').length})`],
+              ['promotor', `Promotores (${allUsers.filter((u) => u.account_type === 'promotor').length})`],
             ].map(([value, label]) => (
               <button
                 key={value}
@@ -907,6 +918,8 @@ function AdminInner() {
                       >
                         <option value="particular">Particular</option>
                         <option value="agencia">Agência</option>
+                        <option value="consultor">Consultor imobiliário</option>
+                        <option value="promotor">Promotor imobiliário</option>
                       </select>
                       {u.account_type === 'particular' && u.agency_name && (
                         <span title="Tem nome de agência preenchido mas está marcado como particular" style={{ color: '#8a6a1f', fontWeight: 700, fontSize: 11 }}>
@@ -915,7 +928,7 @@ function AdminInner() {
                       )}
                       {u.is_admin && ' · Administrador'}
                       {u.is_blocked && <span style={{ color: '#8a3b2a', fontWeight: 700 }}> · Bloqueado</span>}
-                      {u.account_type === 'agencia' && (
+                      {isProfessionalAccount(u.account_type) && (
                         <>
                           {' · '}
                           <span style={{
@@ -933,12 +946,12 @@ function AdminInner() {
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
-                  {u.account_type === 'agencia' && u.subscription_proof_url && u.subscription_status === 'pending' && (
+                  {isProfessionalAccount(u.account_type) && u.subscription_proof_url && u.subscription_status === 'pending' && (
                     <a href={u.subscription_proof_url} target="_blank" rel="noopener noreferrer" className="btn" style={{ fontSize: 13 }}>
                       📄 Ver comprovativo
                     </a>
                   )}
-                  {u.account_type === 'agencia' && u.subscription_status !== 'active' && (
+                  {isProfessionalAccount(u.account_type) && u.subscription_status !== 'active' && (
                     <button onClick={() => activateSubscription(u.id)} className="btn btn-primary" style={{ fontSize: 13 }}>
                       Confirmar pagamento (1 mês)
                     </button>

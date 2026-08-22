@@ -8,6 +8,7 @@ import { useLanguage } from '../../lib/i18n';
 import { isPasswordValid, PASSWORD_RULES_TEXT } from '../../lib/passwordRules';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
+import { isProfessionalAccount } from '../../lib/accountTypes';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -118,7 +119,7 @@ export default function LoginPage() {
         return;
       }
 
-      if (PAYMENT_INFO.subscriptionEnforced && profile?.account_type === 'agencia' && !profile?.is_admin) {
+      if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(profile?.account_type) && !profile?.is_admin) {
         const isActive = profile.subscription_status === 'active'
           && profile.subscription_paid_until
           && new Date(profile.subscription_paid_until) >= new Date();
@@ -209,7 +210,7 @@ export default function LoginPage() {
   async function handleSignup(e) {
     e.preventDefault();
     setError('');
-    if ((accountType === 'agencia' || accountType === 'consultor') && !amiLicense.trim()) {
+    if (isProfessionalAccount(accountType) && accountType !== 'promotor' && !amiLicense.trim()) {
       setError('Indique o número de licença AMI.');
       return;
     }
@@ -267,7 +268,7 @@ export default function LoginPage() {
 
       // Agências novas ficam com o primeiro mês grátis, sem precisar de pagar já.
       let freeMonthFields = {};
-      if (PAYMENT_INFO.subscriptionEnforced && accountType === 'agencia') {
+      if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType)) {
         const freeUntil = new Date();
         freeUntil.setMonth(freeUntil.getMonth() + 1);
         freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
@@ -279,7 +280,7 @@ export default function LoginPage() {
         email: data.user.email,
         phone_real: phone || null,
         show_phone_public: showPhonePublic,
-        ...((accountType === 'agencia' || accountType === 'consultor') && { agency_license: amiLicense.trim() }),
+        ...(isProfessionalAccount(accountType) && accountType !== 'promotor' && { agency_license: amiLicense.trim() }),
         ...freeMonthFields,
         ...(avatar_url && { avatar_url }),
       }, { onConflict: 'id' });
@@ -293,7 +294,7 @@ export default function LoginPage() {
       return;
     }
 
-    const isNewFreeAgency = PAYMENT_INFO.subscriptionEnforced && accountType === 'agencia';
+    const isNewFreeAgency = PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType);
     router.push(isNewFreeAgency ? '/dashboard?welcome=agencia' : '/dashboard');
   }
 
@@ -338,7 +339,7 @@ export default function LoginPage() {
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 20 }}>
               Enviámos um link de confirmação para <b>{email}</b>. Clique nesse link para ativar a sua conta e poder entrar.
             </p>
-            {PAYMENT_INFO.subscriptionEnforced && accountType === 'agencia' && (
+            {PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType) && (
               <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, marginBottom: 20, textAlign: 'left' }}>
                 <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>🎁 O seu primeiro mês é grátis</p>
                 <p style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
@@ -418,7 +419,7 @@ export default function LoginPage() {
               </select>
             </div>
 
-            {(accountType === 'agencia' || accountType === 'consultor') && (
+            {isProfessionalAccount(accountType) && accountType !== 'promotor' && (
               <div className="field">
                 <label htmlFor="ami-input">Licença AMI</label>
                 <input

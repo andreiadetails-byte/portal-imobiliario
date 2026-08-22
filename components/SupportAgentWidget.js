@@ -2,18 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-
-const NOMES_F = ['Beatriz', 'Inês', 'Mariana', 'Catarina', 'Carolina', 'Sofia', 'Joana', 'Rita', 'Leonor', 'Matilde'];
-const NOMES_M = ['Tiago', 'Rui', 'André', 'Miguel', 'Diogo', 'Bruno', 'Pedro', 'Ricardo', 'Nuno', 'Gonçalo'];
-const APELIDOS = ['Ferreira', 'Costa', 'Santos', 'Silva', 'Pereira', 'Oliveira', 'Rodrigues', 'Martins'];
-
-function randomAgentName() {
-  const isFemale = Math.random() < 0.5;
-  const nomes = isFemale ? NOMES_F : NOMES_M;
-  const nome = nomes[Math.floor(Math.random() * nomes.length)];
-  const apelido = APELIDOS[Math.floor(Math.random() * APELIDOS.length)];
-  return { fullName: `${nome} ${apelido}`, isFemale };
-}
+import { randomAgentName } from '../lib/agentNames';
 
 // Avatar ilustrado simples (não é uma foto real de ninguém)
 function AgentAvatar({ size = 46 }) {

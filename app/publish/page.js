@@ -9,6 +9,7 @@ import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { geocodeAddress } from '../../lib/geocode';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
+import { isProfessionalAccount } from '../../lib/accountTypes';
 import { distritos, concelhosPorDistrito, freguesiasPorConcelho } from '../../lib/locations';
 import { containsOffensiveLanguage, containsLink } from '../../lib/contentModeration';
 
@@ -94,7 +95,7 @@ function PublishForm() {
 
       const { data: myProfile } = await supabase.from('profiles').select('account_type, subscription_status, subscription_paid_until, is_admin').eq('id', data.user.id).single();
       setIsAdmin(!!myProfile?.is_admin);
-      if (PAYMENT_INFO.subscriptionEnforced && myProfile?.account_type === 'agencia' && !myProfile?.is_admin) {
+      if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(myProfile?.account_type) && !myProfile?.is_admin) {
         const isActive = myProfile.subscription_status === 'active'
           && myProfile.subscription_paid_until
           && new Date(myProfile.subscription_paid_until) >= new Date();
@@ -102,7 +103,7 @@ function PublishForm() {
       }
 
       if (!editId && !myProfile?.is_admin) {
-        const accountTypeLimit = myProfile?.account_type === 'agencia' ? 50 : 3;
+        const accountTypeLimit = isProfessionalAccount(myProfile?.account_type) ? 50 : 3;
         setAccountLimit(accountTypeLimit);
         const { count } = await supabase
           .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', data.user.id).neq('status', 'eliminado');
@@ -694,8 +695,11 @@ function PublishForm() {
               value={form.property_type}
               onChange={(e) => {
                 updateField('property_type', e.target.value);
-                if (e.target.value === 'Quarto') updateField('business_type', 'Arrendamento');
-                if (!['Apartamento', 'Moradia', 'Quarto'].includes(e.target.value)) {
+                if (e.target.value === 'Quarto') {
+                  updateField('business_type', 'Arrendamento');
+                  updateField('typology', null);
+                  updateField('bedrooms', 1); // um quarto é sempre "1", não precisa de escolher
+                } else if (!['Apartamento', 'Moradia'].includes(e.target.value)) {
                   updateField('typology', null);
                   updateField('bedrooms', 0);
                 }
@@ -704,7 +708,7 @@ function PublishForm() {
               {TIPOS_IMOVEL.map((t) => <option key={t}>{t}</option>)}
             </select>
           </div>
-          {['Apartamento', 'Moradia', 'Quarto'].includes(form.property_type) && (
+          {['Apartamento', 'Moradia'].includes(form.property_type) && (
             <div className="field">
               <label>Tipologia</label>
               <select
@@ -722,7 +726,7 @@ function PublishForm() {
           )}
         </div>
 
-        {['Apartamento', 'Moradia', 'Quarto'].includes(form.property_type) && (
+        {['Apartamento', 'Moradia'].includes(form.property_type) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
             <label>Quartos</label>
@@ -730,6 +734,14 @@ function PublishForm() {
           </div>
           <div className="field">
             <label>Casas de banho (WC)</label>
+            <input type="number" min={0} required value={form.bathrooms} onChange={(e) => updateField('bathrooms', e.target.value)} />
+          </div>
+        </div>
+        )}
+        {form.property_type === 'Quarto' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="field">
+            <label>Casas de banho (WC) <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(partilhadas ou privativas)</span></label>
             <input type="number" min={0} required value={form.bathrooms} onChange={(e) => updateField('bathrooms', e.target.value)} />
           </div>
         </div>
@@ -801,7 +813,7 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>Certificado energético</label>
+          <label>Certificado energético <span style={{ color: '#b8452f', fontWeight: 700 }}>(obrigatório)</span></label>
           <select required value={form.energy_certificate} onChange={(e) => updateField('energy_certificate', e.target.value)}>
             <option value="">Escolha uma opção</option>
             {['A+', 'A', 'B', 'B-', 'C', 'D', 'E', 'F', 'Isento'].map((c) => <option key={c}>{c}</option>)}

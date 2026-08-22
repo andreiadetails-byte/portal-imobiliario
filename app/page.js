@@ -44,13 +44,6 @@ export default function HomePage() {
   const [news, setNews] = useState([]);
   const [user, setUser] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState([]);
-  const [totalActiveCount, setTotalActiveCount] = useState(null);
-
-  useEffect(() => {
-    supabase.from('properties').select('id', { count: 'exact', head: true }).eq('status', 'ativo').then(({ count }) => {
-      if (count != null) setTotalActiveCount(count);
-    });
-  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -183,22 +176,6 @@ export default function HomePage() {
             >
               🗺️ Prefere desenhar a sua zona no mapa?
             </Link>
-          </div>
-
-          <div style={{
-            display: 'flex', justifyContent: 'center', gap: 28, flexWrap: 'wrap', marginTop: 28,
-            paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.18)',
-          }}>
-            {[
-              totalActiveCount != null && [`${totalActiveCount}+`, 'imóveis ativos'],
-              ['7', 'idiomas com tradução automática'],
-              ['0€', 'para publicar como particular'],
-            ].filter(Boolean).map(([value, label]) => (
-              <div key={label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-display, serif)', fontSize: 22, fontWeight: 600, color: '#fff' }}>{value}</div>
-                <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

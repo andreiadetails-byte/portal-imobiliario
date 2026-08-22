@@ -22,9 +22,8 @@ async function isCallerAdmin(request) {
 
 function describeChange(field, value) {
   if (field === 'account_type') {
-    return value === 'agencia'
-      ? 'A sua conta foi alterada para o tipo <b>Agência</b>.'
-      : 'A sua conta foi alterada para o tipo <b>Particular</b>.';
+    const labels = { agencia: 'Agência', consultor: 'Consultor imobiliário', promotor: 'Promotor imobiliário', particular: 'Particular' };
+    return `A sua conta foi alterada para o tipo <b>${labels[value] || 'Particular'}</b>.`;
   }
   if (field === 'is_blocked') {
     return value ? 'A sua conta foi <b>bloqueada</b>.' : 'A sua conta foi <b>desbloqueada</b> e voltou ao normal.';
