@@ -186,23 +186,25 @@ export default function Header({ minimal = false }) {
             </div>
           )}
 
-          <div className="navbar-nav-links" style={{ display: 'flex', alignItems: 'center' }}>
-          <Link href="/chat" className="btn" style={{ marginRight: 12, position: 'relative', minWidth: 110, textAlign: 'center' }}>
-            {t('nav_chat')}
-            {unreadChat > 0 && (
-              <span style={{
-                position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
-                background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
-              }}>
-                {unreadChat > 9 ? '9+' : unreadChat}
-              </span>
-            )}
-          </Link>
-          <Link href="/favorites" className="btn" style={{ marginRight: 12, minWidth: 110, textAlign: 'center' }}>{t('nav_favorites')}</Link>
+          <div className="navbar-nav-links" style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
           {checked && user && (
             <>
-              <Link href="/mensagens-suporte" className="btn" style={{ marginRight: 12, position: 'relative', minWidth: 130, textAlign: 'center' }}>
+              <Link href="/perfil" className="btn" style={{ marginRight: 6, minWidth: 0, padding: '9px 12px', textAlign: 'center' }}>{t('nav_account')}</Link>
+              <Link href="/favorites" className="btn" style={{ marginRight: 6, minWidth: 0, padding: '9px 12px', textAlign: 'center' }}>{t('nav_favorites')}</Link>
+              <Link href="/dashboard" className="btn" style={{ marginRight: 6, minWidth: 0, padding: '9px 12px', textAlign: 'center' }}>{t('dashboard_my_listings')}</Link>
+              <Link href="/chat" className="btn" style={{ marginRight: 6, position: 'relative', minWidth: 0, padding: '9px 12px', textAlign: 'center' }}>
+                {t('nav_chat')}
+                {unreadChat > 0 && (
+                  <span style={{
+                    position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
+                    background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                  }}>
+                    {unreadChat > 9 ? '9+' : unreadChat}
+                  </span>
+                )}
+              </Link>
+              <Link href="/mensagens-suporte" className="btn" style={{ marginRight: 6, position: 'relative', minWidth: 0, padding: '9px 10px', textAlign: 'center' }}>
                 Mensagens Suporte
                 {unreadSupport > 0 && (
                   <span style={{
@@ -214,10 +216,8 @@ export default function Header({ minimal = false }) {
                   </span>
                 )}
               </Link>
-              <Link href="/dashboard" className="btn" style={{ marginRight: 12, minWidth: 110, textAlign: 'center' }}>{t('dashboard_my_listings')}</Link>
-              <Link href="/perfil" className="btn" style={{ marginRight: 12, minWidth: 110, textAlign: 'center' }}>{t('nav_account')}</Link>
               {isAdmin && (
-                <Link href="/admin" className="btn" style={{ marginRight: 12, color: 'var(--telha)', position: 'relative' }}>
+                <Link href="/admin" className="btn" style={{ marginRight: 6, color: 'var(--telha)', position: 'relative', padding: '9px 12px' }}>
                   ⚙ Admin
                   {adminPending > 0 && (
                     <span style={{
@@ -238,35 +238,42 @@ export default function Header({ minimal = false }) {
           ) : (
             <Link href="/login" className="btn navbar-login-btn" style={{ marginRight: 12, flexShrink: 0 }}>{t('nav_login')}</Link>
           )}
-          <Link href="/publish" className="btn btn-primary navbar-publish-btn" style={{ minWidth: 130, textAlign: 'center' }}>{t('nav_publish')}</Link>
+          {checked && user && (
+            <Link href="/publish" className="btn btn-primary navbar-publish-btn" style={{ minWidth: 130, textAlign: 'center' }}>{t('nav_publish')}</Link>
+          )}
         </div>
 
         {/* Duas linhas fixas, só em telemóvel: (Entrar/Sair + Publicar) e (Favoritos + Mensagens) */}
-        <div className="navbar-mobile-rows">
-          <div className="navbar-mobile-row">
-            {checked && user ? (
+        {checked && user && (
+          <div className="navbar-mobile-rows">
+            <div className="navbar-mobile-row">
               <button onClick={handleLogout} className="btn">{t('nav_logout')}</button>
-            ) : (
+              <Link href="/publish" className="btn btn-primary">{t('nav_publish')}</Link>
+            </div>
+            <div className="navbar-mobile-row">
+              <Link href="/favorites" className="btn">{t('nav_favorites')}</Link>
+              <Link href="/chat" className="btn" style={{ position: 'relative' }}>
+                {t('nav_chat')}
+                {unreadChat > 0 && (
+                  <span style={{
+                    position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
+                    background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                  }}>
+                    {unreadChat > 9 ? '9+' : unreadChat}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </div>
+        )}
+        {checked && !user && (
+          <div className="navbar-mobile-rows">
+            <div className="navbar-mobile-row">
               <Link href="/login" className="btn">{t('nav_login')}</Link>
-            )}
-            <Link href="/publish" className="btn btn-primary">{t('nav_publish')}</Link>
+            </div>
           </div>
-          <div className="navbar-mobile-row">
-            <Link href="/favorites" className="btn">{t('nav_favorites')}</Link>
-            <Link href="/chat" className="btn" style={{ position: 'relative' }}>
-              {t('nav_chat')}
-              {unreadChat > 0 && (
-                <span style={{
-                  position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
-                  background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
-                }}>
-                  {unreadChat > 9 ? '9+' : unreadChat}
-                </span>
-              )}
-            </Link>
-          </div>
-        </div>
+        )}
       </div>
       <div className="tile-strip" />
 

@@ -41,6 +41,7 @@ a{ color:inherit; text-decoration:none; }
 
 header.site-header{ background:var(--paper); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10; }
 .navbar{ display:flex; align-items:center; justify-content:space-between; padding:20px 32px; max-width:1180px; margin:0 auto; }
+.navbar-nav-links a, .navbar-nav-links .btn{ font-size: 13px !important; white-space: nowrap; }
 .logo{ font-family:'Fraunces',serif; font-weight:600; font-size:31px; }
 .logo span{ color:var(--telha); }
 
