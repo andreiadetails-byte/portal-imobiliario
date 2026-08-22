@@ -196,7 +196,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .navbar-mobile-row{ display: flex; gap: 8px; }
   .navbar-mobile-row .btn{ flex: 1; text-align: center; justify-content: center; }
   .support-widget{ bottom: 76px !important; right: 12px !important; }
-  .support-widget > div{ max-width: calc(100vw - 24px) !important; }
+  .support-widget-panel{ max-width: calc(100vw - 90px) !important; }
   .support-widget-text{ display: none !important; }
   .support-widget-btn{ padding: 8px !important; border-radius: 50% !important; }
 

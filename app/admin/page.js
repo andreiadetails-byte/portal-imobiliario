@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
-import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings } from 'lucide-react';
+import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send } from 'lucide-react';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -98,6 +98,15 @@ function AdminInner() {
   const [rateSaved, setRateSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
+  const [campaignSubject, setCampaignSubject] = useState('Novidades no More·ada — queremos saber a sua opinião!');
+  const [campaignMessage, setCampaignMessage] = useState(
+    `<h2 style="font-size:19px; color:#332E22; margin: 0 0 6px;">Obrigada por fazer parte do More·ada 🏡</h2>
+<p style="margin:0 0 12px;">Temos vindo a melhorar o portal com novidades como tradução automática de anúncios, calculadoras de crédito e investimento, e um processo de publicação mais simples.</p>
+<p style="margin:0 0 12px;">A sua opinião é muito importante para continuarmos a melhorar. Tem 1 minuto para nos dizer como tem sido a sua experiência?</p>`
+  );
+  const [campaignAudience, setCampaignAudience] = useState('todos');
+  const [sendingCampaign, setSendingCampaign] = useState(false);
+  const [campaignResult, setCampaignResult] = useState(null);
   const [userSearch, setUserSearch] = useState('');
   const [supportReplyText, setSupportReplyText] = useState({});
   const [ads, setAds] = useState([]);
@@ -209,6 +218,33 @@ function AdminInner() {
       .select('*, properties(id, typology, address, district, owner_id, profiles(id, full_name, agency_name))')
       .order('created_at', { ascending: false });
     setAllLeads(data || []);
+  }
+
+  async function sendCampaign() {
+    const audienceLabel = campaignAudience === 'todos' ? 'TODOS os utilizadores' : campaignAudience === 'agencias' ? 'todas as agências' : 'todos os particulares';
+    if (!confirm(`Vai enviar este email a ${audienceLabel}. Tem a certeza?`)) return;
+
+    setSendingCampaign(true);
+    setCampaignResult(null);
+    const { data: { user } } = await supabase.auth.getUser();
+
+    try {
+      const res = await fetch('/api/send-campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          adminUserId: user.id,
+          subject: campaignSubject,
+          message: campaignMessage,
+          audience: campaignAudience,
+        }),
+      });
+      const data = await res.json();
+      setCampaignResult(data);
+    } catch (err) {
+      setCampaignResult({ error: 'Não foi possível enviar a campanha.' });
+    }
+    setSendingCampaign(false);
   }
 
   async function activateSubscription(userId) {
@@ -333,6 +369,21 @@ function AdminInner() {
     await supabase.from('support_replies').delete().eq('support_request_id', id);
     await supabase.from('support_requests').delete().eq('id', id);
     setSupportMessages((cur) => cur.filter((m) => m.id !== id));
+  }
+
+  async function requestTestimonialConsent(id) {
+    if (!confirm('Enviar um email a pedir autorização para publicar esta mensagem como testemunho no site?')) return;
+    const res = await fetch('/api/request-testimonial-consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ supportRequestId: id }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Não foi possível enviar o pedido.');
+      return;
+    }
+    setSupportMessages((cur) => cur.map((m) => (m.id === id ? { ...m, testimonial_consent: 'pedido' } : m)));
   }
 
   async function loadReports() {
@@ -479,7 +530,7 @@ function AdminInner() {
           ['anuncios', ClipboardList, 'Anúncios', 0],
           ['denuncias', Flag, 'Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
           ['suporte', MessageCircle, 'Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
-          ['utilizadores', Users, 'Utilizadores', 0], ['leads', Mail, 'Leads', allLeads.filter((l) => l.status === 'novo').length], ['atividade', Footprints, 'Atividade', 0], ['destaques', Star, 'Destaques', 0], ['agencias', Building2, 'Agências', 0],
+          ['utilizadores', Users, 'Utilizadores', 0], ['leads', Mail, 'Leads', allLeads.filter((l) => l.status === 'novo').length], ['atividade', Footprints, 'Atividade', 0], ['campanha', Send, 'Campanha', 0], ['destaques', Star, 'Destaques', 0], ['agencias', Building2, 'Agências', 0],
           ['noticias', Newspaper, 'Notícias', 0], ['publicidade', Megaphone, 'Publicidade', 0], ['definicoes', Settings, 'Definições', 0],
         ].map(([value, Icon, label, count]) => (
           <button
@@ -683,6 +734,20 @@ function AdminInner() {
                   >
                     Enviar
                   </button>
+                  {m.user_id && !m.testimonial_consent && (
+                    <button onClick={() => requestTestimonialConsent(m.id)} className="btn" style={{ fontSize: 12.5 }}>
+                      💬 Pedir testemunho
+                    </button>
+                  )}
+                  {m.testimonial_consent === 'pedido' && (
+                    <span style={{ fontSize: 11.5, color: 'var(--text-soft)', alignSelf: 'center' }}>Pedido enviado, a aguardar resposta</span>
+                  )}
+                  {m.testimonial_consent === 'sim' && (
+                    <span style={{ fontSize: 11.5, color: 'var(--telha)', fontWeight: 600, alignSelf: 'center' }}>✓ Autorizado — pode publicar</span>
+                  )}
+                  {m.testimonial_consent === 'nao' && (
+                    <span style={{ fontSize: 11.5, color: '#8a3b2a', alignSelf: 'center' }}>Não autorizado</span>
+                  )}
                   {m.status !== 'resolvida' && (
                     <button onClick={() => resolveSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5 }}>
                       Marcar resolvida
@@ -851,6 +916,59 @@ function AdminInner() {
               </div>
             ))}
           </div>
+        </>
+      )}
+
+      {section === 'campanha' && (
+        <>
+          <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
+            Envia um email a vários utilizadores de uma vez — por exemplo, para falar de novidades do portal e pedir feedback.
+            O email inclui automaticamente uma saudação personalizada e um botão para deixar a opinião.
+          </p>
+
+          <div className="field">
+            <label>Assunto</label>
+            <input value={campaignSubject} onChange={(e) => setCampaignSubject(e.target.value)} />
+          </div>
+
+          <div className="field">
+            <label>Mensagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(aceita HTML simples: &lt;h2&gt;, &lt;p&gt;, &lt;b&gt;)</span></label>
+            <textarea
+              value={campaignMessage}
+              onChange={(e) => setCampaignMessage(e.target.value)}
+              rows={10}
+              style={{ fontFamily: 'monospace', fontSize: 12.5 }}
+            />
+          </div>
+
+          <div className="field">
+            <label>Enviar para</label>
+            <select value={campaignAudience} onChange={(e) => setCampaignAudience(e.target.value)}>
+              <option value="todos">Todos os utilizadores</option>
+              <option value="agencias">Só agências</option>
+              <option value="particulares">Só particulares</option>
+            </select>
+          </div>
+
+          <button onClick={sendCampaign} className="btn btn-primary" disabled={sendingCampaign}>
+            {sendingCampaign ? 'A enviar...' : 'Enviar campanha'}
+          </button>
+
+          {sendingCampaign && (
+            <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginTop: 10 }}>
+              Isto pode demorar um pouco, consoante o número de utilizadores — não feche esta página.
+            </p>
+          )}
+
+          {campaignResult && !campaignResult.error && (
+            <div style={{ marginTop: 14, background: 'rgba(126,143,106,0.14)', borderRadius: 8, padding: 14, fontSize: 13 }}>
+              ✓ Enviado a {campaignResult.sentCount} de {campaignResult.total} utilizadores.
+              {campaignResult.failedCount > 0 && ` (${campaignResult.failedCount} falharam, provavelmente sem email disponível.)`}
+            </div>
+          )}
+          {campaignResult?.error && (
+            <p className="error-text" style={{ marginTop: 14 }}>{campaignResult.error}</p>
+          )}
         </>
       )}
 

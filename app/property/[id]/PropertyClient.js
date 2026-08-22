@@ -13,6 +13,7 @@ import RentVsBuyCalculator from '../../../components/RentVsBuyCalculator';
 import dynamic from 'next/dynamic';
 
 const PropertyLocationMap = dynamic(() => import('../../../components/PropertyLocationMap'), { ssr: false });
+import NeighborhoodScore from '../../../components/NeighborhoodScore';
 
 export default function PropertyClient() {
   const { id } = useParams();
@@ -33,7 +34,6 @@ export default function PropertyClient() {
   const [activePhoto, setActivePhoto] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [similar, setSimilar] = useState([]);
-  const [zoneAvgPrice, setZoneAvgPrice] = useState(null);
   const [reportModal, setReportModal] = useState(false);
   const [reportSent, setReportSent] = useState(false);
   const [reportForm, setReportForm] = useState({ reason: 'Anúncio enganador ou falso', details: '', name: '', contact: '' });
@@ -87,28 +87,6 @@ export default function PropertyClient() {
         }
 
         setSimilar(foundSimilar);
-
-        // Preço médio por m² nesta zona, para comparação — só imóveis do mesmo
-        // tipo de negócio (venda/arrendamento) e com área preenchida.
-        const { data: zoneData } = await supabase
-          .from('properties')
-          .select('price, area, area_util')
-          .eq('status', 'ativo')
-          .eq('district', data.district)
-          .eq('business_type', data.business_type)
-          .neq('id', data.id);
-
-        const pricesPerM2 = (zoneData || [])
-          .map((p) => {
-            const area = p.area || p.area_util;
-            return area > 0 ? Number(p.price) / Number(area) : null;
-          })
-          .filter((v) => v != null && v > 0 && Number.isFinite(v));
-
-        if (pricesPerM2.length >= 3) {
-          const avg = pricesPerM2.reduce((sum, v) => sum + v, 0) / pricesPerM2.length;
-          setZoneAvgPrice({ avg, count: pricesPerM2.length });
-        }
       }
 
       const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -300,7 +278,7 @@ export default function PropertyClient() {
                 {Number(property.price).toLocaleString('pt-PT')} {property.business_type === 'Arrendamento' ? '€/mês' : '€'}
               </div>
               {property.previous_price && property.previous_price > property.price && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2, flexWrap: 'wrap' }}>
                   <span style={{
                     fontSize: 11.5, fontWeight: 700, padding: '3px 9px', borderRadius: 10,
                     background: 'rgba(126,143,106,0.18)', color: 'var(--telha)',
@@ -310,6 +288,11 @@ export default function PropertyClient() {
                   <span style={{ fontSize: 13, color: 'var(--text-soft)', textDecoration: 'line-through' }}>
                     {Number(property.previous_price).toLocaleString('pt-PT')} €
                   </span>
+                  {property.price_reduction_count > 1 && (
+                    <span style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
+                      · já desceu {property.price_reduction_count} vezes desde que foi publicado
+                    </span>
+                  )}
                 </div>
               )}
               {property.document_verified && (
@@ -322,20 +305,6 @@ export default function PropertyClient() {
                   </span>
                 </div>
               )}
-              {zoneAvgPrice && (property.area || property.area_util) > 0 && (() => {
-                const thisPricePerM2 = Number(property.price) / Number(property.area || property.area_util);
-                const diffPct = Math.round(((thisPricePerM2 - zoneAvgPrice.avg) / zoneAvgPrice.avg) * 100);
-                const isBelow = diffPct < 0;
-                return (
-                  <div style={{ marginTop: 8, fontSize: 12.5, color: 'var(--text-soft)' }}>
-                    {Math.round(thisPricePerM2).toLocaleString('pt-PT')} €/m² ·{' '}
-                    <span style={{ fontWeight: 600, color: isBelow ? 'var(--telha)' : diffPct > 0 ? '#8a3b2a' : 'var(--text-soft)' }}>
-                      {diffPct === 0 ? 'na média' : `${Math.abs(diffPct)}% ${isBelow ? 'abaixo' : 'acima'}`} da zona
-                    </span>
-                    {' '}(média de {Math.round(zoneAvgPrice.avg).toLocaleString('pt-PT')} €/m², com base em {zoneAvgPrice.count} imóveis em {property.district})
-                  </div>
-                );
-              })()}
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <a
@@ -527,6 +496,7 @@ export default function PropertyClient() {
           )}
 
           <PropertyLocationMap latitude={property.latitude} longitude={property.longitude} address={displayAddress(property)} />
+          <NeighborhoodScore propertyId={property.id} latitude={property.latitude} longitude={property.longitude} />
 
           {property.business_type === 'Venda' && (
             <>

@@ -256,11 +256,11 @@ export default function HomePage() {
               Sobre compra, venda, arrendamento, crédito, documentos, impostos, ou como usar a plataforma — pergunta, e respondemos.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
-              {['Processo de compra', 'Processo de venda', 'Arrendamento', 'Crédito habitação', 'Documentos', 'Escritura', 'Impostos', 'Publicar anúncio'].map((tema) => (
+              {['Processo de compra', 'Processo de venda', 'Arrendamento', 'Crédito habitação', 'Documentos', 'Escritura', 'Impostos', 'Publicar anúncio', 'Outros temas'].map((tema) => (
                 <button
                   key={tema}
                   type="button"
-                  onClick={() => window.dispatchEvent(new CustomEvent('morada-open-support', { detail: tema }))}
+                  onClick={() => window.dispatchEvent(new CustomEvent('morada-open-support', { detail: tema === 'Outros temas' ? null : tema }))}
                   style={{
                     fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 14, cursor: 'pointer',
                     background: 'var(--plaster)', color: 'var(--text-soft)', border: '1px solid var(--line)',

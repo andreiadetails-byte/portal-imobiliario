@@ -69,88 +69,108 @@ export default function SupportAgentWidget() {
   }
 
   return (
-    <div className="support-widget" style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 50 }}>
+    <>
       {open && (
         <div
-          className="card"
+          onClick={() => setOpen(false)}
           style={{
-            width: 300, marginBottom: 12, padding: 18,
-            boxShadow: '0 10px 30px rgba(51,46,34,0.22)',
+            position: 'fixed', inset: 0, background: 'rgba(20,17,12,0.55)', zIndex: 260,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-            <AgentAvatar />
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{agentName.fullName}</div>
-              <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>Apoio ao cliente · Morada</div>
-            </div>
-          </div>
-
-          {sent ? (
-            <p style={{ fontSize: 13.5 }}>
-              Obrigada! {agentName.isFemale ? 'A' : 'O'} {agentName.fullName.split(' ')[0]} vai responder-lhe em breve.
-              {user
-                ? ' Pode ver a resposta no seu painel, em "As minhas mensagens de suporte".'
-                : ' Inicie sessão para poder ver a resposta na app.'}
-            </p>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 10 }}>
-                Precisa de ajuda com alguma questão do portal? Deixe a sua mensagem.
-              </p>
-              <div className="field">
-                <label>Nome</label>
-                <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="card support-widget-panel"
+            style={{
+              width: '100%', maxWidth: 380, padding: 20, maxHeight: '85vh', overflowY: 'auto',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <AgentAvatar />
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{agentName.fullName}</div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>Apoio ao cliente · Morada</div>
+                </div>
               </div>
-              <div className="field">
-                <label>Email ou telefone</label>
-                <input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} />
-              </div>
-              <div className="field">
-                <label>Mensagem</label>
-                <textarea required rows={3} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-              </div>
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  required
-                  checked={acceptedPolicy}
-                  onChange={(e) => setAcceptedPolicy(e.target.checked)}
-                  style={{ marginTop: 2, flexShrink: 0 }}
-                />
-                <span>
-                  Li e aceito a{' '}
-                  <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
-                    Política de Privacidade
-                  </a>{' '}
-                  e os{' '}
-                  <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
-                    Termos e Condições
-                  </a>.
-                </span>
-              </label>
-              <button type="submit" className="btn btn-primary btn-block" disabled={sending || !acceptedPolicy}>
-                {sending ? 'A enviar...' : 'Enviar mensagem'}
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Fechar"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: 'var(--text-soft)', flexShrink: 0 }}
+              >
+                ✕
               </button>
-            </form>
-          )}
+            </div>
+
+            {sent ? (
+              <p style={{ fontSize: 13.5 }}>
+                Obrigada! {agentName.isFemale ? 'A' : 'O'} {agentName.fullName.split(' ')[0]} vai responder-lhe em breve.
+                {user
+                  ? ' Pode ver a resposta no seu painel, em "As minhas mensagens de suporte".'
+                  : ' Inicie sessão para poder ver a resposta na app.'}
+              </p>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 10 }}>
+                  Precisa de ajuda com alguma questão do portal? Deixe a sua mensagem.
+                </p>
+                <div className="field">
+                  <label>Nome</label>
+                  <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>Email ou telefone</label>
+                  <input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>Mensagem</label>
+                  <textarea required rows={3} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
+                </div>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    required
+                    checked={acceptedPolicy}
+                    onChange={(e) => setAcceptedPolicy(e.target.checked)}
+                    style={{ marginTop: 2, flexShrink: 0 }}
+                  />
+                  <span>
+                    Li e aceito a{' '}
+                    <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                      Política de Privacidade
+                    </a>{' '}
+                    e os{' '}
+                    <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                      Termos e Condições
+                    </a>.
+                  </span>
+                </label>
+                <button type="submit" className="btn btn-primary btn-block" disabled={sending || !acceptedPolicy}>
+                  {sending ? 'A enviar...' : 'Enviar mensagem'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       )}
 
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="support-widget-btn"
-        style={{
-          display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 10px 10px',
-          background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 30,
-          boxShadow: '0 6px 18px rgba(51,46,34,0.18)', cursor: 'pointer',
-        }}
-      >
-        <AgentAvatar size={36} />
-        <span className="support-widget-text" style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>
-          {open ? 'Fechar' : `Fale com ${agentName.isFemale ? 'a' : 'o'} ${agentName.fullName.split(' ')[0]}`}
-        </span>
-      </button>
-    </div>
+      <div className="support-widget" style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 50 }}>
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="support-widget-btn"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 10px 10px',
+            background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 30,
+            boxShadow: '0 6px 18px rgba(51,46,34,0.18)', cursor: 'pointer',
+          }}
+        >
+          <AgentAvatar size={36} />
+          <span className="support-widget-text" style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>
+            {open ? 'Fechar' : `Fale com ${agentName.isFemale ? 'a' : 'o'} ${agentName.fullName.split(' ')[0]}`}
+          </span>
+        </button>
+      </div>
+    </>
   );
 }
