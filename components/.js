@@ -18,7 +18,7 @@ export default function BackButton({ fallback = '/' }) {
       className="btn"
       style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px' }}
     >
-      ← Voltar à página anterior
+      ← Voltar
     </button>
   );
 }

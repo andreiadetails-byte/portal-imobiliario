@@ -214,7 +214,7 @@ export default function PropertyClient() {
         className="btn"
         style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px' }}
       >
-        ← Voltar
+        ← Voltar à página anterior
       </button>
       <div className="property-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
         <div>

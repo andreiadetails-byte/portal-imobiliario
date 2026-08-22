@@ -24,7 +24,7 @@ export default function TextPage({ title, children }) {
           className="btn"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px' }}
         >
-          ← Voltar
+          ← Voltar à página anterior
         </button>
         <h1 className="display" style={{ fontSize: 30, marginBottom: 24 }}>{title}</h1>
         <div style={{ fontSize: 14.5, color: 'var(--text-soft)', lineHeight: 1.7 }}>
