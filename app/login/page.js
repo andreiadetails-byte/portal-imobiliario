@@ -116,23 +116,49 @@ export default function LoginPage() {
   // está mesmo visível — o Google não a encontra sozinho porque só existe depois
   // de a pessoa clicar em "Registar" (o site troca entre Login e Registar).
   useEffect(() => {
-    if (mode !== 'signup' || !recaptchaScriptReady || !recaptchaRef.current) return;
+    if (mode !== 'signup' || !recaptchaScriptReady) return;
     if (recaptchaWidgetId.current !== null) return; // já desenhada, não repetir
-    if (typeof window === 'undefined' || !window.grecaptcha || !window.grecaptcha.render) return;
-    recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
-      sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-    });
+
+    // Tenta desenhar a caixa repetidamente, de pouco em pouco tempo, até
+    // conseguir — evita o caso em que o script do Google fica pronto antes
+    // do sítio onde a caixa deve aparecer existir na página (não teria
+    // mais nenhuma oportunidade de tentar outra vez, senão).
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (recaptchaWidgetId.current !== null) { clearInterval(interval); return; }
+      if (recaptchaRef.current && window.grecaptcha && window.grecaptcha.render) {
+        recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+        });
+        clearInterval(interval);
+      } else if (attempts > 40) { // desiste ao fim de ~10 segundos
+        clearInterval(interval);
+      }
+    }, 250);
+    return () => clearInterval(interval);
   }, [mode, recaptchaScriptReady]);
 
   // O mesmo, mas para o formulário de login — protege contra alguém tentar
   // adivinhar passwords em massa (ataques de "força bruta").
   useEffect(() => {
-    if (mode !== 'login' || !recaptchaScriptReady || !loginRecaptchaRef.current) return;
+    if (mode !== 'login' || !recaptchaScriptReady) return;
     if (loginRecaptchaWidgetId.current !== null) return;
-    if (typeof window === 'undefined' || !window.grecaptcha || !window.grecaptcha.render) return;
-    loginRecaptchaWidgetId.current = window.grecaptcha.render(loginRecaptchaRef.current, {
-      sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-    });
+
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (loginRecaptchaWidgetId.current !== null) { clearInterval(interval); return; }
+      if (loginRecaptchaRef.current && window.grecaptcha && window.grecaptcha.render) {
+        loginRecaptchaWidgetId.current = window.grecaptcha.render(loginRecaptchaRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+        });
+        clearInterval(interval);
+      } else if (attempts > 40) {
+        clearInterval(interval);
+      }
+    }, 250);
+    return () => clearInterval(interval);
   }, [mode, recaptchaScriptReady]);
 
   async function handleSignup(e) {
