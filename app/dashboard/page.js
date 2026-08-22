@@ -31,7 +31,21 @@ function DashboardInner() {
   const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
   const [properties, setProperties] = useState([]);
-  const [listingSearch, setListingSearch] = useState('');
+  const [listingFilters, setListingFilters] = useState({ address: '', price: '', parish: '', municipality: '' });
+  const [appliedListingFilters, setAppliedListingFilters] = useState({ address: '', price: '', parish: '', municipality: '' });
+
+  function updateListingFilter(key, value) {
+    setListingFilters((cur) => ({ ...cur, [key]: value }));
+  }
+  function runListingSearch(e) {
+    e.preventDefault();
+    setAppliedListingFilters(listingFilters);
+  }
+  function clearListingSearch() {
+    const empty = { address: '', price: '', parish: '', municipality: '' };
+    setListingFilters(empty);
+    setAppliedListingFilters(empty);
+  }
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [featuredModal, setFeaturedModal] = useState(null);
@@ -207,15 +221,30 @@ function DashboardInner() {
       </div>
 
       {properties.length > 0 && (
-        <div style={{ marginBottom: 20 }}>
-          <input
-            type="text"
-            value={listingSearch}
-            onChange={(e) => setListingSearch(e.target.value)}
-            placeholder="Pesquisar por morada, preço, freguesia, concelho..."
-            style={{ maxWidth: 420 }}
-          />
-        </div>
+        <form onSubmit={runListingSearch} className="card" style={{ padding: 16, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 10 }}>
+            <div className="field" style={{ marginBottom: 0 }}>
+              <label style={{ fontSize: 12 }}>Morada</label>
+              <input type="text" value={listingFilters.address} onChange={(e) => updateListingFilter('address', e.target.value)} placeholder="Rua, número..." />
+            </div>
+            <div className="field" style={{ marginBottom: 0 }}>
+              <label style={{ fontSize: 12 }}>Preço</label>
+              <input type="text" value={listingFilters.price} onChange={(e) => updateListingFilter('price', e.target.value)} placeholder="Ex: 250000" />
+            </div>
+            <div className="field" style={{ marginBottom: 0 }}>
+              <label style={{ fontSize: 12 }}>Freguesia</label>
+              <input type="text" value={listingFilters.parish} onChange={(e) => updateListingFilter('parish', e.target.value)} placeholder="Freguesia" />
+            </div>
+            <div className="field" style={{ marginBottom: 0 }}>
+              <label style={{ fontSize: 12 }}>Concelho</label>
+              <input type="text" value={listingFilters.municipality} onChange={(e) => updateListingFilter('municipality', e.target.value)} placeholder="Concelho" />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="submit" className="btn btn-primary" style={{ fontSize: 13 }}>Pesquisar</button>
+            <button type="button" onClick={clearListingSearch} className="btn" style={{ fontSize: 13 }}>Limpar</button>
+          </div>
+        </form>
       )}
       {properties.length === 0 ? (
         <p className="empty-state">{t('dashboard_none_listings')}</p>
@@ -227,12 +256,13 @@ function DashboardInner() {
             { key: 'eliminado', title: 'Eliminados', match: (p) => p.status === 'eliminado' },
             { key: 'outros', title: 'Recusados ou anulados', match: (p) => ['rejeitado', 'anulado_suporte'].includes(p.status) },
           ].map(({ key, title, match }) => {
-            const term = listingSearch.trim().toLowerCase();
             const matchesSearch = (p) => {
-              if (!term) return true;
-              const haystack = [p.address, p.parish, p.municipality, p.district, p.typology, String(p.price)]
-                .filter(Boolean).join(' ').toLowerCase();
-              return haystack.includes(term);
+              const { address, price, parish, municipality } = appliedListingFilters;
+              if (address && !(p.address || '').toLowerCase().includes(address.trim().toLowerCase())) return false;
+              if (price && !String(p.price || '').includes(price.trim())) return false;
+              if (parish && !(p.parish || '').toLowerCase().includes(parish.trim().toLowerCase())) return false;
+              if (municipality && !(p.municipality || '').toLowerCase().includes(municipality.trim().toLowerCase())) return false;
+              return true;
             };
             const group = properties.filter((p) => match(p) && matchesSearch(p));
             if (group.length === 0) return null;
@@ -320,13 +350,15 @@ function DashboardInner() {
           })}
         </div>
       )}
-      {properties.length > 0 && listingSearch.trim() && properties.filter((p) => {
-        const term = listingSearch.trim().toLowerCase();
-        const haystack = [p.address, p.parish, p.municipality, p.district, p.typology, String(p.price)]
-          .filter(Boolean).join(' ').toLowerCase();
-        return haystack.includes(term);
+      {properties.length > 0 && Object.values(appliedListingFilters).some(Boolean) && properties.filter((p) => {
+        const { address, price, parish, municipality } = appliedListingFilters;
+        if (address && !(p.address || '').toLowerCase().includes(address.trim().toLowerCase())) return false;
+        if (price && !String(p.price || '').includes(price.trim())) return false;
+        if (parish && !(p.parish || '').toLowerCase().includes(parish.trim().toLowerCase())) return false;
+        if (municipality && !(p.municipality || '').toLowerCase().includes(municipality.trim().toLowerCase())) return false;
+        return true;
       }).length === 0 && (
-        <p className="empty-state">Nenhum anúncio corresponde a "{listingSearch}".</p>
+        <p className="empty-state">Nenhum anúncio corresponde à pesquisa.</p>
       )}
 
       <h2 className="display" style={{ fontSize: 18, marginBottom: 14 }}>{t('dashboard_recent_leads')}</h2>
