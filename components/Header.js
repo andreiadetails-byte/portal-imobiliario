@@ -16,6 +16,7 @@ export default function Header({ minimal = false }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [checked, setChecked] = useState(false);
   const [unreadChat, setUnreadChat] = useState(0);
+  const [unreadSupport, setUnreadSupport] = useState(0);
   const [adminPending, setAdminPending] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -46,6 +47,7 @@ export default function Header({ minimal = false }) {
         setUser(data.user);
         setIsAdmin(!!profile?.is_admin);
         loadUnreadChat(data.user.id);
+        loadUnreadSupport(data.user.id);
         loadNotifications(data.user.id);
         logVisitIfNeeded(supabase, data.user.id);
         if (profile?.is_admin) loadAdminPending();
@@ -77,6 +79,17 @@ export default function Header({ minimal = false }) {
       .from('messages').select('id', { count: 'exact', head: true })
       .in('conversation_id', ids).or('read.eq.false,read.is.null').neq('sender_id', userId);
     setUnreadChat(count || 0);
+  }
+
+  async function loadUnreadSupport(userId) {
+    const { data: threads } = await supabase
+      .from('support_requests').select('id').eq('user_id', userId);
+    const ids = (threads || []).map((t) => t.id);
+    if (ids.length === 0) { setUnreadSupport(0); return; }
+    const { count } = await supabase
+      .from('support_replies').select('id', { count: 'exact', head: true })
+      .in('support_request_id', ids).eq('sender_role', 'admin').eq('read_by_user', false);
+    setUnreadSupport(count || 0);
   }
 
   async function loadNotifications(userId) {
@@ -189,6 +202,18 @@ export default function Header({ minimal = false }) {
           <Link href="/favorites" className="btn" style={{ marginRight: 12, minWidth: 110, textAlign: 'center' }}>{t('nav_favorites')}</Link>
           {checked && user && (
             <>
+              <Link href="/mensagens-suporte" className="btn" style={{ marginRight: 12, position: 'relative', minWidth: 130, textAlign: 'center' }}>
+                Mensagens Suporte
+                {unreadSupport > 0 && (
+                  <span style={{
+                    position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
+                    background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                  }}>
+                    {unreadSupport > 9 ? '9+' : unreadSupport}
+                  </span>
+                )}
+              </Link>
               <Link href="/dashboard" className="btn" style={{ marginRight: 12, minWidth: 110, textAlign: 'center' }}>{t('dashboard_my_listings')}</Link>
               <Link href="/perfil" className="btn" style={{ marginRight: 12, minWidth: 110, textAlign: 'center' }}>{t('nav_account')}</Link>
               {isAdmin && (
