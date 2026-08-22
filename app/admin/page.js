@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send } from 'lucide-react';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
@@ -424,10 +425,13 @@ function AdminInner() {
     setFeaturedList(data || []);
   }
 
-  async function activateFeatured(id) {
+  async function activateFeatured(id, days) {
+    const featuredUntil = new Date();
+    featuredUntil.setDate(featuredUntil.getDate() + (days || 7));
     await supabase.from('properties').update({
       featured_status: 'active',
       featured_activated_at: new Date().toISOString(),
+      featured_until: featuredUntil.toISOString(),
     }).eq('id', id);
     loadFeatured();
   }
@@ -1053,13 +1057,18 @@ function AdminInner() {
                 <div>
                   <b>{p.typology} · {p.address}</b>
                   <div className="meta">
-                    {Number(p.price).toLocaleString('pt-PT')} € · Ref. {p.id.slice(0, 8)} ·{' '}
-                    {p.featured_status === 'pending' ? 'Aguarda confirmação de pagamento' : 'Destaque ativo'}
+                    {Number(p.price).toLocaleString('pt-PT')} € · Ref. {p.id.slice(0, 8)}
+                    {p.featured_status === 'pending' && p.featured_days && (
+                      <> · {p.featured_days} dias pedidos · Total: {(PAYMENT_INFO.activationFee + PAYMENT_INFO.dailyFee * p.featured_days).toFixed(2)} € · Aguarda confirmação de pagamento</>
+                    )}
+                    {p.featured_status === 'active' && (
+                      <> · Destaque ativo{p.featured_until ? ` até ${new Date(p.featured_until).toLocaleDateString('pt-PT')}` : ''}</>
+                    )}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   {p.featured_status === 'pending' && (
-                    <button onClick={() => activateFeatured(p.id)} className="btn btn-primary" style={{ fontSize: 13 }}>
+                    <button onClick={() => activateFeatured(p.id, p.featured_days)} className="btn btn-primary" style={{ fontSize: 13 }}>
                       Confirmar pagamento e ativar
                     </button>
                   )}

@@ -34,6 +34,7 @@ function DashboardInner() {
   const [loading, setLoading] = useState(true);
   const [featuredModal, setFeaturedModal] = useState(null);
   const [featuredPaymentMethod, setFeaturedPaymentMethod] = useState('transferencia');
+  const [featuredDays, setFeaturedDays] = useState(7);
   const [viewsChartId, setViewsChartId] = useState(null);
   const [userId, setUserId] = useState(null);
   const [page, setPage] = useState(1);
@@ -153,9 +154,11 @@ function DashboardInner() {
     await supabase.from('properties').update({
       featured_status: 'pending',
       featured_requested_at: new Date().toISOString(),
+      featured_days: featuredDays,
     }).eq('id', id);
     setProperties((cur) => cur.map((p) => (p.id === id ? { ...p, featured_status: 'pending' } : p)));
     setFeaturedModal(null);
+    setFeaturedDays(7);
   }
 
   if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
@@ -344,6 +347,41 @@ function DashboardInner() {
             </div>
           </div>
 
+          <div className="field">
+            <label>Durante quantos dias?</label>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              {[7, 15, 30].map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setFeaturedDays(d)}
+                  className={featuredDays === d ? 'btn btn-primary' : 'btn'}
+                  style={{ flex: 1, fontSize: 13 }}
+                >
+                  {d} dias
+                </button>
+              ))}
+            </div>
+            <input
+              type="number"
+              min={1}
+              max={90}
+              value={featuredDays}
+              onChange={(e) => setFeaturedDays(Math.max(1, Math.min(90, Number(e.target.value) || 1)))}
+              style={{ fontSize: 13 }}
+            />
+          </div>
+
+          <div style={{
+            background: 'rgba(126,143,106,0.14)', borderRadius: 8, padding: 16, marginBottom: 18,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <span style={{ fontSize: 13.5, fontWeight: 600 }}>Total a pagar agora</span>
+            <b style={{ fontSize: 20, color: 'var(--telha)' }}>
+              {(PAYMENT_INFO.activationFee + PAYMENT_INFO.dailyFee * featuredDays).toFixed(2)} €
+            </b>
+          </div>
+
           <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
             <button
               onClick={() => setFeaturedPaymentMethod('transferencia')}
@@ -383,8 +421,8 @@ function DashboardInner() {
                 <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
               </div>
               <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 18 }}>
-                Indique o número de referência <b>{featuredModal.slice(0, 8)}</b> na descrição da transferência.
-                Depois de recebermos o pagamento, o destaque é ativado manualmente (normalmente em 1 dia útil).
+                Transfira <b>{(PAYMENT_INFO.activationFee + PAYMENT_INFO.dailyFee * featuredDays).toFixed(2)} €</b> e indique o número de referência <b>{featuredModal.slice(0, 8)}</b> na descrição da transferência.
+                Depois de recebermos o pagamento, o destaque é ativado manualmente (normalmente em 1 dia útil), e dura {featuredDays} dias a partir da ativação.
               </p>
 
               <button onClick={() => requestFeatured(featuredModal)} className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>
