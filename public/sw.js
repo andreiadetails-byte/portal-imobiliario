@@ -12,7 +12,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Deixa todos os pedidos passar normalmente, sem cache — o site continua
-  // a funcionar exatamente como antes, isto só "ativa" a instalação.
-  event.respondWith(fetch(event.request));
+  // Só intervém em pedidos do próprio site — pedidos para serviços externos
+  // (Google Analytics, mapas, etc.) passam diretamente pela rede, sem o
+  // service worker se meter, para nunca causar um erro aqui por causa de
+  // algo que nem está relacionado com o site em si.
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    fetch(event.request).catch(() => new Response('', { status: 503 }))
+  );
 });

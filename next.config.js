@@ -44,7 +44,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://overpass-api.de https://api.qrserver.com https://generativelanguage.googleapis.com https://*.tile.openstreetmap.org https://earth.google.com",
+              "connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://www.gstatic.com https://overpass-api.de https://api.qrserver.com https://generativelanguage.googleapis.com https://*.tile.openstreetmap.org https://earth.google.com",
               "frame-src https://www.google.com",
               "media-src 'self' https://*.supabase.co",
             ].join('; '),
