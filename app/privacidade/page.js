@@ -32,7 +32,7 @@ export default function PrivacidadePage() {
         Não vendemos os seus dados a terceiros. Os seus dados de contacto (nome, e o telemóvel, se autorizar) só ficam visíveis a outros utilizadores quando o decide — por exemplo, ao autorizar a exibição do telemóvel no seu anúncio, ou ao contactar diretamente outro utilizador pelo chat.
       </p>
       <p style={{ marginBottom: 16 }}>
-        Usamos os seguintes prestadores de serviços para operar o site, que processam dados em nosso nome: <b>Supabase</b> (base de dados e alojamento de ficheiros), <b>Netlify</b> (alojamento do site) e um serviço de email para o envio de notificações. Estes prestadores estão contratualmente obrigados a proteger os seus dados.
+        Usamos prestadores de serviços de confiança para operar o site, que processam dados em nosso nome — nomeadamente serviços de base de dados e alojamento de ficheiros, alojamento do site, e envio de emails de notificação. Estes prestadores estão contratualmente obrigados a proteger os seus dados, e não têm autorização para os usar para outros fins.
       </p>
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Quanto tempo guardamos os seus dados</h2>
