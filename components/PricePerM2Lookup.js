@@ -12,7 +12,7 @@ export default function PricePerM2Lookup() {
   const [levels, setLevels] = useState(null);
   const [typedQuery, setTypedQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState(null);
-  const [businessType, setBusinessType] = useState('Venda');
+  const businessType = 'Venda'; // este indicador só faz sentido para compra/venda, não arrendamento
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [searched, setSearched] = useState(false);
@@ -50,7 +50,7 @@ export default function PricePerM2Lookup() {
         .from('ine_reference_prices')
         .select('*')
         .ilike('geo_name', selectedRegion)
-        .eq('business_type', businessType === 'Arrendamento' ? 'Arrendamento' : 'Venda')
+        .eq('business_type', businessType)
         .limit(1)
         .maybeSingle();
       setResult({ count: 0, ine: ineData || null });
@@ -104,7 +104,7 @@ export default function PricePerM2Lookup() {
           .from('ine_reference_prices')
           .select('*')
           .ilike('geo_name', name)
-          .eq('business_type', businessType === 'Arrendamento' ? 'Arrendamento' : 'Venda')
+          .eq('business_type', businessType)
           .limit(1)
           .maybeSingle();
         if (ineData) { ineMatch = ineData; break; }
@@ -127,26 +127,8 @@ export default function PricePerM2Lookup() {
     <div className="card" style={{ padding: 24 }}>
       <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>Quanto custa o m² na tua zona?</h3>
       <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
-        Consulta o preço médio por m² numa freguesia, concelho ou distrito, com base nos imóveis publicados no site.
+        Consulta o preço médio de venda por m² numa freguesia, concelho ou distrito, com base nos imóveis publicados no site.
       </p>
-
-      <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-        {['Venda', 'Arrendamento'].map((bt) => (
-          <button
-            key={bt}
-            type="button"
-            onClick={() => setBusinessType(bt)}
-            style={{
-              flex: 1, padding: '8px 0', fontSize: 13, fontWeight: 600, borderRadius: 5, cursor: 'pointer',
-              border: businessType === bt ? '1.5px solid var(--telha)' : '1px solid var(--line)',
-              background: businessType === bt ? 'rgba(126,143,106,0.12)' : 'var(--paper)',
-              color: businessType === bt ? 'var(--telha)' : 'var(--text-soft)',
-            }}
-          >
-            {bt}
-          </button>
-        ))}
-      </div>
 
       <div style={{ position: 'relative' }}>
         <LocationAutocomplete onChange={handleLocationChange} onLevels={handleLocationLevels} placeholder="Escreve uma freguesia, concelho, distrito ou região (ex: Algarve)..." />
