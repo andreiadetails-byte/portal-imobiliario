@@ -1,12 +1,17 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { sendEmail } from '../../../lib/sendEmail';
-import { renderEmail, propertyCardHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { renderEmail, propertyCardHtml, escapeHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { isValidWebhookRequest } from '../../../lib/verifyWebhook';
 
 // Esta rota é chamada automaticamente pelo Supabase (via Database Webhook)
 // sempre que uma nova linha é inserida na tabela "leads".
 
 export async function POST(request) {
   try {
+    if (!isValidWebhookRequest(request)) {
+      return Response.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
     const payload = await request.json();
     const lead = payload.record;
 
@@ -41,12 +46,12 @@ export async function POST(request) {
         businessType: property.business_type, photoUrl: firstPhoto, propertyId: lead.property_id,
       }) : ''}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 14px 0; font-size:14px;">
-        <tr><td style="padding:4px 0;"><b>Nome:</b> ${lead.name}</td></tr>
-        <tr><td style="padding:4px 0;"><b>Telefone:</b> ${lead.phone || '—'}</td></tr>
-        <tr><td style="padding:4px 0;"><b>Email:</b> ${lead.email || '—'}</td></tr>
+        <tr><td style="padding:4px 0;"><b>Nome:</b> ${escapeHtml(lead.name)}</td></tr>
+        <tr><td style="padding:4px 0;"><b>Telefone:</b> ${escapeHtml(lead.phone) || '—'}</td></tr>
+        <tr><td style="padding:4px 0;"><b>Email:</b> ${escapeHtml(lead.email) || '—'}</td></tr>
       </table>
       <div style="background:#F1E8D6; border-radius:6px; padding:12px 14px; font-size:14px; font-style:italic; color:#332E22;">
-        "${lead.message || 'Sem mensagem adicional.'}"
+        "${escapeHtml(lead.message) || 'Sem mensagem adicional.'}"
       </div>
     `;
 
@@ -54,7 +59,7 @@ export async function POST(request) {
       to: ownerEmail,
       subject: `Nova mensagem sobre ${propertyLabel}`,
       html: renderEmail({
-        preheader: `${lead.name} está interessado no seu imóvel`,
+        preheader: `${escapeHtml(lead.name)} está interessado no seu imóvel`,
         bodyHtml,
         ctaText: 'Ver e responder',
         ctaUrl: `${SITE_URL}/dashboard`,

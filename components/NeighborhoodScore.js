@@ -15,7 +15,7 @@ export default function NeighborhoodScore({ propertyId, latitude, longitude }) {
 
   useEffect(() => {
     if (!latitude || !longitude) { setLoading(false); return; }
-    fetch(`/api/neighborhood-score?propertyId=${propertyId}&lat=${latitude}&lng=${longitude}`)
+    fetch(`/api/neighborhood-score?propertyId=${propertyId}`)
       .then((res) => res.json())
       .then((json) => {
         if (json.error) setError(true);

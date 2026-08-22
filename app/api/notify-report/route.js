@@ -1,9 +1,14 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { sendEmail } from '../../../lib/sendEmail';
-import { renderEmail, propertyCardHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { renderEmail, propertyCardHtml, escapeHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { isValidWebhookRequest } from '../../../lib/verifyWebhook';
 
 export async function POST(request) {
   try {
+    if (!isValidWebhookRequest(request)) {
+      return Response.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
     const payload = await request.json();
     const report = payload.record;
 
@@ -27,10 +32,10 @@ export async function POST(request) {
         businessType: property.business_type, photoUrl: firstPhoto, propertyId: report.property_id,
       }) : `<p>Imóvel: ${report.property_id}</p>`}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 14px 0; font-size:14px;">
-        <tr><td style="padding:4px 0;"><b>Motivo:</b> ${report.reason}</td></tr>
-        <tr><td style="padding:4px 0;"><b>Detalhes:</b> ${report.details || '—'}</td></tr>
-        <tr><td style="padding:4px 0;"><b>Nome de quem denunciou:</b> ${report.reporter_name || 'não fornecido'}</td></tr>
-        <tr><td style="padding:4px 0;"><b>Contacto (interno):</b> ${report.reporter_contact || 'não fornecido'}</td></tr>
+        <tr><td style="padding:4px 0;"><b>Motivo:</b> ${escapeHtml(report.reason)}</td></tr>
+        <tr><td style="padding:4px 0;"><b>Detalhes:</b> ${escapeHtml(report.details) || '—'}</td></tr>
+        <tr><td style="padding:4px 0;"><b>Nome de quem denunciou:</b> ${escapeHtml(report.reporter_name) || 'não fornecido'}</td></tr>
+        <tr><td style="padding:4px 0;"><b>Contacto (interno):</b> ${escapeHtml(report.reporter_contact) || 'não fornecido'}</td></tr>
       </table>
       <p style="font-size:11.5px; color:#8a3b2a;">
         Nota: os dados de quem denunciou não são partilhados com o anunciante.

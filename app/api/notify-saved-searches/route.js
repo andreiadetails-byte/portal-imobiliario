@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { sendEmail } from '../../../lib/sendEmail';
-import { renderEmail, propertyCardHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { renderEmail, propertyCardHtml, escapeHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { isValidWebhookRequest } from '../../../lib/verifyWebhook';
 
 // Chamada pelo Supabase (Database Webhook) sempre que um imóvel é atualizado.
 // Só age quando o estado passa a "ativo" (aprovado), para não enviar alertas repetidos.
@@ -25,6 +26,10 @@ function matchesFilters(property, filters) {
 
 export async function POST(request) {
   try {
+    if (!isValidWebhookRequest(request)) {
+      return Response.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
     const payload = await request.json();
     const property = payload.record;
     const oldProperty = payload.old_record;
@@ -53,9 +58,9 @@ export async function POST(request) {
       const userFirstName = (userProfile?.full_name || '').split(' ')[0];
 
       const bodyHtml = `
-        <p style="margin:0 0 14px; font-size:15px;">Olá${userFirstName ? ` ${userFirstName}` : ''},</p>
+        <p style="margin:0 0 14px; font-size:15px;">Olá${userFirstName ? ` ${escapeHtml(userFirstName)}` : ''},</p>
         <h2 style="font-size:19px; color:#332E22; margin: 0 0 6px;">Novo imóvel para si 🔎</h2>
-        <p style="margin:0 0 4px;">Corresponde à sua pesquisa guardada "<b>${search.name}</b>".</p>
+        <p style="margin:0 0 4px;">Corresponde à sua pesquisa guardada "<b>${escapeHtml(search.name)}</b>".</p>
         ${propertyCardHtml({
           typology: property.typology, address: property.address, price: property.price,
           businessType: property.business_type, photoUrl: firstPhoto, propertyId: property.id,

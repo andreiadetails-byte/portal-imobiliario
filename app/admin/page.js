@@ -231,11 +231,14 @@ function AdminInner() {
     const { data: { user } } = await supabase.auth.getUser();
 
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
       const res = await fetch('/api/send-campaign', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionData?.session?.access_token}`,
+        },
         body: JSON.stringify({
-          adminUserId: user.id,
           subject: campaignSubject,
           message: campaignMessage,
           audience: campaignAudience,
@@ -375,9 +378,13 @@ function AdminInner() {
 
   async function requestTestimonialConsent(id) {
     if (!confirm('Enviar um email a pedir autorização para publicar esta mensagem como testemunho no site?')) return;
+    const { data: sessionData } = await supabase.auth.getSession();
     const res = await fetch('/api/request-testimonial-consent', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${sessionData?.session?.access_token}`,
+      },
       body: JSON.stringify({ supportRequestId: id }),
     });
     const data = await res.json();
@@ -517,6 +524,24 @@ function AdminInner() {
     setProperties((cur) => cur.map((p) => (p.id === propId ? { ...p, document_verified: true } : p)));
   }
 
+  async function openDocument(propertyId) {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const res = await fetch('/api/get-document-url', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${sessionData?.session?.access_token}`,
+      },
+      body: JSON.stringify({ propertyId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Não foi possível abrir o documento.');
+      return;
+    }
+    window.open(data.url, '_blank', 'noopener,noreferrer');
+  }
+
   async function cancelProperty(propObj) {
     const reason = prompt('Motivo da anulação (visível ao anunciante):');
     if (!reason) return;
@@ -623,13 +648,36 @@ function AdminInner() {
                 {Number(p.price).toLocaleString('pt-PT')} € · {p.property_type} · {p.district} · publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')} · estado atual: {p.status}
               </div>
               <p style={{ fontSize: 13, color: 'var(--text-soft)', maxWidth: 500, marginTop: 4 }}>{p.description}</p>
+              {p.moderation_flag_reason && (
+                <p style={{ fontSize: 12.5, marginTop: 6, color: '#8a3b2a', fontWeight: 600 }}>
+                  ⚠️ Assinalado automaticamente: {p.moderation_flag_reason}
+                </p>
+              )}
               {p.document_url && (
                 <p style={{ fontSize: 12.5, marginTop: 6 }}>
-                  <a href={p.document_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)' }}>
+                  <button
+                    onClick={() => openDocument(p.id)}
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--telha)', fontSize: 12.5, textDecoration: 'underline' }}
+                  >
                     📄 Ver documento anexado
-                  </a>
+                  </button>
                   {p.document_verified && <span style={{ color: 'var(--azulejo)', marginLeft: 8 }}>✓ Verificado</span>}
                 </p>
+              )}
+              {p.video_url && (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-soft)', marginBottom: 4 }}>
+                    🎬 Vídeo do anúncio — não é verificado automaticamente, veja antes de aprovar:
+                  </div>
+                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  <video
+                    controls
+                    preload="metadata"
+                    style={{ width: '100%', maxWidth: 360, maxHeight: 240, borderRadius: 6, border: '1px solid var(--line)', background: '#000' }}
+                  >
+                    <source src={p.video_url} />
+                  </video>
+                </div>
               )}
             </div>
             <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>

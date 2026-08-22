@@ -31,26 +31,35 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const propertyId = searchParams.get('propertyId');
-    const latitude = Number(searchParams.get('lat'));
-    const longitude = Number(searchParams.get('lng'));
 
+    if (!propertyId) {
+      return Response.json({ error: 'Falta o propertyId.' }, { status: 400 });
+    }
+
+    // Vai sempre buscar as coordenadas REAIS do imóvel à base de dados — nunca
+    // confia em coordenadas enviadas no pedido, que qualquer pessoa podia
+    // alterar para gravar um score falso num imóvel que não é o que diz ser.
+    const { data: existing } = await supabaseAdmin
+      .from('properties')
+      .select('latitude, longitude, neighborhood_score, neighborhood_breakdown, neighborhood_score_updated_at')
+      .eq('id', propertyId)
+      .maybeSingle();
+
+    if (!existing) {
+      return Response.json({ error: 'Imóvel não encontrado.' }, { status: 404 });
+    }
+
+    const latitude = existing.latitude;
+    const longitude = existing.longitude;
     if (!latitude || !longitude) {
-      return Response.json({ error: 'Faltam coordenadas.' }, { status: 400 });
+      return Response.json({ error: 'Este imóvel não tem coordenadas guardadas.' }, { status: 400 });
     }
 
     // Vê se já há um score em cache, ainda recente, para este imóvel.
-    if (propertyId) {
-      const { data: existing } = await supabaseAdmin
-        .from('properties')
-        .select('neighborhood_score, neighborhood_breakdown, neighborhood_score_updated_at')
-        .eq('id', propertyId)
-        .maybeSingle();
-
-      if (existing?.neighborhood_score != null && existing.neighborhood_score_updated_at) {
-        const ageDays = (Date.now() - new Date(existing.neighborhood_score_updated_at).getTime()) / (1000 * 60 * 60 * 24);
-        if (ageDays < CACHE_DAYS) {
-          return Response.json({ score: existing.neighborhood_score, breakdown: existing.neighborhood_breakdown, cached: true });
-        }
+    if (existing.neighborhood_score != null && existing.neighborhood_score_updated_at) {
+      const ageDays = (Date.now() - new Date(existing.neighborhood_score_updated_at).getTime()) / (1000 * 60 * 60 * 24);
+      if (ageDays < CACHE_DAYS) {
+        return Response.json({ score: existing.neighborhood_score, breakdown: existing.neighborhood_breakdown, cached: true });
       }
     }
 
@@ -98,12 +107,10 @@ export async function GET(request) {
     score = Math.min(100, Math.round(score));
 
     // Guarda em cache, para a próxima vez não precisar de perguntar ao mapa outra vez.
-    if (propertyId) {
-      await supabaseAdmin
-        .from('properties')
-        .update({ neighborhood_score: score, neighborhood_breakdown: breakdown, neighborhood_score_updated_at: new Date().toISOString() })
-        .eq('id', propertyId);
-    }
+    await supabaseAdmin
+      .from('properties')
+      .update({ neighborhood_score: score, neighborhood_breakdown: breakdown, neighborhood_score_updated_at: new Date().toISOString() })
+      .eq('id', propertyId);
 
     return Response.json({ score, breakdown, cached: false });
   } catch (err) {

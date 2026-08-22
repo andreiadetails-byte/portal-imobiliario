@@ -9,6 +9,7 @@ import Header from '../../components/Header';
 import { geocodeAddress } from '../../lib/geocode';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { distritos, concelhosPorDistrito, freguesiasPorConcelho } from '../../lib/locations';
+import { containsOffensiveLanguage, containsLink } from '../../lib/contentModeration';
 
 const CARACTERISTICAS = [
   'Elevador', 'Cozinha equipada', 'Aquecimento central', 'Ar condicionado', 'Terraço',
@@ -267,12 +268,24 @@ function PublishForm() {
 
   function handlePlanSelect(e) {
     const file = e.target.files?.[0];
-    if (file) setPlanFile(file);
+    if (!file) return;
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('A planta tem de ser uma imagem (JPG, PNG, WEBP) ou um PDF.');
+      e.target.value = '';
+      return;
+    }
+    setPlanFile(file);
   }
 
   function handleVideoSelect(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!file.type.startsWith('video/')) {
+      alert('O ficheiro escolhido não é um vídeo.');
+      e.target.value = '';
+      return;
+    }
     const MAX_VIDEO_MB = 100;
     if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
       setVideoError(`O vídeo é demasiado grande (máximo ${MAX_VIDEO_MB}MB). Tente gravar um vídeo mais curto, ou reduza a qualidade nas definições da câmara do telemóvel.`);
@@ -307,13 +320,16 @@ function PublishForm() {
     if (!documentFile) return null;
     const ext = documentFile.name.split('.').pop();
     const path = `${user.id}/${propertyId}/documento.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, documentFile, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from('property-documents').upload(path, documentFile, { upsert: true });
     if (uploadError) return null;
-    const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
-    return publicUrlData.publicUrl;
+    // Guarda só o caminho — nunca um link público, porque este espaço é
+    // privado (o documento pode ter dados sensíveis). O link só é gerado
+    // na hora, e só para quem tem autorização, através de uma rota própria.
+    return path;
   }
 
   async function uploadPhotos(propertyId, startPosition = 0) {
+    const uploadedUrls = [];
     for (let i = 0; i < photos.length; i++) {
       const { file } = photos[i];
       const ext = file.name.split('.').pop();
@@ -323,6 +339,7 @@ function PublishForm() {
       if (uploadError) continue; // se uma foto falhar, continua com as outras
 
       const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
+      uploadedUrls.push(publicUrlData.publicUrl);
 
       await supabase.from('property_photos').insert({
         property_id: propertyId,
@@ -330,6 +347,7 @@ function PublishForm() {
         position: startPosition + i,
       });
     }
+    return uploadedUrls;
   }
 
   async function handleSubmit(e) {
@@ -359,6 +377,10 @@ function PublishForm() {
     }
     if (form.description.trim().length < 50) {
       setError(`A descrição precisa de pelo menos 50 caracteres (tem ${form.description.trim().length}).`);
+      return;
+    }
+    if (containsLink(form.title, form.description)) {
+      setError('O título e a descrição não podem conter links (WhatsApp, sites, redes sociais, etc.) — use o chat do site para falar com interessados.');
       return;
     }
     if (form.property_type === 'Moradia' && !form.house_subtype) {
@@ -434,10 +456,20 @@ function PublishForm() {
     let propertyId = editId;
     let error;
 
+    // Verifica linguagem ofensiva no título e descrição, para decidir mais
+    // tarde se o anúncio pode ser aprovado automaticamente. Um anúncio novo
+    // NUNCA fica "ativo" já neste momento — fica sempre "em_revisao" até as
+    // fotos terminarem de ser enviadas em segundo plano (só depois é que
+    // fica mesmo visível), para nunca aparecer sem fotos por breves segundos.
+    const hasOffensiveText = containsOffensiveLanguage(propertyFields.title, propertyFields.description);
+
     if (isEditMode) {
       if (originalPrice && Number(form.price) < Number(originalPrice)) {
         propertyFields.previous_price = originalPrice;
         propertyFields.price_reduced_at = new Date().toISOString();
+      }
+      if (hasOffensiveText) {
+        propertyFields.status = 'em_revisao';
       }
       const { error: updateError } = await supabase.from('properties').update(propertyFields).eq('id', editId);
       error = updateError;
@@ -452,11 +484,16 @@ function PublishForm() {
 
     // Traduz o título e descrição em segundo plano — não faz o utilizador esperar.
     if (propertyId) {
-      fetch('/api/translate-property', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ propertyId, title: propertyFields.title, description: propertyFields.description }),
-      }).catch(() => {});
+      supabase.auth.getSession().then(({ data: sessionData }) => {
+        fetch('/api/translate-property', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionData?.session?.access_token}`,
+          },
+          body: JSON.stringify({ propertyId }),
+        }).catch(() => {});
+      });
     }
 
     setSaving(false);
@@ -480,8 +517,53 @@ function PublishForm() {
       if (videoUrl) {
         await supabase.from('properties').update({ video_url: videoUrl }).eq('id', propertyId);
       }
+      let uploadedPhotoUrls = [];
       if (photos.length > 0) {
-        await uploadPhotos(propertyId, existingPhotoCount);
+        uploadedPhotoUrls = await uploadPhotos(propertyId, existingPhotoCount);
+      }
+
+      // Verifica as fotos (e a planta, se for uma imagem) só depois de estarem
+      // enviadas. Vídeo não é verificado automaticamente (análise de vídeo não
+      // é fiável o suficiente neste momento) — fica sempre para revisão manual.
+      const imagesToCheck = [...uploadedPhotoUrls];
+      if (planUrl && /\.(jpg|jpeg|png|webp)$/i.test(planUrl)) imagesToCheck.push(planUrl);
+
+      let imagesFlagged = false;
+      let flagReason = '';
+
+      if (imagesToCheck.length > 0) {
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const modRes = await fetch('/api/moderate-content', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${sessionData?.session?.access_token}`,
+            },
+            body: JSON.stringify({ imageUrls: imagesToCheck }),
+          });
+          const modData = await modRes.json();
+          if (modData.flagged) {
+            imagesFlagged = true;
+            flagReason = modData.reason || 'Conteúdo assinalado para revisão.';
+          }
+        } catch {
+          // Se a verificação falhar, marca para revisão manual em vez de
+          // aprovar às cegas — mais seguro do que assumir que está tudo bem.
+          imagesFlagged = true;
+          flagReason = 'Não foi possível verificar as fotos automaticamente.';
+        }
+      }
+
+      // Só decide aprovar automaticamente para anúncios NOVOS (não edições) —
+      // e só agora, com as fotos já todas prontas, para nunca aparecer "ativo"
+      // com um espaço em branco onde deviam estar as fotos.
+      if (!isEditMode) {
+        if (!hasOffensiveText && !imagesFlagged) {
+          await supabase.from('properties').update({ status: 'ativo' }).eq('id', propertyId);
+        } else if (imagesFlagged) {
+          await supabase.from('properties').update({ status: 'em_revisao', moderation_flag_reason: flagReason }).eq('id', propertyId);
+        }
       }
     })();
   }

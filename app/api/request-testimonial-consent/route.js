@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { sendEmail } from '../../../lib/sendEmail';
 import { renderEmail, SITE_URL } from '../../../lib/emailTemplate';
@@ -6,8 +7,25 @@ import { renderEmail, SITE_URL } from '../../../lib/emailTemplate';
 // Chamada pelo painel de administração, quando decides pedir autorização a
 // alguém para publicar a mensagem simpática que enviou como testemunho.
 
+async function isCallerAdmin(request) {
+  const authHeader = request.headers.get('authorization') || '';
+  const token = authHeader.replace('Bearer ', '');
+  if (!token) return false;
+
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const { data: { user } } = await supabase.auth.getUser(token);
+  if (!user) return false;
+
+  const { data: profile } = await supabaseAdmin.from('profiles').select('is_admin').eq('id', user.id).single();
+  return !!profile?.is_admin;
+}
+
 export async function POST(request) {
   try {
+    if (!(await isCallerAdmin(request))) {
+      return Response.json({ error: 'Não autorizado.' }, { status: 403 });
+    }
+
     const { supportRequestId } = await request.json();
     if (!supportRequestId) {
       return Response.json({ error: 'Falta o ID da mensagem.' }, { status: 400 });

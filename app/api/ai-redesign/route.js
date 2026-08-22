@@ -1,3 +1,4 @@
+import { createClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 
 const MONTHLY_LIMIT = 10;
@@ -7,11 +8,29 @@ function currentMonthKey() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
+// Confirma que quem está a pedir isto tem mesmo sessão iniciada, e usa
+// SEMPRE o ID confirmado pelo Supabase — nunca o que vier no pedido, que
+// podia ser alterado para usar a quota de outra pessoa (ou nunca ficar
+// sem limite, trocando sempre de "userId").
+async function getVerifiedUserId(request) {
+  const authHeader = request.headers.get('authorization') || '';
+  const token = authHeader.replace('Bearer ', '');
+  if (!token) return null;
+
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const { data: { user } } = await supabase.auth.getUser(token);
+  return user?.id || null;
+}
+
 export async function POST(request) {
   try {
-    const { userId, imageUrl, prompt } = await request.json();
+    const userId = await getVerifiedUserId(request);
+    if (!userId) {
+      return Response.json({ error: 'Precisa de ter sessão iniciada para usar esta funcionalidade.' }, { status: 401 });
+    }
 
-    if (!userId || !imageUrl || !prompt) {
+    const { imageUrl, prompt } = await request.json();
+    if (!imageUrl || !prompt) {
       return Response.json({ error: 'Faltam dados no pedido.' }, { status: 400 });
     }
 

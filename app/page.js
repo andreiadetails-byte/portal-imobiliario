@@ -180,7 +180,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 32px' }}>
+      <section style={{ padding: '0 0 40px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
             <div className="tile-strip" />
@@ -192,7 +192,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 14px' }}>
+      <section style={{ padding: '0 0 40px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
@@ -220,7 +220,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 32px' }}>
+      <section style={{ padding: '0 0 40px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <Link
             href="/simulador-investimento"
@@ -248,7 +248,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 32px' }}>
+      <section style={{ padding: '0 0 64px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div className="card" style={{ padding: '26px 28px' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>Tens dúvidas?</h3>
@@ -282,7 +282,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '48px 0 80px' }}>
+      <section style={{ padding: '48px 0 64px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 26, marginBottom: 24 }}>{t('home_featured')}</h2>
 
@@ -442,7 +442,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 88px' }}>
+      <section style={{ padding: '0 0 64px' }}>
         <div className="wrap">
           <div style={{
             position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220,
@@ -494,7 +494,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 88px' }}>
+      <section style={{ padding: '0 0 64px' }}>
         <div className="wrap" style={{ maxWidth: 620 }}>
           <PricePerM2Lookup />
         </div>

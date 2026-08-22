@@ -14,6 +14,8 @@ export default function LoginPage() {
   const [mode, setMode] = useState('login');
   const recaptchaRef = useRef(null);
   const recaptchaWidgetId = useRef(null);
+  const loginRecaptchaRef = useRef(null);
+  const loginRecaptchaWidgetId = useRef(null);
   const [recaptchaScriptReady, setRecaptchaScriptReady] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,10 +55,36 @@ export default function LoginPage() {
   async function handleLogin(e) {
     e.preventDefault();
     setError('');
+
+    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha && loginRecaptchaWidgetId.current !== null
+      ? window.grecaptcha.getResponse(loginRecaptchaWidgetId.current)
+      : '';
+    if (!recaptchaToken) {
+      setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
+      return;
+    }
+
     setLoading(true);
+    const verifyRes = await fetch('/api/verify-recaptcha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: recaptchaToken }),
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyData.success) {
+      setError('Não foi possível confirmar que não é um robô. Tente novamente.');
+      if (window.grecaptcha && loginRecaptchaWidgetId.current !== null) window.grecaptcha.reset(loginRecaptchaWidgetId.current);
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) { setError(error.message); return; }
+    if (error) {
+      setError(error.message);
+      if (window.grecaptcha && loginRecaptchaWidgetId.current !== null) window.grecaptcha.reset(loginRecaptchaWidgetId.current);
+      return;
+    }
     if (data.user) {
       await supabase.from('profiles').update({ email: data.user.email }).eq('id', data.user.id);
 
@@ -92,6 +120,17 @@ export default function LoginPage() {
     if (recaptchaWidgetId.current !== null) return; // já desenhada, não repetir
     if (typeof window === 'undefined' || !window.grecaptcha || !window.grecaptcha.render) return;
     recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+      sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+    });
+  }, [mode, recaptchaScriptReady]);
+
+  // O mesmo, mas para o formulário de login — protege contra alguém tentar
+  // adivinhar passwords em massa (ataques de "força bruta").
+  useEffect(() => {
+    if (mode !== 'login' || !recaptchaScriptReady || !loginRecaptchaRef.current) return;
+    if (loginRecaptchaWidgetId.current !== null) return;
+    if (typeof window === 'undefined' || !window.grecaptcha || !window.grecaptcha.render) return;
+    loginRecaptchaWidgetId.current = window.grecaptcha.render(loginRecaptchaRef.current, {
       sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
     });
   }, [mode, recaptchaScriptReady]);
@@ -280,6 +319,7 @@ export default function LoginPage() {
               <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
+            <div ref={loginRecaptchaRef} style={{ marginBottom: 16 }} />
             <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
               {t('login_login')}
             </button>
@@ -378,7 +418,7 @@ export default function LoginPage() {
             </div>
             <div className="field">
               <label>{t('login_pw_min')}</label>
-              <input type="password" required minLength={6} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <input type="password" required minLength={8} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
             <div ref={recaptchaRef} style={{ marginBottom: 16 }} />

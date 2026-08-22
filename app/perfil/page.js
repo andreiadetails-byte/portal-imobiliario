@@ -27,6 +27,7 @@ export default function PerfilPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSaved, setPasswordSaved] = useState(false);
 
@@ -104,7 +105,11 @@ export default function PerfilPage() {
     setPasswordError('');
     setPasswordSaved(false);
 
-    if (newPassword.length < 6) {
+    if (!currentPassword) {
+      setPasswordError('Introduza a sua palavra-passe atual, para confirmarmos que é mesmo você.');
+      return;
+    }
+    if (newPassword.length < 8) {
       setPasswordError(t('perfil_password_too_short'));
       return;
     }
@@ -114,6 +119,21 @@ export default function PerfilPage() {
     }
 
     setSavingPassword(true);
+
+    // Confirma a palavra-passe atual antes de deixar mudar — sem isto,
+    // alguém que ficasse com acesso à sua sessão (ex: computador partilhado)
+    // conseguia mudar a palavra-passe sem saber a antiga, e ficava com a
+    // conta, sem si conseguir voltar a entrar.
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    if (verifyError) {
+      setSavingPassword(false);
+      setPasswordError('A palavra-passe atual está incorreta.');
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setSavingPassword(false);
 
@@ -121,6 +141,7 @@ export default function PerfilPage() {
       setPasswordError(error.message);
       return;
     }
+    setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
     setPasswordSaved(true);
@@ -231,12 +252,16 @@ export default function PerfilPage() {
           <h2 className="display" style={{ fontSize: 18, marginBottom: 18 }}>{t('perfil_change_password')}</h2>
 
           <div className="field">
+            <label htmlFor="current-password-input">Palavra-passe atual</label>
+            <input id="current-password-input" type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" />
+          </div>
+          <div className="field">
             <label htmlFor="new-password-input">{t('perfil_new_password')}</label>
-            <input id="new-password-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t('perfil_password_min')} />
+            <input id="new-password-input" type="password" required minLength={8} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t('perfil_password_min')} autoComplete="new-password" />
           </div>
           <div className="field">
             <label htmlFor="confirm-password-input">{t('perfil_confirm_password')}</label>
-            <input id="confirm-password-input" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+            <input id="confirm-password-input" type="password" required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" />
           </div>
 
           {passwordError && <p className="error-text">{passwordError}</p>}

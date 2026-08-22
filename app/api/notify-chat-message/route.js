@@ -1,10 +1,15 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { sendEmail } from '../../../lib/sendEmail';
-import { renderEmail, propertyCardHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { renderEmail, propertyCardHtml, escapeHtml, SITE_URL } from '../../../lib/emailTemplate';
+import { isValidWebhookRequest } from '../../../lib/verifyWebhook';
 
 // Chamada pelo Supabase (Database Webhook) sempre que uma nova mensagem de chat é inserida.
 export async function POST(request) {
   try {
+    if (!isValidWebhookRequest(request)) {
+      return Response.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
     const payload = await request.json();
     const message = payload.record;
     if (!message) return Response.json({ error: 'Sem dados' }, { status: 400 });
@@ -48,19 +53,19 @@ export async function POST(request) {
     const recipientFirstName = (recipientProfile?.agency_name || recipientProfile?.full_name || '').split(' ')[0];
 
     const bodyHtml = `
-      <p style="margin:0 0 14px; font-size:15px;">Olá${recipientFirstName ? ` ${recipientFirstName}` : ''},</p>
+      <p style="margin:0 0 14px; font-size:15px;">Olá${recipientFirstName ? ` ${escapeHtml(recipientFirstName)}` : ''},</p>
       <h2 style="font-size:19px; color:#332E22; margin: 0 0 6px;">Tem uma nova mensagem 💬</h2>
       ${property ? propertyCardHtml({
         typology: property.typology, address: property.address, price: property.price,
         businessType: property.business_type, photoUrl: firstPhoto, propertyId: conversation.property_id,
       }) : ''}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 10px 0;">
-        <tr><td style="padding:4px 0; font-size:13.5px;"><b>Nome:</b> ${senderName}</td></tr>
-        ${senderEmail ? `<tr><td style="padding:4px 0; font-size:13.5px;"><b>Email:</b> ${senderEmail}</td></tr>` : ''}
-        ${senderPhone ? `<tr><td style="padding:4px 0; font-size:13.5px;"><b>Telefone:</b> ${senderPhone}</td></tr>` : ''}
+        <tr><td style="padding:4px 0; font-size:13.5px;"><b>Nome:</b> ${escapeHtml(senderName)}</td></tr>
+        ${senderEmail ? `<tr><td style="padding:4px 0; font-size:13.5px;"><b>Email:</b> ${escapeHtml(senderEmail)}</td></tr>` : ''}
+        ${senderPhone ? `<tr><td style="padding:4px 0; font-size:13.5px;"><b>Telefone:</b> ${escapeHtml(senderPhone)}</td></tr>` : ''}
       </table>
       <div style="background:#F1E8D6; border-radius:6px; padding:12px 14px; font-size:14px; font-style:italic; color:#332E22;">
-        "${message.content}"
+        "${escapeHtml(message.content)}"
       </div>
     `;
 
