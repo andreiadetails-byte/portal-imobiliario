@@ -31,6 +31,7 @@ function DashboardInner() {
   const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
   const [properties, setProperties] = useState([]);
+  const [listingSearch, setListingSearch] = useState('');
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [featuredModal, setFeaturedModal] = useState(null);
@@ -204,6 +205,18 @@ function DashboardInner() {
           </span>
         )}
       </div>
+
+      {properties.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <input
+            type="text"
+            value={listingSearch}
+            onChange={(e) => setListingSearch(e.target.value)}
+            placeholder="Pesquisar por morada, preço, freguesia, concelho..."
+            style={{ maxWidth: 420 }}
+          />
+        </div>
+      )}
       {properties.length === 0 ? (
         <p className="empty-state">{t('dashboard_none_listings')}</p>
       ) : (
@@ -214,7 +227,14 @@ function DashboardInner() {
             { key: 'eliminado', title: 'Eliminados', match: (p) => p.status === 'eliminado' },
             { key: 'outros', title: 'Recusados ou anulados', match: (p) => ['rejeitado', 'anulado_suporte'].includes(p.status) },
           ].map(({ key, title, match }) => {
-            const group = properties.filter(match);
+            const term = listingSearch.trim().toLowerCase();
+            const matchesSearch = (p) => {
+              if (!term) return true;
+              const haystack = [p.address, p.parish, p.municipality, p.district, p.typology, String(p.price)]
+                .filter(Boolean).join(' ').toLowerCase();
+              return haystack.includes(term);
+            };
+            const group = properties.filter((p) => match(p) && matchesSearch(p));
             if (group.length === 0) return null;
             return (
               <div key={key}>
@@ -299,6 +319,14 @@ function DashboardInner() {
             );
           })}
         </div>
+      )}
+      {properties.length > 0 && listingSearch.trim() && properties.filter((p) => {
+        const term = listingSearch.trim().toLowerCase();
+        const haystack = [p.address, p.parish, p.municipality, p.district, p.typology, String(p.price)]
+          .filter(Boolean).join(' ').toLowerCase();
+        return haystack.includes(term);
+      }).length === 0 && (
+        <p className="empty-state">Nenhum anúncio corresponde a "{listingSearch}".</p>
       )}
 
       <h2 className="display" style={{ fontSize: 18, marginBottom: 14 }}>{t('dashboard_recent_leads')}</h2>
