@@ -41,16 +41,34 @@ export default function MortgageSimulator({ price }) {
   const [rateUpdatedAt, setRateUpdatedAt] = useState(null);
   const [hasCalculated, setHasCalculated] = useState(false);
   const [result, setResult] = useState(null);
+  const [loadedMortgageRate, setLoadedMortgageRate] = useState(null);
+  const [loadedEuriborRate, setLoadedEuriborRate] = useState(null);
 
   useEffect(() => {
     supabase.from('settings').select('mortgage_rate, euribor_rate, updated_at').eq('id', 1).single().then(({ data }) => {
       if (data) {
         setRate(Number(data.mortgage_rate));
         setRateUpdatedAt(data.updated_at);
-        if (data.euribor_rate != null) setMixedVariableRate(Number(data.euribor_rate));
+        setLoadedMortgageRate(Number(data.mortgage_rate));
+        if (data.euribor_rate != null) {
+          setMixedVariableRate(Number(data.euribor_rate));
+          setLoadedEuriborRate(Number(data.euribor_rate));
+        }
       }
     });
   }, []);
+
+  // Ao escolher "Variável", sugere logo a Euribor como ponto de partida
+  // (em vez da taxa média geral, que só faz sentido para "Fixa"/"Mista").
+  // Ao voltar para Fixa/Mista, repõe a taxa média geral.
+  useEffect(() => {
+    if (rateType === 'Variável' && loadedEuriborRate != null) {
+      setRate(loadedEuriborRate);
+    } else if (rateType !== 'Variável' && loadedMortgageRate != null) {
+      setRate(loadedMortgageRate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rateType]);
 
   function handleCalculate() {
     const monthlyRate = rate / 100 / 12;
@@ -159,6 +177,11 @@ export default function MortgageSimulator({ price }) {
       <div className="field">
         <label>{rateType === 'Mista' ? 'Taxa fixa inicial (%)' : 'Taxa de juro anual (%)'}</label>
         <input type="number" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} min={0} />
+        {rateType === 'Variável' && (
+          <span className="hint" style={{ fontWeight: 400, fontSize: 11.5, color: 'var(--text-soft)' }}>
+            Valor de partida: Euribor a 6 meses atual (ajuste conforme o spread do seu banco).
+          </span>
+        )}
       </div>
 
       {rateType === 'Mista' && (
