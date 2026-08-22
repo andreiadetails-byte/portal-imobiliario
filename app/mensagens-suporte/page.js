@@ -61,11 +61,6 @@ export default function MensagensSuportePage() {
     setSupportThreads((cur) => cur.filter((r) => r.id !== requestId));
   }
 
-  async function deleteInitialMessage(requestId) {
-    // Apagar a mensagem inicial apaga a conversa toda, já que tudo depende dela.
-    await deleteThread(requestId);
-  }
-
   async function deleteReply(requestId, replyId) {
     if (!confirm('Apagar esta mensagem? Esta ação não pode ser desfeita.')) return;
     await supabase.from('support_replies').delete().eq('id', replyId);
@@ -98,16 +93,14 @@ export default function MensagensSuportePage() {
                   <span style={{ fontSize: 15, fontWeight: 600 }}>
                     Conversa com {agentLabel(r.agent_name)}
                   </span>
-                  {!r.read_by_admin && (
-                    <button
-                      onClick={() => deleteInitialMessage(r.id)}
-                      aria-label="Apagar conversa"
-                      title="Apagar conversa (ainda não foi vista)"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a', fontSize: 15 }}
-                    >
-                      🗑
-                    </button>
-                  )}
+                  <button
+                    onClick={() => deleteThread(r.id)}
+                    aria-label="Eliminar conversa"
+                    title="Eliminar esta conversa definitivamente"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a', fontSize: 15 }}
+                  >
+                    🗑
+                  </button>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>

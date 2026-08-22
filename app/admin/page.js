@@ -101,6 +101,9 @@ function AdminInner() {
   const [mortgageRate, setMortgageRate] = useState('');
   const [savingRate, setSavingRate] = useState(false);
   const [rateSaved, setRateSaved] = useState(false);
+  const [euriborRate, setEuriborRate] = useState('');
+  const [savingEuribor, setSavingEuribor] = useState(false);
+  const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
   const [campaignSubject, setCampaignSubject] = useState('Novidades no More·ada — queremos saber a sua opinião!');
@@ -301,8 +304,11 @@ function AdminInner() {
   }
 
   async function loadMortgageRate() {
-    const { data } = await supabase.from('settings').select('mortgage_rate').eq('id', 1).single();
-    if (data) setMortgageRate(String(data.mortgage_rate));
+    const { data } = await supabase.from('settings').select('mortgage_rate, euribor_rate').eq('id', 1).single();
+    if (data) {
+      setMortgageRate(String(data.mortgage_rate));
+      if (data.euribor_rate != null) setEuriborRate(String(data.euribor_rate));
+    }
   }
 
   async function saveMortgageRate(e) {
@@ -312,6 +318,15 @@ function AdminInner() {
     setSavingRate(false);
     setRateSaved(true);
     setTimeout(() => setRateSaved(false), 2500);
+  }
+
+  async function saveEuriborRate(e) {
+    e.preventDefault();
+    setSavingEuribor(true);
+    await supabase.from('settings').update({ euribor_rate: Number(euriborRate), updated_at: new Date().toISOString() }).eq('id', 1);
+    setSavingEuribor(false);
+    setEuriborSaved(true);
+    setTimeout(() => setEuriborSaved(false), 2500);
   }
 
   useEffect(() => {
@@ -1388,6 +1403,25 @@ function AdminInner() {
               {savingRate ? 'A guardar...' : 'Guardar taxa'}
             </button>
             {rateSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 12 }}>✓ Guardado</span>}
+          </form>
+        </div>
+      )}
+
+      {section === 'definicoes' && (
+        <div className="card" style={{ padding: 20, maxWidth: 400, marginTop: 16 }}>
+          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>Taxa Euribor de referência</h3>
+          <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+            Usada como ponto de partida na "taxa variável" do simulador de crédito misto. Não é atualizada automaticamente — atualiza aqui sempre que a Euribor mudar significativamente (consulta em euribor-rates.eu ou no Banco de Portugal).
+          </p>
+          <form onSubmit={saveEuriborRate}>
+            <div className="field">
+              <label>Euribor a 6 meses (%)</label>
+              <input type="number" step="0.01" required value={euriborRate} onChange={(e) => setEuriborRate(e.target.value)} />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={savingEuribor}>
+              {savingEuribor ? 'A guardar...' : 'Guardar taxa'}
+            </button>
+            {euriborSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 12 }}>✓ Guardado</span>}
           </form>
         </div>
       )}

@@ -43,10 +43,11 @@ export default function MortgageSimulator({ price }) {
   const [result, setResult] = useState(null);
 
   useEffect(() => {
-    supabase.from('settings').select('mortgage_rate, updated_at').eq('id', 1).single().then(({ data }) => {
+    supabase.from('settings').select('mortgage_rate, euribor_rate, updated_at').eq('id', 1).single().then(({ data }) => {
       if (data) {
         setRate(Number(data.mortgage_rate));
         setRateUpdatedAt(data.updated_at);
+        if (data.euribor_rate != null) setMixedVariableRate(Number(data.euribor_rate));
       }
     });
   }, []);
@@ -172,6 +173,9 @@ export default function MortgageSimulator({ price }) {
           <div className="field">
             <label>Taxa variável estimada depois (%)</label>
             <input type="number" step="0.1" value={mixedVariableRate} onChange={(e) => setMixedVariableRate(Number(e.target.value))} min={0} />
+            <span className="hint" style={{ fontWeight: 400, fontSize: 11.5, color: 'var(--text-soft)' }}>
+              Valor de partida: Euribor a 6 meses atual (ajuste conforme o spread do seu banco).
+            </span>
           </div>
         </>
       )}
