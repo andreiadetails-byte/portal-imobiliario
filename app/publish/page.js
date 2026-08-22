@@ -388,7 +388,10 @@ function PublishForm() {
       setError('Por favor, escolha o subtipo de moradia.');
       return;
     }
-    const boolFields = ['has_storage', 'has_parking', 'has_balcony', 'has_garden', 'has_pool', 'has_gym', 'has_coworking', 'is_furnished', 'pets_allowed', 'near_transit'];
+    const boolFields = ['has_storage', 'has_parking', 'has_balcony', 'has_garden', 'has_pool', 'has_gym', 'has_coworking', 'near_transit'];
+    if (form.business_type === 'Arrendamento') {
+      boolFields.push('is_furnished', 'pets_allowed'); // só aparecem no formulário para arrendamento
+    }
     if (boolFields.some((f) => form[f] === null)) {
       setError('Por favor, responda a todas as perguntas de Sim/Não (arrumos, estacionamento, varanda, jardim, piscina, ginásio, sala coworking).');
       return;
