@@ -363,7 +363,7 @@ export default function LoginPage() {
                 </p>
                 <div className="field">
                   <label>{t('login_email')}</label>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 {error && <p className="error-text">{error}</p>}
                 <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
@@ -382,11 +382,11 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <div className="field">
               <label>{t('login_email')}</label>
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="email" required autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="field">
               <label>{t('login_pw')}</label>
-              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
             {!recaptchaAlreadyOk && <div ref={loginRecaptchaRef} style={{ marginBottom: 16 }} />}

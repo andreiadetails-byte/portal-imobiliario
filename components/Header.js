@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { logVisitIfNeeded } from '../lib/logVisit';
@@ -12,6 +12,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 export default function Header({ minimal = false }) {
   const { t } = useLanguage();
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -137,9 +138,11 @@ export default function Header({ minimal = false }) {
       <div className="navbar">
         <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, marginRight: 20 }}>
           <Link href="/" className="logo">More<span>&middot;</span>ada</Link>
-          <Link href="/" style={{ fontSize: 10.5, color: 'var(--text-soft)', marginTop: -2 }}>
-            ← Voltar à página principal
-          </Link>
+          {pathname !== '/' && (
+            <Link href="/" style={{ fontSize: 10.5, color: 'var(--text-soft)', marginTop: -2 }}>
+              ← Voltar à página principal
+            </Link>
+          )}
         </div>
         <div className="navbar-links" style={{ display: 'flex', alignItems: 'center' }}>
           <LanguageSwitcher />
