@@ -112,6 +112,29 @@ export default function LoginPage() {
     router.push('/');
   }
 
+  // Quando a pessoa volta atrás para esta página (botão do browser), o
+  // Chrome/Safari por vezes reaproveitam a página tal como estava guardada
+  // em memória ("bfcache"), em vez de a carregarem de novo — e a caixa do
+  // reCAPTCHA não sobrevive bem a isso. Isto deteta essa situação e força
+  // a caixa a ser desenhada outra vez.
+  useEffect(() => {
+    function handlePageShow(event) {
+      if (!event.persisted) return; // só nos interessa quando veio do cache
+      if (window.grecaptcha) {
+        recaptchaWidgetId.current = null;
+        loginRecaptchaWidgetId.current = null;
+        // Limpa o conteúdo antigo das caixas, para o Google não recusar
+        // desenhar de novo com "já existe uma caixa aqui".
+        if (recaptchaRef.current) recaptchaRef.current.innerHTML = '';
+        if (loginRecaptchaRef.current) loginRecaptchaRef.current.innerHTML = '';
+        setRecaptchaScriptReady(false);
+        setTimeout(() => setRecaptchaScriptReady(true), 0);
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
   // Desenha a caixa "Não sou um robô" à mão, só quando o formulário de registo
   // está mesmo visível — o Google não a encontra sozinho porque só existe depois
   // de a pessoa clicar em "Registar" (o site troca entre Login e Registar).
