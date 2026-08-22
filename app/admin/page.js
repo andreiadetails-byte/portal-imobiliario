@@ -88,6 +88,7 @@ function AdminInner() {
   const [news, setNews] = useState([]);
   const [newsForm, setNewsForm] = useState({ category: 'Habitação', title: '', body: '' });
   const [newsImage, setNewsImage] = useState(null);
+  const [editingNewsId, setEditingNewsId] = useState(null);
   const [savingNews, setSavingNews] = useState(false);
   const [featuredList, setFeaturedList] = useState([]);
   const [agencies, setAgencies] = useState([]);
@@ -445,7 +446,7 @@ function AdminInner() {
     e.preventDefault();
     setSavingNews(true);
 
-    let cover_image_url = null;
+    let cover_image_url = editingNewsId ? undefined : null;
     if (newsImage) {
       const ext = newsImage.name.split('.').pop();
       const path = `news/${Date.now()}.${ext}`;
@@ -456,17 +457,37 @@ function AdminInner() {
       }
     }
 
-    await supabase.from('news').insert({
+    const payload = {
       category: newsForm.category,
       title: (newsForm.title || '').replace(/\*+/g, ''),
       body: (newsForm.body || '').replace(/\*+/g, ''),
-      cover_image_url,
-      published: true,
-    });
+      ...(cover_image_url !== undefined ? { cover_image_url } : {}),
+    };
+
+    if (editingNewsId) {
+      await supabase.from('news').update(payload).eq('id', editingNewsId);
+    } else {
+      await supabase.from('news').insert({ ...payload, published: true });
+    }
+
     setNewsForm({ category: 'Habitação', title: '', body: '' });
     setNewsImage(null);
+    setEditingNewsId(null);
     setSavingNews(false);
     loadNews();
+  }
+
+  function startEditNews(n) {
+    setEditingNewsId(n.id);
+    setNewsForm({ category: n.category, title: n.title, body: n.body });
+    setNewsImage(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelEditNews() {
+    setEditingNewsId(null);
+    setNewsForm({ category: 'Habitação', title: '', body: '' });
+    setNewsImage(null);
   }
 
   async function deleteNews(id) {
@@ -1085,7 +1106,7 @@ function AdminInner() {
       {section === 'noticias' && (
         <>
           <form onSubmit={createNews} className="card" style={{ padding: 20, marginBottom: 28, overflow: 'visible' }}>
-            <h3 className="display" style={{ fontSize: 17, marginBottom: 14 }}>Nova notícia</h3>
+            <h3 className="display" style={{ fontSize: 17, marginBottom: 14 }}>{editingNewsId ? 'Editar notícia' : 'Nova notícia'}</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12, marginBottom: 12 }}>
               <div className="field" style={{ marginBottom: 0 }}>
                 <label>Categoria</label>
@@ -1106,7 +1127,7 @@ function AdminInner() {
               <textarea required rows={3} value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
             </div>
             <div className="field">
-              <label>Imagem <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+              <label>Imagem <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{editingNewsId ? '(deixa em branco para manter a imagem atual)' : '(opcional)'}</span></label>
               <label
                 htmlFor="news-image-input"
                 style={{
@@ -1118,9 +1139,14 @@ function AdminInner() {
               </label>
               <input id="news-image-input" type="file" accept="image/*" onChange={(e) => setNewsImage(e.target.files?.[0] || null)} style={{ display: 'none' }} />
             </div>
-            <button type="submit" className="btn btn-primary" disabled={savingNews}>
-              {savingNews ? 'A publicar...' : 'Publicar notícia'}
-            </button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="submit" className="btn btn-primary" disabled={savingNews}>
+                {savingNews ? 'A guardar...' : editingNewsId ? 'Guardar alterações' : 'Publicar notícia'}
+              </button>
+              {editingNewsId && (
+                <button type="button" onClick={cancelEditNews} className="btn">Cancelar edição</button>
+              )}
+            </div>
           </form>
 
           {news.length === 0 && <p className="empty-state">Ainda não publicaste nenhuma notícia.</p>}
@@ -1137,7 +1163,10 @@ function AdminInner() {
                   <div style={{ fontWeight: 600, fontSize: 14, margin: '4px 0' }}>{n.title}</div>
                   <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
                 </div>
-                <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12, flexShrink: 0, height: 'fit-content' }}>Apagar</button>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0, height: 'fit-content' }}>
+                  <button onClick={() => startEditNews(n)} className="btn" style={{ fontSize: 12 }}>Editar</button>
+                  <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12 }}>Apagar</button>
+                </div>
               </div>
             ))}
           </div>
