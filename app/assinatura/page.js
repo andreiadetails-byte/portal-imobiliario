@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 
 export default function AssinaturaPage() {
@@ -122,6 +123,7 @@ export default function AssinaturaPage() {
     <>
       <Header />
       <div className="wrap" style={{ maxWidth: 480, paddingTop: 60, paddingBottom: 80 }}>
+        <BackButton fallback="/dashboard" />
         <div className="card" style={{ padding: 30 }}>
           <h1 className="display" style={{ fontSize: 24, marginBottom: 8 }}>Assinatura de agência</h1>
 

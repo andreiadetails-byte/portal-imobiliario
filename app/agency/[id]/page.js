@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import Header from '../../../components/Header';
+import BackButton from '../../../components/BackButton';
 import { displayAddress } from '../../../lib/displayAddress';
 
 export default function AgencyPage() {
@@ -77,6 +78,9 @@ export default function AgencyPage() {
   return (
     <div>
       <Header />
+      <div className="wrap" style={{ paddingTop: 16, paddingBottom: 0 }}>
+        <BackButton fallback="/" />
+      </div>
       <div style={{
         height: 200,
         backgroundImage: 'linear-gradient(rgba(30,26,18,0.55), rgba(30,26,18,0.55)), url(/hero.jpg)',

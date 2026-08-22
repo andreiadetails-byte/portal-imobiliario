@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import { useLanguage } from '../../lib/i18n';
 
 export default function PerfilPage() {
@@ -154,6 +155,7 @@ export default function PerfilPage() {
     <>
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 560, paddingTop: 48, paddingBottom: 80 }}>
+        <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 26, marginBottom: 28 }}>{t('perfil_title')}</h1>
 
         <form onSubmit={saveProfile} className="card" style={{ padding: 24, marginBottom: 24 }}>

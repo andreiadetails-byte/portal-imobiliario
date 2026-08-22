@@ -8,6 +8,7 @@ import { useLanguage } from '../../lib/i18n';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import dynamic from 'next/dynamic';
 
 const MapDrawSearch = dynamic(() => import('../../components/MapDrawSearch'), { ssr: false });
@@ -239,6 +240,7 @@ function ResultsInner() {
       <Header />
 
       <main id="main-content" className="wrap" style={{ paddingTop: 32, paddingBottom: 32 }}>
+        <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('results_title')}</h1>
 
         <div className="results-grid" style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>

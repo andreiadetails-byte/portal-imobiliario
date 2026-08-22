@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send } from 'lucide-react';
 
@@ -573,6 +574,7 @@ function AdminInner() {
     <>
       <Header />
     <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
+      <BackButton fallback="/" />
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>Administração</h1>
 
       <div className="admin-tabs" style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)', overflowX: 'auto' }}>

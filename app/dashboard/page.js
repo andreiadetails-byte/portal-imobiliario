@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import { X, Gift } from 'lucide-react';
 import ViewsChart from '../../components/ViewsChart';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
@@ -167,6 +168,7 @@ function DashboardInner() {
     <>
       <Header />
     <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
+      <BackButton fallback="/" />
       {isWelcomeAgency && !welcomeDismissed && (
         <div style={{
           background: 'linear-gradient(135deg, var(--telha) 0%, #3E4A32 100%)', borderRadius: 10,

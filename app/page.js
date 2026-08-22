@@ -126,6 +126,15 @@ export default function HomePage() {
         }}
       >
         <div className="wrap" style={{ maxWidth: 760 }}>
+          <button
+            onClick={() => (typeof window !== 'undefined' && window.history.length > 1 ? window.history.back() : null)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, marginBottom: 20, padding: '8px 14px',
+              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 6, color: '#fff', cursor: 'pointer',
+            }}
+          >
+            ← Voltar
+          </button>
           <span style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
             textTransform: 'uppercase', color: 'var(--brass)', marginBottom: 18, display: 'block',

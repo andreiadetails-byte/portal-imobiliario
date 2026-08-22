@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 
 function Content() {
   const params = useSearchParams();
@@ -24,6 +25,9 @@ function Content() {
 
   return (
     <main id="main-content" className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center' }}>
+      <div style={{ textAlign: 'left', marginBottom: 12 }}>
+        <BackButton fallback="/" />
+      </div>
       <h1 className="display" style={{ fontSize: 24, marginBottom: 12 }}>{title}</h1>
       <p style={{ fontSize: 14.5, color: 'var(--text-soft)' }}>{text}</p>
     </main>

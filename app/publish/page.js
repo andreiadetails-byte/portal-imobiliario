@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import { geocodeAddress } from '../../lib/geocode';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { distritos, concelhosPorDistrito, freguesiasPorConcelho } from '../../lib/locations';
@@ -620,6 +621,7 @@ function PublishForm() {
     <>
       <Header />
     <main id="main-content" className="wrap" style={{ maxWidth: 720, padding: '48px 32px' }}>
+      <BackButton fallback="/dashboard" />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 className="display" style={{ fontSize: 28 }}>{isEditMode ? 'Editar anúncio' : t('publish_title')}</h1>
       </div>
