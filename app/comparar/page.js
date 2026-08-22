@@ -17,6 +17,7 @@ const ROWS = [
   { label: 'Andar', get: (p) => p.floor || '—' },
   { label: 'Estado', get: (p) => p.state || '—' },
   { label: 'Certificado energético', get: (p) => p.energy_certificate || '—' },
+  { label: 'Ano de construção', get: (p) => p.construction_year || '—' },
   { label: 'Condomínio', get: (p) => (p.condo_fee ? `${p.condo_fee} €/mês` : '—') },
   { label: 'Localização', get: (p) => displayAddress(p) },
   { label: 'Arrumos', get: (p) => (p.has_storage ? 'Sim' : 'Não') },
@@ -66,13 +67,20 @@ export default function CompararPage() {
     <>
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 1180, padding: '48px 32px 100px' }}>
-        <Link href="/favorites" className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 600, marginBottom: 20, padding: '10px 18px' }}>
+        <Link href="/favorites" className="btn no-print" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 600, marginBottom: 20, padding: '10px 18px' }}>
           ← Voltar aos favoritos
         </Link>
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Comparar imóveis</h1>
-        <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 28 }}>
-          Veja lado a lado as diferenças entre os imóveis que selecionou.
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 28 }} className="no-print">
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', margin: 0 }}>
+            Veja lado a lado as diferenças entre os imóveis que selecionou.
+          </p>
+          {properties.length >= 2 && (
+            <button onClick={() => window.print()} className="btn" style={{ fontSize: 13 }}>
+              📄 Descarregar em PDF
+            </button>
+          )}
+        </div>
 
         {loading ? (
           <p>A carregar...</p>
@@ -97,6 +105,7 @@ export default function CompararPage() {
                           <button
                             onClick={() => removeFromCompare(p.id)}
                             aria-label="Remover da comparação"
+                            className="no-print"
                             style={{
                               position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: '50%',
                               background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', fontSize: 13, zIndex: 1,

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
+import { isPasswordValid, PASSWORD_RULES_TEXT } from '../../lib/passwordRules';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -17,8 +18,8 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError('');
 
-    if (password.length < 8) {
-      setError('A palavra-passe precisa de pelo menos 8 caracteres.');
+    if (!isPasswordValid(password)) {
+      setError(PASSWORD_RULES_TEXT);
       return;
     }
     if (password !== confirmPassword) {

@@ -231,3 +231,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 textarea:focus-visible, [tabindex]:focus-visible{
   outline: 3px solid var(--brass); outline-offset: 2px;
 }
+
+/* Regras de impressão — usadas quando a pessoa descarrega a comparação de
+   imóveis em PDF (o browser "imprime para PDF"). Esconde tudo o que não
+   interessa no papel (cabeçalho do site, botões), e ajusta a tabela. */
+@media print{
+  .site-header, .support-widget, .no-print{ display:none !important; }
+  body{ background:#fff !important; }
+  table{ width:100% !important; }
+  a{ text-decoration:none !important; color:inherit !important; }
+}

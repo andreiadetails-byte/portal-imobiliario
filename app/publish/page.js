@@ -19,7 +19,7 @@ const CARACTERISTICAS = [
 
 const TIPOS_IMOVEL = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório', 'Quarto'];
 const SUBTIPOS_MORADIA = ['Moradia bifamiliar', 'Moradia geminada', 'Moradia em banda', 'Moradia independente'];
-const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente'];
+const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente', 'Nordeste', 'Noroeste', 'Sudeste', 'Sudoeste'];
 const PISOS = ['R/C', '1º', '2º', '3º', '4º', '5º', '6º', '7º', '8º', '9º', '10º', 'Superior ao 10º'];
 
 function YesNoField({ label, value, onChange }) {
@@ -79,7 +79,7 @@ function PublishForm() {
   const [form, setForm] = useState({
     title: '', internal_reference: '', description: '', property_type: 'Apartamento', typology: 'T3',
     business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: 3, bathrooms: 2,
-    state: '', energy_certificate: 'B', address: '', district: '', municipality: '', parish: '',
+    state: '', energy_certificate: '', construction_year: '', address: '', district: '', municipality: '', parish: '',
     floor: '', area_util: '', house_subtype: '', is_top_floor: false,
     has_storage: null, has_parking: null, has_balcony: null,
     has_garden: null, has_pool: null, has_gym: null, has_coworking: null,
@@ -137,7 +137,7 @@ function PublishForm() {
           typology: prop.typology || 'T3', business_type: prop.business_type || 'Venda',
           price: prop.price ?? '', condo_fee: prop.condo_fee ?? '', area: prop.area ?? '',
           bedrooms: prop.bedrooms ?? 3, bathrooms: prop.bathrooms ?? 2, state: prop.state || '',
-          energy_certificate: prop.energy_certificate || 'B', address: prop.address || '',
+          energy_certificate: prop.energy_certificate || '', construction_year: prop.construction_year || '', address: prop.address || '',
           district: prop.district || '', municipality: prop.municipality || '', parish: prop.parish || '',
           floor: prop.floor || '', area_util: prop.area_util ?? '', house_subtype: prop.house_subtype || '',
           is_top_floor: !!prop.is_top_floor,
@@ -376,6 +376,10 @@ function PublishForm() {
       setError('Por favor, indique a área útil.');
       return;
     }
+    if (!form.energy_certificate) {
+      setError('Por favor, escolha o certificado energético do imóvel.');
+      return;
+    }
     if (form.description.trim().length < 50) {
       setError(`A descrição precisa de pelo menos 50 caracteres (tem ${form.description.trim().length}).`);
       return;
@@ -418,7 +422,7 @@ function PublishForm() {
     const stripAsterisks = (text) => (text || '').replace(/\*+/g, '');
 
     const propertyFields = {
-      title: stripAsterisks(form.title) || `${form.typology} · ${form.address}`,
+      title: stripAsterisks(form.title) || `${form.typology || form.property_type} · ${form.address}`,
       internal_reference: form.internal_reference || null,
       display_name: form.display_name || null,
       description: stripAsterisks(form.description),
@@ -432,6 +436,7 @@ function PublishForm() {
       bathrooms: Number(form.bathrooms),
       state: form.state,
       energy_certificate: form.energy_certificate,
+      construction_year: form.construction_year ? Number(form.construction_year) : null,
       address: form.address,
       district: form.district,
       municipality: form.municipality || null,
@@ -690,27 +695,34 @@ function PublishForm() {
               onChange={(e) => {
                 updateField('property_type', e.target.value);
                 if (e.target.value === 'Quarto') updateField('business_type', 'Arrendamento');
+                if (!['Apartamento', 'Moradia', 'Quarto'].includes(e.target.value)) {
+                  updateField('typology', null);
+                  updateField('bedrooms', 0);
+                }
               }}
             >
               {TIPOS_IMOVEL.map((t) => <option key={t}>{t}</option>)}
             </select>
           </div>
-          <div className="field">
-            <label>Tipologia</label>
-            <select
-              value={form.typology}
-              onChange={(e) => {
-                const novaTipologia = e.target.value;
-                updateField('typology', novaTipologia);
-                const sugerido = { T0: 0, T1: 1, T2: 2, T3: 3, T4: 4, 'T5+': 5 }[novaTipologia];
-                if (sugerido !== undefined) updateField('bedrooms', sugerido);
-              }}
-            >
-              {['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'].map((t) => <option key={t}>{t}</option>)}
-            </select>
-          </div>
+          {['Apartamento', 'Moradia', 'Quarto'].includes(form.property_type) && (
+            <div className="field">
+              <label>Tipologia</label>
+              <select
+                value={form.typology || 'T0'}
+                onChange={(e) => {
+                  const novaTipologia = e.target.value;
+                  updateField('typology', novaTipologia);
+                  const sugerido = { T0: 0, T1: 1, T2: 2, T3: 3, T4: 4, 'T5+': 5 }[novaTipologia];
+                  if (sugerido !== undefined) updateField('bedrooms', sugerido);
+                }}
+              >
+                {['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'].map((t) => <option key={t}>{t}</option>)}
+              </select>
+            </div>
+          )}
         </div>
 
+        {['Apartamento', 'Moradia', 'Quarto'].includes(form.property_type) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
             <label>Quartos</label>
@@ -721,6 +733,7 @@ function PublishForm() {
             <input type="number" min={0} required value={form.bathrooms} onChange={(e) => updateField('bathrooms', e.target.value)} />
           </div>
         </div>
+        )}
 
         {form.property_type === 'Moradia' && (
           <div className="field">
@@ -789,9 +802,22 @@ function PublishForm() {
 
         <div className="field">
           <label>Certificado energético</label>
-          <select value={form.energy_certificate} onChange={(e) => updateField('energy_certificate', e.target.value)}>
-            {['A+', 'A', 'B', 'C', 'D', 'E', 'F'].map((c) => <option key={c}>{c}</option>)}
+          <select required value={form.energy_certificate} onChange={(e) => updateField('energy_certificate', e.target.value)}>
+            <option value="">Escolha uma opção</option>
+            {['A+', 'A', 'B', 'B-', 'C', 'D', 'E', 'F', 'Isento'].map((c) => <option key={c}>{c}</option>)}
           </select>
+        </div>
+
+        <div className="field">
+          <label>Ano de construção <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+          <input
+            type="number"
+            min={1900}
+            max={new Date().getFullYear() + 2}
+            value={form.construction_year}
+            onChange={(e) => updateField('construction_year', e.target.value)}
+            placeholder="ex: 2005"
+          />
         </div>
 
         <div className="field">

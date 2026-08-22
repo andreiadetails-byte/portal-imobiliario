@@ -37,6 +37,7 @@ function ResultsInner() {
   const [selectedTypologies, setSelectedTypologies] = useState(
     searchParams.get('typologies') ? searchParams.get('typologies').split(',') : []
   );
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [minBedrooms, setMinBedrooms] = useState('');
   const [minBathrooms, setMinBathrooms] = useState('');
@@ -118,7 +119,7 @@ function ResultsInner() {
       ? `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} em ${district}`
       : `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} imóvel`;
 
-    const filters = { district, businessType, selectedTypes, selectedStates, selectedAgency, selectedTypologies, maxPrice, minBedrooms, minBathrooms, minArea, selectedAmenities };
+    const filters = { district, businessType, selectedTypes, selectedStates, selectedAgency, selectedTypologies, minPrice, maxPrice, minBedrooms, minBathrooms, minArea, selectedAmenities };
 
     const { error } = await supabase.from('saved_searches').insert({ user_id: user.id, name, filters, notify: true });
     if (!error) alert(`Pesquisa guardada! Vai receber um email sempre que aparecer um imóvel novo que corresponda.`);
@@ -143,6 +144,7 @@ function ResultsInner() {
     if (selectedStates.length > 0) query = query.in('state', selectedStates);
     if (selectedAgency) query = query.eq('owner_id', selectedAgency.id);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
+    if (minPrice) query = query.gte('price', Number(minPrice));
     if (maxPrice) query = query.lte('price', Number(maxPrice));
     if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
     if (minBathrooms) query = query.gte('bathrooms', Number(minBathrooms));
@@ -198,6 +200,7 @@ function ResultsInner() {
     if (selectedStates.length > 0) query = query.in('state', selectedStates);
     if (selectedAgency) query = query.eq('owner_id', selectedAgency.id);
     if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
+    if (minPrice) query = query.gte('price', Number(minPrice));
     if (maxPrice) query = query.lte('price', Number(maxPrice));
     if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
     if (minBathrooms) query = query.gte('bathrooms', Number(minBathrooms));
@@ -261,8 +264,12 @@ function ResultsInner() {
             </div>
 
             <div className="field">
-              <label>{t('results_maxprice')}</label>
-              <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+              <label>Preço</label>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input type="number" placeholder="Desde" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+                <span style={{ color: 'var(--text-soft)', fontSize: 13 }}>—</span>
+                <input type="number" placeholder="Até" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+              </div>
             </div>
 
             <div className="field">

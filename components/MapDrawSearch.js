@@ -61,7 +61,7 @@ function MapInner({ drawing, points, setPoints, withCoords }) {
         <Polygon positions={points} pathOptions={{ color: '#5A6B49', fillColor: '#7E8F6A', fillOpacity: 0.25 }} />
       )}
 
-      {withCoords.length > 0 && <ClusterMarkers properties={withCoords} />}
+      {withCoords.length > 0 && !drawing && <ClusterMarkers properties={withCoords} />}
     </MapContainer>
   );
 }

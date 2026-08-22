@@ -155,6 +155,24 @@ export default function FavoritesPage() {
           ))}
         </div>
 
+        {tab === 'favoritos' && properties.length > 1 && (
+          <div style={{ marginBottom: 20 }}>
+            <button
+              onClick={() => router.push('/comparar')}
+              className="btn btn-primary"
+              disabled={compareIds.length < 2}
+              style={{ fontSize: 13.5, opacity: compareIds.length < 2 ? 0.5 : 1, cursor: compareIds.length < 2 ? 'not-allowed' : 'pointer' }}
+            >
+              ⇄ Comparar os meus imóveis {compareIds.length >= 2 ? `(${compareIds.length})` : ''}
+            </button>
+            {compareIds.length < 2 && (
+              <span style={{ fontSize: 12, color: 'var(--text-soft)', marginLeft: 10 }}>
+                Marque a caixa "Comparar" em pelo menos 2 imóveis abaixo.
+              </span>
+            )}
+          </div>
+        )}
+
         {tab === 'favoritos' && (
           <>
             {properties.length === 0 && <div className="empty-state">{t('favorites_empty')}</div>}

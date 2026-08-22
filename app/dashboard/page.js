@@ -33,6 +33,8 @@ function DashboardInner() {
   const [properties, setProperties] = useState([]);
   const [listingFilters, setListingFilters] = useState({ address: '', price: '', parish: '', municipality: '' });
   const [appliedListingFilters, setAppliedListingFilters] = useState({ address: '', price: '', parish: '', municipality: '' });
+  const [listingPages, setListingPages] = useState({});
+  const LISTINGS_PER_PAGE = 15;
 
   function updateListingFilter(key, value) {
     setListingFilters((cur) => ({ ...cur, [key]: value }));
@@ -101,6 +103,12 @@ function DashboardInner() {
   async function markLeadReplied(leadId) {
     await supabase.from('leads').update({ status: 'respondido' }).eq('id', leadId);
     setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, status: 'respondido' } : l)));
+  }
+
+  async function deleteLead(leadId) {
+    if (!confirm('Apagar esta mensagem? Esta ação não pode ser desfeita.')) return;
+    await supabase.from('leads').delete().eq('id', leadId);
+    setLeads((cur) => cur.filter((l) => l.id !== leadId));
   }
 
   async function deleteProperty(id) {
@@ -266,13 +274,16 @@ function DashboardInner() {
             };
             const group = properties.filter((p) => match(p) && matchesSearch(p));
             if (group.length === 0) return null;
+            const currentPage = listingPages[key] || 1;
+            const totalPages = Math.ceil(group.length / LISTINGS_PER_PAGE);
+            const pageItems = group.slice((currentPage - 1) * LISTINGS_PER_PAGE, currentPage * LISTINGS_PER_PAGE);
             return (
               <div key={key}>
                 <h2 className="display" style={{ fontSize: 15, marginBottom: 10, color: 'var(--text-soft)' }}>
                   {title} <span style={{ fontWeight: 400 }}>({group.length})</span>
                 </h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {group.map((p) => {
+                  {pageItems.map((p) => {
                     const st = STATUS_LABELS[p.status] || { label: p.status, color: 'var(--text-soft)', bg: 'var(--line)' };
                     const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                     const isLocked = p.status === 'anulado_suporte' || p.status === 'eliminado';
@@ -345,6 +356,29 @@ function DashboardInner() {
                     );
                   })}
                 </div>
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, marginBottom: 4 }}>
+                    <button
+                      onClick={() => setListingPages((cur) => ({ ...cur, [key]: currentPage - 1 }))}
+                      disabled={currentPage <= 1}
+                      className="btn"
+                      style={{ fontSize: 12.5, opacity: currentPage <= 1 ? 0.4 : 1 }}
+                    >
+                      ← Anterior
+                    </button>
+                    <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
+                      Página {currentPage} de {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setListingPages((cur) => ({ ...cur, [key]: currentPage + 1 }))}
+                      disabled={currentPage >= totalPages}
+                      className="btn"
+                      style={{ fontSize: 12.5, opacity: currentPage >= totalPages ? 0.4 : 1 }}
+                    >
+                      Seguinte →
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -377,11 +411,16 @@ function DashboardInner() {
                 </span>
               </div>
               <p style={{ fontSize: 13, color: 'var(--text-soft)', margin: '4px 0' }}>{l.message}</p>
-              {l.status === 'novo' && (
-                <button onClick={() => markLeadReplied(l.id)} className="btn" style={{ fontSize: 12, padding: '6px 12px' }}>
-                  {t('dashboard_mark_replied')}
+              <div style={{ display: 'flex', gap: 8 }}>
+                {l.status === 'novo' && (
+                  <button onClick={() => markLeadReplied(l.id)} className="btn" style={{ fontSize: 12, padding: '6px 12px' }}>
+                    {t('dashboard_mark_replied')}
+                  </button>
+                )}
+                <button onClick={() => deleteLead(l.id)} className="btn" style={{ fontSize: 12, padding: '6px 12px' }}>
+                  Apagar
                 </button>
-              )}
+              </div>
             </div>
           ))}
         </div>

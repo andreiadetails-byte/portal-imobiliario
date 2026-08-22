@@ -138,7 +138,7 @@ export default function InvestmentProfitCalculator() {
       <EuroField label="Valor de revenda do imóvel" value={resalePrice} onChange={setResalePrice} />
 
       <div className="field">
-        <label>Vai financiar a compra com crédito?</label>
+        <label>Este imóvel teve financiamento (crédito habitação)?</label>
         <PillGroup value={financed} onChange={setFinanced} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
       </div>
       {financed === 'Sim' && (

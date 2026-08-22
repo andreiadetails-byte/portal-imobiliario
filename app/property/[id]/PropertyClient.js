@@ -426,6 +426,7 @@ export default function PropertyClient() {
               property.floor && ['Piso', property.floor],
               property.solar_orientations?.length > 0 && ['Orientação', property.solar_orientations.join(', ')],
               property.energy_certificate && ['Classe energética', property.energy_certificate],
+              property.construction_year && ['Ano de construção', property.construction_year],
               property.state && ['Estado do imóvel', property.state],
               ['Elevador', property.features?.includes('Elevador') ? 'Sim' : 'Não'],
               ['Estacionamento', property.has_parking ? 'Sim' : 'Não'],

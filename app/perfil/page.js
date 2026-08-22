@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { useLanguage } from '../../lib/i18n';
+import { isPasswordValid, PASSWORD_RULES_TEXT } from '../../lib/passwordRules';
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -110,8 +111,8 @@ export default function PerfilPage() {
       setPasswordError('Introduza a sua palavra-passe atual, para confirmarmos que é mesmo você.');
       return;
     }
-    if (newPassword.length < 8) {
-      setPasswordError(t('perfil_password_too_short'));
+    if (!isPasswordValid(newPassword)) {
+      setPasswordError(PASSWORD_RULES_TEXT);
       return;
     }
     if (newPassword !== confirmPassword) {

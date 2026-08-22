@@ -111,6 +111,7 @@ function AdminInner() {
   const [sendingCampaign, setSendingCampaign] = useState(false);
   const [campaignResult, setCampaignResult] = useState(null);
   const [userSearch, setUserSearch] = useState('');
+  const [userTypeFilter, setUserTypeFilter] = useState('todos');
   const [supportReplyText, setSupportReplyText] = useState({});
   const [ads, setAds] = useState([]);
   const [adForm, setAdForm] = useState({ title: '', link_url: '' });
@@ -842,6 +843,22 @@ function AdminInner() {
 
       {section === 'utilizadores' && (
         <>
+          <div style={{ marginBottom: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {[
+              ['todos', 'Todos'],
+              ['particular', `Particulares (${allUsers.filter((u) => u.account_type === 'particular').length})`],
+              ['agencia', `Agências (${allUsers.filter((u) => u.account_type === 'agencia').length})`],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setUserTypeFilter(value)}
+                className={userTypeFilter === value ? 'btn btn-primary' : 'btn'}
+                style={{ fontSize: 12.5 }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div style={{ marginBottom: 16 }}>
             <input
               value={userSearch}
@@ -853,6 +870,7 @@ function AdminInner() {
           {allUsers.length === 0 && <p className="empty-state">Ainda não há utilizadores.</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {allUsers
+              .filter((u) => userTypeFilter === 'todos' || u.account_type === userTypeFilter)
               .filter((u) => {
                 const q = userSearch.trim().toLowerCase();
                 if (!q) return true;
@@ -956,7 +974,7 @@ function AdminInner() {
       {section === 'leads' && (
         <>
           <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
-            Todas as mensagens de contacto (leads) enviadas através dos anúncios, de todos os utilizadores.
+            Aqui vês, como administradora, todas as mensagens de contacto (leads) que os outros utilizadores receberam através dos seus anúncios — de qualquer pessoa, de qualquer utilizador. Serve para apoio e moderação.
           </p>
           {allLeads.length === 0 && <p className="empty-state">Ainda não há leads.</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

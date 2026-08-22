@@ -32,11 +32,6 @@ export default function ValuationClient() {
   return (
     <>
       <Header />
-      <div style={{
-        width: '100%', maxWidth: 900, margin: '0 auto', aspectRatio: '16 / 9',
-        backgroundImage: 'url(/images/avaliacao-banner.jpg)',
-        backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
-      }} />
       <div className="wrap" style={{ maxWidth: 560, padding: '48px 32px 80px' }}>
         <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Avalie o seu imóvel</h1>

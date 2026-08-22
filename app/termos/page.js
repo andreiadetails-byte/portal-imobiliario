@@ -25,7 +25,7 @@ export default function TermosPage() {
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Subscrição de agências</h2>
       <p style={{ marginBottom: 16 }}>
-        Contas de agência têm direito a um primeiro mês gratuito. Após esse período, a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €, paga através de uma Entidade e Referência Multibanco gerada diretamente na plataforma. A subscrição é válida por um mês exato a contar da data de confirmação do pagamento; caso não seja renovada, o acesso ao painel e à publicação de novos anúncios fica suspenso até à confirmação de um novo pagamento. Não há fidelização — a subscrição pode ser cancelada a qualquer momento.
+        Contas de agência têm direito a um primeiro mês gratuito. Após esse período, a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €, paga através de uma Entidade e Referência Multibanco gerada diretamente na plataforma. A subscrição é válida por um mês exato a contar da data de confirmação do pagamento; caso não seja renovada, o acesso ao painel e à publicação de novos anúncios fica suspenso até à confirmação de um novo pagamento.
       </p>
 
       <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginTop: 20, marginBottom: 8 }}>Conteúdo dos anúncios</h2>

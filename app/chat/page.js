@@ -259,28 +259,28 @@ function ChatInner() {
                     key={c.id}
                     onClick={() => setActiveId(c.id)}
                     style={{
-                      display: 'flex', gap: 10, padding: '12px 14px', margin: '0 10px 10px',
+                      display: 'flex', gap: 12, padding: '16px 16px', margin: '0 10px 12px',
                       border: c.id === activeId ? '1.5px solid var(--telha)' : '1px solid var(--line)',
                       borderRadius: 8, cursor: 'pointer',
                       background: c.id === activeId ? 'var(--plaster)' : 'var(--paper)', alignItems: 'flex-start',
                     }}
                   >
                     <div style={{
-                      width: 34, height: 34, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, flexShrink: 0,
+                      width: 42, height: 42, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, flexShrink: 0,
                     }}>
                       {initials || '?'}
                     </div>
 
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
-                        <b style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</b>
-                        <span style={{ fontSize: 10, color: 'var(--text-soft)', flexShrink: 0 }}>
+                        <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</b>
+                        <span style={{ fontSize: 12, color: 'var(--text-soft)', flexShrink: 0 }}>
                           {c.lastMessage ? new Date(c.lastMessage.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' }) : ''}
                         </span>
                       </div>
                       {contact && (
-                        <div style={{ fontSize: 11, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 13, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {contact}
                         </div>
                       )}
@@ -293,17 +293,17 @@ function ChatInner() {
                           <div style={{ width: 32, height: 26, borderRadius: 3, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
                         )}
                         <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {c.properties?.typology} · {c.properties?.address}
                           </div>
-                          <div style={{ fontSize: 10.5, color: 'var(--text-soft)' }}>
+                          <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
                             {c.properties && `${Number(c.properties.price).toLocaleString('pt-PT')} €`}
                           </div>
                         </div>
                       </div>
 
                       <div style={{
-                        fontSize: 11.5, marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        fontSize: 13.5, marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         fontWeight: isUnread ? 700 : 400, color: isUnread ? 'var(--ink)' : 'var(--text-soft)',
                       }}>
                         {c.lastMessage?.content || 'Sem mensagens ainda'}
@@ -311,12 +311,12 @@ function ChatInner() {
 
                       <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
                         {isUnread && (
-                          <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 8, background: '#b8452f', color: '#fff' }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: '#b8452f', color: '#fff' }}>
                             {c.unreadCount} NOVA{c.unreadCount > 1 ? 'S' : ''}
                           </span>
                         )}
                         {c.status === 'tratada' && (
-                          <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 8, background: 'var(--line)', color: 'var(--text-soft)' }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: 'var(--line)', color: 'var(--text-soft)' }}>
                             TRATADA
                           </span>
                         )}
@@ -343,7 +343,7 @@ function ChatInner() {
           <div className={`chat-thread-col${activeId ? '' : ' chat-hide-mobile'}`} style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             <div style={{ borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
               <div style={{ padding: '14px 18px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 13.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button
                     onClick={() => setActiveId(null)}
                     className="chat-back-btn"

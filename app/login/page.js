@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
+import { isPasswordValid, PASSWORD_RULES_TEXT } from '../../lib/passwordRules';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 
@@ -208,8 +209,12 @@ export default function LoginPage() {
   async function handleSignup(e) {
     e.preventDefault();
     setError('');
-    if (accountType === 'agencia' && !amiLicense.trim()) {
-      setError('Indique o número de licença AMI da sua agência.');
+    if ((accountType === 'agencia' || accountType === 'consultor') && !amiLicense.trim()) {
+      setError('Indique o número de licença AMI.');
+      return;
+    }
+    if (!isPasswordValid(password)) {
+      setError(PASSWORD_RULES_TEXT);
       return;
     }
     const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha && recaptchaWidgetId.current !== null
@@ -274,7 +279,7 @@ export default function LoginPage() {
         email: data.user.email,
         phone_real: phone || null,
         show_phone_public: showPhonePublic,
-        ...(accountType === 'agencia' && { agency_license: amiLicense.trim() }),
+        ...((accountType === 'agencia' || accountType === 'consultor') && { agency_license: amiLicense.trim() }),
         ...freeMonthFields,
         ...(avatar_url && { avatar_url }),
       }, { onConflict: 'id' });
@@ -406,12 +411,14 @@ export default function LoginPage() {
             <div className="field">
               <label>{t('login_account_type')}</label>
               <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
-                <option value="particular">{t('login_individual')}</option>
-                <option value="agencia">{t('login_agency')}</option>
+                <option value="particular">Particular</option>
+                <option value="agencia">Agência</option>
+                <option value="consultor">Consultor imobiliário</option>
+                <option value="promotor">Promotor imobiliário</option>
               </select>
             </div>
 
-            {accountType === 'agencia' && (
+            {(accountType === 'agencia' || accountType === 'consultor') && (
               <div className="field">
                 <label htmlFor="ami-input">Licença AMI</label>
                 <input
@@ -422,7 +429,7 @@ export default function LoginPage() {
                   placeholder="ex: 12345"
                 />
                 <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>
-                  Número de licença AMI da sua agência (obrigatório em Portugal para mediação imobiliária).
+                  Número de licença AMI (obrigatório em Portugal para mediação imobiliária).
                 </span>
               </div>
             )}
@@ -489,6 +496,7 @@ export default function LoginPage() {
             <div className="field">
               <label>{t('login_pw_min')}</label>
               <input type="password" required minLength={8} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <span className="hint" style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>Pelo menos 8 caracteres, com maiúscula, minúscula e número.</span>
             </div>
             {error && <p className="error-text">{error}</p>}
             <div ref={recaptchaRef} style={{ marginBottom: 16 }} />

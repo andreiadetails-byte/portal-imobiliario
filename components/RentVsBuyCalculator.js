@@ -53,14 +53,13 @@ export default function RentVsBuyCalculator({ price = 200000 }) {
         Estimativa simplificada. Considera juros, IMT, Selo e manutenção do lado da compra; renda com aumento anual do lado do arrendamento — sem contar a valorização do imóvel.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--telha)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 8 }}>
+        🏠 Se comprar
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
         <div className="field">
           <label>Preço do imóvel</label>
           <input type="number" value={purchasePrice} onChange={(e) => setPurchasePrice(Number(e.target.value))} />
-        </div>
-        <div className="field">
-          <label>Renda mensal equivalente</label>
-          <input type="number" value={monthlyRent} onChange={(e) => setMonthlyRent(Number(e.target.value))} />
         </div>
         <div className="field">
           <label>Entrada (%)</label>
@@ -74,10 +73,24 @@ export default function RentVsBuyCalculator({ price = 200000 }) {
           <label>Taxa de juro (%)</label>
           <input type="number" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} />
         </div>
-        <div className="field">
-          <label>Quantos anos vais ficar?</label>
-          <input type="number" value={horizon} onChange={(e) => setHorizon(Number(e.target.value))} />
+      </div>
+
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--telha)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 8 }}>
+        🔑 Se arrendar
+      </div>
+      <div style={{ marginBottom: 18 }}>
+        <div className="field" style={{ maxWidth: 300 }}>
+          <label>Renda mensal equivalente</label>
+          <input type="number" value={monthlyRent} onChange={(e) => setMonthlyRent(Number(e.target.value))} />
         </div>
+      </div>
+
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 8 }}>
+        Horizonte temporal
+      </div>
+      <div className="field" style={{ maxWidth: 300 }}>
+        <label>Quantos anos vais ficar no imóvel?</label>
+        <input type="number" value={horizon} onChange={(e) => setHorizon(Number(e.target.value))} />
       </div>
 
       <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 18, marginTop: 8 }}>

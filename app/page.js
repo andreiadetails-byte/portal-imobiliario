@@ -44,6 +44,13 @@ export default function HomePage() {
   const [news, setNews] = useState([]);
   const [user, setUser] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState([]);
+  const [totalActiveCount, setTotalActiveCount] = useState(null);
+
+  useEffect(() => {
+    supabase.from('properties').select('id', { count: 'exact', head: true }).eq('status', 'ativo').then(({ count }) => {
+      if (count != null) setTotalActiveCount(count);
+    });
+  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -177,6 +184,22 @@ export default function HomePage() {
               🗺️ Prefere desenhar a sua zona no mapa?
             </Link>
           </div>
+
+          <div style={{
+            display: 'flex', justifyContent: 'center', gap: 28, flexWrap: 'wrap', marginTop: 28,
+            paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.18)',
+          }}>
+            {[
+              totalActiveCount != null && [`${totalActiveCount}+`, 'imóveis ativos'],
+              ['7', 'idiomas com tradução automática'],
+              ['0€', 'para publicar como particular'],
+            ].filter(Boolean).map(([value, label]) => (
+              <div key={label} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-display, serif)', fontSize: 22, fontWeight: 600, color: '#fff' }}>{value}</div>
+                <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -211,8 +234,10 @@ export default function HomePage() {
               <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 6 }}>
                 Aponta a câmara para abrir no telemóvel, e depois:
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-soft)', lineHeight: 1.6 }}>
-                <b>Android (Chrome):</b> toca em "Instalar" quando aparecer, ou nos 3 pontinhos → "Instalar aplicação"<br />
+              <div style={{ fontSize: 12, color: 'var(--text-soft)', lineHeight: 1.7 }}>
+                <b>Android (Chrome):</b><br />
+                Opção 1 — Toca em "Instalar" quando aparecer<br />
+                Opção 2 — Toca em ⋮ (canto superior direito) → "Instalar aplicação"<br /><br />
                 <b>iPhone (Safari):</b> toca em Partilhar → "Adicionar ao Ecrã Principal"
               </div>
             </div>
