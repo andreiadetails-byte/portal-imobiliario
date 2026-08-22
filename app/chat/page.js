@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
+import BackButton from '../../components/BackButton';
 import { Trash2 } from 'lucide-react';
 
 function ChatInner() {
@@ -209,6 +210,7 @@ function ChatInner() {
     <>
       <Header />
     <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
+      <BackButton fallback="/" />
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('chat_title')}</h1>
 
       {conversations.length === 0 ? (

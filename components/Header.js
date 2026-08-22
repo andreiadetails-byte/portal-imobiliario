@@ -135,7 +135,12 @@ export default function Header({ minimal = false }) {
   return (
     <header className={`site-header${minimal ? ' header-minimal' : ''}`}>
       <div className="navbar">
-        <Link href="/" className="logo" style={{ flexShrink: 0, marginRight: 20 }}>More<span>&middot;</span>ada</Link>
+        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, marginRight: 20 }}>
+          <Link href="/" className="logo">More<span>&middot;</span>ada</Link>
+          <Link href="/" style={{ fontSize: 10.5, color: 'var(--text-soft)', marginTop: -2 }}>
+            ← Voltar à página principal
+          </Link>
+        </div>
         <div className="navbar-links" style={{ display: 'flex', alignItems: 'center' }}>
           <LanguageSwitcher />
 
@@ -204,18 +209,20 @@ export default function Header({ minimal = false }) {
                   </span>
                 )}
               </Link>
-              <Link href="/mensagens-suporte" className="btn" style={{ marginRight: 6, position: 'relative', minWidth: 0, padding: '9px 10px', textAlign: 'center' }}>
-                Mensagens Suporte
-                {unreadSupport > 0 && (
-                  <span style={{
-                    position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
-                    background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
-                  }}>
-                    {unreadSupport > 9 ? '9+' : unreadSupport}
-                  </span>
-                )}
-              </Link>
+              {!isAdmin && (
+                <Link href="/mensagens-suporte" className="btn" style={{ marginRight: 6, position: 'relative', minWidth: 0, padding: '9px 10px', textAlign: 'center' }}>
+                  Mensagens Suporte
+                  {unreadSupport > 0 && (
+                    <span style={{
+                      position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
+                      background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                    }}>
+                      {unreadSupport > 9 ? '9+' : unreadSupport}
+                    </span>
+                  )}
+                </Link>
+              )}
               {isAdmin && (
                 <Link href="/admin" className="btn" style={{ marginRight: 6, color: 'var(--telha)', position: 'relative', padding: '9px 12px' }}>
                   ⚙ Admin
