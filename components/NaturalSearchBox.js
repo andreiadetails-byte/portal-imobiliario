@@ -96,7 +96,7 @@ export default function NaturalSearchBox() {
   const baseTextRef = useRef('');
   const startingRef = useRef(false);
 
-  const VOICE_LOCALES = { pt: 'pt-PT', en: 'en-US', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', nl: 'nl-NL', ru: 'ru-RU' };
+  const VOICE_LOCALES = { pt: 'pt-PT', en: 'en-US', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', nl: 'nl-NL', ru: 'ru-RU', it: 'it-IT', pl: 'pl-PL', sv: 'sv-SE', uk: 'uk-UA', zh: 'zh-CN', ar: 'ar-SA' };
 
   // O reconhecimento é criado só uma vez. Trocar de idioma a meio de uma gravação
   // não recria o objeto (o que às vezes deixava o microfone num estado confuso).

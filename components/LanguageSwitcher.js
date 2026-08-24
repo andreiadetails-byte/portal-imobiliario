@@ -11,6 +11,12 @@ const LANGUAGES = [
   { code: 'de', label: 'DE', flag: 'de' },
   { code: 'nl', label: 'NL', flag: 'nl' },
   { code: 'ru', label: 'RU', flag: 'ru' },
+  { code: 'it', label: 'IT', flag: 'it' },
+  { code: 'pl', label: 'PL', flag: 'pl' },
+  { code: 'sv', label: 'SV', flag: 'se' },
+  { code: 'uk', label: 'UA', flag: 'ua' },
+  { code: 'zh', label: '中文', flag: 'cn' },
+  { code: 'ar', label: 'AR', flag: 'sa' },
 ];
 
 export default function LanguageSwitcher() {

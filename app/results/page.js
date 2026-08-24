@@ -260,7 +260,7 @@ function ResultsInner() {
 
             <div className="field">
               <label>{t('results_district')}</label>
-              <LocationAutocomplete onChange={setDistrict} placeholder="ex: Lisboa" />
+              <LocationAutocomplete onChange={setDistrict} placeholder="ex: Lisboa" initialValue={district} />
             </div>
 
             <div className="field">

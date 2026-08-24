@@ -21,13 +21,22 @@ function matchesQuery(label, query) {
   return normalize(label).includes(normalizedQuery);
 }
 
-export default function LocationAutocomplete({ onChange, onLevels, placeholder = 'Distrito, concelho ou freguesia' }) {
+export default function LocationAutocomplete({ onChange, onLevels, placeholder = 'Distrito, concelho ou freguesia', initialValue = '' }) {
   const [distrito, setDistrito] = useState(null);
   const [concelho, setConcelho] = useState(null);
   const [freguesia, setFreguesia] = useState(null);
-  const [typed, setTyped] = useState('');
+  const [typed, setTyped] = useState(initialValue || '');
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
+
+  // Se chegarmos a esta página já com uma localização escolhida (ex: vindos
+  // da pesquisa da página inicial), mostra-a logo na caixa — sem isto, a
+  // caixa aparecia vazia mesmo que a pesquisa já estivesse a ser aplicada,
+  // o que confundia (parecia que a localização "não tinha pegado").
+  useEffect(() => {
+    if (initialValue) setTyped(initialValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValue]);
 
   useEffect(() => {
     function handleClickOutside(e) {
