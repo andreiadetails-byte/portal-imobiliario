@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLanguage } from '../lib/i18n';
 
 // Tabela IMT 2026 — Continente, Habitação Própria e Permanente
 // Fonte: tabelas práticas da Autoridade Tributária (Ofício Circulado 40129/2026)
@@ -56,7 +57,8 @@ function PillGroup({ options, value, onChange }) {
   );
 }
 
-export default function ImtCalculator({ price }) {
+export default function ImtCalculator({ price, showTitle }) {
+  const { t } = useLanguage();
   const [value, setValue] = useState(price);
   const [isResident, setIsResident] = useState('Sim');
   const [finalidade, setFinalidade] = useState('Própria e permanente');
@@ -94,13 +96,21 @@ export default function ImtCalculator({ price }) {
 
   return (
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
-      <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>Calculadora de IMT</h3>
+      {showTitle && (
+        <>
+          <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('imt_page_title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>
+            {t('imt_page_subtitle')}
+          </p>
+        </>
+      )}
+      <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>{t('imt_calc_title')}</h3>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
-        Estimativa para o Continente, com base nas tabelas de 2026. Para Açores/Madeira, confirme na Autoridade Tributária ou com o seu banco.
+        {t('imt_disclaimer')}
       </p>
 
       <div className="field">
-        <label>Valor do imóvel</label>
+        <label>{t('imt_property_value')}</label>
         <div style={{ position: 'relative' }}>
           <input type="number" value={value} onChange={(e) => setValue(Number(e.target.value))} style={{ paddingRight: 30 }} />
           <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: 'var(--text-soft)' }}>€</span>
@@ -108,33 +118,32 @@ export default function ImtCalculator({ price }) {
       </div>
 
       <div className="field">
-        <label>Finalidade</label>
+        <label>{t('imt_purpose')}</label>
         <PillGroup
           value={finalidade}
           onChange={setFinalidade}
-          options={[{ value: 'Própria e permanente', label: 'Própria e permanente' }, { value: 'Secundária', label: 'Secundária' }]}
+          options={[{ value: 'Própria e permanente', label: t('imt_primary_home') }, { value: 'Secundária', label: t('imt_secondary_home') }]}
         />
       </div>
 
       <div className="field">
-        <label>É residente fiscal em Portugal?</label>
-        <PillGroup value={isResident} onChange={setIsResident} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
+        <label>{t('imt_is_resident')}</label>
+        <PillGroup value={isResident} onChange={setIsResident} options={[{ value: 'Sim', label: t('imt_yes') }, { value: 'Não', label: t('imt_no') }]} />
       </div>
 
       {isResident === 'Não' ? (
         <p style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 12 }}>
-          Desde maio de 2026, não residentes pagam uma taxa fixa de 7,5% de IMT na compra de habitação.
-          Há exceções (ex: antigo residente fiscal, mudança de residência dentro do prazo legal, certos arrendamentos acessíveis) — confirme se alguma se aplica ao seu caso.
+          {t('imt_nonresident_note')}
         </p>
       ) : !isHPP ? (
         <p style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 12 }}>
-          Habitação secundária paga sempre mais IMT do que própria e permanente — não há isenção no primeiro escalão nem direito ao regime "IMT Jovem".
+          {t('imt_secondary_note')}
         </p>
       ) : (
         <>
           <div className="field">
-            <label>Tens 35 anos ou menos?</label>
-            <PillGroup value={under35} onChange={setUnder35} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
+            <label>{t('imt_under35')}</label>
+            <PillGroup value={under35} onChange={setUnder35} options={[{ value: 'Sim', label: t('imt_yes') }, { value: 'Não', label: t('imt_no') }]} />
           </div>
 
           {under35 === 'Sim' && (
@@ -158,11 +167,11 @@ export default function ImtCalculator({ price }) {
           <div style={{ fontSize: 15, fontWeight: 600 }}>{imt.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
         </div>
         <div>
-          <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Imposto do Selo (0,8%)</div>
+          <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('imt_stamp_duty')}</div>
           <div style={{ fontSize: 15, fontWeight: 600 }}>{selo.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
         </div>
         <div>
-          <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Total a pagar antes da escritura</div>
+          <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('imt_total_before_deed')}</div>
           <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
             {total.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €
           </div>

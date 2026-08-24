@@ -264,11 +264,11 @@ function ResultsInner() {
             </div>
 
             <div className="field">
-              <label>Preço</label>
+              <label>{t('results_price_label')}</label>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input type="number" placeholder="Desde" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+                <input type="number" placeholder={t('results_price_from')} value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
                 <span style={{ color: 'var(--text-soft)', fontSize: 13 }}>—</span>
-                <input type="number" placeholder="Até" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+                <input type="number" placeholder={t('results_price_to')} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
               </div>
             </div>
 
@@ -293,11 +293,11 @@ function ResultsInner() {
             </div>
 
             <div className="field" style={{ position: 'relative' }}>
-              <label>Só uma agência específica</label>
+              <label>{t('results_only_agency')}</label>
               <input
                 value={agencyQuery}
                 onChange={(e) => { if (selectedAgency) clearAgency(); searchAgencies(e.target.value); }}
-                placeholder="Escreva o nome da agência..."
+                placeholder={t('results_agency_placeholder')}
                 style={{ paddingRight: selectedAgency ? 30 : undefined }}
               />
               {selectedAgency && (
@@ -329,7 +329,7 @@ function ResultsInner() {
             </div>
 
             <div className="field">
-              <label>Estado do imóvel</label>
+              <label>{t('results_property_state')}</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 6 }}>
                 <span
                   onClick={() => setSelectedStates([])}
@@ -382,16 +382,16 @@ function ResultsInner() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div className="field">
-                <label>Quartos (mín.)</label>
+                <label>{t('results_min_bedrooms')}</label>
                 <select value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)}>
-                  <option value="">Qualquer</option>
+                  <option value="">{t('results_any')}</option>
                   {[0, 1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
               <div className="field">
                 <label>WC (mín.)</label>
                 <select value={minBathrooms} onChange={(e) => setMinBathrooms(e.target.value)}>
-                  <option value="">Qualquer</option>
+                  <option value="">{t('results_any')}</option>
                   {[0, 1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
@@ -403,7 +403,7 @@ function ResultsInner() {
             </div>
 
             <div className="field">
-              <label>Características</label>
+              <label>{t('results_features')}</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 6 }}>
                 {[
                   ['has_storage', 'Arrumos'], ['has_parking', 'Estacion.'], ['has_balcony', 'Varanda'],
@@ -439,7 +439,7 @@ function ResultsInner() {
             </div>
 
             <div className="field">
-              <label>Certificado energético</label>
+              <label>{t('results_energy_cert')}</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 6 }}>
                 {['A+', 'A', 'B', 'C', 'D', 'E', 'F'].map((cls) => (
                   <span

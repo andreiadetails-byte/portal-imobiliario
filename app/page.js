@@ -207,15 +207,15 @@ export default function HomePage() {
               style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
             />
             <div>
-              <div className="display" style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>Instala o More·ada como app</div>
+              <div className="display" style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>{t('home_install_title')}</div>
               <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 6 }}>
-                Aponta a câmara para abrir no telemóvel, e depois:
+                {t('home_install_subtitle')}
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-soft)', lineHeight: 1.7 }}>
-                <b>Android (Chrome):</b><br />
-                Opção 1 — Toca em "Instalar" quando aparecer<br />
-                Opção 2 — Toca em ⋮ (canto superior direito) → "Instalar aplicação"<br /><br />
-                <b>iPhone (Safari):</b> toca em Partilhar → "Adicionar ao Ecrã Principal"
+                <b>{t('home_install_android_label')}</b><br />
+                {t('home_install_android_opt1')}<br />
+                {t('home_install_android_opt2')}<br /><br />
+                {t('home_install_ios')}
               </div>
             </div>
           </div>
@@ -234,9 +234,9 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <span style={{ fontSize: 34, flexShrink: 0 }}>📈</span>
               <div>
-                <div className="display" style={{ fontSize: 19, fontWeight: 600, color: '#fff', marginBottom: 3 }}>És investidor?</div>
+                <div className="display" style={{ fontSize: 19, fontWeight: 600, color: '#fff', marginBottom: 3 }}>{t('home_investor_title')}</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)' }}>
-                  Calcula o teu lucro na revenda de um imóvel, com todos os impostos incluídos.
+                  {t('home_investor_text')}
                 </div>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function HomePage() {
               background: '#fff', color: 'var(--ink)', fontSize: 13.5, fontWeight: 600,
               padding: '11px 22px', borderRadius: 6, whiteSpace: 'nowrap',
             }}>
-              Calcular agora →
+              {t('home_investor_cta')}
             </span>
           </Link>
         </div>
@@ -253,16 +253,16 @@ export default function HomePage() {
       <section style={{ padding: '0 0 64px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div className="card" style={{ padding: '26px 28px' }}>
-            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>Tens dúvidas?</h3>
+            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16 }}>
-              Sobre compra, venda, arrendamento, crédito, documentos, impostos, ou como usar a plataforma — pergunta, e respondemos.
+              {t('home_doubts_text')}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
-              {['Processo de compra', 'Processo de venda', 'Arrendamento', 'Crédito habitação', 'Documentos', 'Escritura', 'Impostos', 'Publicar anúncio', 'Outros temas'].map((tema) => (
+              {[t('home_doubts_tag_buy'), t('home_doubts_tag_sell'), t('home_doubts_tag_rent'), t('home_doubts_tag_credit'), t('home_doubts_tag_docs'), t('home_doubts_tag_deed'), t('home_doubts_tag_taxes'), t('home_doubts_tag_publish'), t('home_doubts_tag_other')].map((tema) => (
                 <button
                   key={tema}
                   type="button"
-                  onClick={() => window.dispatchEvent(new CustomEvent('morada-open-support', { detail: tema === 'Outros temas' ? null : tema }))}
+                  onClick={() => window.dispatchEvent(new CustomEvent('morada-open-support', { detail: tema === t('home_doubts_tag_other') ? null : tema }))}
                   style={{
                     fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 14, cursor: 'pointer',
                     background: 'var(--plaster)', color: 'var(--text-soft)', border: '1px solid var(--line)',
@@ -278,7 +278,7 @@ export default function HomePage() {
               className="btn btn-primary"
               style={{ fontSize: 13.5 }}
             >
-              Tirar uma dúvida →
+              {t('home_doubts_cta')}
             </button>
           </div>
         </div>
@@ -332,7 +332,7 @@ export default function HomePage() {
                       {p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} wc` : ''}
                     </div>
-                    <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
+                    <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>{t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                       <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}</div>
                       {p.profiles && (
@@ -408,7 +408,7 @@ export default function HomePage() {
                       {p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} wc` : ''}
                     </div>
-                    <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>Publicado em {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
+                    <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>{t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                       <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}</div>
                       {p.profiles && (
@@ -465,11 +465,11 @@ export default function HomePage() {
             <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: 150, backgroundImage: 'url(/images/simulador-arrendar.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
               <div style={{ padding: '30px 30px 36px' }}>
-                <h3 className="display" style={{ fontSize: 22, marginBottom: 10 }}>Arrendar ou comprar?</h3>
+                <h3 className="display" style={{ fontSize: 22, marginBottom: 10 }}>{t('home_rentbuy_title')}</h3>
                 <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 20, lineHeight: 1.55 }}>
                   Compare o custo real das duas opções, ao longo do tempo.
                 </p>
-                <Link href="/simulador-arrendar-comprar" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>Comparar agora</Link>
+                <Link href="/simulador-arrendar-comprar" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>{t('home_rentbuy_cta')}</Link>
               </div>
             </div>
             <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -538,7 +538,7 @@ export default function HomePage() {
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 22, marginBottom: 20 }}>{t('home_news_title')}</h2>
           {news.length === 0 ? (
-            <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>Ainda não há notícias publicadas.</p>
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>{t('home_no_news')}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {news.map((n) => (
@@ -589,9 +589,9 @@ export default function HomePage() {
               </h5>
               <Link href="/publish" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_publish')}</Link>
               <Link href="/dashboard" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_dashboard')}</Link>
-              <Link href="/simulador-credito" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Simulador de crédito</Link>
-              <Link href="/simulador-imt" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Calculadora de IMT</Link>
-              <Link href="/simulador-investimento" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Lucro em investimento</Link>
+              <Link href="/simulador-credito" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_sim_credit')}</Link>
+              <Link href="/simulador-imt" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_sim_imt')}</Link>
+              <Link href="/simulador-investimento" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_sim_investment')}</Link>
             </div>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
@@ -605,20 +605,20 @@ export default function HomePage() {
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
                 More·ada
               </h5>
-              <Link href="/sobre" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Sobre nós</Link>
-              <Link href="/trabalha-connosco" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Trabalha connosco</Link>
+              <Link href="/sobre" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_about_us')}</Link>
+              <Link href="/trabalha-connosco" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_careers')}</Link>
               <span style={{ display: 'block', fontSize: 13.5, padding: '5px 0', color: 'var(--text-soft)' }}>{t('footer_about_text')}</span>
             </div>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
                 Ajuda
               </h5>
-              <Link href="/faq" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Perguntas frequentes</Link>
-              <Link href="/seguranca" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Segurança online</Link>
-              <Link href="/contacto" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Contacta-nos</Link>
-              <Link href="/privacidade" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Privacidade</Link>
-              <Link href="/cookies" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Política de cookies</Link>
-              <Link href="/termos" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>Condições gerais</Link>
+              <Link href="/faq" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_faq')}</Link>
+              <Link href="/seguranca" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_security')}</Link>
+              <Link href="/contacto" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_contact')}</Link>
+              <Link href="/privacidade" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_privacy')}</Link>
+              <Link href="/cookies" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_cookies_policy')}</Link>
+              <Link href="/termos" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_terms')}</Link>
             </div>
           </div>
           <div style={{ borderTop: '1px solid var(--line)', paddingTop: 20, fontSize: 13, color: 'var(--text-soft)' }}>

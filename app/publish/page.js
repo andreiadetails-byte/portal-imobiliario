@@ -578,7 +578,7 @@ function PublishForm() {
     })();
   }
 
-  if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar sessão...</div></>);
+  if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('pub_checking_session')}</div></>);
 
   if (limitReached) {
     return (
@@ -591,11 +591,11 @@ function PublishForm() {
           }}>
             !
           </div>
-          <h1 className="display" style={{ fontSize: 24, marginBottom: 10 }}>Chegou ao limite de {accountLimit} anúncios</h1>
+          <h1 className="display" style={{ fontSize: 24, marginBottom: 10 }}>{t('pub_limit_reached').replace('{n}', accountLimit)}</h1>
           <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
             Já tem {accountLimit} anúncios publicados na sua conta, que é o máximo permitido. Para publicar um novo, apague primeiro um anúncio antigo no seu painel.
           </p>
-          <Link href="/dashboard" className="btn btn-primary">Ir para o meu painel</Link>
+          <Link href="/dashboard" className="btn btn-primary">{t('pub_go_to_dashboard')}</Link>
         </div>
       </>
     );
@@ -618,9 +618,9 @@ function PublishForm() {
           <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
             {isEditMode
               ? 'As alterações foram guardadas. Vamos levá-lo para o painel...'
-              : (<>O seu imóvel está agora <b>em revisão</b> — assim que for aprovado, fica visível no site. Vamos levá-lo para o painel...</>)}
+              : (<>{t('pub_under_review_msg')}</>)}
           </p>
-          <Link href="/dashboard" className="btn btn-primary">Ver no meu painel agora</Link>
+          <Link href="/dashboard" className="btn btn-primary">{t('pub_view_dashboard_now')}</Link>
         </div>
       </>
     );
@@ -637,7 +637,7 @@ function PublishForm() {
 
       <div className="card" style={{ padding: '16px 20px', marginBottom: 20, position: 'sticky', top: 76, zIndex: 5 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>Qualidade do anúncio</span>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{t('pub_listing_quality')}</span>
           <span style={{ fontSize: 13, fontWeight: 600, color: qualityColor }}>{quality}% · {qualityLabel}</span>
         </div>
         <div style={{ height: 6, background: 'var(--plaster)', borderRadius: 3, overflow: 'hidden' }}>
@@ -652,18 +652,18 @@ function PublishForm() {
 
       <form onSubmit={handleSubmit} className="card" style={{ padding: 32, overflow: 'visible' }}>
         <div className="field">
-          <label>Título do anúncio (opcional)</label>
+          <label>{t('pub_title_optional')}</label>
           <input value={form.title} onChange={(e) => updateField('title', e.target.value)} placeholder="ex: T3 remodelado em Campo de Ourique" />
         </div>
 
         <div className="field">
-          <label>Referência interna <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional — aparece no anúncio, útil para identificar o imóvel)</span></label>
+          <label>{t('pub_internal_ref')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_internal_ref_hint')}</span></label>
           <input value={form.internal_reference} onChange={(e) => updateField('internal_reference', e.target.value)} placeholder="ex: AGD-2026-014" />
         </div>
 
         {isAdmin && (
           <div className="field">
-            <label>Nome a mostrar neste anúncio <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional — em vez do teu nome verdadeiro, visível só a administradores)</span></label>
+            <label>{t('pub_display_name')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_display_name_hint')}</span></label>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
                 value={form.display_name}
@@ -690,7 +690,7 @@ function PublishForm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>Tipo de imóvel</label>
+            <label>{t('pub_property_type')}</label>
             <select
               value={form.property_type}
               onChange={(e) => {
@@ -710,7 +710,7 @@ function PublishForm() {
           </div>
           {['Apartamento', 'Moradia'].includes(form.property_type) && (
             <div className="field">
-              <label>Tipologia</label>
+              <label>{t('pub_typology')}</label>
               <select
                 value={form.typology || 'T0'}
                 onChange={(e) => {
@@ -729,11 +729,11 @@ function PublishForm() {
         {['Apartamento', 'Moradia'].includes(form.property_type) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>Quartos</label>
+            <label>{t('pub_bedrooms')}</label>
             <input type="number" min={0} required value={form.bedrooms} onChange={(e) => updateField('bedrooms', e.target.value)} />
           </div>
           <div className="field">
-            <label>Casas de banho (WC)</label>
+            <label>{t('pub_bathrooms')}</label>
             <input type="number" min={0} required value={form.bathrooms} onChange={(e) => updateField('bathrooms', e.target.value)} />
           </div>
         </div>
@@ -741,7 +741,7 @@ function PublishForm() {
         {form.property_type === 'Quarto' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>Casas de banho (WC) <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(partilhadas ou privativas)</span></label>
+            <label>{t('pub_bathrooms')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_bathrooms_shared_hint')}</span></label>
             <input type="number" min={0} required value={form.bathrooms} onChange={(e) => updateField('bathrooms', e.target.value)} />
           </div>
         </div>
@@ -749,9 +749,9 @@ function PublishForm() {
 
         {form.property_type === 'Moradia' && (
           <div className="field">
-            <label>Subtipo de moradia</label>
+            <label>{t('pub_house_subtype')}</label>
             <select value={form.house_subtype} onChange={(e) => updateField('house_subtype', e.target.value)}>
-              <option value="">Escolha uma opção</option>
+              <option value="">{t('pub_choose_option')}</option>
               {SUBTIPOS_MORADIA.map((s) => <option key={s}>{s}</option>)}
             </select>
           </div>
@@ -761,7 +761,7 @@ function PublishForm() {
           <div className="field">
             <label>Piso</label>
             <select required value={form.floor} onChange={(e) => updateField('floor', e.target.value)}>
-              <option value="">Escolha uma opção</option>
+              <option value="">{t('pub_choose_option')}</option>
               {PISOS.map((p) => <option key={p}>{p}</option>)}
             </select>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, fontWeight: 400, fontSize: 13, cursor: 'pointer' }}>
@@ -781,19 +781,19 @@ function PublishForm() {
             <input type="number" required value={form.area_util} onChange={(e) => updateField('area_util', e.target.value)} />
           </div>
           <div className="field">
-            <label>Estado <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>(obrigatório)</span></label>
+            <label>{t('pub_state')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>{t('pub_required')}</span></label>
             <select required value={form.state} onChange={(e) => updateField('state', e.target.value)}>
-              <option value="">Escolha uma opção</option>
+              <option value="">{t('pub_choose_option')}</option>
               <option value="Novo">Novo</option>
-              <option value="Em construção">Em construção</option>
-              <option value="Para recuperar">Para recuperar</option>
-              <option value="Usado">Usado</option>
+              <option value="Em construção">{t('pub_state_construction')}</option>
+              <option value="Para recuperar">{t('pub_state_torenovate')}</option>
+              <option value="Usado">{t('pub_state_used')}</option>
             </select>
           </div>
         </div>
 
         <div className="field">
-          <label>Orientação solar <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional, pode escolher mais do que uma)</span></label>
+          <label>{t('pub_solar_orientation')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_solar_hint')}</span></label>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {ORIENTACOES.map((o) => (
               <span
@@ -813,15 +813,15 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>Certificado energético <span style={{ color: '#b8452f', fontWeight: 700 }}>(obrigatório)</span></label>
+          <label>{t('pub_energy_cert')} <span style={{ color: '#b8452f', fontWeight: 700 }}>{t('pub_required')}</span></label>
           <select required value={form.energy_certificate} onChange={(e) => updateField('energy_certificate', e.target.value)}>
-            <option value="">Escolha uma opção</option>
+            <option value="">{t('pub_choose_option')}</option>
             {['A+', 'A', 'B', 'B-', 'C', 'D', 'E', 'F', 'Isento'].map((c) => <option key={c}>{c}</option>)}
           </select>
         </div>
 
         <div className="field">
-          <label>Ano de construção <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+          <label>{t('pub_construction_year')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_optional')}</span></label>
           <input
             type="number"
             min={1900}
@@ -833,7 +833,7 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>Morada</label>
+          <label>{t('pub_address')}</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <select
               value={addressType}
@@ -859,7 +859,7 @@ function PublishForm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>Distrito</label>
+            <label>{t('pub_district')}</label>
             <select
               value={form.district}
               onChange={(e) => {
@@ -868,12 +868,12 @@ function PublishForm() {
                 updateField('parish', '');
               }}
             >
-              <option value="">Escolha</option>
+              <option value="">{t('pub_choose')}</option>
               {distritos.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
           <div className="field">
-            <label>Concelho</label>
+            <label>{t('pub_municipality')}</label>
             {municipalityManual ? (
               <div style={{ display: 'flex', gap: 6 }}>
                 <input
@@ -905,14 +905,14 @@ function PublishForm() {
                 }}
                 disabled={!form.district}
               >
-                <option value="">Escolha</option>
+                <option value="">{t('pub_choose')}</option>
                 {(concelhosPorDistrito[form.district] || []).map((c) => <option key={c}>{c}</option>)}
                 <option value="__outro__">✎ Não encontras o teu? Escreve aqui</option>
               </select>
             )}
           </div>
           <div className="field">
-            <label>Localidade / Freguesia</label>
+            <label>{t('pub_parish')}</label>
             {parishManual ? (
               <div style={{ display: 'flex', gap: 6 }}>
                 <input
@@ -945,7 +945,7 @@ function PublishForm() {
                 }}
                 disabled={!form.municipality}
               >
-                <option value="">Escolha uma opção</option>
+                <option value="">{t('pub_choose_option')}</option>
                 {(freguesiasPorConcelho[form.municipality] || []).map((f) => <option key={f}>{f}</option>)}
                 <option value="__outro__">✎ Não encontras a tua? Escreve aqui</option>
               </select>
@@ -954,7 +954,7 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>Mostrar a morada completa no anúncio?</label>
+          <label>{t('pub_show_full_address')}</label>
           <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: -2, marginBottom: 8 }}>
             Se escolher "Não", o anúncio mostra apenas a localidade/concelho, não a rua e o número.
           </p>
@@ -978,7 +978,7 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>Descrição <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(mínimo 50 caracteres)</span></label>
+          <label>{t('pub_description')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_min_50_chars')}</span></label>
           <textarea required rows={9} style={{ minHeight: 180 }} value={form.description} onChange={(e) => updateField('description', e.target.value)} />
           <p style={{ fontSize: 11.5, marginTop: 4, color: form.description.length < 50 ? '#8a3b2a' : 'var(--text-soft)' }}>
             {form.description.length}/50 caracteres {form.description.length < 50 && `(faltam ${50 - form.description.length})`}
@@ -986,31 +986,31 @@ function PublishForm() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <YesNoField label="Arrumos" value={form.has_storage} onChange={(v) => updateField('has_storage', v)} />
-          <YesNoField label="Estacionamento" value={form.has_parking} onChange={(v) => updateField('has_parking', v)} />
+          <YesNoField label={t('pub_storage')} value={form.has_storage} onChange={(v) => updateField('has_storage', v)} />
+          <YesNoField label={t('pub_parking')} value={form.has_parking} onChange={(v) => updateField('has_parking', v)} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <YesNoField label="Varanda" value={form.has_balcony} onChange={(v) => updateField('has_balcony', v)} />
-          <YesNoField label="Jardim" value={form.has_garden} onChange={(v) => updateField('has_garden', v)} />
+          <YesNoField label={t('pub_balcony')} value={form.has_balcony} onChange={(v) => updateField('has_balcony', v)} />
+          <YesNoField label={t('pub_garden')} value={form.has_garden} onChange={(v) => updateField('has_garden', v)} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <YesNoField label="Piscina" value={form.has_pool} onChange={(v) => updateField('has_pool', v)} />
-          <YesNoField label="Ginásio" value={form.has_gym} onChange={(v) => updateField('has_gym', v)} />
+          <YesNoField label={t('pub_pool')} value={form.has_pool} onChange={(v) => updateField('has_pool', v)} />
+          <YesNoField label={t('pub_gym')} value={form.has_gym} onChange={(v) => updateField('has_gym', v)} />
         </div>
-        <YesNoField label="Sala de coworking" value={form.has_coworking} onChange={(v) => updateField('has_coworking', v)} />
+        <YesNoField label={t('pub_coworking')} value={form.has_coworking} onChange={(v) => updateField('has_coworking', v)} />
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <YesNoField label="Perto de transportes (metro/comboio)" value={form.near_transit} onChange={(v) => updateField('near_transit', v)} />
+          <YesNoField label={t('pub_near_transit')} value={form.near_transit} onChange={(v) => updateField('near_transit', v)} />
           {form.business_type === 'Arrendamento' && (
-            <YesNoField label="Mobilado" value={form.is_furnished} onChange={(v) => updateField('is_furnished', v)} />
+            <YesNoField label={t('pub_furnished')} value={form.is_furnished} onChange={(v) => updateField('is_furnished', v)} />
           )}
         </div>
         {form.business_type === 'Arrendamento' && (
-          <YesNoField label="Aceita animais" value={form.pets_allowed} onChange={(v) => updateField('pets_allowed', v)} />
+          <YesNoField label={t('pub_pets_allowed')} value={form.pets_allowed} onChange={(v) => updateField('pets_allowed', v)} />
         )}
 
         <div className="field">
-          <label>Outras características</label>
+          <label>{t('pub_other_features')}</label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {CARACTERISTICAS.map((f) => (
               <span
@@ -1031,27 +1031,27 @@ function PublishForm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>Tipo de negócio</label>
+            <label>{t('pub_business_type')}</label>
             <select
               value={form.business_type}
               disabled={form.property_type === 'Quarto'}
               onChange={(e) => updateField('business_type', e.target.value)}
             >
-              <option value="Venda" disabled={form.property_type === 'Quarto'}>Venda</option>
-              <option value="Arrendamento">Arrendamento</option>
+              <option value="Venda" disabled={form.property_type === 'Quarto'}>{t('pub_sale')}</option>
+              <option value="Arrendamento">{t('pub_rent')}</option>
             </select>
             {form.property_type === 'Quarto' && (
-              <span className="hint" style={{ fontSize: 12, color: 'var(--text-soft)' }}>Quartos só podem ser publicados para arrendamento.</span>
+              <span className="hint" style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_rooms_rent_only')}</span>
             )}
           </div>
           <div className="field">
-            <label>Preço (€)</label>
+            <label>{t('pub_price_eur')}</label>
             <input type="number" required value={form.price} onChange={(e) => updateField('price', e.target.value)} />
           </div>
         </div>
 
         <div className="field">
-          <label>Planta do imóvel <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{isEditMode ? '(só se quiser substituir a atual)' : '(opcional)'}</span></label>
+          <label>{t('pub_floor_plan')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{isEditMode ? t('pub_replace_current') : t('pub_optional')}</span></label>
           <label
             htmlFor="plan-input"
             style={{
@@ -1065,7 +1065,7 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>Vídeo do imóvel <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{isEditMode ? '(só se quiser substituir o atual)' : '(opcional, máx. 100MB)'}</span></label>
+          <label>{t('pub_video')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{isEditMode ? t('pub_replace_current') : t('pub_optional_max100mb')}</span></label>
           <label
             htmlFor="video-input"
             style={{
@@ -1098,7 +1098,7 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>Fotografias {isEditMode && <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(já tem {existingPhotoCount} — o que adicionar aqui junta-se às existentes)</span>}</label>
+          <label>{t('pub_photos')} {isEditMode && <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_already_has_photos').replace('{n}', existingPhotoCount)}</span>}</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <label
               htmlFor="photo-input"
@@ -1209,7 +1209,7 @@ function PublishForm() {
         {error && <p className="error-text">{error}</p>}
 
         <button type="submit" className="btn btn-primary btn-block" disabled={saving}>
-          {saving ? 'A guardar...' : (isEditMode ? 'Guardar alterações' : t('publish_submit'))}
+          {saving ? t('pub_saving') : (isEditMode ? t('pub_save_changes') : t('publish_submit'))}
         </button>
         {!isEditMode && (
           <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>

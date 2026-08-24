@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import { useLanguage } from '../../lib/i18n';
 import BackButton from '../../components/BackButton';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes';
@@ -54,6 +55,7 @@ function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwner
 function AdminInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
 
   // Edita o perfil de OUTRO utilizador, em segurança (usa a chave especial do servidor,
   // por baixo, contorna as regras normais que impedem um utilizador de editar o de outro).
@@ -581,15 +583,15 @@ function AdminInner() {
     alert('Anúncio anulado. O anunciante não pode republicá-lo — terá de criar um novo.');
   }
 
-  if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar acesso...</div></>);
+  if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('admin_checking_access')}</div></>);
 
   if (!allowed) {
     return (
       <>
         <Header />
         <div className="wrap" style={{ padding: 60 }}>
-          <h1 className="display" style={{ fontSize: 22 }}>Sem acesso</h1>
-          <p style={{ color: 'var(--text-soft)' }}>Esta página é só para administradores.</p>
+          <h1 className="display" style={{ fontSize: 22 }}>{t('admin_no_access_title')}</h1>
+          <p style={{ color: 'var(--text-soft)' }}>{t('admin_no_access_text')}</p>
         </div>
       </>
     );
@@ -600,7 +602,7 @@ function AdminInner() {
       <Header />
     <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
       <BackButton fallback="/" />
-      <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>Administração</h1>
+      <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('admin_title')}</h1>
 
       <div className="admin-tabs" style={{ display: 'flex', gap: 8, marginBottom: 28, borderBottom: '1px solid var(--line)', overflowX: 'auto' }}>
         {[
@@ -661,7 +663,7 @@ function AdminInner() {
         ))}
       </div>
 
-      {properties.length === 0 && <p className="empty-state">Não há anúncios neste estado.</p>}
+      {properties.length === 0 && <p className="empty-state">{t('admin_no_listings_state')}</p>}
 
       <GroupedByOwner
         items={properties}
@@ -714,13 +716,13 @@ function AdminInner() {
                 </button>
               )}
               {p.status !== 'ativo' && p.status !== 'anulado_suporte' && (
-                <button onClick={() => updateStatus(p.id, 'ativo')} className="btn btn-primary" style={{ fontSize: 13 }}>Aprovar</button>
+                <button onClick={() => updateStatus(p.id, 'ativo')} className="btn btn-primary" style={{ fontSize: 13 }}>{t('admin_approve')}</button>
               )}
               {p.status !== 'rejeitado' && p.status !== 'anulado_suporte' && (
-                <button onClick={() => updateStatus(p.id, 'rejeitado')} className="btn" style={{ fontSize: 13 }}>Rejeitar</button>
+                <button onClick={() => updateStatus(p.id, 'rejeitado')} className="btn" style={{ fontSize: 13 }}>{t('admin_reject')}</button>
               )}
               {p.status === 'ativo' && (
-                <button onClick={() => cancelProperty(p)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>Anular</button>
+                <button onClick={() => cancelProperty(p)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>{t('admin_cancel_listing')}</button>
               )}
             </div>
           </div>
@@ -731,7 +733,7 @@ function AdminInner() {
 
       {section === 'denuncias' && (
         <>
-          {reports.length === 0 && <p className="empty-state">Não há denúncias.</p>}
+          {reports.length === 0 && <p className="empty-state">{t('admin_no_reports')}</p>}
           <GroupedByOwner
             items={reports}
             getOwnerKey={(r) => r.properties?.profiles?.id || r.properties?.owner_id}
@@ -755,7 +757,7 @@ function AdminInner() {
                     <a href={`/property/${r.properties.id}`} target="_blank" rel="noopener noreferrer" className="btn" style={{ fontSize: 13 }}>Ver</a>
                   )}
                   {r.status !== 'resolvida' && (
-                    <button onClick={() => resolveReport(r.id)} className="btn btn-primary" style={{ fontSize: 13 }}>Marcar resolvida</button>
+                    <button onClick={() => resolveReport(r.id)} className="btn btn-primary" style={{ fontSize: 13 }}>{t('admin_mark_resolved')}</button>
                   )}
                   {r.status === 'resolvida' && (
                     <button onClick={() => deleteReport(r.id)} className="btn" style={{ fontSize: 13, color: '#b8452f' }}>🗑 Apagar</button>
@@ -769,7 +771,7 @@ function AdminInner() {
 
       {section === 'suporte' && (
         <>
-          {supportMessages.length === 0 && <p className="empty-state">Ainda não chegou nenhuma mensagem.</p>}
+          {supportMessages.length === 0 && <p className="empty-state">{t('admin_no_messages_yet')}</p>}
           <GroupedByOwner
             items={supportMessages}
             getOwnerKey={(m) => m.accountProfile?.id}
@@ -840,13 +842,13 @@ function AdminInner() {
                     </button>
                   )}
                   {m.testimonial_consent === 'pedido' && (
-                    <span style={{ fontSize: 11.5, color: 'var(--text-soft)', alignSelf: 'center' }}>Pedido enviado, a aguardar resposta</span>
+                    <span style={{ fontSize: 11.5, color: 'var(--text-soft)', alignSelf: 'center' }}>{t('admin_request_sent')}</span>
                   )}
                   {m.testimonial_consent === 'sim' && (
                     <span style={{ fontSize: 11.5, color: 'var(--telha)', fontWeight: 600, alignSelf: 'center' }}>✓ Autorizado — pode publicar</span>
                   )}
                   {m.testimonial_consent === 'nao' && (
-                    <span style={{ fontSize: 11.5, color: '#8a3b2a', alignSelf: 'center' }}>Não autorizado</span>
+                    <span style={{ fontSize: 11.5, color: '#8a3b2a', alignSelf: 'center' }}>{t('admin_not_authorized')}</span>
                   )}
                   {m.status !== 'resolvida' && (
                     <button onClick={() => resolveSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5 }}>
@@ -893,7 +895,7 @@ function AdminInner() {
               style={{ width: '100%', maxWidth: 420, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 13.5 }}
             />
           </div>
-          {allUsers.length === 0 && <p className="empty-state">Ainda não há utilizadores.</p>}
+          {allUsers.length === 0 && <p className="empty-state">{t('admin_no_users_yet')}</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {allUsers
               .filter((u) => userTypeFilter === 'todos' || u.account_type === userTypeFilter)
@@ -931,10 +933,10 @@ function AdminInner() {
                           background: 'var(--paper)', color: 'var(--ink)', cursor: u.is_admin ? 'default' : 'pointer',
                         }}
                       >
-                        <option value="particular">Particular</option>
-                        <option value="agencia">Agência</option>
-                        <option value="consultor">Consultor imobiliário</option>
-                        <option value="promotor">Promotor imobiliário</option>
+                        <option value="particular">{t('admin_particular_opt')}</option>
+                        <option value="agencia">{t('admin_agency_opt')}</option>
+                        <option value="consultor">{t('admin_consultant_opt')}</option>
+                        <option value="promotor">{t('admin_developer_opt')}</option>
                       </select>
                       {u.account_type === 'particular' && u.agency_name && (
                         <span title="Tem nome de agência preenchido mas está marcado como particular" style={{ color: '#8a6a1f', fontWeight: 700, fontSize: 11 }}>
@@ -1004,7 +1006,7 @@ function AdminInner() {
           <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
             Aqui vês, como administradora, todas as mensagens de contacto (leads) que os outros utilizadores receberam através dos seus anúncios — de qualquer pessoa, de qualquer utilizador. Serve para apoio e moderação.
           </p>
-          {allLeads.length === 0 && <p className="empty-state">Ainda não há leads.</p>}
+          {allLeads.length === 0 && <p className="empty-state">{t('admin_no_leads_yet')}</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {allLeads.map((l) => (
               <div key={l.id} className="card" style={{ padding: 16 }}>
@@ -1030,7 +1032,7 @@ function AdminInner() {
                       {l.properties.typology} · {l.properties.district} — anunciante: {l.properties.profiles?.agency_name || l.properties.profiles?.full_name || '—'}
                     </a>
                   ) : (
-                    <span className="meta">Anúncio já não existe</span>
+                    <span className="meta">{t('admin_listing_no_longer_exists')}</span>
                   )}
                   <span className="meta">{new Date(l.created_at).toLocaleDateString('pt-PT')}</span>
                 </div>
@@ -1048,12 +1050,12 @@ function AdminInner() {
           </p>
 
           <div className="field">
-            <label>Assunto</label>
+            <label>{t('admin_subject')}</label>
             <input value={campaignSubject} onChange={(e) => setCampaignSubject(e.target.value)} />
           </div>
 
           <div className="field">
-            <label>Mensagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(aceita HTML simples: &lt;h2&gt;, &lt;p&gt;, &lt;b&gt;)</span></label>
+            <label>Mensagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('admin_html_hint')}</span></label>
             <textarea
               value={campaignMessage}
               onChange={(e) => setCampaignMessage(e.target.value)}
@@ -1063,11 +1065,11 @@ function AdminInner() {
           </div>
 
           <div className="field">
-            <label>Enviar para</label>
+            <label>{t('admin_send_to')}</label>
             <select value={campaignAudience} onChange={(e) => setCampaignAudience(e.target.value)}>
-              <option value="todos">Todos os utilizadores</option>
-              <option value="agencias">Só agências</option>
-              <option value="particulares">Só particulares</option>
+              <option value="todos">{t('admin_all_users')}</option>
+              <option value="agencias">{t('admin_agencies_only')}</option>
+              <option value="particulares">{t('admin_individuals_only')}</option>
             </select>
           </div>
 
@@ -1100,7 +1102,7 @@ function AdminInner() {
             Visitantes sem conta não aparecem aqui — para esses, usa o Google Analytics.
           </p>
           {allUsers.filter((u) => u.last_seen_at).length === 0 && (
-            <p className="empty-state">Ainda não há registos de visitas.</p>
+            <p className="empty-state">{t('admin_no_visit_records')}</p>
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[...allUsers]
@@ -1143,7 +1145,7 @@ function AdminInner() {
 
       {section === 'destaques' && (
         <>
-          {featuredList.length === 0 && <p className="empty-state">Não há pedidos de destaque.</p>}
+          {featuredList.length === 0 && <p className="empty-state">{t('admin_no_featured_requests')}</p>}
           <GroupedByOwner
             items={featuredList}
             getOwnerKey={(p) => p.profiles?.id}
@@ -1182,7 +1184,7 @@ function AdminInner() {
 
       {section === 'agencias' && (
         <>
-          {agencies.length === 0 && <p className="empty-state">Ainda não há agências registadas.</p>}
+          {agencies.length === 0 && <p className="empty-state">{t('admin_no_agencies_registered')}</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {agencies.map((a) => (
               <div key={a.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
@@ -1214,25 +1216,25 @@ function AdminInner() {
             <h3 className="display" style={{ fontSize: 17, marginBottom: 14 }}>{editingNewsId ? 'Editar notícia' : 'Nova notícia'}</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12, marginBottom: 12 }}>
               <div className="field" style={{ marginBottom: 0 }}>
-                <label>Categoria</label>
+                <label>{t('admin_category')}</label>
                 <select value={newsForm.category} onChange={(e) => setNewsForm({ ...newsForm, category: e.target.value })}>
-                  <option>Habitação</option>
-                  <option>Crédito</option>
-                  <option>Construção</option>
-                  <option>Mercado</option>
+                  <option>{t('admin_cat_housing')}</option>
+                  <option>{t('admin_cat_credit')}</option>
+                  <option>{t('admin_cat_construction')}</option>
+                  <option>{t('admin_cat_market')}</option>
                 </select>
               </div>
               <div className="field" style={{ marginBottom: 0 }}>
-                <label>Título</label>
+                <label>{t('admin_news_title')}</label>
                 <input required value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} />
               </div>
             </div>
             <div className="field">
-              <label>Texto</label>
+              <label>{t('admin_news_text')}</label>
               <textarea required rows={3} value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
             </div>
             <div className="field">
-              <label>Imagem <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{editingNewsId ? '(deixa em branco para manter a imagem atual)' : '(opcional)'}</span></label>
+              <label>{t('admin_image')} <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{editingNewsId ? t('admin_keep_current_image') : t('admin_optional')}</span></label>
               <label
                 htmlFor="news-image-input"
                 style={{
@@ -1249,12 +1251,12 @@ function AdminInner() {
                 {savingNews ? 'A guardar...' : editingNewsId ? 'Guardar alterações' : 'Publicar notícia'}
               </button>
               {editingNewsId && (
-                <button type="button" onClick={cancelEditNews} className="btn">Cancelar edição</button>
+                <button type="button" onClick={cancelEditNews} className="btn">{t('admin_cancel_edit')}</button>
               )}
             </div>
           </form>
 
-          {news.length === 0 && <p className="empty-state">Ainda não publicaste nenhuma notícia.</p>}
+          {news.length === 0 && <p className="empty-state">{t('admin_no_news_yet')}</p>}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {news.map((n) => (
@@ -1269,8 +1271,8 @@ function AdminInner() {
                   <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0, height: 'fit-content' }}>
-                  <button onClick={() => startEditNews(n)} className="btn" style={{ fontSize: 12 }}>Editar</button>
-                  <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12 }}>Apagar</button>
+                  <button onClick={() => startEditNews(n)} className="btn" style={{ fontSize: 12 }}>{t('admin_edit')}</button>
+                  <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12 }}>{t('admin_delete')}</button>
                 </div>
               </div>
             ))}
@@ -1281,17 +1283,17 @@ function AdminInner() {
       {section === 'publicidade' && (
         <>
           <form onSubmit={createAd} className="card" style={{ padding: 20, marginBottom: 28, overflow: 'visible' }}>
-            <h3 className="display" style={{ fontSize: 17, marginBottom: 14 }}>Novo banner</h3>
+            <h3 className="display" style={{ fontSize: 17, marginBottom: 14 }}>{t('admin_new_banner')}</h3>
             <div className="field">
-              <label>Título / texto do anúncio</label>
+              <label>{t('admin_banner_title')}</label>
               <input required value={adForm.title} onChange={(e) => setAdForm({ ...adForm, title: e.target.value })} placeholder="ex: Simule já o seu crédito habitação" />
             </div>
             <div className="field">
-              <label>Link <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+              <label>{t('admin_link')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('admin_optional')}</span></label>
               <input value={adForm.link_url} onChange={(e) => setAdForm({ ...adForm, link_url: e.target.value })} placeholder="https://..." />
             </div>
             <div className="field">
-              <label>Imagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+              <label>{t('admin_image')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('admin_optional')}</span></label>
               <label
                 htmlFor="ad-image-input"
                 style={{
@@ -1326,7 +1328,7 @@ function AdminInner() {
             </button>
           </form>
 
-          {ads.length === 0 && <p className="empty-state">Ainda não criaste nenhum banner.</p>}
+          {ads.length === 0 && <p className="empty-state">{t('admin_no_banners_yet')}</p>}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {ads.map((a) => (
@@ -1334,7 +1336,7 @@ function AdminInner() {
                 {editingAdId === a.id ? (
                   <div>
                     <div className="field">
-                      <label>Título / texto</label>
+                      <label>{t('admin_title_text')}</label>
                       <input value={editAdForm.title} onChange={(e) => setEditAdForm({ ...editAdForm, title: e.target.value })} />
                     </div>
                     <div className="field">
@@ -1342,7 +1344,7 @@ function AdminInner() {
                       <input value={editAdForm.link_url} onChange={(e) => setEditAdForm({ ...editAdForm, link_url: e.target.value })} placeholder="https://..." />
                     </div>
                     <div className="field">
-                      <label>Imagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(deixe em branco para manter a atual)</span></label>
+                      <label>{t('admin_image')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('admin_keep_current')}</span></label>
                       <label
                         htmlFor={`edit-ad-image-${a.id}`}
                         style={{
@@ -1355,8 +1357,8 @@ function AdminInner() {
                       <input id={`edit-ad-image-${a.id}`} type="file" accept="image/*" onChange={(e) => setEditAdImage(e.target.files?.[0] || null)} style={{ display: 'none' }} />
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => saveEditAd(a.id)} className="btn btn-primary" style={{ fontSize: 12.5 }}>Guardar</button>
-                      <button onClick={() => setEditingAdId(null)} className="btn" style={{ fontSize: 12.5 }}>Cancelar</button>
+                      <button onClick={() => saveEditAd(a.id)} className="btn btn-primary" style={{ fontSize: 12.5 }}>{t('admin_save')}</button>
+                      <button onClick={() => setEditingAdId(null)} className="btn" style={{ fontSize: 12.5 }}>{t('admin_cancel')}</button>
                     </div>
                   </div>
                 ) : (
@@ -1372,7 +1374,7 @@ function AdminInner() {
                       <div className="meta">{a.link_url || 'sem link'} · {a.active ? 'ativo' : 'desativado'}</div>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                      <button onClick={() => startEditAd(a)} className="btn" style={{ fontSize: 12.5 }}>Editar</button>
+                      <button onClick={() => startEditAd(a)} className="btn" style={{ fontSize: 12.5 }}>{t('admin_edit')}</button>
                       <button onClick={() => toggleAdActive(a.id, a.active)} className="btn" style={{ fontSize: 12.5 }}>
                         {a.active ? 'Desativar' : 'Ativar'}
                       </button>
@@ -1390,13 +1392,13 @@ function AdminInner() {
 
       {section === 'definicoes' && (
         <div className="card" style={{ padding: 20, maxWidth: 400 }}>
-          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>Taxa de crédito habitação</h3>
+          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>{t('admin_mortgage_rate_title')}</h3>
           <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
             Usada como ponto de partida no simulador de crédito, em todas as páginas de imóvel. Atualiza sempre que a taxa média do mercado mudar.
           </p>
           <form onSubmit={saveMortgageRate}>
             <div className="field">
-              <label>Taxa de juro anual (%)</label>
+              <label>{t('admin_annual_rate')}</label>
               <input type="number" step="0.1" required value={mortgageRate} onChange={(e) => setMortgageRate(e.target.value)} />
             </div>
             <button type="submit" className="btn btn-primary" disabled={savingRate}>
@@ -1409,13 +1411,13 @@ function AdminInner() {
 
       {section === 'definicoes' && (
         <div className="card" style={{ padding: 20, maxWidth: 400, marginTop: 16 }}>
-          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>Taxa Euribor de referência</h3>
+          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>{t('admin_euribor_ref_title')}</h3>
           <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
             Usada como ponto de partida na "taxa variável" do simulador de crédito misto. Não é atualizada automaticamente — atualiza aqui sempre que a Euribor mudar significativamente (consulta em euribor-rates.eu ou no Banco de Portugal).
           </p>
           <form onSubmit={saveEuriborRate}>
             <div className="field">
-              <label>Euribor a 6 meses (%)</label>
+              <label>{t('admin_euribor_6m')}</label>
               <input type="number" step="0.01" required value={euriborRate} onChange={(e) => setEuriborRate(e.target.value)} />
             </div>
             <button type="submit" className="btn btn-primary" disabled={savingEuribor}>

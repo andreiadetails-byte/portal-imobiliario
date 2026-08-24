@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useLanguage } from '../lib/i18n';
 
 export default function RentVsBuyCalculator({ price = 200000 }) {
+  const { t } = useLanguage();
   const [purchasePrice, setPurchasePrice] = useState(price);
   const [downPaymentPct, setDownPaymentPct] = useState(10);
   const [years, setYears] = useState(30);
@@ -48,64 +50,64 @@ export default function RentVsBuyCalculator({ price = 200000 }) {
 
   return (
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
-      <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>Arrendar ou comprar — o que compensa mais?</h3>
+      <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>{t('rentbuy_title')}</h3>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
         Estimativa simplificada. Considera juros, IMT, Selo e manutenção do lado da compra; renda com aumento anual do lado do arrendamento — sem contar a valorização do imóvel.
       </p>
 
       <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--telha)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 8 }}>
-        🏠 Se comprar
+        {t('rentbuy_if_buying')}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
         <div className="field">
-          <label>Preço do imóvel</label>
+          <label>{t('rentbuy_property_price')}</label>
           <input type="number" value={purchasePrice} onChange={(e) => setPurchasePrice(Number(e.target.value))} />
         </div>
         <div className="field">
-          <label>Entrada (%)</label>
+          <label>{t('rentbuy_down_payment')}</label>
           <input type="number" value={downPaymentPct} onChange={(e) => setDownPaymentPct(Number(e.target.value))} />
         </div>
         <div className="field">
-          <label>Prazo do crédito (anos)</label>
+          <label>{t('rentbuy_loan_term')}</label>
           <input type="number" value={years} onChange={(e) => setYears(Number(e.target.value))} />
         </div>
         <div className="field">
-          <label>Taxa de juro (%)</label>
+          <label>{t('rentbuy_interest_rate')}</label>
           <input type="number" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} />
         </div>
       </div>
 
       <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--telha)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 8 }}>
-        🔑 Se arrendar
+        {t('rentbuy_if_renting')}
       </div>
       <div style={{ marginBottom: 18 }}>
         <div className="field" style={{ maxWidth: 300 }}>
-          <label>Renda mensal equivalente</label>
+          <label>{t('rentbuy_equivalent_rent')}</label>
           <input type="number" value={monthlyRent} onChange={(e) => setMonthlyRent(Number(e.target.value))} />
         </div>
       </div>
 
       <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 8 }}>
-        Horizonte temporal
+        {t('rentbuy_horizon')}
       </div>
       <div className="field" style={{ maxWidth: 300 }}>
-        <label>Quantos anos vais ficar no imóvel?</label>
+        <label>{t('rentbuy_years_staying')}</label>
         <input type="number" value={horizon} onChange={(e) => setHorizon(Number(e.target.value))} />
       </div>
 
       <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 18, marginTop: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-          <span style={{ fontSize: 13.5 }}>Custo estimado a comprar, em {horizon} anos</span>
+          <span style={{ fontSize: 13.5 }}>{t('rentbuy_cost_buying')} {horizon} {t('rentbuy_years_suffix')}</span>
           <b style={{ fontSize: 14 }}>{netCostBuying.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontSize: 13.5 }}>Custo estimado a arrendar, em {horizon} anos</span>
+          <span style={{ fontSize: 13.5 }}>{t('rentbuy_cost_renting')} {horizon} {t('rentbuy_years_suffix')}</span>
           <b style={{ fontSize: 14 }}>{netCostRenting.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
         </div>
         <div style={{ borderTop: '1px solid var(--line)', paddingTop: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--telha)' }}>
-            {buyingIsBetter ? '🏠 Comprar' : '🔑 Arrendar'} compensa mais — poupas cerca de{' '}
-            {difference.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} € em {horizon} anos
+            {buyingIsBetter ? t('rentbuy_buy_wins') : t('rentbuy_rent_wins')} {t('rentbuy_pays_off_save')}{' '}
+            {difference.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} € · {horizon} {t('rentbuy_years_suffix')}
           </span>
         </div>
       </div>

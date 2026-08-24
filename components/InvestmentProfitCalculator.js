@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLanguage } from '../lib/i18n';
 
 // As duas tabelas de IMT — a pessoa escolhe qual se aplica ao imóvel que está a comprar.
 const ESCALOES_HPP = [
@@ -65,6 +66,7 @@ function EuroField({ label, value, onChange, hint }) {
 }
 
 export default function InvestmentProfitCalculator() {
+  const { t } = useLanguage();
   const [investorType, setInvestorType] = useState('Particular');
   const [homeType, setHomeType] = useState('Secundária');
   const [purchasePrice, setPurchasePrice] = useState(200000);
@@ -107,56 +109,56 @@ export default function InvestmentProfitCalculator() {
 
   return (
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
-      <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>Calculadora de lucro em investimento imobiliário</h3>
+      <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>{t('invest_title')}</h3>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
-        Estimativa indicativa, para o Continente. Não substitui o aconselhamento de um contabilista — as regras fiscais de mais-valias têm mais particularidades do que esta calculadora consegue cobrir.
+        {t('invest_disclaimer')}
       </p>
 
       <div className="field">
-        <label>Vai investir como</label>
+        <label>{t('invest_as')}</label>
         <PillGroup
           value={investorType}
           onChange={setInvestorType}
-          options={[{ value: 'Particular', label: 'Particular (IRS)' }, { value: 'Empresa', label: 'Empresa (IRC)' }]}
+          options={[{ value: 'Particular', label: t('invest_individual_irs') }, { value: 'Empresa', label: t('invest_company_irc') }]}
         />
       </div>
 
-      <EuroField label="Valor do imóvel adquirido" value={purchasePrice} onChange={setPurchasePrice} />
+      <EuroField label={t('invest_purchase_value')} value={purchasePrice} onChange={setPurchasePrice} />
 
       <div className="field">
-        <label>Este imóvel foi adquirido como</label>
+        <label>{t('invest_acquired_as')}</label>
         <PillGroup
           value={homeType}
           onChange={setHomeType}
-          options={[{ value: 'Secundária', label: 'Habitação secundária' }, { value: 'Própria e permanente', label: 'Própria e permanente' }]}
+          options={[{ value: 'Secundária', label: t('invest_secondary_home') }, { value: 'Própria e permanente', label: t('invest_primary_home') }]}
         />
         <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 4 }}>
-          Determina a tabela de IMT usada — habitação própria e permanente paga menos IMT, mas exige viver lá e tem consequências se não cumprires os requisitos legais.
+          {t('invest_imt_note')}
         </p>
       </div>
 
-      <EuroField label="Valor de revenda do imóvel" value={resalePrice} onChange={setResalePrice} />
+      <EuroField label={t('invest_resale_value')} value={resalePrice} onChange={setResalePrice} />
 
       <div className="field">
-        <label>Este imóvel teve financiamento (crédito habitação)?</label>
-        <PillGroup value={financed} onChange={setFinanced} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
+        <label>{t('invest_had_financing')}</label>
+        <PillGroup value={financed} onChange={setFinanced} options={[{ value: 'Sim', label: t('invest_yes') }, { value: 'Não', label: t('invest_no') }]} />
       </div>
       {financed === 'Sim' && (
-        <EuroField label="Valor do crédito" value={loanAmount} onChange={setLoanAmount} />
+        <EuroField label={t('invest_loan_amount')} value={loanAmount} onChange={setLoanAmount} />
       )}
 
-      <h4 style={{ fontSize: 14, fontWeight: 600, marginTop: 20, marginBottom: 4 }}>Despesas de aquisição</h4>
+      <h4 style={{ fontSize: 14, fontWeight: 600, marginTop: 20, marginBottom: 4 }}>{t('invest_acquisition_expenses')}</h4>
 
       <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 14, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span>IMT (calculado automaticamente)</span><b>{imt.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-          <span>Imposto do Selo — compra (0,8%)</span><b>{stampDutyPurchase.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
+          <span>{t('invest_stamp_purchase')}</span><b>{stampDutyPurchase.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
         </div>
         {financed === 'Sim' && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-            <span>Imposto do Selo — crédito habitação (0,6%)</span><b>{stampDutyLoan.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
+            <span>{t('invest_stamp_loan')}</span><b>{stampDutyLoan.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
           </div>
         )}
       </div>
@@ -167,10 +169,10 @@ export default function InvestmentProfitCalculator() {
       )}
       <EuroField label="Obras no imóvel" value={renovationCosts} onChange={setRenovationCosts} hint="Guarde as faturas — obras com fatura podem reduzir a mais-valia tributável." />
 
-      <h4 style={{ fontSize: 14, fontWeight: 600, marginTop: 20, marginBottom: 4 }}>Despesas de revenda</h4>
+      <h4 style={{ fontSize: 14, fontWeight: 600, marginTop: 20, marginBottom: 4 }}>{t('invest_resale_expenses')}</h4>
 
       <div className="field">
-        <label>Comissão imobiliária (%)</label>
+        <label>{t('invest_agent_commission')}</label>
         <input type="number" step="0.1" value={commissionPct} onChange={(e) => setCommissionPct(Number(e.target.value))} min={0} max={20} />
         <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 4 }}>
           = {commissionValue.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} € sobre o valor de revenda
@@ -179,7 +181,7 @@ export default function InvestmentProfitCalculator() {
 
       {investorType === 'Particular' && (
         <div className="field">
-          <label>Taxa de IRS aplicável ao teu escalão (%)</label>
+          <label>{t('invest_irs_bracket')}</label>
           <input type="number" step="0.5" value={irsRate} onChange={(e) => setIrsRate(Number(e.target.value))} min={0} max={48} />
           <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 4 }}>
             Depende do total dos teus rendimentos no ano — os escalões de IRS vão de 14,5% a 48%. Se não tiveres a certeza, usa a tua taxa de IRS do último ano, ou pergunta ao teu contabilista.
@@ -199,7 +201,7 @@ export default function InvestmentProfitCalculator() {
       {hasCalculated && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>Lucro bruto (antes de impostos)</div>
+            <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>{t('invest_gross_profit')}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: grossProfit >= 0 ? 'var(--telha)' : '#8a3b2a', fontFamily: 'Inter, sans-serif' }}>
               {grossProfit.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €
             </div>
@@ -215,7 +217,7 @@ export default function InvestmentProfitCalculator() {
           </div>
 
           <div style={{ background: 'rgba(126,143,106,0.14)', borderRadius: 8, padding: 16 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>Lucro líquido final (depois de impostos)</div>
+            <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>{t('invest_net_profit')}</div>
             <div style={{ fontSize: 26, fontWeight: 700, color: netProfit >= 0 ? 'var(--telha)' : '#8a3b2a', fontFamily: 'Inter, sans-serif' }}>
               {netProfit.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €
             </div>

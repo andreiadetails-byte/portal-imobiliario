@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useLanguage } from '../lib/i18n';
 
 function PillGroup({ options, value, onChange }) {
   return (
@@ -26,6 +27,7 @@ function PillGroup({ options, value, onChange }) {
 }
 
 export default function MortgageSimulator({ price }) {
+  const { t } = useLanguage();
   const [mode, setMode] = useState('prestacao'); // 'prestacao' ou 'quanto'
 
   const [propertyPrice, setPropertyPrice] = useState(price);
@@ -120,13 +122,13 @@ export default function MortgageSimulator({ price }) {
   return (
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
-        <h3 className="display" style={{ fontSize: 18 }}>Simulador de crédito habitação</h3>
+        <h3 className="display" style={{ fontSize: 18 }}>{t('mortgage_title')}</h3>
         <button
           type="button"
           onClick={() => handleModeChange(mode === 'prestacao' ? 'quanto' : 'prestacao')}
           style={{ background: 'none', border: 'none', color: 'var(--telha)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
         >
-          {mode === 'prestacao' ? 'Calcular o valor que posso gastar' : '← Simular a prestação deste imóvel'}
+          {mode === 'prestacao' ? t('mortgage_mode_calc') : t('mortgage_mode_back')}
         </button>
       </div>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
@@ -136,7 +138,7 @@ export default function MortgageSimulator({ price }) {
 
       {mode === 'prestacao' ? (
         <div className="field">
-          <label>Preço do imóvel</label>
+          <label>{t('mortgage_property_price')}</label>
           <div style={{ position: 'relative' }}>
             <input type="number" value={propertyPrice} onChange={(e) => setPropertyPrice(Number(e.target.value))} style={{ paddingRight: 30 }} />
             <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: 'var(--text-soft)' }}>€</span>
@@ -144,7 +146,7 @@ export default function MortgageSimulator({ price }) {
         </div>
       ) : (
         <div className="field">
-          <label>Quanto pode pagar por mês</label>
+          <label>{t('mortgage_monthly_budget')}</label>
           <div style={{ position: 'relative' }}>
             <input type="number" value={monthlyBudget} onChange={(e) => setMonthlyBudget(Number(e.target.value))} style={{ paddingRight: 50 }} />
             <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: 'var(--text-soft)' }}>€/mês</span>
@@ -153,7 +155,7 @@ export default function MortgageSimulator({ price }) {
       )}
 
       <div className="field">
-        <label>Entrada inicial (%)</label>
+        <label>{t('mortgage_down_payment')}</label>
         <input type="number" value={downPaymentPct} onChange={(e) => setDownPaymentPct(Number(e.target.value))} min={0} max={100} />
         <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 6 }}>
           Os bancos normalmente pedem uma entrada mínima de 10%, mais despesas associadas.
@@ -161,25 +163,25 @@ export default function MortgageSimulator({ price }) {
       </div>
 
       <div className="field">
-        <label>Prazo em anos</label>
+        <label>{t('mortgage_term_years')}</label>
         <input type="number" value={years} onChange={(e) => setYears(Number(e.target.value))} min={1} max={40} />
       </div>
 
       <div className="field">
-        <label>Tipo de taxa de juro</label>
+        <label>{t('mortgage_rate_type')}</label>
         <PillGroup
           value={rateType}
           onChange={setRateType}
-          options={[{ value: 'Fixa', label: 'Fixa' }, { value: 'Variável', label: 'Variável' }, { value: 'Mista', label: 'Mista' }]}
+          options={[{ value: 'Fixa', label: t('mortgage_rate_fixed') }, { value: 'Variável', label: t('mortgage_rate_variable') }, { value: 'Mista', label: t('mortgage_rate_mixed') }]}
         />
       </div>
 
       <div className="field">
-        <label>{rateType === 'Mista' ? 'Taxa fixa inicial (%)' : 'Taxa de juro anual (%)'}</label>
+        <label>{rateType === 'Mista' ? t('mortgage_rate_fixed_initial') : t('mortgage_rate_annual')}</label>
         <input type="number" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} min={0} />
         {rateType === 'Variável' && (
           <span className="hint" style={{ fontWeight: 400, fontSize: 11.5, color: 'var(--text-soft)' }}>
-            Valor de partida: Euribor a 6 meses atual (ajuste conforme o spread do seu banco).
+            {t('mortgage_euribor_hint')}
           </span>
         )}
       </div>
@@ -187,41 +189,41 @@ export default function MortgageSimulator({ price }) {
       {rateType === 'Mista' && (
         <>
           <div className="field">
-            <label>Anos com taxa fixa</label>
+            <label>{t('mortgage_fixed_years')}</label>
             <input type="number" value={mixedFixedYears} onChange={(e) => setMixedFixedYears(Number(e.target.value))} min={1} max={years} />
             <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 6 }}>
-              As ofertas mais comuns em Portugal são 2, 5, 7 ou 10 anos de taxa fixa.
+              {t('mortgage_common_offers')}
             </p>
           </div>
           <div className="field">
-            <label>Taxa variável estimada depois (%)</label>
+            <label>{t('mortgage_variable_after')}</label>
             <input type="number" step="0.1" value={mixedVariableRate} onChange={(e) => setMixedVariableRate(Number(e.target.value))} min={0} />
             <span className="hint" style={{ fontWeight: 400, fontSize: 11.5, color: 'var(--text-soft)' }}>
-              Valor de partida: Euribor a 6 meses atual (ajuste conforme o spread do seu banco).
+              {t('mortgage_euribor_hint')}
             </span>
           </div>
         </>
       )}
 
       <div className="field">
-        <label>Tipo de casa</label>
+        <label>{t('mortgage_house_type')}</label>
         <PillGroup
           value={houseType}
           onChange={setHouseType}
-          options={[{ value: 'Principal', label: 'Principal' }, { value: 'Secundária', label: 'Secundária' }]}
+          options={[{ value: 'Principal', label: t('mortgage_house_primary') }, { value: 'Secundária', label: t('mortgage_house_secondary') }]}
         />
       </div>
 
       <div className="field">
-        <label>Tens 35 anos ou menos?</label>
+        <label>{t('mortgage_under35')}</label>
         <PillGroup
           value={under35}
           onChange={setUnder35}
-          options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]}
+          options={[{ value: 'Sim', label: t('mortgage_yes') }, { value: 'Não', label: t('mortgage_no') }]}
         />
         {under35 === 'Sim' && houseType === 'Principal' && (
           <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 6 }}>
-            Pode ter direito a benefícios fiscais para jovens na compra de primeira habitação própria. Confirme as condições atuais com o seu banco ou nas Finanças.
+            {t('mortgage_young_benefits')}
           </p>
         )}
       </div>
@@ -232,7 +234,7 @@ export default function MortgageSimulator({ price }) {
         className="btn btn-primary btn-block"
         style={{ marginTop: 4, marginBottom: hasCalculated ? 16 : 0 }}
       >
-        Calcular
+        {t('mortgage_calculate_btn')}
       </button>
 
       {hasCalculated && result && (
@@ -240,17 +242,17 @@ export default function MortgageSimulator({ price }) {
           result.mixedResult ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16 }}>
-                <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>Montante financiado</div>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>{t('mortgage_financed_amount')}</div>
                 <div style={{ fontSize: 15, fontWeight: 600 }}>{result.loanAmount.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
               </div>
               <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>Primeiros {result.mixedResult.fixedYears} anos (taxa fixa)</div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{t('mortgage_first_years')} {result.mixedResult.fixedYears} {t('mortgage_years_fixed_suffix')}</div>
                 <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
                   {result.mixedResult.fixedPayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
                 </div>
               </div>
               <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>Restantes {result.mixedResult.remainingYears.toFixed(0)} anos (taxa variável estimada)</div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>{t('mortgage_remaining')} {result.mixedResult.remainingYears.toFixed(0)} {t('mortgage_years_variable_suffix')}</div>
                 <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
                   {result.mixedResult.variablePayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
                 </div>
@@ -262,11 +264,11 @@ export default function MortgageSimulator({ price }) {
           ) : (
             <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
               <div>
-                <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Montante financiado</div>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('mortgage_financed_amount')}</div>
                 <div style={{ fontSize: 15, fontWeight: 600 }}>{result.loanAmount.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
               </div>
               <div>
-                <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Prestação mensal estimada</div>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('mortgage_monthly_payment')}</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
                   {result.monthlyPayment.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €/mês
                 </div>
@@ -276,11 +278,11 @@ export default function MortgageSimulator({ price }) {
         ) : (
           <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
             <div>
-              <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Montante máximo de crédito</div>
+              <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('mortgage_max_credit')}</div>
               <div style={{ fontSize: 15, fontWeight: 600 }}>{result.maxLoan.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</div>
             </div>
             <div>
-              <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>Preço máximo do imóvel</div>
+              <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('mortgage_max_price')}</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif' }}>
                 {result.maxPropertyPrice.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €
               </div>

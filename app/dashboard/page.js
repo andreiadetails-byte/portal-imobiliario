@@ -217,11 +217,11 @@ function DashboardInner() {
         <form onSubmit={runListingSearch} className="card" style={{ padding: 16, marginBottom: 20 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 10 }}>
             <div className="field" style={{ marginBottom: 0 }}>
-              <label style={{ fontSize: 12 }}>Morada</label>
+              <label style={{ fontSize: 12 }}>{t('dash_address')}</label>
               <input type="text" value={listingFilters.address} onChange={(e) => updateListingFilter('address', e.target.value)} placeholder="Rua, número..." />
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
-              <label style={{ fontSize: 12 }}>Preço</label>
+              <label style={{ fontSize: 12 }}>{t('dash_price')}</label>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 <input type="number" value={listingFilters.minPrice} onChange={(e) => updateListingFilter('minPrice', e.target.value)} placeholder="Desde" />
                 <span style={{ color: 'var(--text-soft)', fontSize: 12 }}>—</span>
@@ -229,17 +229,17 @@ function DashboardInner() {
               </div>
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
-              <label style={{ fontSize: 12 }}>Freguesia</label>
+              <label style={{ fontSize: 12 }}>{t('dash_parish')}</label>
               <input type="text" value={listingFilters.parish} onChange={(e) => updateListingFilter('parish', e.target.value)} placeholder="Freguesia" />
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
-              <label style={{ fontSize: 12 }}>Concelho</label>
+              <label style={{ fontSize: 12 }}>{t('dash_municipality')}</label>
               <input type="text" value={listingFilters.municipality} onChange={(e) => updateListingFilter('municipality', e.target.value)} placeholder="Concelho" />
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button type="submit" className="btn btn-primary" style={{ fontSize: 13 }}>Pesquisar</button>
-            <button type="button" onClick={clearListingSearch} className="btn" style={{ fontSize: 13 }}>Limpar</button>
+            <button type="submit" className="btn btn-primary" style={{ fontSize: 13 }}>{t('dash_search_btn')}</button>
+            <button type="button" onClick={clearListingSearch} className="btn" style={{ fontSize: 13 }}>{t('dash_clear_btn')}</button>
           </div>
         </form>
       )}
@@ -248,10 +248,10 @@ function DashboardInner() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 40, alignItems: 'start' }}>
           {[
-            { key: 'pendente', title: 'Pendentes (em revisão)', match: (p) => p.status === 'em_revisao' },
-            { key: 'ativo', title: 'Publicados', match: (p) => ['ativo', 'desativado', 'vendido', 'arrendado', 'expirado'].includes(p.status) },
-            { key: 'eliminado', title: 'Eliminados', match: (p) => p.status === 'eliminado' },
-            { key: 'outros', title: 'Recusados ou anulados', match: (p) => ['rejeitado', 'anulado_suporte'].includes(p.status) },
+            { key: 'pendente', title: t('dash_pending_review'), match: (p) => p.status === 'em_revisao' },
+            { key: 'ativo', title: t('dash_published'), match: (p) => ['ativo', 'desativado', 'vendido', 'arrendado', 'expirado'].includes(p.status) },
+            { key: 'eliminado', title: t('dash_deleted'), match: (p) => p.status === 'eliminado' },
+            { key: 'outros', title: t('dash_rejected_cancelled'), match: (p) => ['rejeitado', 'anulado_suporte'].includes(p.status) },
           ].map(({ key, title, match }) => {
             const matchesSearch = (p) => {
               const { address, minPrice, maxPrice, parish, municipality } = appliedListingFilters;
@@ -300,7 +300,7 @@ function DashboardInner() {
                             {Number(p.price).toLocaleString('pt-PT')} €
                           </div>
                           {p.status === 'anulado_suporte' && p.cancellation_reason && (
-                            <p style={{ fontSize: 10.5, color: '#8a3b2a', marginTop: 2, marginBottom: 0 }}>Motivo: {p.cancellation_reason}</p>
+                            <p style={{ fontSize: 10.5, color: '#8a3b2a', marginTop: 2, marginBottom: 0 }}>{t('dash_reason')} {p.cancellation_reason}</p>
                           )}
 
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', marginTop: 8 }}>
@@ -330,10 +330,10 @@ function DashboardInner() {
                               </button>
                             )}
                             {p.status !== 'anulado_suporte' && (
-                              <Link href={`/publish?edit=${p.id}`} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>Editar</Link>
+                              <Link href={`/publish?edit=${p.id}`} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>{t('dash_edit')}</Link>
                             )}
                             {p.status !== 'eliminado' && (
-                              <Link href={`/property/${p.id}`} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>Ver anúncio</Link>
+                              <Link href={`/property/${p.id}`} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>{t('dash_view_listing')}</Link>
                             )}
                             {p.status !== 'eliminado' && p.status !== 'anulado_suporte' && (
                               <button onClick={() => deleteProperty(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
@@ -383,7 +383,7 @@ function DashboardInner() {
         if (municipality && !(p.municipality || '').toLowerCase().includes(municipality.trim().toLowerCase())) return false;
         return true;
       }).length === 0 && (
-        <p className="empty-state">Nenhum anúncio corresponde à pesquisa.</p>
+        <p className="empty-state">{t('dash_no_match')}</p>
       )}
 
     </main>
@@ -401,15 +401,15 @@ function DashboardInner() {
 
           <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, marginBottom: 18 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5, marginBottom: 6 }}>
-              <span>Ativação (pagamento único)</span><b>{PAYMENT_INFO.activationFee.toFixed(2)} €</b>
+              <span>{t('dash_activation_fee')}</span><b>{PAYMENT_INFO.activationFee.toFixed(2)} €</b>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5 }}>
-              <span>Por dia em destaque</span><b>{PAYMENT_INFO.dailyFee.toFixed(2)} €</b>
+              <span>{t('dash_per_day_featured')}</span><b>{PAYMENT_INFO.dailyFee.toFixed(2)} €</b>
             </div>
           </div>
 
           <div className="field">
-            <label>Durante quantos dias?</label>
+            <label>{t('dash_how_many_days')}</label>
             <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
               {[7, 15, 30].map((d) => (
                 <button
@@ -437,7 +437,7 @@ function DashboardInner() {
             background: 'rgba(126,143,106,0.14)', borderRadius: 8, padding: 16, marginBottom: 18,
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
-            <span style={{ fontSize: 13.5, fontWeight: 600 }}>Total a pagar agora</span>
+            <span style={{ fontSize: 13.5, fontWeight: 600 }}>{t('dash_total_now')}</span>
             <b style={{ fontSize: 20, color: 'var(--telha)' }}>
               {(PAYMENT_INFO.activationFee + PAYMENT_INFO.dailyFee * featuredDays).toFixed(2)} €
             </b>
@@ -472,11 +472,11 @@ function DashboardInner() {
               <button onClick={() => setFeaturedPaymentMethod('transferencia')} className="btn btn-block" style={{ marginBottom: 8 }}>
                 Usar transferência bancária
               </button>
-              <button onClick={() => setFeaturedModal(null)} className="btn btn-block">Cancelar</button>
+              <button onClick={() => setFeaturedModal(null)} className="btn btn-block">{t('dash_cancel')}</button>
             </>
           ) : (
             <>
-              <p style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6 }}>Pagamento por transferência bancária:</p>
+              <p style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6 }}>{t('dash_bank_transfer')}</p>
               <div style={{ fontSize: 13, marginBottom: 6 }}>
                 <div><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
                 <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
@@ -489,7 +489,7 @@ function DashboardInner() {
               <button onClick={() => requestFeatured(featuredModal)} className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>
                 Já fiz a transferência
               </button>
-              <button onClick={() => setFeaturedModal(null)} className="btn btn-block">Cancelar</button>
+              <button onClick={() => setFeaturedModal(null)} className="btn btn-block">{t('dash_cancel')}</button>
             </>
           )}
         </div>
