@@ -99,6 +99,7 @@ export default function PricePerM2Lookup() {
       // Sem imóveis suficientes em nenhum nível — tenta um valor de referência oficial do INE.
       const geoNamesToTry = [levels.freguesia, levels.concelho, levels.distrito].filter(Boolean);
       let ineMatch = null;
+      let ineWidenedLabel = null;
       for (const name of geoNamesToTry) {
         const { data: ineData } = await supabase
           .from('ine_reference_prices')
@@ -107,9 +108,16 @@ export default function PricePerM2Lookup() {
           .eq('business_type', businessType)
           .limit(1)
           .maybeSingle();
-        if (ineData) { ineMatch = ineData; break; }
+        if (ineData) {
+          ineMatch = ineData;
+          // Se o valor encontrado não é do nível mais específico pedido, marca
+          // claramente que veio de uma zona mais larga — nunca mostrar um
+          // valor sem dizer exatamente a que zona ele se refere de verdade.
+          if (name !== geoNamesToTry[0]) ineWidenedLabel = name;
+          break;
+        }
       }
-      setResult({ count: 0, ine: ineMatch });
+      setResult({ count: 0, ine: ineMatch, ineWidenedLabel });
     } else {
       const { pricesPerM2, label, widened } = bestMatch;
       const avg = pricesPerM2.reduce((sum, v) => sum + v, 0) / pricesPerM2.length;
@@ -179,6 +187,7 @@ export default function PricePerM2Lookup() {
               <>
                 <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 4 }}>
                   Ainda não há imóveis suficientes publicados em {areaLabel} — este é o valor oficial mais recente do INE
+                  {result.ineWidenedLabel && ` para ${result.ineWidenedLabel} (não há dado próprio para ${areaLabel})`}
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
                   {Number(result.ine.price_per_m2).toLocaleString('pt-PT')} €/m²
