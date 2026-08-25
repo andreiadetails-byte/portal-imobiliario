@@ -16,6 +16,11 @@
 html, body{ margin:0; padding:0; }
 html{ overflow-x:hidden; max-width:100%; }
 img, video, iframe{ max-width: 100%; height: auto; }
+/* Rede de segurança: texto "nowrap" com corte (...) dentro de grelhas/flex
+   por defeito recusa-se a encolher abaixo do tamanho do próprio texto,
+   o que empurra a página inteira para o lado no telemóvel. Isto força
+   sempre esses elementos a poderem encolher corretamente. */
+[style*="white-space: nowrap"]{ min-width: 0; }
 img{ -webkit-user-drag:none; user-drag:none; }
 body{
   background:var(--plaster);

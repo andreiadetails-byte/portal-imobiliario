@@ -368,7 +368,7 @@ function ResultsInner() {
                     key={tp}
                     onClick={() => toggleFromList(selectedTypologies, setSelectedTypologies, tp)}
                     style={{
-                      fontSize: 12, padding: '6px 0', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontSize: 12, padding: '6px 0', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0,
                       border: '1px solid var(--line)',
                       background: selectedTypologies.includes(tp) ? 'var(--azulejo)' : 'var(--paper)',
                       color: selectedTypologies.includes(tp) ? '#fff' : 'var(--text-soft)',
@@ -415,7 +415,7 @@ function ResultsInner() {
                     key={col}
                     onClick={() => toggleFromList(selectedAmenities, setSelectedAmenities, col)}
                     style={{
-                      fontSize: 11, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontSize: 11, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0,
                       border: '1px solid var(--line)',
                       background: selectedAmenities.includes(col) ? 'var(--azulejo)' : 'var(--paper)',
                       color: selectedAmenities.includes(col) ? '#fff' : 'var(--text-soft)',
@@ -427,7 +427,7 @@ function ResultsInner() {
                 <span
                   onClick={() => setElevatorOnly((v) => !v)}
                   style={{
-                    fontSize: 11, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    fontSize: 11, padding: '6px 4px', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0,
                     border: '1px solid var(--line)',
                     background: elevatorOnly ? 'var(--azulejo)' : 'var(--paper)',
                     color: elevatorOnly ? '#fff' : 'var(--text-soft)',
@@ -446,7 +446,7 @@ function ResultsInner() {
                     key={cls}
                     onClick={() => toggleFromList(selectedEnergy, setSelectedEnergy, cls)}
                     style={{
-                      fontSize: 12, padding: '6px 0', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontSize: 12, padding: '6px 0', textAlign: 'center', borderRadius: 5, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0,
                       border: '1px solid var(--line)',
                       background: selectedEnergy.includes(cls) ? 'var(--azulejo)' : 'var(--paper)',
                       color: selectedEnergy.includes(cls) ? '#fff' : 'var(--text-soft)',
@@ -684,7 +684,7 @@ function ResultsInner() {
                             </div>
                           )}
                           <span style={{
-                            fontSize: 11.5, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            fontSize: 11.5, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0,
                           }}>
                             {p.display_name || p.profiles?.agency_name || p.profiles?.full_name || 'Anunciante'}
                           </span>

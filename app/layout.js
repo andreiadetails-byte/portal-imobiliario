@@ -6,6 +6,7 @@ import CookieConsent from '../components/CookieConsent';
 import CompareBar from '../components/CompareBar';
 import GoogleAnalytics from '../components/GoogleAnalytics';
 import InstallPrompt from '../components/InstallPrompt';
+import Script from 'next/script';
 
 export const metadata = {
   metadataBase: new URL('https://portalimobiliario.netlify.app'),
@@ -52,6 +53,12 @@ export default function RootLayout({ children }) {
           <GoogleAnalytics />
           <InstallPrompt />
         </LanguageProvider>
+        {/* TEMPORÁRIO — ferramenta de depuração visível no ecrã, para apanhar
+            o motivo do problema de layout no telemóvel. Remover depois de resolvido. */}
+        <Script src="https://cdn.jsdelivr.net/npm/eruda" strategy="afterInteractive" />
+        <Script id="eruda-init" strategy="afterInteractive">
+          {`if (typeof eruda !== 'undefined') eruda.init();`}
+        </Script>
       </body>
     </html>
   );

@@ -295,7 +295,7 @@ function DashboardInner() {
                             </span>
                             {p.featured_status === 'active' && <span style={{ fontSize: 11 }}>★</span>}
                           </div>
-                          <b style={{ fontSize: 12.5, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.typology} · {p.address}</b>
+                          <b style={{ fontSize: 12.5, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{p.typology} · {p.address}</b>
                           <div className="meta" style={{ marginTop: 1, marginBottom: 0, fontSize: 11 }}>
                             {Number(p.price).toLocaleString('pt-PT')} €
                           </div>

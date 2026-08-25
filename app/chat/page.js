@@ -274,13 +274,13 @@ function ChatInner() {
 
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
-                        <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</b>
+                        <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{name}</b>
                         <span style={{ fontSize: 12, color: 'var(--text-soft)', flexShrink: 0 }}>
                           {c.lastMessage ? new Date(c.lastMessage.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' }) : ''}
                         </span>
                       </div>
                       {contact && (
-                        <div style={{ fontSize: 13, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 13, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                           {contact}
                         </div>
                       )}
@@ -293,7 +293,7 @@ function ChatInner() {
                           <div style={{ width: 32, height: 26, borderRadius: 3, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
                         )}
                         <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                             {c.properties?.typology} · {c.properties?.address}
                           </div>
                           <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
@@ -303,7 +303,7 @@ function ChatInner() {
                       </div>
 
                       <div style={{
-                        fontSize: 13.5, marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        fontSize: 13.5, marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0,
                         fontWeight: isUnread ? 700 : 400, color: isUnread ? 'var(--ink)' : 'var(--text-soft)',
                       }}>
                         {c.lastMessage?.content || 'Sem mensagens ainda'}
