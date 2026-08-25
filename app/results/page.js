@@ -265,10 +265,10 @@ function ResultsInner() {
 
             <div className="field">
               <label>{t('results_price_label')}</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input type="number" placeholder={t('results_price_from')} value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', minWidth: 0 }}>
+                <input type="number" placeholder={t('results_price_from')} value={minPrice} onChange={(e) => setMinPrice(e.target.value)} style={{ minWidth: 0, flex: 1 }} />
                 <span style={{ color: 'var(--text-soft)', fontSize: 13 }}>—</span>
-                <input type="number" placeholder={t('results_price_to')} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+                <input type="number" placeholder={t('results_price_to')} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} style={{ minWidth: 0, flex: 1 }} />
               </div>
             </div>
 

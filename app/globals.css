@@ -21,6 +21,10 @@ img, video, iframe{ max-width: 100%; height: auto; }
    o que empurra a página inteira para o lado no telemóvel. Isto força
    sempre esses elementos a poderem encolher corretamente. */
 [style*="nowrap"]{ min-width: 0; }
+/* Os campos de formulário (input/select) também se recusam, por defeito,
+   a encolher dentro de uma fila flex/grid — a mesma causa do texto "nowrap"
+   acima, mas em caixas de escrever/escolher. */
+input, select, textarea, button{ min-width: 0; }
 img{ -webkit-user-drag:none; user-drag:none; }
 body{
   background:var(--plaster);
