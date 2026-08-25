@@ -24,11 +24,12 @@ const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente', 'Nordeste', 'Noroeste
 const PISOS = ['R/C', '1º', '2º', '3º', '4º', '5º', '6º', '7º', '8º', '9º', '10º', 'Superior ao 10º'];
 
 function YesNoField({ label, value, onChange }) {
+  const { t } = useLanguage();
   return (
     <div className="field">
       <label>{label}</label>
       <div style={{ display: 'flex', gap: 8 }}>
-        {[{ v: true, l: 'Sim' }, { v: false, l: 'Não' }].map((opt) => (
+        {[{ v: true, l: t('yesno_yes') }, { v: false, l: t('yesno_no') }].map((opt) => (
           <button
             key={String(opt.v)}
             type="button"
@@ -880,7 +881,7 @@ function PublishForm() {
                   autoFocus
                   value={form.municipality}
                   onChange={(e) => updateField('municipality', e.target.value)}
-                  placeholder="Escreve aqui"
+                  placeholder={t('attr_write_here')}
                 />
                 <button
                   type="button"
@@ -920,7 +921,7 @@ function PublishForm() {
                   required
                   value={form.parish}
                   onChange={(e) => updateField('parish', e.target.value)}
-                  placeholder="Escreve aqui"
+                  placeholder={t('attr_write_here')}
                 />
                 <button
                   type="button"

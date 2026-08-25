@@ -154,7 +154,7 @@ export default function Header({ minimal = false }) {
                 onClick={toggleNotifications}
                 className="btn"
                 style={{ position: 'relative', padding: '11px 14px' }}
-                aria-label="Notificações"
+                aria-label={t('attr_notifications')}
               >
                 <Bell size={18} />
                 {unreadNotifCount > 0 && (
@@ -319,7 +319,7 @@ export default function Header({ minimal = false }) {
           <Link href="/assinatura" style={{ color: '#fff', fontWeight: 700, textDecoration: 'underline', flexShrink: 0 }}>{t('header_renew_now')}</Link>
           <button
             onClick={() => setSubReminderDismissed(true)}
-            aria-label="Fechar aviso"
+            aria-label={t('attr_close_alert')}
             style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, flexShrink: 0 }}
           >
             ✕

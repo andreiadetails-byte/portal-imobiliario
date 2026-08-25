@@ -148,8 +148,8 @@ export default function ImtCalculator({ price, showTitle }) {
 
           {under35 === 'Sim' && (
             <div className="field">
-              <label>É a tua primeira habitação própria?</label>
-              <PillGroup value={firstHome} onChange={setFirstHome} options={[{ value: 'Sim', label: 'Sim' }, { value: 'Não', label: 'Não' }]} />
+              <label>{t('imt_first_home')}</label>
+              <PillGroup value={firstHome} onChange={setFirstHome} options={[{ value: 'Sim', label: t('imt_yes') }, { value: 'Não', label: t('imt_no') }]} />
             </div>
           )}
 

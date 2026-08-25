@@ -165,7 +165,7 @@ export default function PerfilPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             {avatarPreview ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={avatarPreview} alt="A tua foto de perfil" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover' }} />
+              <img src={avatarPreview} alt={t('attr_profile_photo_alt')} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover' }} />
             ) : (
               <div style={{
                 width: 72, height: 72, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',

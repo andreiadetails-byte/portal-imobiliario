@@ -174,7 +174,7 @@ export default function HomePage() {
                 fontSize: 13.5, fontWeight: 600, color: '#fff', textDecoration: 'underline', textUnderlineOffset: 3,
               }}
             >
-              🗺️ Prefere desenhar a sua zona no mapa?
+              {t('home_draw_map')}
             </Link>
           </div>
         </div>
@@ -329,8 +329,8 @@ export default function HomePage() {
                     <div className="addr">{p.typology} · {displayAddress(p)}</div>
                     <div className="meta" style={{ marginBottom: 4 }}>
                       {p.property_type}{(p.area || p.area_util) ? ` · ${p.area || p.area_util} m²` : ''}
-                      {p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
-                      {p.bathrooms ? ` · ${p.bathrooms} wc` : ''}
+                      {p.bedrooms ? ` · ${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
+                      {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                     </div>
                     <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>{t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
@@ -405,8 +405,8 @@ export default function HomePage() {
                     <div className="addr">{p.typology} · {displayAddress(p)}</div>
                     <div className="meta" style={{ marginBottom: 4 }}>
                       {p.property_type}{(p.area || p.area_util) ? ` · ${p.area || p.area_util} m²` : ''}
-                      {p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
-                      {p.bathrooms ? ` · ${p.bathrooms} wc` : ''}
+                      {p.bedrooms ? ` · ${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
+                      {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                     </div>
                     <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>{t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>

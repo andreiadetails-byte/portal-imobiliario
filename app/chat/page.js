@@ -239,7 +239,7 @@ function ChatInner() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Nome, email ou imóvel"
+                placeholder={t('attr_search_name_email')}
                 style={{ width: '100%', padding: '8px 12px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 12.5 }}
               />
             </div>
@@ -288,7 +288,7 @@ function ChatInner() {
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
                         {photo ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={photo} alt="Foto do imóvel da conversa" style={{ width: 32, height: 26, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
+                          <img src={photo} alt={t('attr_photo_conversation')} style={{ width: 32, height: 26, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
                         ) : (
                           <div style={{ width: 32, height: 26, borderRadius: 3, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
                         )}
@@ -325,8 +325,8 @@ function ChatInner() {
 
                     <button
                       onClick={(e) => { e.stopPropagation(); deleteConversation(c); }}
-                      aria-label="Apagar conversa"
-                      title="Apagar conversa definitivamente"
+                      aria-label={t('attr_delete_conversation')}
+                      title={t('attr_delete_conv_permanent')}
                       style={{
                         background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a',
                         fontSize: 14, padding: 4, flexShrink: 0, alignSelf: 'flex-start',
@@ -347,7 +347,7 @@ function ChatInner() {
                   <button
                     onClick={() => setActiveId(null)}
                     className="chat-back-btn"
-                    aria-label="Voltar à lista de conversas"
+                    aria-label={t('attr_back_to_conversations')}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, display: 'none' }}
                   >
                     ←
@@ -366,8 +366,8 @@ function ChatInner() {
                     <button
                       onClick={() => deleteConversation(activeConversation)}
                       className="btn"
-                      aria-label="Apagar conversa"
-                      title="Apagar conversa definitivamente"
+                      aria-label={t('attr_delete_conversation')}
+                      title={t('attr_delete_conv_permanent')}
                       style={{ fontSize: 12, padding: '6px 10px', color: '#8a3b2a', borderColor: '#8a3b2a' }}
                     >
                       <Trash2 size={14} />
@@ -385,7 +385,7 @@ function ChatInner() {
                     const photo = activeConversation.properties.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                     return photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={photo} alt="Foto do imóvel da conversa" style={{ width: 44, height: 34, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                      <img src={photo} alt={t('attr_photo_conversation')} style={{ width: 44, height: 34, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
                     ) : (
                       <div style={{ width: 44, height: 34, borderRadius: 4, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
                     );
@@ -423,8 +423,8 @@ function ChatInner() {
                       {isMine && !m.read && (
                         <button
                           onClick={() => deleteMessage(m)}
-                          aria-label="Apagar mensagem"
-                          title="Apagar mensagem (ainda não foi vista)"
+                          aria-label={t('attr_delete_message')}
+                          title={t('attr_delete_message_unseen')}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, flexShrink: 0, display: 'flex', alignItems: 'center' }}
                         >
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8452f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

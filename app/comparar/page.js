@@ -106,7 +106,7 @@ export default function CompararPage() {
                         <div style={{ position: 'relative' }}>
                           <button
                             onClick={() => removeFromCompare(p.id)}
-                            aria-label="Remover da comparação"
+                            aria-label={t('attr_remove_compare')}
                             className="no-print"
                             style={{
                               position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: '50%',

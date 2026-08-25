@@ -215,7 +215,7 @@ export default function PropertyClient() {
         className="btn"
         style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px' }}
       >
-        ← Voltar à página anterior
+        {t('back_to_previous_page')}
       </button>
       <div className="property-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
         <div>
@@ -491,7 +491,7 @@ export default function PropertyClient() {
               ) : (
                 <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={property.floor_plan_url} alt="Planta do imóvel" style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid var(--line)' }} />
+                  <img src={property.floor_plan_url} alt={t('attr_floorplan_alt')} style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid var(--line)' }} />
                 </a>
               )}
             </>
@@ -525,7 +525,7 @@ export default function PropertyClient() {
                 <div style={{ fontSize: 13.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
                   {property.display_name || ownerProfile.agency_name || ownerProfile.full_name}
                   {ownerProfile.is_verified && (
-                    <span title="Profissional verificado" style={{
+                    <span title={t('attr_verified_professional')} style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 15, height: 15,
                       borderRadius: '50%', background: 'var(--azulejo)', color: '#fff', fontSize: 9,
                     }}>
@@ -578,7 +578,7 @@ export default function PropertyClient() {
               </div>
               <div className="field">
                 <label>{t('prop_message_to')} {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
-                <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} placeholder="Olá, tenho interesse neste imóvel..." />
+                <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} placeholder={t('attr_interest_placeholder')} />
               </div>
               <button type="submit" className="btn btn-primary btn-block">{t('prop_send_message')}</button>
               <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
@@ -622,7 +622,7 @@ export default function PropertyClient() {
                 <Link key={s.id} href={`/property/${s.id}`} className="card" style={{ position: 'relative' }}>
                   <button
                     onClick={(e) => toggleSimilarFavorite(e, s.id)}
-                    aria-label="Guardar nos favoritos"
+                    aria-label={t('attr_save_favorites')}
                     style={{
                       position: 'absolute', top: 10, right: 10, zIndex: 1, width: 30, height: 30, borderRadius: '50%',
                       background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 15,

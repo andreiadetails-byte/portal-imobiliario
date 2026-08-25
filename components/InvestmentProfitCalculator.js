@@ -65,7 +65,7 @@ function EuroField({ label, value, onChange, hint }) {
   );
 }
 
-export default function InvestmentProfitCalculator() {
+export default function InvestmentProfitCalculator({ showTitle }) {
   const { t } = useLanguage();
   const [investorType, setInvestorType] = useState('Particular');
   const [homeType, setHomeType] = useState('Secundária');
@@ -109,6 +109,12 @@ export default function InvestmentProfitCalculator() {
 
   return (
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
+      {showTitle && (
+        <>
+          <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('invest_page_title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>{t('invest_page_subtitle')}</p>
+        </>
+      )}
       <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>{t('invest_title')}</h3>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
         {t('invest_disclaimer')}
@@ -195,7 +201,7 @@ export default function InvestmentProfitCalculator() {
         className="btn btn-primary btn-block"
         style={{ marginTop: 4, marginBottom: hasCalculated ? 16 : 0 }}
       >
-        Calcular lucro
+        {t('invest_calculate_btn')}
       </button>
 
       {hasCalculated && (
@@ -209,7 +215,7 @@ export default function InvestmentProfitCalculator() {
 
           <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16 }}>
             <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 4 }}>
-              Imposto sobre a mais-valia ({investorType === 'Particular' ? `IRS, 50% tributável a ${irsRate}%` : 'IRC, 21%'})
+              {t('invest_capital_gains_tax')} ({investorType === 'Particular' ? `${t('invest_irs_taxable')} ${irsRate}%` : 'IRC, 21%'})
             </div>
             <div style={{ fontSize: 18, fontWeight: 700, color: '#8a3b2a', fontFamily: 'Inter, sans-serif' }}>
               − {taxDue.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €

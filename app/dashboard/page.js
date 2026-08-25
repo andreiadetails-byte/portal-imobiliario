@@ -13,15 +13,15 @@ import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount } from '../../lib/accountTypes';
 
 const STATUS_LABELS = {
-  ativo: { label: 'Publicado', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
-  em_revisao: { label: 'Em revisão', color: '#8a6a1f', bg: 'var(--brass)' },
-  rejeitado: { label: 'Rejeitado', color: '#8a3b2a', bg: 'rgba(138,59,42,0.12)' },
-  desativado: { label: 'Desativado', color: 'var(--text-soft)', bg: 'var(--line)' },
-  anulado_suporte: { label: 'Anulado pelo suporte', color: '#8a3b2a', bg: 'rgba(138,59,42,0.12)' },
-  eliminado: { label: 'Eliminado', color: 'var(--text-soft)', bg: 'var(--line)' },
-  vendido: { label: 'Vendido', color: 'var(--text-soft)', bg: 'var(--line)' },
-  arrendado: { label: 'Arrendado', color: 'var(--text-soft)', bg: 'var(--line)' },
-  expirado: { label: 'Expirado', color: 'var(--text-soft)', bg: 'var(--line)' },
+  ativo: { labelKey: 'dash_status_active', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
+  em_revisao: { labelKey: 'dash_status_review', color: '#8a6a1f', bg: 'var(--brass)' },
+  rejeitado: { labelKey: 'dash_status_rejected', color: '#8a3b2a', bg: 'rgba(138,59,42,0.12)' },
+  desativado: { labelKey: 'dash_status_deactivated', color: 'var(--text-soft)', bg: 'var(--line)' },
+  anulado_suporte: { labelKey: 'dash_status_cancelled_support', color: '#8a3b2a', bg: 'rgba(138,59,42,0.12)' },
+  eliminado: { labelKey: 'dash_status_deleted', color: 'var(--text-soft)', bg: 'var(--line)' },
+  vendido: { labelKey: 'dash_status_sold', color: 'var(--text-soft)', bg: 'var(--line)' },
+  arrendado: { labelKey: 'dash_status_rented', color: 'var(--text-soft)', bg: 'var(--line)' },
+  expirado: { labelKey: 'dash_status_expired', color: 'var(--text-soft)', bg: 'var(--line)' },
 };
 
 function DashboardInner() {
@@ -184,7 +184,7 @@ function DashboardInner() {
         }}>
           <button
             onClick={() => setWelcomeDismissed(true)}
-            aria-label="Fechar aviso"
+            aria-label={t('attr_close_alert')}
             style={{ position: 'absolute', top: 14, right: 16, background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16 }}
           >
             <X size={16} />
@@ -218,23 +218,23 @@ function DashboardInner() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 10 }}>
             <div className="field" style={{ marginBottom: 0 }}>
               <label style={{ fontSize: 12 }}>{t('dash_address')}</label>
-              <input type="text" value={listingFilters.address} onChange={(e) => updateListingFilter('address', e.target.value)} placeholder="Rua, número..." />
+              <input type="text" value={listingFilters.address} onChange={(e) => updateListingFilter('address', e.target.value)} placeholder={t('attr_street_number')} />
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
               <label style={{ fontSize: 12 }}>{t('dash_price')}</label>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <input type="number" value={listingFilters.minPrice} onChange={(e) => updateListingFilter('minPrice', e.target.value)} placeholder="Desde" />
+                <input type="number" value={listingFilters.minPrice} onChange={(e) => updateListingFilter('minPrice', e.target.value)} placeholder={t('attr_from')} />
                 <span style={{ color: 'var(--text-soft)', fontSize: 12 }}>—</span>
-                <input type="number" value={listingFilters.maxPrice} onChange={(e) => updateListingFilter('maxPrice', e.target.value)} placeholder="Até" />
+                <input type="number" value={listingFilters.maxPrice} onChange={(e) => updateListingFilter('maxPrice', e.target.value)} placeholder={t('dash_price_to')} />
               </div>
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
               <label style={{ fontSize: 12 }}>{t('dash_parish')}</label>
-              <input type="text" value={listingFilters.parish} onChange={(e) => updateListingFilter('parish', e.target.value)} placeholder="Freguesia" />
+              <input type="text" value={listingFilters.parish} onChange={(e) => updateListingFilter('parish', e.target.value)} placeholder={t('attr_parish')} />
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
               <label style={{ fontSize: 12 }}>{t('dash_municipality')}</label>
-              <input type="text" value={listingFilters.municipality} onChange={(e) => updateListingFilter('municipality', e.target.value)} placeholder="Concelho" />
+              <input type="text" value={listingFilters.municipality} onChange={(e) => updateListingFilter('municipality', e.target.value)} placeholder={t('attr_municipality')} />
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -274,7 +274,8 @@ function DashboardInner() {
                 </h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {pageItems.map((p) => {
-                    const st = STATUS_LABELS[p.status] || { label: p.status, color: 'var(--text-soft)', bg: 'var(--line)' };
+                    const st = STATUS_LABELS[p.status] || { labelKey: null, color: 'var(--text-soft)', bg: 'var(--line)' };
+                    const stLabel = st.labelKey ? t(st.labelKey) : p.status;
                     const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                     const isLocked = p.status === 'anulado_suporte' || p.status === 'eliminado';
                     return (
@@ -291,7 +292,7 @@ function DashboardInner() {
                         <div style={{ minWidth: 0, flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 2 }}>
                             <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 6px', borderRadius: 8, background: st.bg, color: st.color }}>
-                              {st.label.toUpperCase()}
+                              {stLabel.toUpperCase()}
                             </span>
                             {p.featured_status === 'active' && <span style={{ fontSize: 11 }}>★</span>}
                           </div>

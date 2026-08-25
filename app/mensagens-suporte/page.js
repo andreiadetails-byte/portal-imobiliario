@@ -97,8 +97,8 @@ export default function MensagensSuportePage() {
                   </span>
                   <button
                     onClick={() => deleteThread(r.id)}
-                    aria-label="Eliminar conversa"
-                    title="Eliminar esta conversa definitivamente"
+                    aria-label={t('attr_delete_conversation')}
+                    title={t('attr_delete_conv_permanent')}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a', fontSize: 15 }}
                   >
                     🗑
@@ -131,8 +131,8 @@ export default function MensagensSuportePage() {
                         {rep.sender_role === 'user' && !rep.read_at && (
                           <button
                             onClick={() => deleteReply(r.id, rep.id)}
-                            aria-label="Apagar mensagem"
-                            title="Apagar mensagem (ainda não foi vista)"
+                            aria-label={t('attr_delete_message')}
+                            title={t('attr_delete_message_unseen')}
                             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a3b2a', fontSize: 13, flexShrink: 0 }}
                           >
                             🗑
@@ -153,7 +153,7 @@ export default function MensagensSuportePage() {
                   <input
                     value={replyText[r.id] || ''}
                     onChange={(e) => setReplyText((cur) => ({ ...cur, [r.id]: e.target.value }))}
-                    placeholder="Escreva uma mensagem..."
+                    placeholder={t('attr_write_message')}
                     style={{ flex: 1, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 16 }}
                   />
                   <button onClick={() => sendSupportReply(r.id)} className="btn btn-primary" style={{ fontSize: 13.5 }}>{t('support_send')}</button>

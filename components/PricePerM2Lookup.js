@@ -179,7 +179,7 @@ export default function PricePerM2Lookup() {
         style={{ marginTop: 12 }}
         disabled={loading || (!levels && !selectedRegion)}
       >
-        {loading ? 'A calcular...' : 'Ver preço por m²'}
+        {loading ? t('pricem2_calculating') : t('pricem2_view_button')}
       </button>
 
       {searched && result && (

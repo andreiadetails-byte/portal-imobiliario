@@ -124,8 +124,8 @@ export default function FavoritesPage() {
     const parts = [];
     if (filters.district) parts.push(filters.district);
     if (filters.selectedTypologies?.length) parts.push(filters.selectedTypologies.join(', '));
-    if (filters.maxPrice) parts.push(`até ${Number(filters.maxPrice).toLocaleString('pt-PT')} €`);
-    return parts.join(' · ') || 'Sem filtros adicionais';
+    if (filters.maxPrice) parts.push(`${t('fav_up_to')} ${Number(filters.maxPrice).toLocaleString('pt-PT')} €`);
+    return parts.join(' · ') || t('fav_no_extra_filters');
   }
 
   if (loading) return (
@@ -140,7 +140,7 @@ export default function FavoritesPage() {
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('favorites_title')}</h1>
 
         <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid var(--line)', marginBottom: 24 }}>
-          {[['favoritos', `Guardados (${properties.length})`], ['pesquisas', `Pesquisas guardadas (${searches.length})`]].map(([value, label]) => (
+          {[['favoritos', `${t('fav_saved_tab')} (${properties.length})`], ['pesquisas', `${t('fav_saved_searches_tab')} (${searches.length})`]].map(([value, label]) => (
             <button
               key={value}
               onClick={() => setTab(value)}
@@ -163,11 +163,11 @@ export default function FavoritesPage() {
               disabled={compareIds.length < 2}
               style={{ fontSize: 13.5, opacity: compareIds.length < 2 ? 0.5 : 1, cursor: compareIds.length < 2 ? 'not-allowed' : 'pointer' }}
             >
-              ⇄ Comparar os meus imóveis {compareIds.length >= 2 ? `(${compareIds.length})` : ''}
+              {t('fav_compare_my_properties')} {compareIds.length >= 2 ? `(${compareIds.length})` : ''}
             </button>
             {compareIds.length < 2 && (
               <span style={{ fontSize: 12, color: 'var(--text-soft)', marginLeft: 10 }}>
-                Marque a caixa "Comparar" em pelo menos 2 imóveis abaixo.
+                {t('fav_check_compare_hint')}
               </span>
             )}
           </div>
@@ -197,14 +197,14 @@ export default function FavoritesPage() {
                       <button
                         onClick={() => removeFavorite(p.id)}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--telha)', fontSize: 18, lineHeight: 1 }}
-                        aria-label="Remover dos favoritos"
+                        aria-label={t('attr_remove_favorites')}
                       >
                         ♥
                       </button>
                     </div>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', marginBottom: 4 }}>
                       <input type="checkbox" checked={compareIds.includes(p.id)} onChange={() => toggleCompare(p.id)} style={{ cursor: 'pointer' }} />
-                      Comparar
+                      {t('fav_compare_checkbox')}
                     </label>
                     <Link href={`/property/${p.id}`}>
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
@@ -215,13 +215,13 @@ export default function FavoritesPage() {
                         display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 12, fontWeight: 600,
                         color: 'var(--telha)', background: 'rgba(126,143,106,0.14)', padding: '5px 9px', borderRadius: 6,
                       }}>
-                        ↓ Desceu {(Number(p.price_at_save) - Number(p.price)).toLocaleString('pt-PT')} € desde que guardaste
+                        {t('fav_price_dropped')} {(Number(p.price_at_save) - Number(p.price)).toLocaleString('pt-PT')} € {t('fav_since_saved')}
                       </div>
                     )}
                     <textarea
                       value={p.notes || ''}
                       onChange={(e) => updateNote(p.id, e.target.value)}
-                      placeholder="📝 Escreve aqui uma nota sobre este imóvel (só tu vês)..."
+                      placeholder={t('fav_note_placeholder')}
                       rows={2}
                       style={{
                         width: '100%', marginTop: 10, fontSize: 12.5, padding: '8px 10px', borderRadius: 6,
@@ -237,9 +237,9 @@ export default function FavoritesPage() {
 
             {suggestions.length > 0 && (
               <div style={{ marginTop: 44 }}>
-                <h2 className="display" style={{ fontSize: 19, marginBottom: 6 }}>💡 Talvez também gostes</h2>
+                <h2 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('fav_maybe_like')}</h2>
                 <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 18 }}>
-                  Com base nos imóveis que já guardaste.
+                  {t('fav_based_on_saved')}
                 </p>
                 <div className="grid-listings">
                   {suggestions.map((p) => {
@@ -248,7 +248,7 @@ export default function FavoritesPage() {
                       <Link key={p.id} href={`/property/${p.id}`} className="card" style={{ position: 'relative' }}>
                         <button
                           onClick={(e) => addSuggestionToFavorites(e, p.id)}
-                          aria-label="Guardar nos favoritos"
+                          aria-label={t('attr_save_favorites')}
                           style={{
                             position: 'absolute', top: 10, right: 10, zIndex: 1, width: 30, height: 30, borderRadius: '50%',
                             background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 15,
@@ -292,10 +292,10 @@ export default function FavoritesPage() {
                   <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
                       <input type="checkbox" checked={s.notify} onChange={() => toggleNotify(s.id, s.notify)} />
-                      Alertas por email
+                      {t('fav_email_alerts')}
                     </label>
                     <button onClick={() => deleteSearch(s.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#8a3b2a' }}>
-                      Apagar
+                      {t('fav_delete')}
                     </button>
                   </div>
                 </div>

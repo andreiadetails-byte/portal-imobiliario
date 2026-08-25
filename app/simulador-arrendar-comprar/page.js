@@ -13,11 +13,7 @@ export default function SimuladorArrendarComprarPage() {
       <Header />
       <div className="wrap" style={{ maxWidth: 620, padding: '48px 32px 80px' }}>
         <BackButton fallback="/" />
-        <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Arrendar ou comprar?</h1>
-        <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 8 }}>
-          Compare o custo real de comprar com o de arrendar, ao longo do tempo que pretende ficar no imóvel.
-        </p>
-        <RentVsBuyCalculator price={200000} />
+        <RentVsBuyCalculator price={200000} showTitle />
       </div>
     </>
   );

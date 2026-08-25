@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useLanguage } from '../lib/i18n';
 
-export default function RentVsBuyCalculator({ price = 200000 }) {
+export default function RentVsBuyCalculator({ price = 200000, showTitle }) {
   const { t } = useLanguage();
   const [purchasePrice, setPurchasePrice] = useState(price);
   const [downPaymentPct, setDownPaymentPct] = useState(10);
@@ -50,6 +50,12 @@ export default function RentVsBuyCalculator({ price = 200000 }) {
 
   return (
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
+      {showTitle && (
+        <>
+          <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('rentbuy_page_title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>{t('rentbuy_page_subtitle')}</p>
+        </>
+      )}
       <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>{t('rentbuy_title')}</h3>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
         Estimativa simplificada. Considera juros, IMT, Selo e manutenção do lado da compra; renda com aumento anual do lado do arrendamento — sem contar a valorização do imóvel.

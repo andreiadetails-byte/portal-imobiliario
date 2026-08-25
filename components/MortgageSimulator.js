@@ -26,7 +26,7 @@ function PillGroup({ options, value, onChange }) {
   );
 }
 
-export default function MortgageSimulator({ price }) {
+export default function MortgageSimulator({ price, showTitle }) {
   const { t } = useLanguage();
   const [mode, setMode] = useState('prestacao'); // 'prestacao' ou 'quanto'
 
@@ -121,6 +121,12 @@ export default function MortgageSimulator({ price }) {
 
   return (
     <div className="card" style={{ padding: 22, marginTop: 8 }}>
+      {showTitle && (
+        <>
+          <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('mortgage_page_title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>{t('mortgage_page_subtitle')}</p>
+        </>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
         <h3 className="display" style={{ fontSize: 18 }}>{t('mortgage_title')}</h3>
         <button
@@ -132,8 +138,8 @@ export default function MortgageSimulator({ price }) {
         </button>
       </div>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
-        Cálculo indicativo, não vinculativo. Consulte o seu banco para uma simulação real.
-        {rateUpdatedAt && ` Taxa de referência atualizada em ${new Date(rateUpdatedAt).toLocaleDateString('pt-PT')}.`}
+        {t('mortgage_disclaimer')}
+        {rateUpdatedAt && ` ${t('mortgage_rate_updated')} ${new Date(rateUpdatedAt).toLocaleDateString('pt-PT')}.`}
       </p>
 
       {mode === 'prestacao' ? (

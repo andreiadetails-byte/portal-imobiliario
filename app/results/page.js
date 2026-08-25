@@ -341,9 +341,9 @@ function ResultsInner() {
                     gridColumn: '1 / -1',
                   }}
                 >
-                  Todos
+                  {t('results_all')}
                 </span>
-                {['Novo', 'Em construção', 'Para recuperar', 'Usado'].map((st) => (
+                {[['Novo', t('results_state_new')], ['Em construção', t('results_state_construction')], ['Para recuperar', t('results_state_torenovate')], ['Usado', t('results_state_used')]].map(([st, stLabel]) => (
                   <span
                     key={st}
                     onClick={() => toggleFromList(selectedStates, setSelectedStates, st)}
@@ -354,7 +354,7 @@ function ResultsInner() {
                       color: selectedStates.includes(st) ? '#fff' : 'var(--text-soft)',
                     }}
                   >
-                    {st}
+                    {stLabel}
                   </span>
                 ))}
               </div>
@@ -389,7 +389,7 @@ function ResultsInner() {
                 </select>
               </div>
               <div className="field">
-                <label>WC (mín.)</label>
+                <label>{t('results_wc_min')}</label>
                 <select value={minBathrooms} onChange={(e) => setMinBathrooms(e.target.value)}>
                   <option value="">{t('results_any')}</option>
                   {[0, 1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}</option>)}
@@ -398,7 +398,7 @@ function ResultsInner() {
             </div>
 
             <div className="field">
-              <label>Área mínima (m²)</label>
+              <label>{t('results_min_area')}</label>
               <input type="number" value={minArea} onChange={(e) => setMinArea(e.target.value)} />
             </div>
 
@@ -406,10 +406,10 @@ function ResultsInner() {
               <label>{t('results_features')}</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 6 }}>
                 {[
-                  ['has_storage', 'Arrumos'], ['has_parking', 'Estacion.'], ['has_balcony', 'Varanda'],
-                  ['has_garden', 'Jardim'], ['has_pool', 'Piscina'], ['has_gym', 'Ginásio'], ['has_coworking', 'Coworking'],
-                  ['near_transit', 'Transportes'],
-                  ...(businessType === 'Arrendamento' ? [['is_furnished', 'Mobilado'], ['pets_allowed', 'Aceita animais']] : []),
+                  ['has_storage', t('results_feat_storage')], ['has_parking', t('results_feat_parking')], ['has_balcony', t('results_feat_balcony')],
+                  ['has_garden', t('results_feat_garden')], ['has_pool', t('results_feat_pool')], ['has_gym', t('results_feat_gym')], ['has_coworking', t('results_feat_coworking')],
+                  ['near_transit', t('results_feat_transit')],
+                  ...(businessType === 'Arrendamento' ? [['is_furnished', t('results_feat_furnished')], ['pets_allowed', t('results_feat_pets')]] : []),
                 ].map(([col, label]) => (
                   <span
                     key={col}
@@ -433,7 +433,7 @@ function ResultsInner() {
                     color: elevatorOnly ? '#fff' : 'var(--text-soft)',
                   }}
                 >
-                  Elevador
+                  {t('results_feat_elevator')}
                 </span>
               </div>
             </div>
@@ -466,7 +466,7 @@ function ResultsInner() {
               onClick={() => setShowMap((s) => !s)}
               style={{ fontSize: 12.5, color: 'var(--telha)', cursor: 'pointer', marginBottom: 8, textAlign: 'center' }}
             >
-              {showMap ? '✕ Esconder mapa' : '🗺️ Ver mapa'}
+              {showMap ? t('results_hide_map') : t('results_view_map')}
             </div>
             {showMap && (
               <div className="card" style={{ padding: 10 }}>
@@ -512,7 +512,7 @@ function ResultsInner() {
               </span>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 <button type="button" onClick={saveSearch} className="btn" style={{ fontSize: 13 }}>
-                  🔔 Guardar pesquisa
+                  {t('results_save_search')}
                 </button>
                 <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); runSearch(null, page, e.target.value); }} style={{ padding: '8px 10px', border: '1px solid var(--line)', borderRadius: 5 }}>
                   <option value="recent">{t('results_sort_recent')}</option>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { randomAgentName } from '../lib/agentNames';
+import { useLanguage } from '../lib/i18n';
 
 // Avatar ilustrado simples (não é uma foto real de ninguém)
 function AgentAvatar({ size = 46 }) {
@@ -16,6 +17,7 @@ function AgentAvatar({ size = 46 }) {
 }
 
 export default function SupportAgentWidget() {
+  const { t } = useLanguage();
   const [agentName, setAgentName] = useState(null);
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
@@ -34,7 +36,7 @@ export default function SupportAgentWidget() {
     function handleOpenRequest(e) {
       setOpen(true);
       const tema = e?.detail;
-      if (tema) setForm((f) => ({ ...f, message: `Tenho uma dúvida sobre: ${tema}. ` }));
+      if (tema) setForm((f) => ({ ...f, message: `${t('sw_doubt_about')} ${tema}. ` }));
     }
     window.addEventListener('morada-open-support', handleOpenRequest);
     return () => window.removeEventListener('morada-open-support', handleOpenRequest);
@@ -80,12 +82,12 @@ export default function SupportAgentWidget() {
                 <AgentAvatar />
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 14 }}>{agentName.fullName}</div>
-                  <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>Apoio ao cliente · Morada</div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>{t('sw_customer_support')}</div>
                 </div>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                aria-label="Fechar"
+                aria-label={t('attr_close')}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: 'var(--text-soft)', flexShrink: 0 }}
               >
                 ✕
@@ -94,26 +96,26 @@ export default function SupportAgentWidget() {
 
             {sent ? (
               <p style={{ fontSize: 13.5 }}>
-                Obrigada! {agentName.isFemale ? 'A' : 'O'} {agentName.fullName.split(' ')[0]} vai responder-lhe em breve.
+                {t('sw_thanks')} {agentName.isFemale ? 'A' : 'O'} {agentName.fullName.split(' ')[0]} {t('sw_will_reply_soon')}
                 {user
-                  ? ' Pode ver a resposta no seu painel, em "As minhas mensagens de suporte".'
-                  : ' Inicie sessão para poder ver a resposta na app.'}
+                  ? ` ${t('sw_see_reply_dashboard')}`
+                  : ` ${t('sw_login_to_see_reply')}`}
               </p>
             ) : (
               <form onSubmit={handleSubmit}>
                 <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 10 }}>
-                  Precisa de ajuda com alguma questão do portal? Deixe a sua mensagem.
+                  {t('sw_help_question')}
                 </p>
                 <div className="field">
-                  <label>Nome</label>
+                  <label>{t('sw_name')}</label>
                   <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                 </div>
                 <div className="field">
-                  <label>Email ou telefone</label>
+                  <label>{t('sw_email_or_phone')}</label>
                   <input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} />
                 </div>
                 <div className="field">
-                  <label>Mensagem</label>
+                  <label>{t('sw_message')}</label>
                   <textarea required rows={3} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
                 </div>
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
@@ -125,18 +127,18 @@ export default function SupportAgentWidget() {
                     style={{ marginTop: 2, flexShrink: 0 }}
                   />
                   <span>
-                    Li e aceito a{' '}
+                    {t('sw_read_accept')}{' '}
                     <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
-                      Política de Privacidade
+                      {t('sw_privacy_policy')}
                     </a>{' '}
-                    e os{' '}
+                    {t('sw_and_the')}{' '}
                     <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
-                      Termos e Condições
+                      {t('sw_terms_conditions')}
                     </a>.
                   </span>
                 </label>
                 <button type="submit" className="btn btn-primary btn-block" disabled={sending || !acceptedPolicy}>
-                  {sending ? 'A enviar...' : 'Enviar mensagem'}
+                  {sending ? t('sw_sending') : t('sw_send_message_btn')}
                 </button>
               </form>
             )}
@@ -156,7 +158,7 @@ export default function SupportAgentWidget() {
         >
           <AgentAvatar size={36} />
           <span className="support-widget-text" style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>
-            {open ? 'Fechar' : `Fale com ${agentName.isFemale ? 'a' : 'o'} ${agentName.fullName.split(' ')[0]}`}
+            {open ? t('sw_close') : `${t('sw_talk_to')} ${agentName.isFemale ? 'a' : 'o'} ${agentName.fullName.split(' ')[0]}`}
           </span>
         </button>
       </div>

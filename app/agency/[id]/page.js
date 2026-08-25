@@ -111,7 +111,7 @@ export default function AgencyPage() {
             <h1 className="display" style={{ fontSize: 28, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
               {displayName}
               {profile.is_verified && (
-                <span title="Profissional verificado" style={{
+                <span title={t('attr_verified_professional')} style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24,
                   borderRadius: '50%', background: 'var(--azulejo)', color: '#fff', fontSize: 13,
                 }}>
@@ -202,7 +202,7 @@ export default function AgencyPage() {
                 )}
                 <button
                   onClick={(e) => toggleFavorite(e, p.id)}
-                  aria-label="Guardar nos favoritos"
+                  aria-label={t('attr_save_favorites')}
                   style={{
                     position: 'absolute', top: 10, right: 10, zIndex: 1, width: 30, height: 30, borderRadius: '50%',
                     background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 15,
