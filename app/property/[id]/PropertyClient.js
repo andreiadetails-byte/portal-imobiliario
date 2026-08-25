@@ -377,7 +377,7 @@ export default function PropertyClient() {
             {property.floor && (
               <div><b>{property.floor}{property.is_top_floor ? ' (último)' : ''}</b><div className="meta">Piso</div></div>
             )}
-            {property.state && <div><b>{property.state}</b><div className="meta">Estado</div></div>}
+            {property.state && <div><b>{property.state}</b><div className="meta">{t('prop_state_label')}</div></div>}
           </div>
 
           {property.property_type === 'Moradia' && property.house_subtype && (
@@ -468,7 +468,7 @@ export default function PropertyClient() {
 
           {property.video_url && (
             <>
-              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>Vídeo do imóvel</h3>
+              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>{t('prop_video_title')}</h3>
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video
                 controls
@@ -483,7 +483,7 @@ export default function PropertyClient() {
 
           {property.floor_plan_url && (
             <>
-              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>Planta do imóvel</h3>
+              <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>{t('prop_floorplan_title')}</h3>
               {property.floor_plan_url.toLowerCase().endsWith('.pdf') ? (
                 <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer" className="btn">
                   📄 Ver planta (PDF)
@@ -559,28 +559,28 @@ export default function PropertyClient() {
           ) : sent ? (
             <p style={{ fontSize: 14 }}>
               {user ? (
-                <>Mensagem enviada! Pode continuar a conversa no <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>chat</Link>.</>
+                <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
               ) : t('property_sent')}
             </p>
           ) : user ? (
             <form onSubmit={handleSendLead}>
               <div className="field">
-                <label>O seu nome</label>
+                <label>{t('prop_your_name')}</label>
                 <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
               </div>
               <div className="field">
-                <label>O seu email</label>
+                <label>{t('prop_your_email')}</label>
                 <input required type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} />
               </div>
               <div className="field">
-                <label>Telefone <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+                <label>{t('prop_phone_optional')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('prop_optional')}</span></label>
                 <input value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
               </div>
               <div className="field">
-                <label>Mensagem para {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
+                <label>{t('prop_message_to')} {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
                 <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} placeholder="Olá, tenho interesse neste imóvel..." />
               </div>
-              <button type="submit" className="btn btn-primary btn-block">Enviar mensagem</button>
+              <button type="submit" className="btn btn-primary btn-block">{t('prop_send_message')}</button>
               <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
                 A mensagem, o seu nome e email ficam visíveis no chat, associados a esta conversa.
               </p>
@@ -592,7 +592,7 @@ export default function PropertyClient() {
                 <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
               </div>
               <div className="field">
-                <label>O seu email</label>
+                <label>{t('prop_your_email')}</label>
                 <input required type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} />
               </div>
               <div className="field">
@@ -614,7 +614,7 @@ export default function PropertyClient() {
 
       {similar.length > 0 && (
         <div style={{ marginTop: 8 }}>
-          <h3 className="display" style={{ fontSize: 19, marginBottom: 14 }}>Imóveis semelhantes</h3>
+          <h3 className="display" style={{ fontSize: 19, marginBottom: 14 }}>{t('prop_similar_title')}</h3>
           <div className="grid-listings">
             {similar.map((s) => {
               const sPhoto = s.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
@@ -662,7 +662,7 @@ export default function PropertyClient() {
           <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>⚑ Denunciar este anúncio</h3>
 
           {reportSent ? (
-            <p style={{ fontSize: 14 }}>Obrigado. A nossa equipa vai analisar esta denúncia.</p>
+            <p style={{ fontSize: 14 }}>{t('prop_report_thanks')}</p>
           ) : (
             <form onSubmit={submitReport}>
               <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16, background: 'var(--plaster)', padding: 12, borderRadius: 6 }}>
@@ -670,35 +670,35 @@ export default function PropertyClient() {
               </p>
 
               <div className="field">
-                <label>Motivo</label>
+                <label>{t('prop_reason_label')}</label>
                 <select value={reportForm.reason} onChange={(e) => setReportForm({ ...reportForm, reason: e.target.value })}>
-                  <option>Anúncio enganador ou falso</option>
-                  <option>Imóvel não existe / fraude</option>
-                  <option>Preço ou dados incorretos</option>
-                  <option>Conteúdo discriminatório</option>
-                  <option>Conteúdo ilegal ou proibido</option>
-                  <option>Spam ou anúncio duplicado</option>
-                  <option>Outro motivo</option>
+                  <option>{t('prop_reason_misleading')}</option>
+                  <option>{t('prop_reason_notexist')}</option>
+                  <option>{t('prop_reason_wrongprice')}</option>
+                  <option>{t('prop_reason_discriminatory')}</option>
+                  <option>{t('prop_reason_illegal')}</option>
+                  <option>{t('prop_reason_spam')}</option>
+                  <option>{t('prop_reason_other')}</option>
                 </select>
               </div>
 
               <div className="field">
-                <label>O seu nome</label>
+                <label>{t('prop_your_name')}</label>
                 <input required value={reportForm.name} onChange={(e) => setReportForm({ ...reportForm, name: e.target.value })} />
               </div>
 
               <div className="field">
-                <label>Detalhes <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+                <label>{t('prop_details_label')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('prop_optional')}</span></label>
                 <textarea rows={3} value={reportForm.details} onChange={(e) => setReportForm({ ...reportForm, details: e.target.value })} />
               </div>
 
               <div className="field">
-                <label>O seu contacto <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(email ou telefone, para vos podermos responder se for preciso)</span></label>
+                <label>{t('prop_your_contact')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('prop_contact_hint')}</span></label>
                 <input required value={reportForm.contact} onChange={(e) => setReportForm({ ...reportForm, contact: e.target.value })} />
               </div>
 
-              <button type="submit" className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>Enviar denúncia</button>
-              <button type="button" onClick={() => setReportModal(false)} className="btn btn-block">Cancelar</button>
+              <button type="submit" className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>{t('prop_send_report')}</button>
+              <button type="button" onClick={() => setReportModal(false)} className="btn btn-block">{t('prop_cancel')}</button>
             </form>
           )}
         </div>
@@ -745,7 +745,7 @@ export default function PropertyClient() {
         style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}
       >
         <div onClick={(e) => e.stopPropagation()} className="card" style={{ width: 300, maxWidth: 'calc(100vw - 32px)', padding: 26, textAlign: 'center' }}>
-          <h3 className="display" style={{ fontSize: 18, marginBottom: 6 }}>Código QR do anúncio</h3>
+          <h3 className="display" style={{ fontSize: 18, marginBottom: 6 }}>{t('prop_qr_title')}</h3>
           <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
             Útil para cartazes, folhetos ou vitrinas — quem digitalizar vai direto a este anúncio.
           </p>
@@ -768,7 +768,7 @@ export default function PropertyClient() {
             >
               Descarregar
             </a>
-            <button onClick={() => setShowQr(false)} className="btn" style={{ fontSize: 13, flex: 1 }}>Fechar</button>
+            <button onClick={() => setShowQr(false)} className="btn" style={{ fontSize: 13, flex: 1 }}>{t('prop_close')}</button>
           </div>
         </div>
       </div>

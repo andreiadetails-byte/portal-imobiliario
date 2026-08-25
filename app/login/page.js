@@ -335,7 +335,7 @@ export default function LoginPage() {
             }}>
               ✉️
             </div>
-            <h2 style={{ fontSize: 18, marginBottom: 10 }}>Verifique o seu email</h2>
+            <h2 style={{ fontSize: 18, marginBottom: 10 }}>{t('login_verify_email')}</h2>
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 20 }}>
               Enviámos um link de confirmação para <b>{email}</b>. Clique nesse link para ativar a sua conta e poder entrar.
             </p>
@@ -357,7 +357,7 @@ export default function LoginPage() {
           </div>
         ) : forgotMode ? (
           <div>
-            <h2 style={{ fontSize: 17, marginBottom: 6 }}>Recuperar palavra-passe</h2>
+            <h2 style={{ fontSize: 17, marginBottom: 6 }}>{t('login_recover_password')}</h2>
             {forgotSent ? (
               <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>
                 Se existir uma conta com esse email, vai receber um link para definir uma nova palavra-passe.
@@ -373,7 +373,7 @@ export default function LoginPage() {
                 </div>
                 {error && <p className="error-text">{error}</p>}
                 <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                  {loading ? 'A enviar...' : 'Enviar link de recuperação'}
+                  {loading ? t('login_sending') : t('login_send_recovery_link')}
                 </button>
               </form>
             )}
@@ -404,7 +404,7 @@ export default function LoginPage() {
               onClick={() => { setForgotMode(true); setError(''); }}
               style={{ background: 'none', border: 'none', color: 'var(--telha)', fontSize: 12.5, cursor: 'pointer', marginTop: 12, display: 'block' }}
             >
-              Esqueceu-se da palavra-passe?
+              {t('login_forgot_password')}
             </button>
           </form>
         ) : (
@@ -412,16 +412,16 @@ export default function LoginPage() {
             <div className="field">
               <label>{t('login_account_type')}</label>
               <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
-                <option value="particular">Particular</option>
-                <option value="agencia">Agência</option>
-                <option value="consultor">Consultor imobiliário</option>
-                <option value="promotor">Promotor imobiliário</option>
+                <option value="particular">{t('login_particular_opt')}</option>
+                <option value="agencia">{t('login_agency_opt')}</option>
+                <option value="consultor">{t('login_consultant_opt')}</option>
+                <option value="promotor">{t('login_developer_opt')}</option>
               </select>
             </div>
 
             {isProfessionalAccount(accountType) && accountType !== 'promotor' && (
               <div className="field">
-                <label htmlFor="ami-input">Licença AMI</label>
+                <label htmlFor="ami-input">{t('login_ami_license')}</label>
                 <input
                   id="ami-input"
                   required
@@ -436,7 +436,7 @@ export default function LoginPage() {
             )}
 
             <div className="field">
-              <label>Foto de perfil <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+              <label>{t('login_profile_photo')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('login_optional')}</span></label>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 {avatarPreview && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -461,7 +461,7 @@ export default function LoginPage() {
               <input type="email" required autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="field">
-              <label>Telemóvel <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+              <label>{t('login_mobile_phone')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('login_optional')}</span></label>
               <input type="tel" autoComplete="off" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="912 345 678" />
               {phone && (
                 <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
@@ -497,7 +497,7 @@ export default function LoginPage() {
             <div className="field">
               <label>{t('login_pw_min')}</label>
               <input type="password" required minLength={8} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
-              <span className="hint" style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>Pelo menos 8 caracteres, com maiúscula, minúscula e número.</span>
+              <span className="hint" style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>{t('login_password_hint')}</span>
             </div>
             {error && <p className="error-text">{error}</p>}
             <div ref={recaptchaRef} style={{ marginBottom: 16 }} />

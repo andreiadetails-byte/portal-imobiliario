@@ -246,7 +246,7 @@ function ChatInner() {
 
             <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingTop: 10 }}>
               {filteredConversations.length === 0 && (
-                <p style={{ padding: 16, fontSize: 12.5, color: 'var(--text-soft)' }}>Nenhuma conversa neste filtro.</p>
+                <p style={{ padding: 16, fontSize: 12.5, color: 'var(--text-soft)' }}>{t('chat_no_conversations')}</p>
               )}
               {filteredConversations.map((c) => {
                 const { name } = otherPersonOf(c);

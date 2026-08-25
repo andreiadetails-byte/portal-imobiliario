@@ -141,7 +141,7 @@ export default function Header({ minimal = false }) {
           <Link href="/" className="logo">More<span>&middot;</span>ada</Link>
           {pathname !== '/' && (
             <Link href="/" style={{ fontSize: 10.5, color: 'var(--text-soft)', marginTop: -2 }}>
-              ← Voltar à página principal
+              {t('header_back_to_home')}
             </Link>
           )}
         </div>
@@ -174,7 +174,7 @@ export default function Header({ minimal = false }) {
                   boxShadow: '0 10px 30px rgba(51,46,34,0.18)', zIndex: 50,
                 }}>
                   {notifications.length === 0 ? (
-                    <p style={{ padding: 16, fontSize: 13, color: 'var(--text-soft)' }}>Sem notificações.</p>
+                    <p style={{ padding: 16, fontSize: 13, color: 'var(--text-soft)' }}>{t('header_no_notifications')}</p>
                   ) : (
                     notifications.map((n) => (
                       <Link
@@ -215,7 +215,7 @@ export default function Header({ minimal = false }) {
               </Link>
               {!isAdmin && (
                 <Link href="/mensagens-suporte" className="btn" style={{ marginRight: 6, position: 'relative', minWidth: 0, padding: '9px 10px', textAlign: 'center' }}>
-                  Mensagens Suporte
+                  {t('header_support_messages')}
                   {unreadSupport > 0 && (
                     <span style={{
                       position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
@@ -289,11 +289,11 @@ export default function Header({ minimal = false }) {
       <div className="tile-strip" />
 
       <nav className="bottom-nav">
-        <Link href="/" className="bottom-nav-item"><Home size={21} /><span>Início</span></Link>
-        <Link href="/results" className="bottom-nav-item"><Search size={21} /><span>Pesquisar</span></Link>
-        <Link href="/favorites" className="bottom-nav-item"><Heart size={21} /><span>Favoritos</span></Link>
+        <Link href="/" className="bottom-nav-item"><Home size={21} /><span>{t('header_home')}</span></Link>
+        <Link href="/results" className="bottom-nav-item"><Search size={21} /><span>{t('header_search')}</span></Link>
+        <Link href="/favorites" className="bottom-nav-item"><Heart size={21} /><span>{t('nav_favorites')}</span></Link>
         <Link href="/chat" className="bottom-nav-item" style={{ position: 'relative' }}>
-          <MessageCircle size={21} /><span>Chat</span>
+          <MessageCircle size={21} /><span>{t('nav_chat')}</span>
           {unreadChat > 0 && (
             <span style={{
               position: 'absolute', top: 0, right: 18, minWidth: 15, height: 15, borderRadius: 8,
@@ -305,7 +305,7 @@ export default function Header({ minimal = false }) {
             </span>
           )}
         </Link>
-        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item"><span style={{ fontSize: 21 }}>☰</span><span>{user ? 'Anúncios' : 'Entrar'}</span></Link>
+        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item"><span style={{ fontSize: 21 }}>☰</span><span>{user ? t('header_listings') : t('nav_login')}</span></Link>
       </nav>
 
       {subReminder && !subReminderDismissed && (
@@ -316,7 +316,7 @@ export default function Header({ minimal = false }) {
           <span>
             ⏰ A sua assinatura {subReminder.daysLeft <= 0 ? 'termina hoje' : `termina em ${subReminder.daysLeft} dia${subReminder.daysLeft === 1 ? '' : 's'}`} ({subReminder.paidUntil.toLocaleDateString('pt-PT')}). Renove para não perder o acesso ao seu painel.
           </span>
-          <Link href="/assinatura" style={{ color: '#fff', fontWeight: 700, textDecoration: 'underline', flexShrink: 0 }}>Renovar agora</Link>
+          <Link href="/assinatura" style={{ color: '#fff', fontWeight: 700, textDecoration: 'underline', flexShrink: 0 }}>{t('header_renew_now')}</Link>
           <button
             onClick={() => setSubReminderDismissed(true)}
             aria-label="Fechar aviso"

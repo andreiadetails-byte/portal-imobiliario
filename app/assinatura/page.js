@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
+import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 
 export default function AssinaturaPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -75,7 +77,7 @@ export default function AssinaturaPage() {
       <>
         <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, marginBottom: 18 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-            <span>Mensalidade</span><b>{PAYMENT_INFO.subscriptionFee.toFixed(2)} €/mês</b>
+            <span>{t('sub_monthly_fee')}</span><b>{PAYMENT_INFO.subscriptionFee.toFixed(2)} €/mês</b>
           </div>
           <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginTop: 6 }}>
             Até {PAYMENT_INFO.subscriptionListingsLimit} anúncios ativos. Sem fidelização — cancele quando quiser, sem multas.
@@ -85,7 +87,7 @@ export default function AssinaturaPage() {
           </div>
         </div>
 
-        <p style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6 }}>Pagamento por transferência bancária:</p>
+        <p style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6 }}>{t('sub_bank_transfer')}</p>
         <div style={{ fontSize: 13, marginBottom: 6 }}>
           <div><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
           <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
@@ -95,7 +97,7 @@ export default function AssinaturaPage() {
         </p>
 
         <div className="field">
-          <label>Comprovativo da transferência <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(imagem ou PDF)</span></label>
+          <label>{t('sub_proof_of_transfer')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('sub_image_or_pdf')}</span></label>
           <label
             htmlFor="proof-input"
             className="btn"
@@ -111,7 +113,7 @@ export default function AssinaturaPage() {
         <button onClick={requestPayment} className="btn btn-primary btn-block" style={{ marginBottom: 8 }} disabled={submitting}>
           {submitting ? 'A enviar...' : 'Já fiz a transferência'}
         </button>
-        <button onClick={handleLogout} className="btn btn-block">Terminar sessão</button>
+        <button onClick={handleLogout} className="btn btn-block">{t('sub_logout')}</button>
       </>
     );
   }
@@ -125,7 +127,7 @@ export default function AssinaturaPage() {
       <div className="wrap" style={{ maxWidth: 480, paddingTop: 60, paddingBottom: 80 }}>
         <BackButton fallback="/dashboard" />
         <div className="card" style={{ padding: 30 }}>
-          <h1 className="display" style={{ fontSize: 24, marginBottom: 8 }}>Assinatura de agência</h1>
+          <h1 className="display" style={{ fontSize: 24, marginBottom: 8 }}>{t('sub_agency_title')}</h1>
 
           {profile?.subscription_status === 'pending' ? (
             <>
@@ -136,7 +138,7 @@ export default function AssinaturaPage() {
                 <div style={{ fontSize: 13, marginBottom: 4 }}><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
                 <div style={{ fontSize: 13 }}><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
               </div>
-              <button onClick={handleLogout} className="btn btn-block">Terminar sessão</button>
+              <button onClick={handleLogout} className="btn btn-block">{t('sub_logout')}</button>
             </>
           ) : profile?.subscription_status === 'expired' ? (
             <>

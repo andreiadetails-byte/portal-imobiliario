@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
+import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { agentLabel } from '../../lib/agentNames';
 
 export default function MensagensSuportePage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [userId, setUserId] = useState(null);
   const [supportThreads, setSupportThreads] = useState([]);
@@ -79,12 +81,12 @@ export default function MensagensSuportePage() {
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 760, padding: '40px 32px 80px' }}>
         <BackButton fallback="/" />
-        <h1 className="display" style={{ fontSize: 26, marginBottom: 24 }}>Mensagens de suporte</h1>
+        <h1 className="display" style={{ fontSize: 26, marginBottom: 24 }}>{t('support_title')}</h1>
 
         {loading ? (
-          <p style={{ fontSize: 15, color: 'var(--text-soft)' }}>A carregar...</p>
+          <p style={{ fontSize: 15, color: 'var(--text-soft)' }}>{t('comparar_loading')}</p>
         ) : supportThreads.length === 0 ? (
-          <p className="empty-state">Ainda não enviou nenhuma mensagem de suporte.</p>
+          <p className="empty-state">{t('support_no_messages_yet')}</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {supportThreads.map((r) => (
@@ -154,7 +156,7 @@ export default function MensagensSuportePage() {
                     placeholder="Escreva uma mensagem..."
                     style={{ flex: 1, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 16 }}
                   />
-                  <button onClick={() => sendSupportReply(r.id)} className="btn btn-primary" style={{ fontSize: 13.5 }}>Enviar</button>
+                  <button onClick={() => sendSupportReply(r.id)} className="btn btn-primary" style={{ fontSize: 13.5 }}>{t('support_send')}</button>
                 </div>
               </div>
             ))}

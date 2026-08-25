@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
+import { useLanguage } from '../../lib/i18n';
 import { getCompareIds, useCompareList } from '../../lib/useCompareList';
 import { displayAddress } from '../../lib/displayAddress';
 import Header from '../../components/Header';
@@ -32,6 +33,7 @@ const ROWS = [
 ];
 
 export default function CompararPage() {
+  const { t } = useLanguage();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toggle, clear } = useCompareList();
@@ -70,7 +72,7 @@ export default function CompararPage() {
         <Link href="/favorites" className="btn no-print" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 600, marginBottom: 20, padding: '10px 18px' }}>
           ← Voltar aos favoritos
         </Link>
-        <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Comparar imóveis</h1>
+        <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('comparar_title')}</h1>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 28 }} className="no-print">
           <p style={{ fontSize: 14, color: 'var(--text-soft)', margin: 0 }}>
             Veja lado a lado as diferenças entre os imóveis que selecionou.
@@ -83,13 +85,13 @@ export default function CompararPage() {
         </div>
 
         {loading ? (
-          <p>A carregar...</p>
+          <p>{t('comparar_loading')}</p>
         ) : properties.length < 2 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 16 }}>
               Precisa de pelo menos 2 imóveis selecionados para comparar. Volte aos resultados e marque a caixa &quot;Comparar&quot; em pelo menos dois anúncios.
             </p>
-            <Link href="/results" className="btn btn-primary">Ver resultados</Link>
+            <Link href="/results" className="btn btn-primary">{t('comparar_view_results')}</Link>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>

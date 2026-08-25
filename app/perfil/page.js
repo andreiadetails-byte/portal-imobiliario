@@ -255,7 +255,7 @@ export default function PerfilPage() {
           <h2 className="display" style={{ fontSize: 18, marginBottom: 18 }}>{t('perfil_change_password')}</h2>
 
           <div className="field">
-            <label htmlFor="current-password-input">Palavra-passe atual</label>
+            <label htmlFor="current-password-input">{t('perfil_current_password')}</label>
             <input id="current-password-input" type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" />
           </div>
           <div className="field">

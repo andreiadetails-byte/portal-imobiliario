@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import LocationAutocomplete from './LocationAutocomplete';
+import { useLanguage } from '../lib/i18n';
 
 // Regiões usadas pelo INE que não são distrito/concelho/freguesia (não existem
 // nessa hierarquia), mas que as pessoas costumam escrever à procura de preços.
 const INE_REGIONS = ['Algarve', 'Grande Lisboa', 'Área Metropolitana do Porto', 'Península de Setúbal', 'Região Autónoma da Madeira', 'Portugal'];
 
 export default function PricePerM2Lookup() {
+  const { t } = useLanguage();
   const [levels, setLevels] = useState(null);
   const [typedQuery, setTypedQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -133,13 +135,13 @@ export default function PricePerM2Lookup() {
 
   return (
     <div className="card" style={{ padding: 24 }}>
-      <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>Quanto custa o m² na tua zona?</h3>
+      <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('pricem2_title')}</h3>
       <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
         Consulta o preço médio de venda por m² numa freguesia, concelho ou distrito, com base nos imóveis publicados no site.
       </p>
 
       <div style={{ position: 'relative' }}>
-        <LocationAutocomplete onChange={handleLocationChange} onLevels={handleLocationLevels} placeholder="Escreve uma freguesia, concelho, distrito ou região (ex: Algarve)..." />
+        <LocationAutocomplete onChange={handleLocationChange} onLevels={handleLocationLevels} placeholder={t('pricem2_placeholder')} />
         {matchingRegions.length > 0 && (
           <div style={{
             position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, zIndex: 20,

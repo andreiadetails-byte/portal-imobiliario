@@ -281,7 +281,7 @@ export default function FavoritesPage() {
 
         {tab === 'pesquisas' && (
           <>
-            {searches.length === 0 && <div className="empty-state">Ainda não guardaste nenhuma pesquisa.</div>}
+            {searches.length === 0 && <div className="empty-state">{t('fav_no_saved_search')}</div>}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {searches.map((s) => (
                 <div key={s.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>

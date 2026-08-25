@@ -65,7 +65,7 @@ export default function AgencyPage() {
   }, [id]);
 
   if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
-  if (!profile) return (<><Header /><div className="wrap" style={{ padding: 60 }}>Perfil não encontrado.</div></>);
+  if (!profile) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('agency_profile_not_found')}</div></>);
 
   const displayName = displayNameOverride || profile.agency_name || profile.full_name;
   const initials = (displayName || '?')
@@ -143,13 +143,13 @@ export default function AgencyPage() {
             {vendaCount > 0 && (
               <div style={{ textAlign: 'center' }}>
                 <b className="display" style={{ fontSize: 24 }}>{vendaCount}</b>
-                <div className="meta">Para venda</div>
+                <div className="meta">{t('agency_for_sale')}</div>
               </div>
             )}
             {arrendaCount > 0 && (
               <div style={{ textAlign: 'center' }}>
                 <b className="display" style={{ fontSize: 24 }}>{arrendaCount}</b>
-                <div className="meta">Para arrendar</div>
+                <div className="meta">{t('agency_for_rent')}</div>
               </div>
             )}
           </div>
