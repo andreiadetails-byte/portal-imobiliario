@@ -168,10 +168,10 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 /* ===== Ajustes para telemóvel ===== */
 @media (max-width: 900px){
   .property-layout{ grid-template-columns: 1fr !important; justify-items: stretch !important; }
-  .property-layout > div{ width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; margin: 0 !important; overflow-wrap: break-word; word-break: break-word; }
+  .property-layout > *{ width: 100% !important; max-width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; margin: 0 !important; overflow-wrap: break-word; word-break: break-word; }
   .results-grid{ grid-template-columns: 1fr !important; justify-items: stretch !important; }
-  .results-grid > div{ width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
-  .filters-form{ position: static !important; width: 100% !important; box-sizing: border-box !important; margin: 0 !important; }
+  .results-grid > *{ width: 100% !important; max-width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; }
+  .filters-form{ position: static !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; margin: 0 !important; }
   .footer-grid{ grid-template-columns: repeat(2, 1fr) !important; }
   .two-col-stack{ grid-template-columns: 1fr !important; }
 }
