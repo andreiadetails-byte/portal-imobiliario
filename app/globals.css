@@ -20,7 +20,7 @@ img, video, iframe{ max-width: 100%; height: auto; }
    por defeito recusa-se a encolher abaixo do tamanho do próprio texto,
    o que empurra a página inteira para o lado no telemóvel. Isto força
    sempre esses elementos a poderem encolher corretamente. */
-[style*="white-space: nowrap"]{ min-width: 0; }
+[style*="nowrap"]{ min-width: 0; }
 img{ -webkit-user-drag:none; user-drag:none; }
 body{
   background:var(--plaster);
