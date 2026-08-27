@@ -101,9 +101,12 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
     box-shadow: 0 -4px 16px rgba(0,0,0,0.18);
   }
   .bottom-nav-item{
-    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-    font-size:12px; font-weight:600; color:rgba(255,255,255,0.75); position:relative;
+    flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:3px;
+    font-size:11px; font-weight:600; color:rgba(255,255,255,0.75); position:relative;
     transition: transform 0.15s ease, color 0.15s ease;
+  }
+  .bottom-nav-item span:last-child{
+    max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .bottom-nav-item:active{ transform: scale(1.15); color:#fff; }
   body{ padding-bottom:64px; }
@@ -199,6 +202,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   }
   .simulator-card{ flex: 0 0 82% !important; scroll-snap-align: start; }
   .chat-grid{ grid-template-columns: 1fr !important; height: calc(100vh - 220px) !important; min-height: 420px; }
+  .chat-grid > *{ min-width: 0 !important; max-width: 100% !important; }
   .chat-list-col{ border-right: none !important; }
   .chat-hide-mobile{ display: none !important; }
   .chat-back-btn{ display: inline-block !important; }
