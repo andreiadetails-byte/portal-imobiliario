@@ -545,12 +545,19 @@ function PublishForm() {
       scrollToInvalidField('field-house_subtype');
       return;
     }
+    const boolFieldLabels = {
+      has_storage: t('pub_storage'), has_parking: t('pub_parking'), has_balcony: t('pub_balcony'),
+      has_garden: t('pub_garden'), has_pool: t('pub_pool'), has_gym: t('pub_gym'), has_coworking: t('pub_coworking'),
+      near_transit: t('pub_near_transit'), is_furnished: t('pub_furnished'), pets_allowed: t('pub_pets_allowed'),
+    };
     const boolFields = ['has_storage', 'has_parking', 'has_balcony', 'has_garden', 'has_pool', 'has_gym', 'has_coworking', 'near_transit'];
     if (form.business_type === 'Arrendamento') {
       boolFields.push('is_furnished', 'pets_allowed'); // só aparecem no formulário para arrendamento
     }
-    if (boolFields.some((f) => form[f] === null)) {
-      setError('Por favor, responda a todas as perguntas de Sim/Não (arrumos, estacionamento, varanda, jardim, piscina, ginásio, sala coworking).');
+    const missingBoolFields = boolFields.filter((f) => form[f] === null);
+    if (missingBoolFields.length > 0) {
+      console.error('Campos Sim/Não por preencher:', missingBoolFields, '— valores atuais:', Object.fromEntries(boolFields.map((f) => [f, form[f]])));
+      setError(`Por favor, responda: ${missingBoolFields.map((f) => boolFieldLabels[f]).join(', ')}.`);
       scrollToInvalidField('field-yesno');
       return;
     }

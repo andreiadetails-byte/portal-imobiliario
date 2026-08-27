@@ -319,7 +319,7 @@ export default function HomePage() {
                   </button>
                   {firstPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                    <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} style={{ width: '100%', height: 170, objectFit: 'cover' }} />
                   ) : (
                     <div className="card-photo" />
                   )}
