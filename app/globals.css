@@ -216,13 +216,15 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .support-widget-btn{ padding: 8px !important; border-radius: 50% !important; }
 
   /* Cabeçalho simplificado (só na página inicial): logótipo + PT + Entrar na mesma linha */
-  .header-minimal .navbar{ flex-wrap: nowrap !important; justify-content: space-between !important; }
+  .header-minimal .navbar{ flex-wrap: nowrap !important; justify-content: space-between !important; min-width: 0; }
+  .header-minimal .navbar > div:first-child{ min-width: 0; overflow: hidden; }
   .header-minimal .navbar-bell,
   .header-minimal .navbar-nav-links,
   .header-minimal .navbar-publish-btn,
   .header-minimal .navbar-mobile-rows{ display: none !important; }
-  .header-minimal .navbar-login-btn{ display: inline-flex !important; margin-right: 0 !important; white-space: nowrap; font-size: 12.5px !important; padding: 8px 12px !important; }
-  .header-minimal .navbar-links{ flex-wrap: nowrap !important; width: auto !important; gap: 8px; }
+  .header-minimal .navbar-login-btn{ display: inline-flex !important; margin-right: 0 !important; white-space: nowrap; font-size: 12.5px !important; padding: 8px 10px !important; flex-shrink: 0; }
+  .header-minimal .navbar-login-btn-extra{ display: none; }
+  .header-minimal .navbar-links{ flex-wrap: nowrap !important; width: auto !important; gap: 8px; min-width: 0; flex-shrink: 1; }
 }
 
 @media (max-width: 400px){
