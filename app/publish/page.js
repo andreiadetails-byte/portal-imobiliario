@@ -456,8 +456,23 @@ function PublishForm() {
 
       // A miniatura é só um "extra" — se por algum motivo falhar, a foto
       // grande já foi enviada com sucesso, e o site usa-a como reserva.
-      const thumbFile = await makeThumbnail(file);
-      const thumbnailUrl = thumbFile ? await uploadOne(thumbFile, 'thumbnail') : null;
+      let thumbnailUrl = null;
+      try {
+        const thumbFile = await makeThumbnail(file);
+        if (thumbFile) {
+          thumbnailUrl = await uploadOne(thumbFile, 'thumbnail');
+          if (!thumbnailUrl) {
+            console.error('Miniatura não foi enviada — uploadOne devolveu vazio.');
+            alert('Aviso: não foi possível criar a miniatura desta foto (a foto grande foi enviada bem na mesma).');
+          }
+        } else {
+          console.error('makeThumbnail devolveu null — o navegador não conseguiu gerar a miniatura.');
+          alert('Aviso: o navegador não conseguiu gerar a miniatura desta foto (a foto grande foi enviada bem na mesma).');
+        }
+      } catch (thumbErr) {
+        console.error('Erro ao gerar/enviar miniatura:', thumbErr);
+        alert(`Aviso: erro ao criar a miniatura (${thumbErr.message}). A foto grande foi enviada bem na mesma.`);
+      }
 
       await supabase.from('property_photos').insert({
         property_id: propertyId,
