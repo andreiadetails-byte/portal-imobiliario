@@ -262,13 +262,22 @@ textarea:focus-visible, [tabindex]:focus-visible{
   border-color: #b8452f !important;
 }
 
-/* Botão flutuante "Enviar mensagem" na ficha do imóvel — só faz sentido no
+/* Barra fixa "Chat / Chamar" na ficha do imóvel — só faz sentido no
    telemóvel, onde o formulário de contacto fica muito abaixo na página
-   (depois de todas as fotos e detalhes), e a pessoa podia nem chegar a
-   percebe que existe sem fazer muito scroll. No computador, o formulário já
-   está sempre visível ao lado, por isso o botão fica escondido lá. */
+   (depois de todas as fotos e detalhes). Fica sempre visível por cima do
+   menu de baixo, tal como noutros portais imobiliários conhecidos, para
+   nunca ser preciso andar à procura de como contactar. No computador, o
+   formulário já está sempre visível ao lado, por isso a barra fica
+   escondida lá. */
+.property-contact-bar{ display: none; }
 @media (max-width: 900px){
-  .property-contact-fab{ display: flex !important; }
+  .property-contact-bar{
+    display: flex !important; gap: 10px;
+    position: fixed; bottom: 64px; left: 0; right: 0; z-index: 45;
+    background: var(--paper); padding: 10px 16px max(10px, env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.12); border-top: 1px solid var(--line);
+  }
+  body:has(.property-contact-bar){ padding-bottom: 128px; }
 }
 
 /* Regras de impressão — usadas quando a pessoa descarrega a comparação de

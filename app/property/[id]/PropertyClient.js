@@ -654,18 +654,30 @@ export default function PropertyClient() {
     </main>
 
     {!(user && user.id === property.owner_id) && (
-      <button
-        onClick={() => document.getElementById('property-contact-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-        className="property-contact-fab"
-        style={{
-          position: 'fixed', bottom: 78, right: 16, zIndex: 45,
-          background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 30,
-          padding: '13px 20px', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-          display: 'none', alignItems: 'center', gap: 8, cursor: 'pointer',
-        }}
-      >
-        💬 {t('prop_send_message')}
-      </button>
+      <div className="property-contact-bar">
+        <button
+          onClick={() => document.getElementById('property-contact-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          style={{
+            flex: 1, background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 8,
+            padding: '13px 10px', fontSize: 14.5, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          }}
+        >
+          💬 {t('prop_send_message')}
+        </button>
+        {ownerProfile?.phone_public && (
+          <a
+            href={`tel:${ownerProfile.phone_public.replace(/\s+/g, '')}`}
+            style={{
+              flex: 1, background: 'var(--paper)', color: 'var(--ink)', border: '1.5px solid var(--line)', borderRadius: 8,
+              padding: '13px 10px', fontSize: 14.5, fontWeight: 700, textDecoration: 'none',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}
+          >
+            📞 {t('prop_call')}
+          </a>
+        )}
+      </div>
     )}
 
     {reportModal && (
