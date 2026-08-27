@@ -14,12 +14,17 @@ async function getVerifiedUserId(request) {
   return user?.id || null;
 }
 
-// Apaga um ficheiro do R2, a partir do seu URL público — se o URL não for
-// do R2 (por exemplo, uma foto antiga que ainda está no Supabase Storage),
-// não faz nada aqui, essa é tratada à parte.
+// Apaga um ficheiro do R2, a partir do seu URL público. Em vez de exigir
+// que o URL comece exatamente pelo R2_PUBLIC_URL atual, procura o pedaço
+// "properties/" no meio do endereço — isto continua a funcionar mesmo em
+// fotos antigas guardadas quando a variável R2_PUBLIC_URL ainda tinha um
+// valor errado (com um nome de ficheiro a mais lá dentro).
 async function deleteFromR2IfApplicable(url) {
-  if (!url || !R2_PUBLIC_URL || !url.startsWith(R2_PUBLIC_URL)) return;
-  const key = url.slice(R2_PUBLIC_URL.length + 1); // +1 para tirar a barra
+  if (!url) return;
+  const marker = 'properties/';
+  const idx = url.indexOf(marker);
+  if (idx === -1) return; // não é um ficheiro do R2 (provavelmente é do Supabase Storage)
+  const key = decodeURIComponent(url.slice(idx));
   try {
     await r2Client.send(new DeleteObjectCommand({ Bucket: R2_BUCKET_NAME, Key: key }));
   } catch (err) {
