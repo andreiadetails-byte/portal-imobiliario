@@ -247,10 +247,7 @@ export default function Header({ minimal = false }) {
           {checked && user ? (
             <button onClick={handleLogout} className="btn navbar-login-btn" style={{ marginRight: 12, flexShrink: 0 }}>{t('nav_logout')}</button>
           ) : (
-            <Link href="/login" className="btn navbar-login-btn" style={{ marginRight: 12, flexShrink: 0 }}>
-              <span>{t('nav_login_short')}</span>
-              <span className="navbar-login-btn-extra">{t('nav_login_extra')}</span>
-            </Link>
+            <Link href="/login" className="btn navbar-login-btn" style={{ marginRight: 12, flexShrink: 0 }}>{t('nav_login')}</Link>
           )}
           {checked && user && (
             <Link href="/publish" className="btn btn-primary navbar-publish-btn" style={{ minWidth: 130, textAlign: 'center' }}>{t('nav_publish')}</Link>
