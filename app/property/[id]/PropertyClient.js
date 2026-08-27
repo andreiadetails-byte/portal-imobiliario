@@ -509,7 +509,7 @@ export default function PropertyClient() {
           )}
         </div>
 
-        <aside className="card" style={{ padding: 22, height: 'fit-content' }}>
+        <aside id="property-contact-box" className="card" style={{ padding: 22, height: 'fit-content' }}>
           {ownerProfile && (
             <Link
               href={`/agency/${ownerProfile.id}${property.display_name ? `?as=${encodeURIComponent(property.display_name)}` : ''}`}
@@ -652,6 +652,21 @@ export default function PropertyClient() {
         </div>
       )}
     </main>
+
+    {!(user && user.id === property.owner_id) && (
+      <button
+        onClick={() => document.getElementById('property-contact-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+        className="property-contact-fab"
+        style={{
+          position: 'fixed', bottom: 78, right: 16, zIndex: 45,
+          background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 30,
+          padding: '13px 20px', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          display: 'none', alignItems: 'center', gap: 8, cursor: 'pointer',
+        }}
+      >
+        💬 {t('prop_send_message')}
+      </button>
+    )}
 
     {reportModal && (
       <div

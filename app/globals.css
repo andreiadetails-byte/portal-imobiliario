@@ -262,6 +262,15 @@ textarea:focus-visible, [tabindex]:focus-visible{
   border-color: #b8452f !important;
 }
 
+/* Botão flutuante "Enviar mensagem" na ficha do imóvel — só faz sentido no
+   telemóvel, onde o formulário de contacto fica muito abaixo na página
+   (depois de todas as fotos e detalhes), e a pessoa podia nem chegar a
+   percebe que existe sem fazer muito scroll. No computador, o formulário já
+   está sempre visível ao lado, por isso o botão fica escondido lá. */
+@media (max-width: 900px){
+  .property-contact-fab{ display: flex !important; }
+}
+
 /* Regras de impressão — usadas quando a pessoa descarrega a comparação de
    imóveis em PDF (o browser "imprime para PDF"). Esconde tudo o que não
    interessa no papel (cabeçalho do site, botões), e ajusta a tabela. */
