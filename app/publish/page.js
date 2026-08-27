@@ -348,7 +348,12 @@ function PublishForm() {
         body,
       });
 
-      if (!res.ok) continue; // se uma foto falhar, continua com as outras
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error('Falha ao enviar foto para o R2:', res.status, errBody);
+        setError(`Não foi possível enviar uma das fotos (${errBody.error || `erro ${res.status}`}). As outras continuam a ser enviadas.`);
+        continue; // se uma foto falhar, continua com as outras
+      }
 
       const { url } = await res.json();
       uploadedUrls.push(url);
