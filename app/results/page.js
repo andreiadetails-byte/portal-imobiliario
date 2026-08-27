@@ -249,7 +249,10 @@ function ResultsInner() {
 
       <main id="main-content" className="wrap" style={{ paddingTop: 32, paddingBottom: 32 }}>
         <BackButton fallback="/" />
-        <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('results_title')}</h1>
+        <h1 className="display" style={{ fontSize: 26, marginBottom: 4 }}>{t('results_title')}</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>
+          {loading ? t('results_searching') : `${mapFilterIds ? mapFilterIds.length : count} ${t('results_found')}`}
+        </p>
 
         <div className="results-grid" style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
 
@@ -698,18 +701,30 @@ function ResultsInner() {
                           {new Date(p.created_at).toLocaleDateString('pt-PT')}
                         </span>
                       </div>
-                      {p.profiles?.phone_public && (
-                        <a
-                          href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                      <div style={{ display: 'flex', gap: 14, marginTop: 8, flexWrap: 'wrap' }}>
+                        {p.profiles?.phone_public && (
+                          <a
+                            href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                              fontWeight: 600, color: 'var(--telha)', textDecoration: 'none',
+                            }}
+                          >
+                            📞 {p.profiles.phone_public}
+                          </a>
+                        )}
+                        <Link
+                          href={`/property/${p.id}#property-contact-box`}
                           onClick={(e) => e.stopPropagation()}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 12.5,
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
                             fontWeight: 600, color: 'var(--telha)', textDecoration: 'none',
                           }}
                         >
-                          📞 {p.profiles.phone_public}
-                        </a>
-                      )}
+                          💬 {t('prop_send_message')}
+                        </Link>
+                      </div>
                     </div>
                   </Link>
                   </React.Fragment>

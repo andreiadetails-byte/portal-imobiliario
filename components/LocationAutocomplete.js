@@ -76,8 +76,10 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
     return [];
   }
 
+  const LEVEL_ORDER = { distrito: 0, concelho: 1, freguesia: 2 };
   const suggestions = currentList()
     .filter((item) => matchesQuery(item.label, typed))
+    .sort((a, b) => (LEVEL_ORDER[a.level] ?? 3) - (LEVEL_ORDER[b.level] ?? 3))
     .slice(0, 40);
 
   function handleSelect(item) {
