@@ -146,7 +146,7 @@ export default function SupportAgentWidget() {
         </div>
       )}
 
-      <div className="support-widget" style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 50 }}>
+      <div className="support-widget" style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 50 }}>
         <button
           onClick={() => setOpen((o) => !o)}
           className="support-widget-btn"
