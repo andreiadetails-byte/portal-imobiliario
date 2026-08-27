@@ -342,16 +342,23 @@ function PublishForm() {
       body.append('file', file);
       body.append('propertyId', propertyId);
 
-      const res = await fetch('/api/upload-photo-r2', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${session?.access_token}` },
-        body,
-      });
+      let res;
+      try {
+        res = await fetch('/api/upload-photo-r2', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body,
+        });
+      } catch (networkErr) {
+        console.error('Erro de rede ao enviar foto:', networkErr);
+        alert(`Não foi possível enviar uma foto (erro de rede): ${networkErr.message}`);
+        continue;
+      }
 
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
         console.error('Falha ao enviar foto para o R2:', res.status, errBody);
-        setError(`Não foi possível enviar uma das fotos (${errBody.error || `erro ${res.status}`}). As outras continuam a ser enviadas.`);
+        alert(`Não foi possível enviar uma foto: ${errBody.error || `erro ${res.status}`}`);
         continue; // se uma foto falhar, continua com as outras
       }
 
