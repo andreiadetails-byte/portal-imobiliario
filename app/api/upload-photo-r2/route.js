@@ -49,21 +49,32 @@ export async function POST(request) {
     // Redimensiona (só encolhe, nunca aumenta) e converte sempre para WebP —
     // fica visualmente igual, mas costuma pesar bastante menos do que o
     // JPEG ou PNG originais, o que poupa espaço e torna o site mais rápido.
-    const optimizedBuffer = await sharp(inputBuffer)
-      .rotate() // aplica a orientação correta guardada na foto (fotos de telemóvel vêm às vezes "deitadas")
-      .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: 'inside', withoutEnlargement: true })
-      .webp({ quality: WEBP_QUALITY })
-      .toBuffer();
+    let optimizedBuffer;
+    try {
+      optimizedBuffer = await sharp(inputBuffer)
+        .rotate() // aplica a orientação correta guardada na foto (fotos de telemóvel vêm às vezes "deitadas")
+        .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: WEBP_QUALITY })
+        .toBuffer();
+    } catch (sharpErr) {
+      console.error('Erro ao otimizar a imagem (sharp):', sharpErr);
+      return NextResponse.json({ error: `Falha ao processar a imagem: ${sharpErr.message}` }, { status: 500 });
+    }
 
     const key = `properties/${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
 
-    await r2Client.send(new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
-      Key: key,
-      Body: optimizedBuffer,
-      ContentType: 'image/webp',
-      CacheControl: 'public, max-age=31536000, immutable', // a imagem nunca muda depois de enviada, por isso o browser/CDN pode guardá-la em cache "para sempre"
-    }));
+    try {
+      await r2Client.send(new PutObjectCommand({
+        Bucket: R2_BUCKET_NAME,
+        Key: key,
+        Body: optimizedBuffer,
+        ContentType: 'image/webp',
+        CacheControl: 'public, max-age=31536000, immutable', // a imagem nunca muda depois de enviada, por isso o browser/CDN pode guardá-la em cache "para sempre"
+      }));
+    } catch (r2Err) {
+      console.error('Erro ao enviar para o R2:', r2Err);
+      return NextResponse.json({ error: `Falha ao enviar para o R2: ${r2Err.message}` }, { status: 500 });
+    }
 
     const publicUrl = `${R2_PUBLIC_URL}/${key}`;
 

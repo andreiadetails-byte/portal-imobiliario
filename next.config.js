@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // O "sharp" (usado para redimensionar/otimizar as fotos antes de irem
+  // para o Cloudflare R2) usa um programa próprio do sistema operativo por
+  // baixo — sem isto, o Next.js pode empacotá-lo de forma incorreta para o
+  // servidor, e a função falha em silêncio (erro genérico, sem detalhe).
+  serverExternalPackages: ['sharp'],
   async headers() {
     return [
       {
