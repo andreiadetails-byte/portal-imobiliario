@@ -301,22 +301,46 @@ function PublishForm() {
 
   async function uploadVideo(propertyId) {
     if (!videoFile) return null;
-    const ext = videoFile.name.split('.').pop();
-    const path = `${user.id}/${propertyId}/video.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, videoFile, { upsert: true });
-    if (uploadError) return null;
-    const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
-    return publicUrlData.publicUrl;
+    const { data: { session } } = await supabase.auth.getSession();
+    const body = new FormData();
+    body.append('file', videoFile);
+    body.append('propertyId', propertyId);
+    body.append('type', 'video');
+
+    const res = await fetch('/api/upload-photo-r2', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+      body,
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      console.error('Falha ao enviar vídeo para o R2:', errBody);
+      return null;
+    }
+    const { url } = await res.json();
+    return url;
   }
 
   async function uploadPlan(propertyId) {
     if (!planFile) return null;
-    const ext = planFile.name.split('.').pop();
-    const path = `${user.id}/${propertyId}/plan.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, planFile);
-    if (uploadError) return null;
-    const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
-    return publicUrlData.publicUrl;
+    const { data: { session } } = await supabase.auth.getSession();
+    const body = new FormData();
+    body.append('file', planFile);
+    body.append('propertyId', propertyId);
+    body.append('type', 'plan');
+
+    const res = await fetch('/api/upload-photo-r2', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+      body,
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      console.error('Falha ao enviar planta para o R2:', errBody);
+      return null;
+    }
+    const { url } = await res.json();
+    return url;
   }
 
   async function uploadDocument(propertyId) {
@@ -341,6 +365,7 @@ function PublishForm() {
       const body = new FormData();
       body.append('file', file);
       body.append('propertyId', propertyId);
+      body.append('type', 'photo');
 
       let res;
       try {

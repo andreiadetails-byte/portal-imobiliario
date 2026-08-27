@@ -13,6 +13,21 @@ async function getVerifiedUserId(request) {
   return user?.id || null;
 }
 
+// Regras próprias para cada tipo de ficheiro que este anúncio pode ter.
+const FILE_RULES = {
+  photo: { folder: 'photos', allowedPrefix: 'image/', maxMB: 20, label: 'A imagem' },
+  video: { folder: 'videos', allowedPrefix: 'video/', maxMB: 100, label: 'O vídeo' },
+  plan: { folder: 'plans', allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'], maxMB: 20, label: 'A planta' },
+};
+
+function extensionFor(mimeType) {
+  const map = {
+    'image/png': 'png', 'image/webp': 'webp', 'image/jpeg': 'jpg',
+    'application/pdf': 'pdf', 'video/mp4': 'mp4', 'video/quicktime': 'mov', 'video/webm': 'webm',
+  };
+  return map[mimeType] || mimeType.split('/')[1] || 'bin';
+}
+
 export async function POST(request) {
   try {
     const userId = await getVerifiedUserId(request);
@@ -23,26 +38,33 @@ export async function POST(request) {
     const formData = await request.formData();
     const file = formData.get('file');
     const propertyId = formData.get('propertyId');
+    const type = formData.get('type') || 'photo';
 
     if (!file || !propertyId) {
       return NextResponse.json({ error: 'Falta o ficheiro ou o propertyId.' }, { status: 400 });
     }
 
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'O ficheiro tem de ser uma imagem.' }, { status: 400 });
+    const rules = FILE_RULES[type];
+    if (!rules) {
+      return NextResponse.json({ error: 'Tipo de ficheiro desconhecido.' }, { status: 400 });
     }
 
-    const MAX_UPLOAD_MB = 20;
-    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
-      return NextResponse.json({ error: `A imagem é demasiado grande (máximo ${MAX_UPLOAD_MB}MB).` }, { status: 400 });
+    const isAllowedType = rules.allowedPrefix
+      ? file.type.startsWith(rules.allowedPrefix)
+      : rules.allowedTypes.includes(file.type);
+    if (!isAllowedType) {
+      return NextResponse.json({ error: `${rules.label} tem um formato não suportado.` }, { status: 400 });
     }
 
-    // Nota: a foto já vem redimensionada e comprimida do browser (até 1920px,
-    // JPEG de boa qualidade) — por isso enviamos diretamente para o R2, sem
-    // processamento extra aqui no servidor por agora.
+    if (file.size > rules.maxMB * 1024 * 1024) {
+      return NextResponse.json({ error: `${rules.label} é demasiado grande (máximo ${rules.maxMB}MB).` }, { status: 400 });
+    }
+
+    // Nota: fotos e vídeos já vêm redimensionados/verificados no browser —
+    // por isso enviamos diretamente para o R2, sem processamento extra aqui.
     const inputBuffer = Buffer.from(await file.arrayBuffer());
-    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-    const key = `properties/${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const ext = extensionFor(file.type);
+    const key = `properties/${propertyId}/${rules.folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     try {
       await r2Client.send(new PutObjectCommand({
@@ -50,7 +72,7 @@ export async function POST(request) {
         Key: key,
         Body: inputBuffer,
         ContentType: file.type,
-        CacheControl: 'public, max-age=31536000, immutable', // a imagem nunca muda depois de enviada, por isso o browser/CDN pode guardá-la em cache "para sempre"
+        CacheControl: 'public, max-age=31536000, immutable', // o ficheiro nunca muda depois de enviado, por isso o browser/CDN pode guardá-lo em cache "para sempre"
       }));
     } catch (r2Err) {
       console.error('Erro ao enviar para o R2:', r2Err);
@@ -61,7 +83,7 @@ export async function POST(request) {
 
     return NextResponse.json({ url: publicUrl });
   } catch (err) {
-    console.error('Erro ao enviar foto para o R2:', err);
-    return NextResponse.json({ error: `Não foi possível enviar a foto: ${err.message}` }, { status: 500 });
+    console.error('Erro ao enviar ficheiro para o R2:', err);
+    return NextResponse.json({ error: `Não foi possível enviar o ficheiro: ${err.message}` }, { status: 500 });
   }
 }
