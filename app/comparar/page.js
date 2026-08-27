@@ -47,7 +47,7 @@ export default function CompararPage() {
       if (ids.length === 0) { setLoading(false); return; }
       const { data } = await supabase
         .from('properties')
-        .select('*, property_photos(url, position)')
+        .select('*, property_photos(url, thumbnail_url, position)')
         .in('id', ids);
       // Mantém a ordem em que foram selecionados.
       const ordered = ids.map((id) => (data || []).find((p) => p.id === id)).filter(Boolean);
@@ -103,7 +103,8 @@ export default function CompararPage() {
                 <tr>
                   <th style={{ textAlign: 'left', padding: '10px 12px', minWidth: 160 }}></th>
                   {properties.map((p) => {
-                    const photo = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+                    const photoSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
+                    const photo = photoSorted?.thumbnail_url || photoSorted?.url;
                     return (
                       <th key={p.id} style={{ padding: '10px 12px', minWidth: 220, verticalAlign: 'top' }}>
                         <div style={{ position: 'relative' }}>

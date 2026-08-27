@@ -73,7 +73,7 @@ export default function HomePage() {
     async function loadProperties() {
       const { data, error } = await supabase
         .from('properties')
-        .select('id, owner_id, title, price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, created_at, property_photos(url, position)')
+        .select('id, owner_id, title, price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, created_at, property_photos(url, thumbnail_url, position)')
         .eq('status', 'ativo')
         .order('created_at', { ascending: false })
         .limit(60);
@@ -298,7 +298,8 @@ export default function HomePage() {
 
           <div className="grid-listings">
             {properties.slice(0, 3).map((p, i) => {
-              const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+              const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
+              const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
               return (
                   <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
@@ -374,7 +375,8 @@ export default function HomePage() {
         <div className="wrap">
           <div className="grid-listings">
             {properties.slice(3, 6).map((p, i) => {
-              const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+              const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
+              const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
               return (
                   <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (

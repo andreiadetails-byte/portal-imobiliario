@@ -167,7 +167,7 @@ function ResultsInner() {
     if (ids.length === 0) { setProperties([]); return; }
     const { data } = await supabase
       .from('properties')
-      .select('id, owner_id, title, description, description_translations, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, floor_plan_url, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, near_transit, is_furnished, pets_allowed, created_at, property_photos(url, position)')
+      .select('id, owner_id, title, description, description_translations, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, floor_plan_url, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, near_transit, is_furnished, pets_allowed, created_at, property_photos(url, thumbnail_url, position)')
       .in('id', ids);
 
     let sorted = [...(data || [])].sort((a, b) => (b.featured_status === 'active') - (a.featured_status === 'active'));
@@ -191,7 +191,7 @@ function ResultsInner() {
 
     let query = supabase
       .from('properties')
-      .select('id, owner_id, title, description, description_translations, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, floor_plan_url, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, near_transit, is_furnished, pets_allowed, created_at, property_photos(url, position)', { count: 'exact' })
+      .select('id, owner_id, title, description, description_translations, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, latitude, longitude, floor_plan_url, featured_status, has_storage, has_parking, has_balcony, has_garden, has_pool, has_gym, has_coworking, near_transit, is_furnished, pets_allowed, created_at, property_photos(url, thumbnail_url, position)', { count: 'exact' })
       .eq('status', 'ativo')
       .eq('business_type', businessType);
 
@@ -543,7 +543,7 @@ function ResultsInner() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
               {properties.map((p, i) => {
                 const sortedPhotos = p.property_photos?.sort((a, b) => a.position - b.position) || [];
-                const firstPhoto = sortedPhotos[0]?.url;
+                const firstPhoto = sortedPhotos[0]?.thumbnail_url || sortedPhotos[0]?.url;
                 const isFav = favoriteIds.includes(p.id);
                 return (
                   <React.Fragment key={p.id}>
@@ -557,7 +557,7 @@ function ResultsInner() {
                       {sortedPhotos.length > 1 ? (
                         <>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={firstPhoto} alt={`Foto principal do imóvel ${p.typology} loading="lazy" em ${p.district}`} style={{ width: '100%', flex: '1 1 0', minHeight: 0, objectFit: 'cover' }} />
+                          <img src={firstPhoto} alt={`Foto principal do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', flex: '1 1 0', minHeight: 0, objectFit: 'cover' }} />
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, height: 110, flexShrink: 0 }}>
                             {[1, 2].map((offset) => {
                               const photo = sortedPhotos[offset % sortedPhotos.length];
@@ -566,7 +566,7 @@ function ResultsInner() {
                               return (
                                 <div key={offset} style={{ position: 'relative', overflow: 'hidden' }}>
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img src={photo.url} alt={`Foto adicional do imóvel ${p.typology} loading="lazy" em ${p.district}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  <img src={photo.thumbnail_url || photo.url} alt={`Foto adicional do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                   {isLast && remaining > 0 && (
                                     <div style={{
                                       position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', color: '#fff',
@@ -582,7 +582,7 @@ function ResultsInner() {
                         </>
                       ) : firstPhoto ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} loading="lazy" em ${p.district}`} style={{ width: '100%', height: 400, objectFit: 'cover' }} />
+                        <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: 400, objectFit: 'cover' }} />
                       ) : (
                         <div className="card-photo" style={{ height: 400 }} />
                       )}

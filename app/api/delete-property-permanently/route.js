@@ -85,13 +85,15 @@ export async function POST(request) {
 
     const { data: photos } = await supabaseAdmin
       .from('property_photos')
-      .select('url')
+      .select('url, thumbnail_url')
       .eq('property_id', propertyId);
 
-    // Apaga todos os ficheiros (fotos, vídeo, planta) — tanto os que estão
-    // no R2 como os mais antigos, que ainda possam estar no Supabase Storage.
+    // Apaga todos os ficheiros (fotos, miniaturas, vídeo, planta) — tanto os
+    // que estão no R2 como os mais antigos, que ainda possam estar no
+    // Supabase Storage.
     const allFileUrls = [
       ...(photos || []).map((p) => p.url),
+      ...(photos || []).map((p) => p.thumbnail_url),
       property.video_url,
       property.floor_plan_url,
     ].filter(Boolean);

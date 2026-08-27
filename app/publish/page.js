@@ -372,17 +372,57 @@ function PublishForm() {
     return path;
   }
 
+  // Gera uma versão pequena da foto (só para as grelhas de resultados,
+  // onde a imagem aparece em tamanho reduzido) — poupa muito tráfego,
+  // porque a pessoa só descarrega a foto grande de verdade quando entra
+  // na ficha do imóvel.
+  function makeThumbnail(file) {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX_DIMENSION = 480;
+        let { naturalWidth: width, naturalHeight: height } = img;
+
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIMENSION) / width);
+            width = MAX_DIMENSION;
+          } else {
+            width = Math.round((width * MAX_DIMENSION) / height);
+            height = MAX_DIMENSION;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            URL.revokeObjectURL(url);
+            if (!blob) { resolve(null); return; }
+            resolve(new File([blob], 'thumb.webp', { type: 'image/webp' }));
+          },
+          'image/webp',
+          0.75
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
   async function uploadPhotos(propertyId, startPosition = 0) {
     const uploadedUrls = [];
     const { data: { session } } = await supabase.auth.getSession();
 
-    for (let i = 0; i < photos.length; i++) {
-      const { file } = photos[i];
-
+    async function uploadOne(file, type) {
       const body = new FormData();
       body.append('file', file);
       body.append('propertyId', propertyId);
-      body.append('type', 'photo');
+      body.append('type', type);
 
       let res;
       try {
@@ -392,24 +432,37 @@ function PublishForm() {
           body,
         });
       } catch (networkErr) {
-        console.error('Erro de rede ao enviar foto:', networkErr);
-        alert(`Não foi possível enviar uma foto (erro de rede): ${networkErr.message}`);
-        continue;
+        console.error(`Erro de rede ao enviar ${type}:`, networkErr);
+        return null;
       }
-
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
-        console.error('Falha ao enviar foto para o R2:', res.status, errBody);
-        alert(`Não foi possível enviar uma foto: ${errBody.error || `erro ${res.status}`}`);
+        console.error(`Falha ao enviar ${type} para o R2:`, res.status, errBody);
+        return null;
+      }
+      const { url } = await res.json();
+      return url;
+    }
+
+    for (let i = 0; i < photos.length; i++) {
+      const { file } = photos[i];
+
+      const url = await uploadOne(file, 'photo');
+      if (!url) {
+        alert('Não foi possível enviar uma das fotos. As outras continuam a ser enviadas.');
         continue; // se uma foto falhar, continua com as outras
       }
-
-      const { url } = await res.json();
       uploadedUrls.push(url);
+
+      // A miniatura é só um "extra" — se por algum motivo falhar, a foto
+      // grande já foi enviada com sucesso, e o site usa-a como reserva.
+      const thumbFile = await makeThumbnail(file);
+      const thumbnailUrl = thumbFile ? await uploadOne(thumbFile, 'thumbnail') : null;
 
       await supabase.from('property_photos').insert({
         property_id: propertyId,
         url,
+        thumbnail_url: thumbnailUrl,
         position: startPosition + i,
       });
     }

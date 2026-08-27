@@ -288,7 +288,7 @@ function ChatInner() {
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
                         {photo ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={photo} alt={t('attr_photo_conversation')} style={{ width: 32, height: 26, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
+                          <img src={photo} alt={t('attr_photo_conversation')} loading="lazy" style={{ width: 32, height: 26, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
                         ) : (
                           <div style={{ width: 32, height: 26, borderRadius: 3, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
                         )}
@@ -385,7 +385,7 @@ function ChatInner() {
                     const photo = activeConversation.properties.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                     return photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={photo} alt={t('attr_photo_conversation')} style={{ width: 44, height: 34, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                      <img src={photo} alt={t('attr_photo_conversation')} loading="lazy" style={{ width: 44, height: 34, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
                     ) : (
                       <div style={{ width: 44, height: 34, borderRadius: 4, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
                     );

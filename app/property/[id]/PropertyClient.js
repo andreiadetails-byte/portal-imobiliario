@@ -491,7 +491,7 @@ export default function PropertyClient() {
               ) : (
                 <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={property.floor_plan_url} alt={t('attr_floorplan_alt')} style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid var(--line)' }} />
+                  <img src={property.floor_plan_url} alt={t('attr_floorplan_alt')} loading="lazy" style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid var(--line)' }} />
                 </a>
               )}
             </>

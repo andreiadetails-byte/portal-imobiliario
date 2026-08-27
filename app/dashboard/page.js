@@ -86,7 +86,7 @@ function DashboardInner() {
   async function loadProperties(uid) {
     const { data: propsData, count } = await supabase
       .from('properties')
-      .select('*, property_photos(url, position)', { count: 'exact' })
+      .select('*, property_photos(url, thumbnail_url, position)', { count: 'exact' })
       .eq('owner_id', uid)
       .order('created_at', { ascending: false });
     setProperties(propsData || []);
@@ -292,7 +292,8 @@ function DashboardInner() {
                   {pageItems.map((p) => {
                     const st = STATUS_LABELS[p.status] || { labelKey: null, color: 'var(--text-soft)', bg: 'var(--line)' };
                     const stLabel = st.labelKey ? t(st.labelKey) : p.status;
-                    const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+                    const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
+                    const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
                     const isLocked = p.status === 'anulado_suporte' || p.status === 'eliminado';
                     return (
                       <div key={p.id} className="card" style={{ padding: 12, display: 'flex', gap: 10 }}>

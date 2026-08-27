@@ -53,7 +53,7 @@ export default function AgencyPage() {
 
       const { data: propsData } = await supabase
         .from('properties')
-        .select('id, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, created_at, property_photos(url, position)')
+        .select('id, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, created_at, property_photos(url, thumbnail_url, position)')
         .eq('owner_id', id)
         .eq('status', 'ativo')
         .order('created_at', { ascending: false });
@@ -194,7 +194,8 @@ export default function AgencyPage() {
 
         <div className="grid-listings" style={{ paddingBottom: 60 }}>
           {filtered.map((p) => {
-            const firstPhoto = [...(p.property_photos || [])].sort((a, b) => a.position - b.position)[0]?.url;
+            const firstSorted = [...(p.property_photos || [])].sort((a, b) => a.position - b.position)[0];
+            const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
             return (
               <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                 {p.featured_status === 'active' && (

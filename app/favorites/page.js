@@ -37,7 +37,7 @@ export default function FavoritesPage() {
         const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
         const { data: propsData } = await supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, position)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, thumbnail_url, position)')
           .in('id', ids);
         favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '', price_at_save: priceAtSaveById[p.id] }));
         setProperties(favProperties);
@@ -58,7 +58,7 @@ export default function FavoritesPage() {
 
         let query = supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, position)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, thumbnail_url, position)')
           .eq('status', 'ativo')
           .gte('price', avgPrice * 0.7)
           .lte('price', avgPrice * 1.3)
@@ -105,7 +105,7 @@ export default function FavoritesPage() {
     // Vai buscar o próprio imóvel para o juntar à lista principal de favoritos, sem precisar de recarregar a página.
     const { data: newFav } = await supabase
       .from('properties')
-      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, position)')
+      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, thumbnail_url, position)')
       .eq('id', propertyId).single();
     if (newFav) setProperties((cur) => [newFav, ...cur]);
   }
@@ -178,7 +178,8 @@ export default function FavoritesPage() {
             {properties.length === 0 && <div className="empty-state">{t('favorites_empty')}</div>}
             <div className="grid-listings">
               {properties.map((p) => {
-                const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+                const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
+                const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
                 return (
                 <div key={p.id} className="card">
                   <Link href={`/property/${p.id}`}>
@@ -243,7 +244,8 @@ export default function FavoritesPage() {
                 </p>
                 <div className="grid-listings">
                   {suggestions.map((p) => {
-                    const firstPhoto = p.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
+                    const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
+                const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
                     return (
                       <Link key={p.id} href={`/property/${p.id}`} className="card" style={{ position: 'relative' }}>
                         <button
