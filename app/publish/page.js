@@ -23,10 +23,10 @@ const SUBTIPOS_MORADIA = ['Moradia bifamiliar', 'Moradia geminada', 'Moradia em 
 const ORIENTACOES = ['Norte', 'Sul', 'Nascente', 'Poente', 'Nordeste', 'Noroeste', 'Sudeste', 'Sudoeste'];
 const PISOS = ['R/C', '1º', '2º', '3º', '4º', '5º', '6º', '7º', '8º', '9º', '10º', 'Superior ao 10º'];
 
-function YesNoField({ label, value, onChange }) {
+function YesNoField({ label, value, onChange, id }) {
   const { t } = useLanguage();
   return (
-    <div className="field">
+    <div className="field" id={id}>
       <label>{label}</label>
       <div style={{ display: 'flex', gap: 8 }}>
         {[{ v: true, l: t('yesno_yes') }, { v: false, l: t('yesno_no') }].map((opt) => (
@@ -484,6 +484,19 @@ function PublishForm() {
     return uploadedUrls;
   }
 
+  // Quando falta preencher algo, salta diretamente para esse campo (com um
+  // deslize suave) e destaca-o a vermelho por um instante — assim a pessoa
+  // não tem de andar à procura do que falta na página toda.
+  function scrollToInvalidField(fieldId) {
+    const el = document.getElementById(fieldId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('field-invalid');
+    const focusable = el.querySelector('input, select, textarea, button');
+    if (focusable) setTimeout(() => focusable.focus({ preventScroll: true }), 400);
+    setTimeout(() => el.classList.remove('field-invalid'), 2500);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
@@ -499,30 +512,37 @@ function PublishForm() {
 
     if (!form.district || !form.municipality || !form.parish) {
       setError('Por favor, escolha o distrito, o concelho e a localidade.');
+      scrollToInvalidField('field-district');
       return;
     }
     if (!form.floor) {
       setError('Por favor, indique o piso.');
+      scrollToInvalidField('field-floor');
       return;
     }
     if (!form.area_util) {
       setError('Por favor, indique a área útil.');
+      scrollToInvalidField('field-area_util');
       return;
     }
     if (!form.energy_certificate) {
       setError('Por favor, escolha o certificado energético do imóvel.');
+      scrollToInvalidField('field-energy_certificate');
       return;
     }
     if (form.description.trim().length < 50) {
       setError(`A descrição precisa de pelo menos 50 caracteres (tem ${form.description.trim().length}).`);
+      scrollToInvalidField('field-description');
       return;
     }
     if (containsLink(form.title, form.description)) {
       setError('O título e a descrição não podem conter links (WhatsApp, sites, redes sociais, etc.) — use o chat do site para falar com interessados.');
+      scrollToInvalidField('field-description');
       return;
     }
     if (form.property_type === 'Moradia' && !form.house_subtype) {
       setError('Por favor, escolha o subtipo de moradia.');
+      scrollToInvalidField('field-house_subtype');
       return;
     }
     const boolFields = ['has_storage', 'has_parking', 'has_balcony', 'has_garden', 'has_pool', 'has_gym', 'has_coworking', 'near_transit'];
@@ -531,16 +551,19 @@ function PublishForm() {
     }
     if (boolFields.some((f) => form[f] === null)) {
       setError('Por favor, responda a todas as perguntas de Sim/Não (arrumos, estacionamento, varanda, jardim, piscina, ginásio, sala coworking).');
+      scrollToInvalidField('field-yesno');
       return;
     }
     if (form.show_full_address === null) {
       setError('Por favor, escolha se a morada completa fica visível no anúncio.');
+      scrollToInvalidField('field-show_full_address');
       return;
     }
 
     if (!isEditMode) {
       if (photos.length < 6) {
         setError(`Por favor, adicione pelo menos 6 fotografias (tem ${photos.length}).`);
+        scrollToInvalidField('field-photos');
         return;
       }
     }
@@ -880,7 +903,7 @@ function PublishForm() {
         )}
 
         {form.property_type === 'Moradia' && (
-          <div className="field">
+          <div className="field" id="field-house_subtype">
             <label>{t('pub_house_subtype')}</label>
             <select value={form.house_subtype} onChange={(e) => updateField('house_subtype', e.target.value)}>
               <option value="">{t('pub_choose_option')}</option>
@@ -890,15 +913,15 @@ function PublishForm() {
         )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div className="field">
-            <label>Piso</label>
+          <div className="field" id="field-floor">
+            <label>{t('pub_floor')}</label>
             <select required value={form.floor} onChange={(e) => updateField('floor', e.target.value)}>
               <option value="">{t('pub_choose_option')}</option>
               {PISOS.map((p) => <option key={p}>{p}</option>)}
             </select>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, fontWeight: 400, fontSize: 13, cursor: 'pointer' }}>
               <input type="checkbox" checked={form.is_top_floor} onChange={(e) => updateField('is_top_floor', e.target.checked)} />
-              É o último piso do prédio
+              {t('pub_top_floor')}
             </label>
           </div>
           <div className="field">
@@ -908,8 +931,8 @@ function PublishForm() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div className="field">
-            <label>Área útil (m²) <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>(obrigatório)</span></label>
+          <div className="field" id="field-area_util">
+            <label>{t('pub_area_util')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>{t('pub_required_lower')}</span></label>
             <input type="number" required value={form.area_util} onChange={(e) => updateField('area_util', e.target.value)} />
           </div>
           <div className="field">
@@ -944,7 +967,7 @@ function PublishForm() {
           </div>
         </div>
 
-        <div className="field">
+        <div className="field" id="field-energy_certificate">
           <label>{t('pub_energy_cert')} <span style={{ color: '#b8452f', fontWeight: 700 }}>{t('pub_required')}</span></label>
           <select required value={form.energy_certificate} onChange={(e) => updateField('energy_certificate', e.target.value)}>
             <option value="">{t('pub_choose_option')}</option>
@@ -990,7 +1013,7 @@ function PublishForm() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-          <div className="field">
+          <div className="field" id="field-district">
             <label>{t('pub_district')}</label>
             <select
               value={form.district}
@@ -1085,13 +1108,13 @@ function PublishForm() {
           </div>
         </div>
 
-        <div className="field">
+        <div className="field" id="field-show_full_address">
           <label>{t('pub_show_full_address')}</label>
           <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: -2, marginBottom: 8 }}>
-            Se escolher "Não", o anúncio mostra apenas a localidade/concelho, não a rua e o número.
+            {t('pub_address_visibility_hint')}
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
-            {[{ v: true, l: 'Sim, mostrar morada completa' }, { v: false, l: 'Não, mostrar só a localidade' }].map((opt) => (
+            {[{ v: true, l: t('pub_show_full_yes') }, { v: false, l: t('pub_show_full_no') }].map((opt) => (
               <button
                 key={String(opt.v)}
                 type="button"
@@ -1109,16 +1132,16 @@ function PublishForm() {
           </div>
         </div>
 
-        <div className="field">
+        <div className="field" id="field-description">
           <label>{t('pub_description')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_min_50_chars')}</span></label>
           <textarea required rows={9} style={{ minHeight: 180 }} value={form.description} onChange={(e) => updateField('description', e.target.value)} />
           <p style={{ fontSize: 11.5, marginTop: 4, color: form.description.length < 50 ? '#8a3b2a' : 'var(--text-soft)' }}>
-            {form.description.length}/50 caracteres {form.description.length < 50 && `(faltam ${50 - form.description.length})`}
+            {form.description.length}/50 {t('pub_characters')} {form.description.length < 50 && `(${t('pub_missing_chars').replace('{n}', 50 - form.description.length)})`}
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <YesNoField label={t('pub_storage')} value={form.has_storage} onChange={(v) => updateField('has_storage', v)} />
+          <YesNoField id="field-yesno" label={t('pub_storage')} value={form.has_storage} onChange={(v) => updateField('has_storage', v)} />
           <YesNoField label={t('pub_parking')} value={form.has_parking} onChange={(v) => updateField('has_parking', v)} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -1229,7 +1252,7 @@ function PublishForm() {
           <input id="document-input" type="file" accept="image/*,.pdf" onChange={(e) => setDocumentFile(e.target.files?.[0] || null)} style={{ display: 'none' }} />
         </div>
 
-        <div className="field">
+        <div className="field" id="field-photos">
           <label>{t('pub_photos')} {isEditMode && <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_already_has_photos').replace('{n}', existingPhotoCount)}</span>}</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <label
@@ -1239,7 +1262,7 @@ function PublishForm() {
                 textAlign: 'center', color: 'var(--text-soft)', fontSize: 13.5, cursor: 'pointer',
               }}
             >
-              {isEditMode ? 'Clique para escolher fotografias' : 'Clique para escolher fotografias (mínimo 6, máximo 25)'}
+              {isEditMode ? t('pub_click_choose_photos') : t('pub_click_choose_photos_range')}
             </label>
             <label
               htmlFor="camera-input"

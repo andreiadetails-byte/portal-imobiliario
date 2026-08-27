@@ -242,6 +242,21 @@ textarea:focus-visible, [tabindex]:focus-visible{
   outline: 3px solid var(--brass); outline-offset: 2px;
 }
 
+/* Quando falta preencher um campo obrigatório no formulário de publicar, a
+   página desliza até ele e este acende a vermelho por instantes — para a
+   pessoa não ter de andar à procura do que falta. */
+@keyframes field-invalid-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(184, 69, 47, 0.35); }
+  50% { box-shadow: 0 0 0 5px rgba(184, 69, 47, 0.15); }
+}
+.field-invalid {
+  border-radius: 8px;
+  animation: field-invalid-pulse 0.9s ease-in-out 2;
+}
+.field-invalid input, .field-invalid select, .field-invalid textarea {
+  border-color: #b8452f !important;
+}
+
 /* Regras de impressão — usadas quando a pessoa descarrega a comparação de
    imóveis em PDF (o browser "imprime para PDF"). Esconde tudo o que não
    interessa no papel (cabeçalho do site, botões), e ajusta a tabela. */
