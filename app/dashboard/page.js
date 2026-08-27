@@ -103,6 +103,22 @@ function DashboardInner() {
     setActiveCount((cur) => Math.max(0, cur - 1));
   }
 
+  async function deletePropertyPermanently(id) {
+    if (!confirm(t('dash_delete_permanently_confirm'))) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/delete-property-permanently', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ propertyId: id }),
+    });
+    if (res.ok) {
+      setProperties((cur) => cur.filter((p) => p.id !== id));
+    } else {
+      const { error } = await res.json();
+      alert(`Não foi possível apagar definitivamente: ${error}`);
+    }
+  }
+
   async function republishProperty(id) {
     const limit = isProfessionalAccount(profile?.account_type) ? 50 : 3;
     if (!profile?.is_admin && activeCount >= limit) {
@@ -327,7 +343,12 @@ function DashboardInner() {
                             )}
                             {p.status === 'eliminado' && (
                               <button onClick={() => republishProperty(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
-                                Republicar
+                                {t('dash_republish')}
+                              </button>
+                            )}
+                            {p.status === 'eliminado' && (
+                              <button onClick={() => deletePropertyPermanently(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px', color: '#8a3b2a' }}>
+                                {t('dash_delete_permanently')}
                               </button>
                             )}
                             {p.status !== 'anulado_suporte' && (
