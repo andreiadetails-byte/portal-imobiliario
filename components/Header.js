@@ -305,7 +305,7 @@ export default function Header({ minimal = false }) {
             </span>
           )}
         </Link>
-        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item"><span style={{ fontSize: 21 }}>☰</span><span>{user ? t('header_listings') : t('nav_login')}</span></Link>
+        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item"><span style={{ fontSize: 21 }}>☰</span><span>{user ? t('header_listings') : t('nav_login_short')}</span></Link>
       </nav>
 
       {subReminder && !subReminderDismissed && (
