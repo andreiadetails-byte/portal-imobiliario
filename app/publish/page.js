@@ -364,7 +364,7 @@ function PublishForm() {
     if (!documentFile) return null;
     const ext = documentFile.name.split('.').pop();
     const path = `${user.id}/${propertyId}/documento.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('property-documents').upload(path, documentFile, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from('property-documents').upload(path, documentFile, { upsert: true, cacheControl: '31536000' });
     if (uploadError) return null;
     // Guarda só o caminho — nunca um link público, porque este espaço é
     // privado (o documento pode ter dados sensíveis). O link só é gerado

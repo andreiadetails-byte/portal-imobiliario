@@ -10,6 +10,7 @@ import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes';
 import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send } from 'lucide-react';
+import { compressImageFile } from '../../lib/imageCompression';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -163,9 +164,10 @@ function AdminInner() {
 
     let image_url = null;
     if (adImage) {
-      const ext = adImage.name.split('.').pop();
+      const compressedAd = await compressImageFile(adImage, 800);
+      const ext = compressedAd.name.split('.').pop();
       const path = `ads/${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, adImage);
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, compressedAd, { cacheControl: '31536000' });
       if (!uploadError) {
         const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
         image_url = publicUrlData.publicUrl;
@@ -204,9 +206,10 @@ function AdminInner() {
   async function saveEditAd(id) {
     let image_url;
     if (editAdImage) {
-      const ext = editAdImage.name.split('.').pop();
+      const compressedAd = await compressImageFile(editAdImage, 800);
+      const ext = compressedAd.name.split('.').pop();
       const path = `ads/${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, editAdImage);
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, compressedAd, { cacheControl: '31536000' });
       if (!uploadError) {
         const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
         image_url = publicUrlData.publicUrl;
@@ -488,9 +491,10 @@ function AdminInner() {
 
     let cover_image_url = editingNewsId ? undefined : null;
     if (newsImage) {
-      const ext = newsImage.name.split('.').pop();
+      const compressedImage = await compressImageFile(newsImage, 800);
+      const ext = compressedImage.name.split('.').pop();
       const path = `news/${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, newsImage);
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, compressedImage, { cacheControl: '31536000' });
       if (!uploadError) {
         const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
         cover_image_url = publicUrlData.publicUrl;

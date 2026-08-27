@@ -12,6 +12,7 @@ import PricePerM2Lookup from '../components/PricePerM2Lookup';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import { distritos } from '../lib/locations';
 import NaturalSearchBox from '../components/NaturalSearchBox';
+import LazyMount from '../components/LazyMount';
 import dynamic from 'next/dynamic';
 
 const MiniMapPreview = dynamic(() => import('../components/MiniMapPreview'), { ssr: false });
@@ -531,7 +532,9 @@ export default function HomePage() {
           </div>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>{t('home_map_title')}</h2>
-            <MiniMapPreview />
+            <LazyMount placeholderHeight={340}>
+              <MiniMapPreview />
+            </LazyMount>
           </div>
         </div>
       </section>

@@ -9,6 +9,7 @@ import { isPasswordValid, PASSWORD_RULES_TEXT } from '../../lib/passwordRules';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount } from '../../lib/accountTypes';
+import { compressImageFile } from '../../lib/imageCompression';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -257,9 +258,10 @@ export default function LoginPage() {
     if (data.user) {
       let avatar_url = null;
       if (avatarFile) {
-        const ext = avatarFile.name.split('.').pop();
+        const compressedAvatar = await compressImageFile(avatarFile);
+        const ext = compressedAvatar.name.split('.').pop();
         const path = `avatars/${data.user.id}.${ext}`;
-        const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, avatarFile, { upsert: true });
+        const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, compressedAvatar, { upsert: true, cacheControl: '31536000' });
         if (!uploadError) {
           const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
           avatar_url = publicUrlData.publicUrl;

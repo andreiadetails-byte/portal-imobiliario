@@ -7,6 +7,7 @@ import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { useLanguage } from '../../lib/i18n';
 import { isPasswordValid, PASSWORD_RULES_TEXT } from '../../lib/passwordRules';
+import { compressImageFile } from '../../lib/imageCompression';
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -75,9 +76,10 @@ export default function PerfilPage() {
 
     let avatar_url;
     if (avatarFile) {
-      const ext = avatarFile.name.split('.').pop();
+      const compressedAvatar = await compressImageFile(avatarFile);
+      const ext = compressedAvatar.name.split('.').pop();
       const path = `${user.id}/avatar.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, avatarFile, { upsert: true });
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, compressedAvatar, { upsert: true, cacheControl: '31536000' });
       if (!uploadError) {
         const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
         avatar_url = publicUrlData.publicUrl;

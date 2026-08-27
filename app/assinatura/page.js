@@ -45,7 +45,7 @@ export default function AssinaturaPage() {
 
     const ext = proofFile.name.split('.').pop();
     const path = `${user.id}/comprovativo-${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, proofFile, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, proofFile, { upsert: true, cacheControl: '31536000' });
 
     if (uploadError) {
       setError('Não foi possível enviar o comprovativo. Tente outra vez.');
