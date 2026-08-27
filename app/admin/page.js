@@ -639,7 +639,7 @@ function AdminInner() {
             onClick={() => setSection(value)}
             style={{
               background: 'none', border: 'none', padding: '0 4px 12px', marginRight: 24, fontWeight: 600,
-              fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+              fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap',
               color: section === value ? 'var(--ink)' : 'var(--text-soft)',
               borderBottom: section === value ? '2px solid var(--telha)' : '2px solid transparent',
             }}
