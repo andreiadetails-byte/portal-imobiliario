@@ -333,20 +333,29 @@ function PublishForm() {
 
   async function uploadPhotos(propertyId, startPosition = 0) {
     const uploadedUrls = [];
+    const { data: { session } } = await supabase.auth.getSession();
+
     for (let i = 0; i < photos.length; i++) {
       const { file } = photos[i];
-      const ext = file.name.split('.').pop();
-      const path = `${user.id}/${propertyId}/${Date.now()}-${i}.${ext}`;
 
-      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, file);
-      if (uploadError) continue; // se uma foto falhar, continua com as outras
+      const body = new FormData();
+      body.append('file', file);
+      body.append('propertyId', propertyId);
 
-      const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
-      uploadedUrls.push(publicUrlData.publicUrl);
+      const res = await fetch('/api/upload-photo-r2', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body,
+      });
+
+      if (!res.ok) continue; // se uma foto falhar, continua com as outras
+
+      const { url } = await res.json();
+      uploadedUrls.push(url);
 
       await supabase.from('property_photos').insert({
         property_id: propertyId,
-        url: publicUrlData.publicUrl,
+        url,
         position: startPosition + i,
       });
     }
