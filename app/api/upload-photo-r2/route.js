@@ -1,14 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import sharp from 'sharp';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { r2Client, R2_BUCKET_NAME, R2_PUBLIC_URL } from '../../../lib/r2Client';
-
-// Tamanho máximo de cada lado da foto — chega perfeitamente para o ecrã de
-// qualquer telemóvel ou computador, e mantém o ficheiro pequeno mesmo à
-// escala de dezenas de milhares de imóveis.
-const MAX_DIMENSION = 1920;
-const WEBP_QUALITY = 82;
 
 async function getVerifiedUserId(request) {
   const authHeader = request.headers.get('authorization') || '';
@@ -44,31 +37,19 @@ export async function POST(request) {
       return NextResponse.json({ error: `A imagem é demasiado grande (máximo ${MAX_UPLOAD_MB}MB).` }, { status: 400 });
     }
 
+    // Nota: a foto já vem redimensionada e comprimida do browser (até 1920px,
+    // JPEG de boa qualidade) — por isso enviamos diretamente para o R2, sem
+    // processamento extra aqui no servidor por agora.
     const inputBuffer = Buffer.from(await file.arrayBuffer());
-
-    // Redimensiona (só encolhe, nunca aumenta) e converte sempre para WebP —
-    // fica visualmente igual, mas costuma pesar bastante menos do que o
-    // JPEG ou PNG originais, o que poupa espaço e torna o site mais rápido.
-    let optimizedBuffer;
-    try {
-      optimizedBuffer = await sharp(inputBuffer)
-        .rotate() // aplica a orientação correta guardada na foto (fotos de telemóvel vêm às vezes "deitadas")
-        .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: WEBP_QUALITY })
-        .toBuffer();
-    } catch (sharpErr) {
-      console.error('Erro ao otimizar a imagem (sharp):', sharpErr);
-      return NextResponse.json({ error: `Falha ao processar a imagem: ${sharpErr.message}` }, { status: 500 });
-    }
-
-    const key = `properties/${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const key = `properties/${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     try {
       await r2Client.send(new PutObjectCommand({
         Bucket: R2_BUCKET_NAME,
         Key: key,
-        Body: optimizedBuffer,
-        ContentType: 'image/webp',
+        Body: inputBuffer,
+        ContentType: file.type,
         CacheControl: 'public, max-age=31536000, immutable', // a imagem nunca muda depois de enviada, por isso o browser/CDN pode guardá-la em cache "para sempre"
       }));
     } catch (r2Err) {
@@ -81,6 +62,6 @@ export async function POST(request) {
     return NextResponse.json({ url: publicUrl });
   } catch (err) {
     console.error('Erro ao enviar foto para o R2:', err);
-    return NextResponse.json({ error: 'Não foi possível enviar a foto. Tente outra vez.' }, { status: 500 });
+    return NextResponse.json({ error: `Não foi possível enviar a foto: ${err.message}` }, { status: 500 });
   }
 }
