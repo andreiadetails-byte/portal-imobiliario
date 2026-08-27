@@ -355,10 +355,10 @@ function DashboardInner() {
                       className="btn"
                       style={{ fontSize: 12.5, opacity: currentPage <= 1 ? 0.4 : 1 }}
                     >
-                      ← Anterior
+                      {t('dash_previous')}
                     </button>
                     <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
-                      Página {currentPage} de {totalPages}
+                      {t('dash_page_of').replace('{n}', currentPage).replace('{total}', totalPages)}
                     </span>
                     <button
                       onClick={() => setListingPages((cur) => ({ ...cur, [key]: currentPage + 1 }))}
@@ -366,7 +366,7 @@ function DashboardInner() {
                       className="btn"
                       style={{ fontSize: 12.5, opacity: currentPage >= totalPages ? 0.4 : 1 }}
                     >
-                      Seguinte →
+                      {t('dash_next')}
                     </button>
                   </div>
                 )}

@@ -157,7 +157,7 @@ export default function InvestmentProfitCalculator({ showTitle }) {
 
       <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 14, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-          <span>IMT (calculado automaticamente)</span><b>{imt.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
+          <span>{t('invest_imt_auto')}</span><b>{imt.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span>{t('invest_stamp_purchase')}</span><b>{stampDutyPurchase.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} €</b>

@@ -8,35 +8,38 @@ import { getCompareIds, useCompareList } from '../../lib/useCompareList';
 import { displayAddress } from '../../lib/displayAddress';
 import Header from '../../components/Header';
 
-const ROWS = [
-  { label: 'Preço', get: (p) => `${Number(p.price).toLocaleString('pt-PT')} ${p.business_type === 'Arrendamento' ? '€/mês' : '€'}` },
-  { label: 'Tipo de negócio', get: (p) => p.business_type },
-  { label: 'Tipologia', get: (p) => p.typology },
-  { label: 'Área', get: (p) => `${p.area || p.area_util || '—'} m²` },
-  { label: 'Quartos', get: (p) => p.bedrooms },
-  { label: 'Casas de banho', get: (p) => p.bathrooms },
-  { label: 'Andar', get: (p) => p.floor || '—' },
-  { label: 'Estado', get: (p) => p.state || '—' },
-  { label: 'Certificado energético', get: (p) => p.energy_certificate || '—' },
-  { label: 'Ano de construção', get: (p) => p.construction_year || '—' },
-  { label: 'Condomínio', get: (p) => (p.condo_fee ? `${p.condo_fee} €/mês` : '—') },
-  { label: 'Localização', get: (p) => displayAddress(p) },
-  { label: 'Arrumos', get: (p) => (p.has_storage ? 'Sim' : 'Não') },
-  { label: 'Estacionamento', get: (p) => (p.has_parking ? 'Sim' : 'Não') },
-  { label: 'Varanda', get: (p) => (p.has_balcony ? 'Sim' : 'Não') },
-  { label: 'Jardim', get: (p) => (p.has_garden ? 'Sim' : 'Não') },
-  { label: 'Piscina', get: (p) => (p.has_pool ? 'Sim' : 'Não') },
-  { label: 'Ginásio', get: (p) => (p.has_gym ? 'Sim' : 'Não') },
-  { label: 'Perto de transportes', get: (p) => (p.near_transit ? 'Sim' : 'Não') },
-  { label: 'Mobilado', get: (p) => (p.is_furnished ? 'Sim' : p.business_type === 'Arrendamento' ? 'Não' : '—') },
-  { label: 'Aceita animais', get: (p) => (p.pets_allowed ? 'Sim' : p.business_type === 'Arrendamento' ? 'Não' : '—') },
-];
-
 export default function CompararPage() {
   const { t } = useLanguage();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toggle, clear } = useCompareList();
+
+  const businessLabel = (bt) => (bt === 'Arrendamento' ? t('comparar_rent') : t('comparar_sale'));
+  const yesNo = (v) => (v ? t('comparar_yes') : t('comparar_no'));
+
+  const ROWS = [
+    { label: t('comparar_row_price'), get: (p) => `${Number(p.price).toLocaleString('pt-PT')} ${p.business_type === 'Arrendamento' ? t('comparar_month') : '€'}` },
+    { label: t('comparar_row_business_type'), get: (p) => businessLabel(p.business_type) },
+    { label: t('comparar_row_typology'), get: (p) => p.typology },
+    { label: t('comparar_row_area'), get: (p) => `${p.area || p.area_util || '—'} m²` },
+    { label: t('comparar_row_bedrooms'), get: (p) => p.bedrooms },
+    { label: t('comparar_row_bathrooms'), get: (p) => p.bathrooms },
+    { label: t('comparar_row_floor'), get: (p) => p.floor || '—' },
+    { label: t('comparar_row_state'), get: (p) => p.state || '—' },
+    { label: t('comparar_row_energy'), get: (p) => p.energy_certificate || '—' },
+    { label: t('comparar_row_year'), get: (p) => p.construction_year || '—' },
+    { label: t('comparar_row_condo'), get: (p) => (p.condo_fee ? `${p.condo_fee} ${t('comparar_month')}` : '—') },
+    { label: t('comparar_row_location'), get: (p) => displayAddress(p) },
+    { label: t('comparar_row_storage'), get: (p) => yesNo(p.has_storage) },
+    { label: t('comparar_row_parking'), get: (p) => yesNo(p.has_parking) },
+    { label: t('comparar_row_balcony'), get: (p) => yesNo(p.has_balcony) },
+    { label: t('comparar_row_garden'), get: (p) => yesNo(p.has_garden) },
+    { label: t('comparar_row_pool'), get: (p) => yesNo(p.has_pool) },
+    { label: t('comparar_row_gym'), get: (p) => yesNo(p.has_gym) },
+    { label: t('comparar_row_transit'), get: (p) => yesNo(p.near_transit) },
+    { label: t('comparar_row_furnished'), get: (p) => (p.is_furnished ? t('comparar_yes') : p.business_type === 'Arrendamento' ? t('comparar_no') : '—') },
+    { label: t('comparar_row_pets'), get: (p) => (p.pets_allowed ? t('comparar_yes') : p.business_type === 'Arrendamento' ? t('comparar_no') : '—') },
+  ];
 
   useEffect(() => {
     async function load() {
@@ -70,16 +73,16 @@ export default function CompararPage() {
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 1180, padding: '48px 32px 100px' }}>
         <Link href="/favorites" className="btn no-print" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 600, marginBottom: 20, padding: '10px 18px' }}>
-          ← Voltar aos favoritos
+          {t('comparar_back_favorites')}
         </Link>
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('comparar_title')}</h1>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 28 }} className="no-print">
           <p style={{ fontSize: 14, color: 'var(--text-soft)', margin: 0 }}>
-            Veja lado a lado as diferenças entre os imóveis que selecionou.
+            {t('comparar_subtitle')}
           </p>
           {properties.length >= 2 && (
             <button onClick={() => window.print()} className="btn" style={{ fontSize: 13 }}>
-              📄 Descarregar em PDF
+              {t('comparar_download_pdf')}
             </button>
           )}
         </div>
@@ -89,7 +92,7 @@ export default function CompararPage() {
         ) : properties.length < 2 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 16 }}>
-              Precisa de pelo menos 2 imóveis selecionados para comparar. Volte aos resultados e marque a caixa &quot;Comparar&quot; em pelo menos dois anúncios.
+              {t('comparar_need_2')}
             </p>
             <Link href="/results" className="btn btn-primary">{t('comparar_view_results')}</Link>
           </div>

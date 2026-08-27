@@ -183,7 +183,7 @@ function ChatInner() {
 
   function otherPersonOf(c) {
     const person = c.buyer_id === user.id ? c.seller : c.buyer;
-    return { name: person?.agency_name || person?.full_name || 'Utilizador' };
+    return { name: person?.agency_name || person?.full_name || t('chat_default_user') };
   }
 
   const activeConversation = conversations.find((c) => c.id === activeId);
@@ -220,7 +220,7 @@ function ChatInner() {
           <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             <div style={{ padding: 14, borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
               <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-                {[['todas', 'Todos'], ['nao_lidos', 'Não lidos'], ['pendentes', 'Por gerir'], ['tratadas', 'Tratadas']].map(([value, label]) => (
+                {[['todas', t('chat_filter_all')], ['nao_lidos', t('chat_filter_unread')], ['pendentes', t('chat_filter_pending')], ['tratadas', t('chat_filter_handled')]].map(([value, label]) => (
                   <button
                     key={value}
                     onClick={() => setFilter(value)}
@@ -306,7 +306,7 @@ function ChatInner() {
                         fontSize: 13.5, marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0,
                         fontWeight: isUnread ? 700 : 400, color: isUnread ? 'var(--ink)' : 'var(--text-soft)',
                       }}>
-                        {c.lastMessage?.content || 'Sem mensagens ainda'}
+                        {c.lastMessage?.content || t('chat_no_messages_yet')}
                       </div>
 
                       <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
@@ -361,7 +361,7 @@ function ChatInner() {
                       className="btn"
                       style={{ fontSize: 12, padding: '6px 12px' }}
                     >
-                      {activeConversation.status === 'tratada' ? '↺ Reabrir' : '✓ Marcar como tratada'}
+                      {activeConversation.status === 'tratada' ? t('chat_reopen') : t('chat_mark_handled')}
                     </button>
                     <button
                       onClick={() => deleteConversation(activeConversation)}

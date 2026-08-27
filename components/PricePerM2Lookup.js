@@ -188,35 +188,35 @@ export default function PricePerM2Lookup() {
             result.ine ? (
               <>
                 <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 4 }}>
-                  Ainda não há imóveis suficientes publicados em {areaLabel} — este é o valor oficial mais recente do INE
-                  {result.ineWidenedLabel && ` para ${result.ineWidenedLabel} (não há dado próprio para ${areaLabel})`}
+                  {t('pricem2_not_enough_ine')} {areaLabel} {t('pricem2_ine_official_value')}
+                  {result.ineWidenedLabel && ` ${t('pricem2_ine_for')} ${result.ineWidenedLabel} ${t('pricem2_ine_no_data_for')} ${areaLabel})`}
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
                   {Number(result.ine.price_per_m2).toLocaleString('pt-PT')} €/m²
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--text-soft)' }}>
-                  {result.ine.geo_name} · Fonte: INE, Estatísticas de Preços da Habitação ao Nível Local
+                  {result.ine.geo_name} · {t('pricem2_source_ine')}
                   {result.ine.reference_quarter && ` (${result.ine.reference_quarter})`}
                 </div>
               </>
             ) : (
               <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>
-                Ainda não há imóveis suficientes publicados em {areaLabel} para calcular uma média fiável, e também não temos um valor de referência oficial guardado para esta zona.
+                {t('pricem2_not_enough_no_ref').replace('{area}', areaLabel)}
               </p>
             )
           ) : (
             <>
               <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 4 }}>
-                Preço médio em {result.widenedLabel || areaLabel} ({result.count} {result.count === 1 ? 'imóvel' : 'imóveis'})
+                {t('pricem2_avg_price_in')} {result.widenedLabel || areaLabel} ({result.count} {result.count === 1 ? t('pricem2_property_singular') : t('pricem2_property_plural')})
                 {result.widenedLabel && (
-                  <> — ainda não há imóveis suficientes só em {areaLabel}, por isso alargámos a pesquisa</>
+                  <> {t('pricem2_widened_search')} {areaLabel}, {t('pricem2_widened_reason')}</>
                 )}
               </div>
               <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
                 {Math.round(result.avg).toLocaleString('pt-PT')} €/m²
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-soft)' }}>
-                Entre {Math.round(result.min).toLocaleString('pt-PT')} € e {Math.round(result.max).toLocaleString('pt-PT')} € por m²
+                {t('pricem2_between')} {Math.round(result.min).toLocaleString('pt-PT')} € {t('pricem2_and')} {Math.round(result.max).toLocaleString('pt-PT')} € {t('pricem2_per_m2')}
               </div>
             </>
           )}

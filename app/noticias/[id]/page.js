@@ -5,8 +5,10 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import Header from '../../../components/Header';
+import { useLanguage } from '../../../lib/i18n';
 
 export default function NoticiaPage() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function NoticiaPage() {
     <>
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 720, padding: '40px 32px 80px' }}>
-        <Link href="/" style={{ fontSize: 13, color: 'var(--telha)' }}>&larr; Voltar à página inicial</Link>
+        <Link href="/" style={{ fontSize: 13, color: 'var(--telha)' }}>&larr; {t('news_back_home')}</Link>
 
         <div style={{ marginTop: 20 }}>
           <span style={{
