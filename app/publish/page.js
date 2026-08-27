@@ -223,18 +223,35 @@ function PublishForm() {
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
 
+        // O WebP costuma ficar 25-35% mais leve do que o JPEG com a mesma
+        // qualidade visual — poupa espaço e torna o site mais rápido. Todos
+        // os browsers atuais (2024 em diante) já sabem criar imagens WebP;
+        // no caso raro de algum não conseguir, usamos JPEG como reserva.
         canvas.toBlob(
-          (blob) => {
-            URL.revokeObjectURL(url);
-            if (!blob || blob.size >= file.size) {
-              // Se a compressão não ajudou (ex: já era pequena), usa o ficheiro original.
-              resolve(file);
-            } else {
-              resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+          (webpBlob) => {
+            const gotRealWebp = webpBlob && webpBlob.type === 'image/webp';
+            if (gotRealWebp && webpBlob.size < file.size) {
+              URL.revokeObjectURL(url);
+              const newName = file.name.replace(/\.[^.]+$/, '') + '.webp';
+              resolve(new File([webpBlob], newName, { type: 'image/webp' }));
+              return;
             }
+            // Reserva: tenta JPEG, tal como acontecia antes.
+            canvas.toBlob(
+              (jpegBlob) => {
+                URL.revokeObjectURL(url);
+                if (!jpegBlob || jpegBlob.size >= file.size) {
+                  resolve(file);
+                } else {
+                  resolve(new File([jpegBlob], file.name, { type: 'image/jpeg' }));
+                }
+              },
+              'image/jpeg',
+              0.85
+            );
           },
-          'image/jpeg',
-          0.85
+          'image/webp',
+          0.82
         );
       };
       img.onerror = () => resolve(file);
