@@ -106,8 +106,8 @@ export default function MensagensSuportePage() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
-                  <div style={{ alignSelf: 'flex-end', maxWidth: '80%' }}>
-                    <div style={{ background: 'var(--telha)', color: '#fff', padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4 }}>
+                  <div style={{ alignSelf: 'flex-end', maxWidth: '80%', minWidth: 0 }}>
+                    <div style={{ background: 'var(--telha)', color: '#fff', padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4, minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                       {r.message}
                     </div>
                     <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 3, textAlign: 'right', paddingRight: 2 }}>
@@ -117,11 +117,12 @@ export default function MensagensSuportePage() {
                     </div>
                   </div>
                   {r.replies.map((rep) => (
-                    <div key={rep.id} style={{ alignSelf: rep.sender_role === 'admin' ? 'flex-start' : 'flex-end', maxWidth: '80%' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, flexDirection: rep.sender_role === 'admin' ? 'row' : 'row-reverse' }}>
+                    <div key={rep.id} style={{ alignSelf: rep.sender_role === 'admin' ? 'flex-start' : 'flex-end', maxWidth: '80%', minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, flexDirection: rep.sender_role === 'admin' ? 'row' : 'row-reverse', minWidth: 0 }}>
                         <div
                           style={{
                             padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
+                            minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
                             background: rep.sender_role === 'admin' ? 'var(--plaster)' : 'var(--telha)',
                             color: rep.sender_role === 'admin' ? 'var(--ink)' : '#fff',
                           }}

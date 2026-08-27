@@ -411,6 +411,7 @@ function ChatInner() {
                     key={m.id}
                     style={{
                       maxWidth: '70%',
+                      minWidth: 0,
                       alignSelf: isMine ? 'flex-end' : 'flex-start',
                     }}
                   >
@@ -419,7 +420,7 @@ function ChatInner() {
                         {m.sender_name}{m.sender_name && (m.sender_email || m.sender_phone) && ' · '}{m.sender_email}{m.sender_email && m.sender_phone && ' · '}{m.sender_phone}
                       </div>
                     )}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                       {isMine && !m.read && (
                         <button
                           onClick={() => deleteMessage(m)}
@@ -438,6 +439,7 @@ function ChatInner() {
                       <div
                         style={{
                           padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
+                          minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
                           background: isMine ? 'var(--telha)' : 'var(--plaster)',
                           color: isMine ? '#fff' : 'var(--ink)',
                         }}
