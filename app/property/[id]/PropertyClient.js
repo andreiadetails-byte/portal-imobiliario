@@ -23,7 +23,7 @@ export default function PropertyClient() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sent, setSent] = useState(false);
-  const [lead, setLead] = useState({ name: '', email: '', phone: '', message: 'Gostaria de obter mais informações acerca deste imóvel.' });
+  const [lead, setLead] = useState({ name: '', email: '', phone: '', message: t('prop_default_lead_message') });
 
   const [user, setUser] = useState(null);
   const [ownerProfile, setOwnerProfile] = useState(null);
@@ -357,25 +357,25 @@ export default function PropertyClient() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div className="meta">{property.district}{property.internal_reference && ` · Ref. ${property.internal_reference}`}</div>
             <div className="meta" style={{ marginTop: 4, display: 'flex', gap: 14 }}>
-              <span>📅 Publicado há {Math.max(0, Math.floor((Date.now() - new Date(property.created_at)) / 86400000))} dias</span>
-              <span>👁 {property.views_count || 0} visualizações</span>
+              <span>📅 {t('prop_published_days_ago')} {Math.max(0, Math.floor((Date.now() - new Date(property.created_at)) / 86400000))} {t('prop_days_ago_suffix')}</span>
+              <span>👁 {property.views_count || 0} {t('prop_views')}</span>
             </div>
             <button
               onClick={() => setReportModal(true)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-soft)', textDecoration: 'underline' }}
             >
-              ⚑ Denunciar este anúncio
+              {t('prop_report_listing')}
             </button>
           </div>
 
           <div style={{ display: 'flex', gap: 24, borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '18px 0', margin: '24px 0', flexWrap: 'wrap' }}>
-            {property.area && <div><b>{property.area} m²</b><div className="meta">Área bruta</div></div>}
-            {property.area_util && <div><b>{property.area_util} m²</b><div className="meta">Área útil</div></div>}
+            {property.area && <div><b>{property.area} m²</b><div className="meta">{t('prop_gross_area')}</div></div>}
+            {property.area_util && <div><b>{property.area_util} m²</b><div className="meta">{t('prop_usable_area')}</div></div>}
             <div><b>{property.bedrooms}</b><div className="meta">{t('property_rooms')}</div></div>
             <div><b>{property.bathrooms}</b><div className="meta">{t('property_baths')}</div></div>
             <div><b>{property.energy_certificate || '—'}</b><div className="meta">{t('property_energy')}</div></div>
             {property.floor && (
-              <div><b>{property.floor}{property.is_top_floor ? ' (último)' : ''}</b><div className="meta">Piso</div></div>
+              <div><b>{property.floor}{property.is_top_floor ? ` ${t('prop_top_floor')}` : ''}</b><div className="meta">{t('prop_floor')}</div></div>
             )}
             {property.state && <div><b>{property.state}</b><div className="meta">{t('prop_state_label')}</div></div>}
           </div>
@@ -403,7 +403,7 @@ export default function PropertyClient() {
             >
               💬
               <span style={{ fontSize: 13.5 }}>
-                Fale com <b>{property.display_name || ownerProfile.agency_name || ownerProfile.full_name}</b> sobre este imóvel, diretamente no chat.
+                {t('prop_chat_with')} <b>{property.display_name || ownerProfile.agency_name || ownerProfile.full_name}</b> {t('prop_chat_about_property')}
               </span>
             </div>
           )}
@@ -423,15 +423,15 @@ export default function PropertyClient() {
 
           <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {[
-              property.area_util && ['Área útil', `${property.area_util} m²`],
-              property.floor && ['Piso', property.floor],
-              property.solar_orientations?.length > 0 && ['Orientação', property.solar_orientations.join(', ')],
-              property.energy_certificate && ['Classe energética', property.energy_certificate],
-              property.construction_year && ['Ano de construção', property.construction_year],
-              property.state && ['Estado do imóvel', property.state],
-              ['Elevador', property.features?.includes('Elevador') ? 'Sim' : 'Não'],
-              ['Estacionamento', property.has_parking ? 'Sim' : 'Não'],
-              ['Varanda', property.has_balcony ? 'Sim' : 'Não'],
+              property.area_util && [t('prop_usable_area'), `${property.area_util} m²`],
+              property.floor && [t('prop_floor'), property.floor],
+              property.solar_orientations?.length > 0 && [t('prop_orientation'), property.solar_orientations.join(', ')],
+              property.energy_certificate && [t('prop_energy_class'), property.energy_certificate],
+              property.construction_year && [t('prop_construction_year'), property.construction_year],
+              property.state && [t('prop_state'), property.state],
+              [t('prop_elevator'), property.features?.includes('Elevador') ? t('prop_yes') : t('prop_no')],
+              [t('prop_parking'), property.has_parking ? t('prop_yes') : t('prop_no')],
+              [t('prop_balcony'), property.has_balcony ? t('prop_yes') : t('prop_no')],
             ].filter(Boolean).map(([label, value]) => (
               <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5, padding: '8px 0', borderBottom: '1px solid var(--line)' }}>
                 <span style={{ color: 'var(--text-soft)' }}>{label}</span>
@@ -442,16 +442,16 @@ export default function PropertyClient() {
 
           {(() => {
             const amenities = [
-              property.has_storage && 'Arrumos',
-              property.has_parking && 'Estacionamento',
-              property.has_balcony && 'Varanda',
-              property.has_garden && 'Jardim',
-              property.has_pool && 'Piscina',
-              property.has_gym && 'Ginásio',
-              property.has_coworking && 'Sala de coworking',
-              property.near_transit && 'Perto de transportes',
-              property.is_furnished && 'Mobilado',
-              property.pets_allowed && 'Aceita animais',
+              property.has_storage && t('prop_amenity_storage'),
+              property.has_parking && t('prop_parking'),
+              property.has_balcony && t('prop_balcony'),
+              property.has_garden && t('prop_amenity_garden'),
+              property.has_pool && t('prop_amenity_pool'),
+              property.has_gym && t('prop_amenity_gym'),
+              property.has_coworking && t('prop_amenity_coworking'),
+              property.near_transit && t('prop_amenity_transit'),
+              property.is_furnished && t('prop_amenity_furnished'),
+              property.pets_allowed && t('prop_amenity_pets'),
               ...(property.features || []),
             ].filter(Boolean);
             return amenities.length > 0 && (
@@ -486,7 +486,7 @@ export default function PropertyClient() {
               <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>{t('prop_floorplan_title')}</h3>
               {property.floor_plan_url.toLowerCase().endsWith('.pdf') ? (
                 <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer" className="btn">
-                  📄 Ver planta (PDF)
+                  {t('prop_view_floorplan')}
                 </a>
               ) : (
                 <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer">
@@ -546,7 +546,7 @@ export default function PropertyClient() {
                   </a>
                 )}
                 <span style={{ fontSize: 11.5, color: 'var(--telha)', fontWeight: 600, marginTop: 4, display: 'inline-block', textDecoration: 'underline' }}>
-                  Ver todos os meus imóveis →
+                  {t('prop_view_all_listings')}
                 </span>
               </div>
             </Link>
@@ -659,7 +659,7 @@ export default function PropertyClient() {
         style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}
       >
         <div onClick={(e) => e.stopPropagation()} className="card" style={{ width: 400, maxWidth: 'calc(100vw - 32px)', padding: 26, maxHeight: '90vh', overflowY: 'auto' }}>
-          <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>⚑ Denunciar este anúncio</h3>
+          <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('prop_report_listing')}</h3>
 
           {reportSent ? (
             <p style={{ fontSize: 14 }}>{t('prop_report_thanks')}</p>

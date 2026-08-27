@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
+import { useLanguage } from '../../lib/i18n';
 
 export default function ValuationClient() {
+  const { t } = useLanguage();
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ address: '', typology: '', area: '', notes: '', name: '', contact: '' });
@@ -34,53 +36,53 @@ export default function ValuationClient() {
       <Header />
       <div className="wrap" style={{ maxWidth: 560, padding: '48px 32px 80px' }}>
         <BackButton fallback="/" />
-        <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>Avalie o seu imóvel</h1>
+        <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('valuation_title')}</h1>
         <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
-          Descreva o seu imóvel e entramos em contacto consigo com uma avaliação, sem compromisso.
+          {t('valuation_subtitle')}
         </p>
 
         <div className="card" style={{ padding: 28 }}>
           {sent ? (
             <p style={{ fontSize: 14.5 }}>
-              Obrigado! Recebemos o seu pedido e vamos entrar em contacto consigo em breve.
+              {t('valuation_thanks')}
             </p>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="field">
-                <label>Morada do imóvel</label>
-                <input required value={form.address} onChange={(e) => update('address', e.target.value)} placeholder="Rua, número, freguesia, concelho" />
+                <label>{t('valuation_address_label')}</label>
+                <input required value={form.address} onChange={(e) => update('address', e.target.value)} placeholder={t('valuation_address_placeholder')} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div className="field">
-                  <label>Tipologia</label>
+                  <label>{t('valuation_typology')}</label>
                   <select value={form.typology} onChange={(e) => update('typology', e.target.value)}>
-                    <option value="">Selecione</option>
+                    <option value="">{t('valuation_select')}</option>
                     {['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'].map((t) => <option key={t}>{t}</option>)}
                   </select>
                 </div>
                 <div className="field">
-                  <label>Área (m²)</label>
+                  <label>{t('valuation_area')}</label>
                   <input type="number" value={form.area} onChange={(e) => update('area', e.target.value)} />
                 </div>
               </div>
 
               <div className="field">
-                <label>Características (opcional)</label>
-                <textarea rows={3} value={form.notes} onChange={(e) => update('notes', e.target.value)} placeholder="ex: renovado em 2022, com garagem e varanda..." />
+                <label>{t('valuation_features_optional')}</label>
+                <textarea rows={3} value={form.notes} onChange={(e) => update('notes', e.target.value)} placeholder={t('valuation_features_placeholder')} />
               </div>
 
               <div className="field">
-                <label>O seu nome</label>
+                <label>{t('valuation_your_name')}</label>
                 <input required value={form.name} onChange={(e) => update('name', e.target.value)} />
               </div>
               <div className="field">
-                <label>Email ou telefone</label>
+                <label>{t('valuation_email_or_phone')}</label>
                 <input required value={form.contact} onChange={(e) => update('contact', e.target.value)} />
               </div>
 
               <button type="submit" className="btn btn-primary btn-block" disabled={sending}>
-                {sending ? 'A enviar...' : 'Pedir avaliação'}
+                {sending ? t('valuation_sending') : t('valuation_request_btn')}
               </button>
             </form>
           )}

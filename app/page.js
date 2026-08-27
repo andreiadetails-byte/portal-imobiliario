@@ -611,7 +611,7 @@ export default function HomePage() {
             </div>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>
-                Ajuda
+                {t('footer_help_heading')}
               </h5>
               <Link href="/faq" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_faq')}</Link>
               <Link href="/seguranca" style={{ display: 'block', fontSize: 13.5, padding: '5px 0' }}>{t('footer_security')}</Link>

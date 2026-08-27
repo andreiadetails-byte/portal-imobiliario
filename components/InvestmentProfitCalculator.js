@@ -169,11 +169,11 @@ export default function InvestmentProfitCalculator({ showTitle }) {
         )}
       </div>
 
-      <EuroField label="Registos notariais e escritura" value={notaryFees} onChange={setNotaryFees} />
+      <EuroField label={t('invest_notary_fees')} value={notaryFees} onChange={setNotaryFees} />
       {financed === 'Sim' && (
-        <EuroField label="Avaliação bancária" value={bankValuation} onChange={setBankValuation} />
+        <EuroField label={t('invest_bank_valuation')} value={bankValuation} onChange={setBankValuation} />
       )}
-      <EuroField label="Obras no imóvel" value={renovationCosts} onChange={setRenovationCosts} hint="Guarde as faturas — obras com fatura podem reduzir a mais-valia tributável." />
+      <EuroField label={t('invest_renovation_costs')} value={renovationCosts} onChange={setRenovationCosts} hint={t('invest_keep_invoices_hint')} />
 
       <h4 style={{ fontSize: 14, fontWeight: 600, marginTop: 20, marginBottom: 4 }}>{t('invest_resale_expenses')}</h4>
 
@@ -181,7 +181,7 @@ export default function InvestmentProfitCalculator({ showTitle }) {
         <label>{t('invest_agent_commission')}</label>
         <input type="number" step="0.1" value={commissionPct} onChange={(e) => setCommissionPct(Number(e.target.value))} min={0} max={20} />
         <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 4 }}>
-          = {commissionValue.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} € sobre o valor de revenda
+          = {commissionValue.toLocaleString('pt-PT', { maximumFractionDigits: 0 })} € {t('invest_over_resale_value')}
         </p>
       </div>
 
@@ -190,7 +190,7 @@ export default function InvestmentProfitCalculator({ showTitle }) {
           <label>{t('invest_irs_bracket')}</label>
           <input type="number" step="0.5" value={irsRate} onChange={(e) => setIrsRate(Number(e.target.value))} min={0} max={48} />
           <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 4 }}>
-            Depende do total dos teus rendimentos no ano — os escalões de IRS vão de 14,5% a 48%. Se não tiveres a certeza, usa a tua taxa de IRS do último ano, ou pergunta ao teu contabilista.
+            {t('invest_irs_bracket_hint')}
           </p>
         </div>
       )}

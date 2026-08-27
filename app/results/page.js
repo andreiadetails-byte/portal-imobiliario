@@ -20,6 +20,11 @@ function ResultsInner() {
   const { t, lang } = useLanguage();
 
   const TIPOS = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório', 'Quarto'];
+  const TIPO_LABELS = {
+    Apartamento: t('results_type_apartment'), Moradia: t('results_type_house'), Terreno: t('results_type_land'),
+    'Espaço comercial': t('results_type_commercial'), Armazém: t('results_type_warehouse'),
+    Escritório: t('results_type_office'), Quarto: t('results_type_room'),
+  };
   const TIPOLOGIAS = ['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'];
 
   const [properties, setProperties] = useState([]);
@@ -286,7 +291,7 @@ function ResultsInner() {
                       color: selectedTypes.includes(tp) ? '#fff' : 'var(--text-soft)',
                     }}
                   >
-                    {tp}
+                    {TIPO_LABELS[tp]}
                   </span>
                 ))}
               </div>
