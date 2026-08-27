@@ -276,6 +276,22 @@ export default function Header({ minimal = false }) {
                 )}
               </Link>
             </div>
+            {isAdmin && (
+              <div className="navbar-mobile-row">
+                <Link href="/admin" className="btn" style={{ color: 'var(--telha)', position: 'relative' }}>
+                  ⚙ Admin
+                  {adminPending > 0 && (
+                    <span style={{
+                      position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
+                      background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                    }}>
+                      {adminPending > 9 ? '9+' : adminPending}
+                    </span>
+                  )}
+                </Link>
+              </div>
+            )}
           </div>
         )}
         {checked && !user && (
