@@ -36,7 +36,7 @@ function summarizeToSentence(text, maxLength = 160) {
 }
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState('');
@@ -548,7 +548,7 @@ export default function HomePage() {
                 }}>
                   {n.cover_image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={n.cover_image_url} alt={n.title} loading="lazy" style={{ width: '100%', height: '100%', minHeight: 150, objectFit: 'cover' }} />
+                    <img src={n.cover_image_url} alt={(n.title_translations && n.title_translations[lang]) || n.title} loading="lazy" style={{ width: '100%', height: '100%', minHeight: 150, objectFit: 'cover' }} />
                   )}
                   <div style={{ padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <span style={{
@@ -557,12 +557,12 @@ export default function HomePage() {
                     }}>
                       {n.category}
                     </span>
-                    <h4 style={{ fontSize: 17, fontWeight: 600, marginBottom: 8, lineHeight: 1.3 }}>{n.title}</h4>
+                    <h4 style={{ fontSize: 17, fontWeight: 600, marginBottom: 8, lineHeight: 1.3 }}>{(n.title_translations && n.title_translations[lang]) || n.title}</h4>
                     <p style={{ fontSize: 13.5, color: 'var(--text-soft)', lineHeight: 1.55 }}>
-                      {summarizeToSentence(n.body)}
+                      {summarizeToSentence((n.body_translations && n.body_translations[lang]) || n.body)}
                     </p>
                     <span style={{ fontSize: 12.5, color: 'var(--telha)', fontWeight: 600, marginTop: 8 }}>
-                      Ler notícia completa →
+                      {t('home_read_full_news')}
                     </span>
                   </div>
                 </Link>

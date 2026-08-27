@@ -92,6 +92,7 @@ function AdminInner() {
   const [filter, setFilter] = useState('em_revisao');
   const [section, setSection] = useState(searchParams.get('tab') || 'anuncios');
   const [news, setNews] = useState([]);
+  const [translatingNewsId, setTranslatingNewsId] = useState(null);
   const [newsForm, setNewsForm] = useState({ category: 'Habitação', title: '', body: '' });
   const [newsImage, setNewsImage] = useState(null);
   const [editingNewsId, setEditingNewsId] = useState(null);
@@ -527,6 +528,23 @@ function AdminInner() {
     setEditingNewsId(null);
     setNewsForm({ category: 'Habitação', title: '', body: '' });
     setNewsImage(null);
+  }
+
+  async function translateNews(id) {
+    setTranslatingNewsId(id);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/translate-news', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ newsId: id }),
+    });
+    if (res.ok) {
+      loadNews();
+    } else {
+      const { error } = await res.json();
+      alert(`Não foi possível traduzir: ${error}`);
+    }
+    setTranslatingNewsId(null);
   }
 
   async function deleteNews(id) {
@@ -1271,6 +1289,15 @@ function AdminInner() {
                   <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{n.body}</p>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0, height: 'fit-content' }}>
+                  <button
+                    onClick={() => translateNews(n.id)}
+                    disabled={translatingNewsId === n.id}
+                    className="btn"
+                    style={{ fontSize: 12, color: n.title_translations ? 'var(--telha)' : 'var(--text-soft)' }}
+                    title={n.title_translations ? t('admin_already_translated_hint') : t('admin_not_translated_hint')}
+                  >
+                    {translatingNewsId === n.id ? t('admin_translating') : n.title_translations ? t('admin_translated') : t('admin_translate_btn')}
+                  </button>
                   <button onClick={() => startEditNews(n)} className="btn" style={{ fontSize: 12 }}>{t('admin_edit')}</button>
                   <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12 }}>{t('admin_delete')}</button>
                 </div>

@@ -53,7 +53,7 @@ function ResultsInner() {
   const [selectedEnergy, setSelectedEnergy] = useState([]);
   const [elevatorOnly, setElevatorOnly] = useState(searchParams.get('elevator') === '1');
   const [sortBy, setSortBy] = useState('recent');
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(searchParams.get('draw') === '1');
   const [mapFilterIds, setMapFilterIds] = useState(null);
   const [user, setUser] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState([]);
