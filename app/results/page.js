@@ -52,8 +52,16 @@ function ResultsInner() {
   );
   const [selectedEnergy, setSelectedEnergy] = useState([]);
   const [elevatorOnly, setElevatorOnly] = useState(searchParams.get('elevator') === '1');
+
+  // Conta quantos filtros a pessoa já escolheu, para mostrar "Filtros (5)"
+  // no telemóvel — tal como noutros portais imobiliários conhecidos.
+  const activeFilterCount = [
+    district, minPrice, maxPrice, minBedrooms, minBathrooms, minArea,
+    selectedStates.length > 0, selectedTypologies.length > 0, elevatorOnly,
+  ].filter(Boolean).length;
   const [sortBy, setSortBy] = useState('recent');
   const [showMap, setShowMap] = useState(searchParams.get('draw') === '1');
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
   const [mapFilterIds, setMapFilterIds] = useState(null);
   const [user, setUser] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState([]);
@@ -183,6 +191,7 @@ function ResultsInner() {
 
   async function runSearch(e, targetPage, sortOverride) {
     if (e) e.preventDefault();
+    setShowFiltersModal(false);
     const goToPage = targetPage || 1;
     const effectiveSort = sortOverride || sortBy;
     setPage(goToPage);
@@ -254,10 +263,33 @@ function ResultsInner() {
           {loading ? t('results_searching') : `${mapFilterIds ? mapFilterIds.length : count} ${t('results_found')}`}
         </p>
 
+        <div className="results-mobile-toolbar">
+          <button type="button" onClick={() => setShowFiltersModal(true)} className="btn">
+            ☰ {t('results_filters_label')} {activeFilterCount > 0 && `(${activeFilterCount})`}
+          </button>
+          <select
+            value={sortBy}
+            onChange={(e) => { setSortBy(e.target.value); runSearch(null, page, e.target.value); }}
+            className="btn"
+            style={{ textAlign: 'center' }}
+          >
+            <option value="recent">{t('results_sort_recent')}</option>
+            <option value="price_asc">{t('results_sort_price_asc')}</option>
+            <option value="price_desc">{t('results_sort_price_desc')}</option>
+          </select>
+          <button type="button" onClick={() => setShowMap((s) => !s)} className="btn">
+            📍 {t('results_map_label')}
+          </button>
+        </div>
+
         <div className="results-grid" style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
 
-          <div>
+          <div className={showFiltersModal ? 'filters-modal-open' : ''}>
           <form onSubmit={runSearch} className="card filters-form" style={{ padding: 18, position: 'sticky', top: 90, overflow: 'visible' }}>
+            <div className="filters-modal-header">
+              <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)' }}>{t('results_filters_label')}</span>
+              <button type="button" onClick={() => setShowFiltersModal(false)} aria-label={t('attr_close')} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
+            </div>
             <div className="field">
               <label>{t('results_business')}</label>
               <select value={businessType} onChange={(e) => setBusinessType(e.target.value)}>
