@@ -110,6 +110,10 @@ function AdminInner() {
   const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
+  const [leadsRevealed, setLeadsRevealed] = useState(false);
+  const [leadsPinInput, setLeadsPinInput] = useState('');
+  const [leadsPinError, setLeadsPinError] = useState('');
+  const [checkingPin, setCheckingPin] = useState(false);
   const [campaignSubject, setCampaignSubject] = useState('Novidades no More·ada — queremos saber a sua opinião!');
   const [campaignMessage, setCampaignMessage] = useState(
     `<h2 style="font-size:19px; color:#332E22; margin: 0 0 6px;">Obrigada por fazer parte do More·ada 🏡</h2>
@@ -233,6 +237,31 @@ function AdminInner() {
       .select('*, properties(id, typology, address, district, owner_id, profiles(id, full_name, agency_name))')
       .order('created_at', { ascending: false });
     setAllLeads(data || []);
+  }
+
+  async function markLeadRead(id) {
+    await supabase.from('leads').update({ status: 'lida' }).eq('id', id);
+    setAllLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: 'lida' } : l)));
+  }
+
+  async function checkLeadsPin(e) {
+    e.preventDefault();
+    setCheckingPin(true);
+    setLeadsPinError('');
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/verify-leads-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ pin: leadsPinInput }),
+    });
+    if (res.ok) {
+      setLeadsRevealed(true);
+      setLeadsPinInput('');
+    } else {
+      const { error } = await res.json();
+      setLeadsPinError(error || 'PIN incorreto.');
+    }
+    setCheckingPin(false);
   }
 
   async function sendCampaign() {
@@ -1028,39 +1057,70 @@ function AdminInner() {
           <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
             Aqui vês, como administradora, todas as mensagens de contacto (leads) que os outros utilizadores receberam através dos seus anúncios — de qualquer pessoa, de qualquer utilizador. Serve para apoio e moderação.
           </p>
-          {allLeads.length === 0 && <p className="empty-state">{t('admin_no_leads_yet')}</p>}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {allLeads.map((l) => (
-              <div key={l.id} className="card" style={{ padding: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
-                  <div>
-                    <b style={{ fontSize: 14 }}>{l.name}</b>
-                    <div className="meta">
-                      {l.email}{l.phone ? ` · 📞 ${l.phone}` : ''}
+          {!leadsRevealed ? (
+            <form onSubmit={checkLeadsPin} style={{ maxWidth: 280 }}>
+              <div className="field">
+                <label>🔒 PIN para revelar os leads</label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  autoFocus
+                  value={leadsPinInput}
+                  onChange={(e) => { setLeadsPinInput(e.target.value); setLeadsPinError(''); }}
+                />
+                {leadsPinError && <p style={{ fontSize: 12.5, color: '#b8452f', marginTop: 4 }}>{leadsPinError}</p>}
+              </div>
+              <button type="submit" disabled={checkingPin || !leadsPinInput} className="btn btn-primary">
+                {checkingPin ? 'A confirmar...' : 'Mostrar leads'}
+              </button>
+            </form>
+          ) : allLeads.length === 0 ? (
+            <p className="empty-state">{t('admin_no_leads_yet')}</p>
+          ) : (
+            <GroupedByOwner
+              items={allLeads}
+              getOwnerKey={(l) => l.properties?.owner_id}
+              getOwnerLabel={(l) => l.properties?.profiles?.agency_name || l.properties?.profiles?.full_name || 'Utilizador'}
+              noOwnerLabel="Sem anúncio associado"
+              renderItem={(l) => (
+                <div key={l.id} className="card" style={{ padding: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+                    <div>
+                      <b style={{ fontSize: 14 }}>{l.name}</b>
+                      <div className="meta">
+                        {l.email}{l.phone ? ` · 📞 ${l.phone}` : ''}
+                      </div>
+                    </div>
+                    <span style={{
+                      fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 12, flexShrink: 0,
+                      background: l.status === 'novo' ? 'rgba(126,143,106,0.18)' : 'var(--line)',
+                      color: l.status === 'novo' ? 'var(--telha)' : 'var(--text-soft)',
+                    }}>
+                      {l.status === 'novo' ? 'Nova' : l.status === 'lida' ? 'Lida' : 'Respondida'}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 13.5, marginBottom: 10 }}>{l.message}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                    {l.properties ? (
+                      <a href={`/property/${l.properties.id}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: 'var(--telha)' }}>
+                        {l.properties.typology} · {l.properties.district}
+                      </a>
+                    ) : (
+                      <span className="meta">{t('admin_listing_no_longer_exists')}</span>
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {l.status === 'novo' && (
+                        <button onClick={() => markLeadRead(l.id)} className="btn" style={{ fontSize: 11.5, padding: '4px 10px' }}>
+                          ✓ Marcar como lida
+                        </button>
+                      )}
+                      <span className="meta">{new Date(l.created_at).toLocaleDateString('pt-PT')}</span>
                     </div>
                   </div>
-                  <span style={{
-                    fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 12, flexShrink: 0,
-                    background: l.status === 'novo' ? 'rgba(126,143,106,0.18)' : 'var(--line)',
-                    color: l.status === 'novo' ? 'var(--telha)' : 'var(--text-soft)',
-                  }}>
-                    {l.status === 'novo' ? 'Nova' : 'Respondida'}
-                  </span>
                 </div>
-                <p style={{ fontSize: 13.5, marginBottom: 10 }}>{l.message}</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                  {l.properties ? (
-                    <a href={`/property/${l.properties.id}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: 'var(--telha)' }}>
-                      {l.properties.typology} · {l.properties.district} — anunciante: {l.properties.profiles?.agency_name || l.properties.profiles?.full_name || '—'}
-                    </a>
-                  ) : (
-                    <span className="meta">{t('admin_listing_no_longer_exists')}</span>
-                  )}
-                  <span className="meta">{new Date(l.created_at).toLocaleDateString('pt-PT')}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              )}
+            />
+          )}
         </>
       )}
 
