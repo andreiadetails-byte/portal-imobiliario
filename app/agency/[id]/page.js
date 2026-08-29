@@ -298,9 +298,9 @@ export default function AgencyPage() {
                       type="button"
                       onClick={(e) => { e.stopPropagation(); openMessageModal(p); }}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                        display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
                         fontWeight: 700, color: '#fff', background: 'var(--telha)', border: 'none',
-                        borderRadius: 7, padding: '8px 12px', cursor: 'pointer',
+                        borderRadius: 8, padding: '11px 16px', cursor: 'pointer',
                       }}
                     >
                       💬 {t('prop_send_message')}
@@ -310,9 +310,9 @@ export default function AgencyPage() {
                         href={`tel:${profile.phone_public.replace(/\s+/g, '')}`}
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
                           fontWeight: 700, color: 'var(--ink)', background: 'var(--plaster)',
-                          border: '1.5px solid var(--line)', borderRadius: 7, padding: '8px 12px', textDecoration: 'none',
+                          border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                         }}
                       >
                         📞 {t('prop_call')}

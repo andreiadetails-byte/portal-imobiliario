@@ -303,7 +303,9 @@ textarea:focus-visible, [tabindex]:focus-visible{
    formulário já está sempre visível ao lado, por isso a barra fica
    escondida lá. */
 .property-contact-bar{ display: none; }
-.navbar-profile-btn-mobile{ display: none; }
+@media (min-width: 901px){
+  .navbar-profile-btn-mobile{ display: none !important; }
+}
 @media (max-width: 900px){
   .support-widget{ bottom: 78px !important; }
   .property-contact-bar{

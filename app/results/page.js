@@ -801,9 +801,9 @@ function ResultsInner() {
                           type="button"
                           onClick={(e) => { e.stopPropagation(); openMessageModal(p); }}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 15.5,
                             fontWeight: 700, color: '#fff', background: 'var(--telha)', border: 'none',
-                            borderRadius: 8, padding: '10px 16px', cursor: 'pointer',
+                            borderRadius: 8, padding: '12px 18px', cursor: 'pointer',
                           }}
                         >
                           💬 {t('prop_send_message')}
@@ -813,9 +813,9 @@ function ResultsInner() {
                             href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
                             onClick={(e) => e.stopPropagation()}
                             style={{
-                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 15.5,
                               fontWeight: 700, color: 'var(--ink)', background: 'var(--paper)',
-                              border: '1.5px solid var(--line)', borderRadius: 8, padding: '10px 16px', textDecoration: 'none',
+                              border: '1.5px solid var(--line)', borderRadius: 8, padding: '12px 18px', textDecoration: 'none',
                             }}
                           >
                             📞 {t('prop_call')}

@@ -369,9 +369,9 @@ export default function HomePage() {
                         href={`/property/${p.id}#property-contact-box`}
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
-                          fontWeight: 700, color: '#fff', background: 'var(--telha)', borderRadius: 7,
-                          padding: '9px 14px', textDecoration: 'none',
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
+                          fontWeight: 700, color: '#fff', background: 'var(--telha)', borderRadius: 8,
+                          padding: '11px 16px', textDecoration: 'none',
                         }}
                       >
                         💬 {t('prop_send_message')}
@@ -381,9 +381,9 @@ export default function HomePage() {
                           href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
                           onClick={(e) => e.stopPropagation()}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
                             fontWeight: 700, color: 'var(--ink)', background: 'var(--paper)',
-                            border: '1.5px solid var(--line)', borderRadius: 7, padding: '9px 14px', textDecoration: 'none',
+                            border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                           }}
                         >
                           📞 {t('prop_call')}
@@ -470,9 +470,9 @@ export default function HomePage() {
                         href={`/property/${p.id}#property-contact-box`}
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
-                          fontWeight: 700, color: '#fff', background: 'var(--telha)', borderRadius: 7,
-                          padding: '9px 14px', textDecoration: 'none',
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
+                          fontWeight: 700, color: '#fff', background: 'var(--telha)', borderRadius: 8,
+                          padding: '11px 16px', textDecoration: 'none',
                         }}
                       >
                         💬 {t('prop_send_message')}
@@ -482,9 +482,9 @@ export default function HomePage() {
                           href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
                           onClick={(e) => e.stopPropagation()}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
                             fontWeight: 700, color: 'var(--ink)', background: 'var(--paper)',
-                            border: '1.5px solid var(--line)', borderRadius: 7, padding: '9px 14px', textDecoration: 'none',
+                            border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                           }}
                         >
                           📞 {t('prop_call')}

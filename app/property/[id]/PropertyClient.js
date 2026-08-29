@@ -660,7 +660,7 @@ export default function PropertyClient() {
           onClick={() => setShowContactModal(true)}
           style={{
             flex: 1, background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 9,
-            padding: '16px 12px', fontSize: 16, fontWeight: 700, cursor: 'pointer',
+            padding: '17px 12px', fontSize: 18, fontWeight: 700, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
@@ -671,7 +671,7 @@ export default function PropertyClient() {
             href={`tel:${ownerProfile.phone_public.replace(/\s+/g, '')}`}
             style={{
               flex: 1, background: 'var(--paper)', color: 'var(--ink)', border: '1.5px solid var(--line)', borderRadius: 9,
-              padding: '16px 12px', fontSize: 16, fontWeight: 700, textDecoration: 'none',
+              padding: '17px 12px', fontSize: 18, fontWeight: 700, textDecoration: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}
           >

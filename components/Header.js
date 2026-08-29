@@ -244,6 +244,9 @@ export default function Header({ minimal = false }) {
             </>
           )}
           </div>
+          {checked && user && (
+            <Link href="/perfil" className="btn navbar-profile-btn-mobile" style={{ marginRight: 6, flexShrink: 0 }}>{t('nav_account')}</Link>
+          )}
           {checked && user ? (
             <button onClick={handleLogout} className="btn navbar-login-btn" style={{ marginRight: 12, flexShrink: 0 }}>{t('nav_logout')}</button>
           ) : (
@@ -271,13 +274,6 @@ export default function Header({ minimal = false }) {
                   </span>
                 )}
               </Link>
-            </div>
-          </div>
-        )}
-        {checked && !user && (
-          <div className="navbar-mobile-rows">
-            <div className="navbar-mobile-row">
-              <Link href="/login" className="btn">{t('nav_login')}</Link>
             </div>
           </div>
         )}
