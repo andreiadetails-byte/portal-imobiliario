@@ -69,6 +69,42 @@ export async function POST(request) {
     if (result.error) {
       return Response.json({ error: 'Falha ao enviar email', details: result.error }, { status: 500 });
     }
+
+    // Envia também uma confirmação para quem fez o pedido — mesmo sem ter
+    // criado conta, fica com a garantia de que a mensagem chegou mesmo, e
+    // sabe o que esperar a seguir.
+    if (lead.email) {
+      const senderFirstName = (lead.name || '').split(' ')[0];
+      const confirmationBodyHtml = `
+        <p style="margin:0 0 14px; font-size:15px;">Olá${senderFirstName ? ` ${senderFirstName}` : ''},</p>
+        <h2 style="font-size:19px; color:#332E22; margin: 0 0 6px;">A sua mensagem foi enviada ✅</h2>
+        <p style="margin:0 0 16px;">Recebemos o seu pedido de contacto sobre este imóvel, e já foi entregue ao anunciante:</p>
+        ${property ? propertyCardHtml({
+          typology: property.typology, address: property.address, price: property.price,
+          businessType: property.business_type, photoUrl: firstPhoto, propertyId: lead.property_id,
+        }) : ''}
+        <p style="margin:16px 0 4px; font-size:13.5px; color:#6B6455;">A sua mensagem:</p>
+        <div style="background:#F1E8D6; border-radius:6px; padding:12px 14px; font-size:14px; font-style:italic; color:#332E22; margin-bottom:16px;">
+          "${escapeHtml(lead.message) || 'Sem mensagem adicional.'}"
+        </div>
+        <p style="margin:0 0 4px;">O anunciante vai entrar em contacto consigo diretamente, através do email ou telefone que indicou.</p>
+        <p style="margin:0; font-size:13px; color:#6B6455;">Se preferir acompanhar tudo pelo site (e ver a resposta num único sítio), pode <a href="${SITE_URL}/login" style="color:#7E8F6A;">criar uma conta gratuita</a> a qualquer momento.</p>
+      `;
+
+      await sendEmail({
+        to: lead.email,
+        subject: `A sua mensagem sobre ${propertyLabel} foi enviada`,
+        html: renderEmail({
+          preheader: 'A sua mensagem foi entregue ao anunciante',
+          bodyHtml: confirmationBodyHtml,
+          ctaText: 'Ver mais imóveis',
+          ctaUrl: SITE_URL,
+        }),
+      });
+      // Nota: se este segundo email falhar, não bloqueia a resposta — o
+      // mais importante (avisar o anunciante) já tinha sido feito com sucesso.
+    }
+
     return Response.json({ success: true });
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
