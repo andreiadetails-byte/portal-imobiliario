@@ -303,9 +303,10 @@ textarea:focus-visible, [tabindex]:focus-visible{
    escondida lá. */
 .property-contact-bar{ display: none; }
 @media (max-width: 900px){
+  .support-widget{ bottom: 78px !important; }
   .property-contact-bar{
     display: flex !important; gap: 10px;
-    position: fixed; bottom: 64px; left: 0; right: 0; z-index: 45;
+    position: fixed; bottom: 64px; left: 0; right: 0; z-index: 55;
     background: var(--paper); padding: 10px 16px max(10px, env(safe-area-inset-bottom));
     box-shadow: 0 -4px 16px rgba(0,0,0,0.12); border-top: 1px solid var(--line);
   }
