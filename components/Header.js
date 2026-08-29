@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { logVisitIfNeeded } from '../lib/logVisit';
-import { Bell, Home, Search, Heart, MessageCircle } from 'lucide-react';
+import { Bell, Home, Search, Heart, MessageCircle, LogIn } from 'lucide-react';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 import { isProfessionalAccount } from '../lib/accountTypes';
@@ -168,7 +168,7 @@ export default function Header({ minimal = false }) {
                 )}
               </button>
               {notifOpen && (
-                <div style={{
+                <div className="navbar-notif-panel" style={{
                   position: 'absolute', top: '110%', right: 0, width: 300, maxWidth: 'calc(100vw - 32px)', maxHeight: 360, overflowY: 'auto',
                   background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 8,
                   boxShadow: '0 10px 30px rgba(51,46,34,0.18)', zIndex: 50,
@@ -254,44 +254,24 @@ export default function Header({ minimal = false }) {
           )}
         </div>
 
-        {/* Duas linhas fixas, só em telemóvel: (Entrar/Sair + Publicar) e (Favoritos + Mensagens) */}
-        {checked && user && (
+        {/* Só a linha de Admin fica aqui — Sair/Publicar já aparecem junto ao
+            sino no topo, e Favoritos/Mensagens já estão no menu de baixo. */}
+        {checked && user && isAdmin && (
           <div className="navbar-mobile-rows">
             <div className="navbar-mobile-row">
-              <button onClick={handleLogout} className="btn">{t('nav_logout')}</button>
-              <Link href="/publish" className="btn btn-primary">{t('nav_publish')}</Link>
-            </div>
-            <div className="navbar-mobile-row">
-              <Link href="/favorites" className="btn">{t('nav_favorites')}</Link>
-              <Link href="/chat" className="btn" style={{ position: 'relative' }}>
-                {t('nav_chat')}
-                {unreadChat > 0 && (
+              <Link href="/admin" className="btn" style={{ color: 'var(--telha)', position: 'relative' }}>
+                ⚙ Admin
+                {adminPending > 0 && (
                   <span style={{
                     position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
                     background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
                   }}>
-                    {unreadChat > 9 ? '9+' : unreadChat}
+                    {adminPending > 9 ? '9+' : adminPending}
                   </span>
                 )}
               </Link>
             </div>
-            {isAdmin && (
-              <div className="navbar-mobile-row">
-                <Link href="/admin" className="btn" style={{ color: 'var(--telha)', position: 'relative' }}>
-                  ⚙ Admin
-                  {adminPending > 0 && (
-                    <span style={{
-                      position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, borderRadius: 8,
-                      background: '#b8452f', color: '#fff', fontSize: 10, fontWeight: 700,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
-                    }}>
-                      {adminPending > 9 ? '9+' : adminPending}
-                    </span>
-                  )}
-                </Link>
-              </div>
-            )}
           </div>
         )}
         {checked && !user && (
@@ -321,7 +301,10 @@ export default function Header({ minimal = false }) {
             </span>
           )}
         </Link>
-        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item"><span style={{ fontSize: 21 }}>☰</span><span>{user ? t('header_listings') : t('nav_login_short')}</span></Link>
+        <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item">
+          {user ? <span style={{ fontSize: 21 }}>☰</span> : <LogIn size={21} />}
+          <span>{user ? t('header_listings') : t('nav_login_short')}</span>
+        </Link>
       </nav>
 
       {subReminder && !subReminderDismissed && (

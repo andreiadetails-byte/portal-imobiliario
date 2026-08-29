@@ -226,7 +226,17 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .chat-list-col{ border-right: none !important; }
   .chat-hide-mobile{ display: none !important; }
   .chat-back-btn{ display: inline-block !important; }
-  .navbar-nav-links, .navbar-login-btn, .navbar-publish-btn{ display: none !important; }
+  .navbar-nav-links{ display: none !important; }
+  .navbar-login-btn{ display: inline-flex !important; margin-right: 6px !important; font-size: 12.5px !important; padding: 9px 10px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+  .navbar-publish-btn{ display: inline-flex !important; min-width: 0 !important; font-size: 12.5px !important; padding: 9px 10px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+  .navbar-links{ flex-wrap: nowrap !important; min-width: 0; }
+  .navbar-links > div:first-child{ flex-shrink: 0; } /* seletor de idioma nunca encolhe */
+  /* A janela de notificações fica ancorada ao ecrã (não ao sino), para
+     nunca ficar cortada nas laterais, seja onde o sino estiver. */
+  .navbar-notif-panel{
+    position: fixed !important; top: 64px !important; right: 12px !important; left: 12px !important;
+    width: auto !important; max-width: none !important;
+  }
   .navbar-mobile-rows{ display: flex !important; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
   .navbar-mobile-row{ display: flex; gap: 8px; }
   .navbar-mobile-row .btn{ flex: 1; text-align: center; justify-content: center; }

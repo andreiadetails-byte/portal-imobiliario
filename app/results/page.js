@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
@@ -17,6 +17,7 @@ import AdBanner from '../../components/AdBanner';
 
 function ResultsInner() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { t, lang } = useLanguage();
 
   const TIPOS = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório', 'Quarto'];
@@ -500,8 +501,9 @@ function ResultsInner() {
 
             <button type="submit" className="btn btn-primary btn-block">{t('results_filter')}</button>
           </form>
+          </div>
 
-          <div id="map-section" style={{ marginTop: 16 }}>
+          <div id="map-section" style={{ marginTop: 16, gridColumn: 1 }}>
             <div
               onClick={() => setShowMap((s) => !s)}
               style={{ fontSize: 12.5, color: 'var(--telha)', cursor: 'pointer', marginBottom: 8, textAlign: 'center' }}
@@ -526,7 +528,6 @@ function ResultsInner() {
                 />
               </div>
             )}
-          </div>
           </div>
 
           <div>
@@ -583,9 +584,14 @@ function ResultsInner() {
                 return (
                   <React.Fragment key={p.id}>
                   {i > 0 && i % 5 === 0 && <AdBanner key={`ad-${i}`} animated={(i / 5) % 2 === 1} />}
-                  <Link href={`/property/${p.id}`} className={`card result-card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
+                  <div
+                    onClick={() => router.push(`/property/${p.id}`)}
+                    role="link"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
+                    className={`card result-card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                         style={{
-                          display: 'grid', gridTemplateColumns: '520px minmax(0, 1fr)', overflow: 'hidden', position: 'relative',
+                          display: 'grid', gridTemplateColumns: '520px minmax(0, 1fr)', overflow: 'hidden', position: 'relative', cursor: 'pointer',
                           border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined,
                         }}>
                     <div className="result-card-photo" style={{ position: 'relative', height: 400, display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -758,7 +764,7 @@ function ResultsInner() {
                         </Link>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                   </React.Fragment>
                 );
               })}
