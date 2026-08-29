@@ -796,29 +796,31 @@ function ResultsInner() {
                           {new Date(p.created_at).toLocaleDateString('pt-PT')}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', gap: 14, marginTop: 8, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); openMessageModal(p); }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                            fontWeight: 700, color: '#fff', background: 'var(--telha)', border: 'none',
+                            borderRadius: 8, padding: '10px 16px', cursor: 'pointer',
+                          }}
+                        >
+                          💬 {t('prop_send_message')}
+                        </button>
                         {p.profiles?.phone_public && (
                           <a
                             href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
                             onClick={(e) => e.stopPropagation()}
                             style={{
-                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
-                              fontWeight: 600, color: 'var(--telha)', textDecoration: 'none',
+                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                              fontWeight: 700, color: 'var(--ink)', background: 'var(--paper)',
+                              border: '1.5px solid var(--line)', borderRadius: 8, padding: '10px 16px', textDecoration: 'none',
                             }}
                           >
-                            📞 {p.profiles.phone_public}
+                            📞 {t('prop_call')}
                           </a>
                         )}
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); openMessageModal(p); }}
-                          style={{
-                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
-                            fontWeight: 600, color: 'var(--telha)', background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                          }}
-                        >
-                          💬 {t('prop_send_message')}
-                        </button>
                       </div>
                     </div>
                   </div>

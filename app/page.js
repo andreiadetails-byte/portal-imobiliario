@@ -364,23 +364,31 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 10, marginTop: 8, flexWrap: 'wrap' }}>
+                      <Link
+                        href={`/property/${p.id}#property-contact-box`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                          fontWeight: 700, color: '#fff', background: 'var(--telha)', borderRadius: 7,
+                          padding: '9px 14px', textDecoration: 'none',
+                        }}
+                      >
+                        💬 {t('prop_send_message')}
+                      </Link>
                       {p.profiles?.phone_public && (
                         <a
                           href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
                           onClick={(e) => e.stopPropagation()}
-                          style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                            fontWeight: 700, color: 'var(--ink)', background: 'var(--paper)',
+                            border: '1.5px solid var(--line)', borderRadius: 7, padding: '9px 14px', textDecoration: 'none',
+                          }}
                         >
-                          📞 {p.profiles.phone_public}
+                          📞 {t('prop_call')}
                         </a>
                       )}
-                      <Link
-                        href={`/property/${p.id}#property-contact-box`}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
-                      >
-                        💬 {t('prop_send_message')}
-                      </Link>
                     </div>
                   </div>
                 </div>
@@ -457,23 +465,31 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 10, marginTop: 8, flexWrap: 'wrap' }}>
+                      <Link
+                        href={`/property/${p.id}#property-contact-box`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                          fontWeight: 700, color: '#fff', background: 'var(--telha)', borderRadius: 7,
+                          padding: '9px 14px', textDecoration: 'none',
+                        }}
+                      >
+                        💬 {t('prop_send_message')}
+                      </Link>
                       {p.profiles?.phone_public && (
                         <a
                           href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
                           onClick={(e) => e.stopPropagation()}
-                          style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                            fontWeight: 700, color: 'var(--ink)', background: 'var(--paper)',
+                            border: '1.5px solid var(--line)', borderRadius: 7, padding: '9px 14px', textDecoration: 'none',
+                          }}
                         >
-                          📞 {p.profiles.phone_public}
+                          📞 {t('prop_call')}
                         </a>
                       )}
-                      <Link
-                        href={`/property/${p.id}#property-contact-box`}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
-                      >
-                        💬 {t('prop_send_message')}
-                      </Link>
                     </div>
                   </div>
                 </div>

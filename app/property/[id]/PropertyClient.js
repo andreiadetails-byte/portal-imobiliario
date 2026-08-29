@@ -23,6 +23,7 @@ export default function PropertyClient() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sent, setSent] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [lead, setLead] = useState({ name: '', email: '', phone: '', message: t('prop_default_lead_message') });
 
   const [user, setUser] = useState(null);
@@ -109,17 +110,13 @@ export default function PropertyClient() {
   }, [id]);
 
   // Se a pessoa chegou aqui através de um link "#property-contact-box" (ex:
-  // o botão "Enviar mensagem" nos resultados), salta suavemente até lá — só
-  // depois dos dados do imóvel terminarem de carregar, para a caixa já
-  // existir no ecrã nesse momento (o salto automático do navegador pode
-  // falhar em silêncio se a caixa ainda não tiver sido desenhada).
+  // o botão "Enviar mensagem" na página inicial), abre logo a janela de
+  // contacto — mais fiável do que tentar "saltar" para uma caixa que pode
+  // ainda não existir no ecrã nesse preciso momento.
   useEffect(() => {
     if (!property || loading) return;
     if (typeof window === 'undefined' || window.location.hash !== '#property-contact-box') return;
-    const timer = setTimeout(() => {
-      document.getElementById('property-contact-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
-    return () => clearTimeout(timer);
+    setShowContactModal(true);
   }, [property, loading]);
 
   async function toggleFavorite() {
@@ -670,7 +667,7 @@ export default function PropertyClient() {
     {!(user && user.id === property.owner_id) && (
       <div className="property-contact-bar">
         <button
-          onClick={() => document.getElementById('property-contact-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          onClick={() => setShowContactModal(true)}
           style={{
             flex: 1, background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 8,
             padding: '13px 10px', fontSize: 14.5, fontWeight: 700, cursor: 'pointer',
@@ -811,6 +808,50 @@ export default function PropertyClient() {
             </a>
             <button onClick={() => setShowQr(false)} className="btn" style={{ fontSize: 13, flex: 1 }}>{t('prop_close')}</button>
           </div>
+        </div>
+      </div>
+    )}
+    {showContactModal && (
+      <div
+        onClick={() => setShowContactModal(false)}
+        style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 120, padding: 20 }}
+      >
+        <div onClick={(e) => e.stopPropagation()} className="card" style={{ padding: 24, maxWidth: 420, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+            <span style={{ fontSize: 16, fontWeight: 700 }}>{t('prop_send_message')}</span>
+            <button onClick={() => setShowContactModal(false)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
+          </div>
+          {user && user.id === property.owner_id ? (
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', textAlign: 'center', padding: '12px 0' }}>
+              {t('property_own_listing')}
+            </p>
+          ) : sent ? (
+            <p style={{ fontSize: 14 }}>
+              {user ? (
+                <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
+              ) : t('property_sent')}
+            </p>
+          ) : (
+            <form onSubmit={handleSendLead}>
+              <div className="field">
+                <label>{t('prop_your_name')}</label>
+                <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>{t('prop_your_email')}</label>
+                <input required type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>{t('prop_phone_optional')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('prop_optional')}</span></label>
+                <input value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
+              </div>
+              <div className="field">
+                <label>{t('prop_message_to')} {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
+                <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
+              </div>
+              <button type="submit" className="btn btn-primary btn-block">{t('prop_send_message')}</button>
+            </form>
+          )}
         </div>
       </div>
     )}
