@@ -108,6 +108,20 @@ export default function PropertyClient() {
     if (id) load();
   }, [id]);
 
+  // Se a pessoa chegou aqui através de um link "#property-contact-box" (ex:
+  // o botão "Enviar mensagem" nos resultados), salta suavemente até lá — só
+  // depois dos dados do imóvel terminarem de carregar, para a caixa já
+  // existir no ecrã nesse momento (o salto automático do navegador pode
+  // falhar em silêncio se a caixa ainda não tiver sido desenhada).
+  useEffect(() => {
+    if (!property || loading) return;
+    if (typeof window === 'undefined' || window.location.hash !== '#property-contact-box') return;
+    const timer = setTimeout(() => {
+      document.getElementById('property-contact-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [property, loading]);
+
   async function toggleFavorite() {
     if (!user) { router.push('/login'); return; }
     setFavLoading(true);
