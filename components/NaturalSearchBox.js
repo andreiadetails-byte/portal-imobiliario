@@ -516,7 +516,7 @@ export default function NaturalSearchBox() {
           rows={2}
           value={listening && interimText ? `${text}${text ? ' ' : ''}${interimText}` : text}
           onChange={(e) => { setText(e.target.value); baseTextRef.current = e.target.value; }}
-          placeholder={ui.placeholder}
+          placeholder=""
           style={{
             width: '100%', padding: 12, paddingRight: voiceSupported ? 52 : 12, border: listening ? '2px solid #b8452f' : '1px solid var(--line)', borderRadius: 6,
             fontFamily: 'Inter, sans-serif', fontSize: 14.5, resize: 'vertical', boxSizing: 'border-box', marginBottom: 10,

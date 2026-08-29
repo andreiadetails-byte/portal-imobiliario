@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { useLanguage } from '../lib/i18n';
@@ -37,6 +38,7 @@ function summarizeToSentence(text, maxLength = 160) {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const { t, lang } = useLanguage();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,27 +145,29 @@ export default function HomePage() {
 
         <div className="wrap">
           <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760, margin: '0 auto', boxShadow: '0 8px 30px rgba(0,0,0,0.25)', overflow: 'visible' }}>
-            <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
-              {['Venda', 'Arrendamento'].map((bt) => (
-                <button
-                  key={bt}
-                  type="button"
-                  onClick={() => setBusinessType(bt)}
-                  style={{
-                    fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 600, padding: '9px 18px',
-                    border: 'none', background: 'transparent', cursor: 'pointer',
-                    color: businessType === bt ? 'var(--ink)' : 'var(--text-soft)',
-                    borderBottom: businessType === bt ? '2px solid var(--telha)' : '2px solid transparent',
-                  }}
-                >
-                  {bt === 'Venda' ? t('results_buy') : t('results_rent')}
-                </button>
-              ))}
+            <div className="home-tabs-search-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {['Venda', 'Arrendamento'].map((bt) => (
+                  <button
+                    key={bt}
+                    type="button"
+                    onClick={() => setBusinessType(bt)}
+                    style={{
+                      fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 600, padding: '9px 18px',
+                      border: 'none', background: 'transparent', cursor: 'pointer',
+                      color: businessType === bt ? 'var(--ink)' : 'var(--text-soft)',
+                      borderBottom: businessType === bt ? '2px solid var(--telha)' : '2px solid transparent',
+                    }}
+                  >
+                    {bt === 'Venda' ? t('results_buy') : t('results_rent')}
+                  </button>
+                ))}
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ flexShrink: 0 }}>{t('home_search_btn')}</button>
             </div>
 
             <div className="search-box-row" style={{ display: 'flex', gap: 12 }}>
               <LocationAutocomplete onChange={setLocation} placeholder={t('home_search_placeholder')} />
-              <button type="submit" className="btn btn-primary">{t('home_search_btn')}</button>
             </div>
           </form>
 
@@ -302,7 +306,14 @@ export default function HomePage() {
               const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
               const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
               return (
-                  <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
+                  <div
+                    key={p.id}
+                    onClick={() => router.push(`/property/${p.id}`)}
+                    role="link"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
+                    className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -353,17 +364,26 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
-                    {p.profiles?.phone_public && (
-                      <a
-                        href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                      {p.profiles?.phone_public && (
+                        <a
+                          href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
+                        >
+                          📞 {p.profiles.phone_public}
+                        </a>
+                      )}
+                      <Link
+                        href={`/property/${p.id}#property-contact-box`}
                         onClick={(e) => e.stopPropagation()}
                         style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
                       >
-                        📞 {p.profiles.phone_public}
-                      </a>
-                    )}
+                        💬 {t('prop_send_message')}
+                      </Link>
+                    </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -379,7 +399,14 @@ export default function HomePage() {
               const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
               const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
               return (
-                  <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
+                  <div
+                    key={p.id}
+                    onClick={() => router.push(`/property/${p.id}`)}
+                    role="link"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
+                    className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -430,17 +457,26 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
-                    {p.profiles?.phone_public && (
-                      <a
-                        href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                      {p.profiles?.phone_public && (
+                        <a
+                          href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
+                        >
+                          📞 {p.profiles.phone_public}
+                        </a>
+                      )}
+                      <Link
+                        href={`/property/${p.id}#property-contact-box`}
                         onClick={(e) => e.stopPropagation()}
                         style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, fontWeight: 600, color: 'var(--telha)', textDecoration: 'none' }}
                       >
-                        📞 {p.profiles.phone_public}
-                      </a>
-                    )}
+                        💬 {t('prop_send_message')}
+                      </Link>
+                    </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

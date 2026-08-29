@@ -212,6 +212,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .property-gallery-main{ height: 260px !important; }
   .property-gallery > img{ height: 260px !important; }
   .search-box-row{ flex-direction: column; }
+  .home-tabs-search-row{ flex-wrap: wrap; }
+  .home-tabs-search-row button.btn-primary{ font-size: 13px !important; padding: 9px 14px !important; }
   .grid-listings{ gap: 14px; }
   .card-body{ padding: 14px !important; }
   .news-card{ grid-template-columns: 1fr !important; }
@@ -252,7 +254,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .header-minimal .navbar-nav-links,
   .header-minimal .navbar-publish-btn,
   .header-minimal .navbar-mobile-rows{ display: none !important; }
-  .header-minimal .navbar-login-btn{ display: inline-flex !important; margin-right: 0 !important; white-space: nowrap; font-size: 12.5px !important; padding: 8px 12px !important; }
+  .header-minimal .navbar-login-btn{ display: inline-flex !important; margin-right: 0 !important; white-space: nowrap; font-size: 12.5px !important; padding: 8px 12px !important; max-width: none !important; overflow: visible !important; text-overflow: unset !important; }
   .header-minimal .navbar-links{ flex-wrap: nowrap !important; min-width: 0; }
 }
 

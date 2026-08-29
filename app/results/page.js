@@ -65,6 +65,10 @@ function ResultsInner() {
   const [showFiltersModal, setShowFiltersModal] = useState(false);
   const [mapFilterIds, setMapFilterIds] = useState(null);
   const [user, setUser] = useState(null);
+  const [messageModalFor, setMessageModalFor] = useState(null); // guarda o imóvel (p) sendo contactado
+  const [messageForm, setMessageForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [messageSent, setMessageSent] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 25;
@@ -188,6 +192,59 @@ function ResultsInner() {
       sorted = sorted.map((p) => ({ ...p, profiles: ownersById[p.owner_id] || null }));
     }
     setProperties(sorted);
+  }
+
+  async function openMessageModal(p) {
+    setMessageSent(false);
+    if (user) {
+      const { data: myProfile } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
+      setMessageForm({ name: myProfile?.full_name || '', email: user.email || '', phone: '', message: '' });
+    } else {
+      setMessageForm({ name: '', email: '', phone: '', message: '' });
+    }
+    setMessageModalFor(p);
+  }
+
+  async function sendInlineMessage(e) {
+    e.preventDefault();
+    if (!messageModalFor) return;
+    setSendingMessage(true);
+    const p = messageModalFor;
+
+    if (user && user.id !== p.owner_id) {
+      // Com sessão iniciada: vai diretamente para o chat, tal como na ficha do imóvel.
+      const { data: existing } = await supabase
+        .from('conversations').select('id').eq('property_id', p.id).eq('buyer_id', user.id).maybeSingle();
+      let conversationId = existing?.id;
+      if (!conversationId) {
+        const { data: created } = await supabase
+          .from('conversations').insert({ property_id: p.id, buyer_id: user.id, seller_id: p.owner_id }).select().single();
+        conversationId = created?.id;
+      }
+      if (conversationId) {
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: messageForm.message,
+          sender_name: messageForm.name,
+          sender_email: messageForm.email,
+          sender_phone: messageForm.phone || null,
+        });
+      }
+    } else {
+      // Sem sessão iniciada — fica como lead, tal como na ficha do imóvel.
+      await supabase.from('leads').insert({
+        property_id: p.id,
+        owner_id: p.owner_id,
+        name: messageForm.name,
+        email: messageForm.email,
+        phone: messageForm.phone,
+        message: messageForm.message,
+      });
+    }
+
+    setSendingMessage(false);
+    setMessageSent(true);
   }
 
   async function runSearch(e, targetPage, sortOverride) {
@@ -752,16 +809,16 @@ function ResultsInner() {
                             📞 {p.profiles.phone_public}
                           </a>
                         )}
-                        <Link
-                          href={`/property/${p.id}#property-contact-box`}
-                          onClick={(e) => e.stopPropagation()}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); openMessageModal(p); }}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
-                            fontWeight: 600, color: 'var(--telha)', textDecoration: 'none',
+                            fontWeight: 600, color: 'var(--telha)', background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                           }}
                         >
                           💬 {t('prop_send_message')}
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -807,6 +864,49 @@ function ResultsInner() {
             )}
           </div>
         </div>
+
+        {messageModalFor && (
+          <div
+            onClick={() => setMessageModalFor(null)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 120, padding: 20 }}
+          >
+            <div onClick={(e) => e.stopPropagation()} className="card" style={{ padding: 24, maxWidth: 420, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>{t('prop_send_message')}</span>
+                <button onClick={() => setMessageModalFor(null)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
+              </div>
+              {messageSent ? (
+                <p style={{ fontSize: 14 }}>
+                  {user ? (
+                    <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
+                  ) : t('property_sent')}
+                </p>
+              ) : (
+                <form onSubmit={sendInlineMessage}>
+                  <div className="field">
+                    <label>{t('prop_your_name')}</label>
+                    <input required value={messageForm.name} onChange={(e) => setMessageForm({ ...messageForm, name: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('prop_your_email')}</label>
+                    <input required type="email" value={messageForm.email} onChange={(e) => setMessageForm({ ...messageForm, email: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('prop_phone_optional')} <span className="hint">{t('prop_optional')}</span></label>
+                    <input value={messageForm.phone} onChange={(e) => setMessageForm({ ...messageForm, phone: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('prop_message_to')} {messageModalFor.display_name || messageModalFor.profiles?.agency_name || messageModalFor.profiles?.full_name}</label>
+                    <textarea required rows={4} value={messageForm.message} onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })} />
+                  </div>
+                  <button type="submit" disabled={sendingMessage} className="btn btn-primary btn-block">
+                    {sendingMessage ? t('sw_sending') : t('prop_send_message')}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </>
   );
