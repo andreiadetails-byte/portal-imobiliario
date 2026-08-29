@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
@@ -12,10 +12,68 @@ import { accountTypeLabel } from '../../../lib/accountTypes';
 
 export default function AgencyPage() {
   const { id } = useParams();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const displayNameOverride = searchParams.get('as');
   const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
+  const [messageModalFor, setMessageModalFor] = useState(null);
+  const [messageForm, setMessageForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [messageSent, setMessageSent] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  async function openMessageModal(p) {
+    setMessageSent(false);
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (currentUser) {
+      const { data: myProfile } = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
+      setMessageForm({ name: myProfile?.full_name || '', email: currentUser.email || '', phone: '', message: '' });
+    } else {
+      setMessageForm({ name: '', email: '', phone: '', message: '' });
+    }
+    setMessageModalFor(p);
+  }
+
+  async function sendInlineMessage(e) {
+    e.preventDefault();
+    if (!messageModalFor) return;
+    setSendingMessage(true);
+    const p = messageModalFor;
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+    if (currentUser && currentUser.id !== p.owner_id) {
+      const { data: existing } = await supabase
+        .from('conversations').select('id').eq('property_id', p.id).eq('buyer_id', currentUser.id).maybeSingle();
+      let conversationId = existing?.id;
+      if (!conversationId) {
+        const { data: created } = await supabase
+          .from('conversations').insert({ property_id: p.id, buyer_id: currentUser.id, seller_id: p.owner_id }).select().single();
+        conversationId = created?.id;
+      }
+      if (conversationId) {
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: currentUser.id,
+          content: messageForm.message,
+          sender_name: messageForm.name,
+          sender_email: messageForm.email,
+          sender_phone: messageForm.phone || null,
+        });
+      }
+    } else {
+      await supabase.from('leads').insert({
+        property_id: p.id,
+        owner_id: p.owner_id,
+        name: messageForm.name,
+        email: messageForm.email,
+        phone: messageForm.phone,
+        message: messageForm.message,
+      });
+    }
+
+    setSendingMessage(false);
+    setMessageSent(true);
+  }
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('todos');
@@ -53,7 +111,7 @@ export default function AgencyPage() {
 
       const { data: propsData } = await supabase
         .from('properties')
-        .select('id, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, created_at, property_photos(url, thumbnail_url, position)')
+        .select('id, price, previous_price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, created_at, owner_id, property_photos(url, thumbnail_url, position)')
         .eq('owner_id', id)
         .eq('status', 'ativo')
         .order('created_at', { ascending: false });
@@ -197,7 +255,7 @@ export default function AgencyPage() {
             const firstSorted = [...(p.property_photos || [])].sort((a, b) => a.position - b.position)[0];
             const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
             return (
-              <Link key={p.id} href={`/property/${p.id}`} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
+              <div key={p.id} onClick={() => router.push(`/property/${p.id}`)} role="link" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }} className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`} style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                 {p.featured_status === 'active' && (
                   <span className="destaque-strip">★ DESTAQUE</span>
                 )}
@@ -235,11 +293,76 @@ export default function AgencyPage() {
                   <div className="meta">
                     {p.district}{p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}{p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
                   </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); openMessageModal(p); }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                        fontWeight: 700, color: '#fff', background: 'var(--telha)', border: 'none',
+                        borderRadius: 7, padding: '8px 12px', cursor: 'pointer',
+                      }}
+                    >
+                      💬 {t('prop_send_message')}
+                    </button>
+                    {profile.phone_public && (
+                      <a
+                        href={`tel:${profile.phone_public.replace(/\s+/g, '')}`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                          fontWeight: 700, color: 'var(--ink)', background: 'var(--plaster)',
+                          border: '1.5px solid var(--line)', borderRadius: 7, padding: '8px 12px', textDecoration: 'none',
+                        }}
+                      >
+                        📞 {t('prop_call')}
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
+
+        {messageModalFor && (
+          <div
+            onClick={() => setMessageModalFor(null)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 120, padding: 20 }}
+          >
+            <div onClick={(e) => e.stopPropagation()} className="card" style={{ padding: 24, maxWidth: 420, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>{t('prop_send_message')}</span>
+                <button onClick={() => setMessageModalFor(null)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
+              </div>
+              {messageSent ? (
+                <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+              ) : (
+                <form onSubmit={sendInlineMessage}>
+                  <div className="field">
+                    <label>{t('prop_your_name')}</label>
+                    <input required value={messageForm.name} onChange={(e) => setMessageForm({ ...messageForm, name: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('prop_your_email')}</label>
+                    <input required type="email" value={messageForm.email} onChange={(e) => setMessageForm({ ...messageForm, email: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('prop_phone_optional')} <span className="hint">{t('prop_optional')}</span></label>
+                    <input value={messageForm.phone} onChange={(e) => setMessageForm({ ...messageForm, phone: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>{t('prop_message_to')} {profile.agency_name || profile.full_name}</label>
+                    <textarea required rows={4} value={messageForm.message} onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })} />
+                  </div>
+                  <button type="submit" disabled={sendingMessage} className="btn btn-primary btn-block">
+                    {sendingMessage ? t('sw_sending') : t('prop_send_message')}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

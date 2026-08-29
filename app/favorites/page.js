@@ -19,6 +19,63 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('favoritos');
   const { ids: compareIds, toggle: toggleCompare } = useCompareList();
+  const [messageModalFor, setMessageModalFor] = useState(null);
+  const [messageForm, setMessageForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [messageSent, setMessageSent] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  async function openMessageModal(p) {
+    setMessageSent(false);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: myProfile } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
+      setMessageForm({ name: myProfile?.full_name || '', email: user.email || '', phone: '', message: '' });
+    } else {
+      setMessageForm({ name: '', email: '', phone: '', message: '' });
+    }
+    setMessageModalFor(p);
+  }
+
+  async function sendInlineMessage(e) {
+    e.preventDefault();
+    if (!messageModalFor) return;
+    setSendingMessage(true);
+    const p = messageModalFor;
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user && user.id !== p.owner_id) {
+      const { data: existing } = await supabase
+        .from('conversations').select('id').eq('property_id', p.id).eq('buyer_id', user.id).maybeSingle();
+      let conversationId = existing?.id;
+      if (!conversationId) {
+        const { data: created } = await supabase
+          .from('conversations').insert({ property_id: p.id, buyer_id: user.id, seller_id: p.owner_id }).select().single();
+        conversationId = created?.id;
+      }
+      if (conversationId) {
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: messageForm.message,
+          sender_name: messageForm.name,
+          sender_email: messageForm.email,
+          sender_phone: messageForm.phone || null,
+        });
+      }
+    } else {
+      await supabase.from('leads').insert({
+        property_id: p.id,
+        owner_id: p.owner_id,
+        name: messageForm.name,
+        email: messageForm.email,
+        phone: messageForm.phone,
+        message: messageForm.message,
+      });
+    }
+
+    setSendingMessage(false);
+    setMessageSent(true);
+  }
 
   useEffect(() => {
     async function load() {
@@ -37,7 +94,7 @@ export default function FavoritesPage() {
         const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
         const { data: propsData } = await supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, thumbnail_url, position)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
           .in('id', ids);
         favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '', price_at_save: priceAtSaveById[p.id] }));
         setProperties(favProperties);
@@ -58,7 +115,7 @@ export default function FavoritesPage() {
 
         let query = supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, thumbnail_url, position)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
           .eq('status', 'ativo')
           .gte('price', avgPrice * 0.7)
           .lte('price', avgPrice * 1.3)
@@ -105,7 +162,7 @@ export default function FavoritesPage() {
     // Vai buscar o próprio imóvel para o juntar à lista principal de favoritos, sem precisar de recarregar a página.
     const { data: newFav } = await supabase
       .from('properties')
-      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, bedrooms, bathrooms, business_type, property_photos(url, thumbnail_url, position)')
+      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
       .eq('id', propertyId).single();
     if (newFav) setProperties((cur) => [newFav, ...cur]);
   }
@@ -211,6 +268,31 @@ export default function FavoritesPage() {
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
                       <div className="meta">{p.district} · {p.area_util ? `${p.area_util} ${t('meta_sqm_useful')}` : '—'} · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
                     </Link>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => openMessageModal(p)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                          fontWeight: 700, color: '#fff', background: 'var(--telha)', border: 'none',
+                          borderRadius: 7, padding: '8px 12px', cursor: 'pointer',
+                        }}
+                      >
+                        💬 {t('prop_send_message')}
+                      </button>
+                      {p.profiles?.phone_public && (
+                        <a
+                          href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5,
+                            fontWeight: 700, color: 'var(--ink)', background: 'var(--plaster)',
+                            border: '1.5px solid var(--line)', borderRadius: 7, padding: '8px 12px', textDecoration: 'none',
+                          }}
+                        >
+                          📞 {t('prop_call')}
+                        </a>
+                      )}
+                    </div>
                     {p.price_at_save && Number(p.price_at_save) > Number(p.price) && (
                       <div style={{
                         display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 12, fontWeight: 600,
@@ -306,6 +388,45 @@ export default function FavoritesPage() {
           </>
         )}
       </main>
+
+      {messageModalFor && (
+        <div
+          onClick={() => setMessageModalFor(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 120, padding: 20 }}
+        >
+          <div onClick={(e) => e.stopPropagation()} className="card" style={{ padding: 24, maxWidth: 420, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+              <span style={{ fontSize: 16, fontWeight: 700 }}>{t('prop_send_message')}</span>
+              <button onClick={() => setMessageModalFor(null)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
+            </div>
+            {messageSent ? (
+              <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+            ) : (
+              <form onSubmit={sendInlineMessage}>
+                <div className="field">
+                  <label>{t('prop_your_name')}</label>
+                  <input required value={messageForm.name} onChange={(e) => setMessageForm({ ...messageForm, name: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t('prop_your_email')}</label>
+                  <input required type="email" value={messageForm.email} onChange={(e) => setMessageForm({ ...messageForm, email: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t('prop_phone_optional')} <span className="hint">{t('prop_optional')}</span></label>
+                  <input value={messageForm.phone} onChange={(e) => setMessageForm({ ...messageForm, phone: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t('prop_message_to')} {messageModalFor.profiles?.agency_name || messageModalFor.profiles?.full_name}</label>
+                  <textarea required rows={4} value={messageForm.message} onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })} />
+                </div>
+                <button type="submit" disabled={sendingMessage} className="btn btn-primary btn-block">
+                  {sendingMessage ? t('sw_sending') : t('prop_send_message')}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
