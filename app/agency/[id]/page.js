@@ -233,7 +233,7 @@ export default function AgencyPage() {
                   )}
                   <div className="addr">{p.typology} · {displayAddress(p)}</div>
                   <div className="meta">
-                    {p.district}{(p.area || p.area_util) ? ` · ${p.area || p.area_util} m²` : ''}{p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
+                    {p.district}{p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}{p.bedrooms ? ` · ${p.bedrooms} quartos` : ''}
                   </div>
                 </div>
               </Link>

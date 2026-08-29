@@ -319,15 +319,6 @@ export default function PropertyClient() {
               )}
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(`${property.typology} · ${displayAddress(property)} — ${Number(property.price).toLocaleString('pt-PT')} € ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn"
-                style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
-              >
-                💬 WhatsApp
-              </a>
               <button
                 onClick={() => {
                   if (navigator.share) {
@@ -369,7 +360,6 @@ export default function PropertyClient() {
             <div className="meta">{property.district}{property.internal_reference && ` · Ref. ${property.internal_reference}`}</div>
             <div className="meta" style={{ marginTop: 4, display: 'flex', gap: 14 }}>
               <span>📅 {t('prop_published_days_ago')} {Math.max(0, Math.floor((Date.now() - new Date(property.created_at)) / 86400000))} {t('prop_days_ago_suffix')}</span>
-              <span>👁 {property.views_count || 0} {t('prop_views')}</span>
             </div>
             <button
               onClick={() => setReportModal(true)}
@@ -669,8 +659,8 @@ export default function PropertyClient() {
         <button
           onClick={() => setShowContactModal(true)}
           style={{
-            flex: 1, background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 8,
-            padding: '13px 10px', fontSize: 14.5, fontWeight: 700, cursor: 'pointer',
+            flex: 1, background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 9,
+            padding: '16px 12px', fontSize: 16, fontWeight: 700, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
@@ -680,8 +670,8 @@ export default function PropertyClient() {
           <a
             href={`tel:${ownerProfile.phone_public.replace(/\s+/g, '')}`}
             style={{
-              flex: 1, background: 'var(--paper)', color: 'var(--ink)', border: '1.5px solid var(--line)', borderRadius: 8,
-              padding: '13px 10px', fontSize: 14.5, fontWeight: 700, textDecoration: 'none',
+              flex: 1, background: 'var(--paper)', color: 'var(--ink)', border: '1.5px solid var(--line)', borderRadius: 9,
+              padding: '16px 12px', fontSize: 16, fontWeight: 700, textDecoration: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}
           >

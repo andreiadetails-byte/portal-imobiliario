@@ -209,7 +209,7 @@ export default function FavoritesPage() {
                     </label>
                     <Link href={`/property/${p.id}`}>
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
-                      <div className="meta">{p.district} · {p.area || p.area_util} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
+                      <div className="meta">{p.district} · {p.area_util ? `${p.area_util} ${t('meta_sqm_useful')}` : '—'} · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
                     </Link>
                     {p.price_at_save && Number(p.price_at_save) > Number(p.price) && (
                       <div style={{

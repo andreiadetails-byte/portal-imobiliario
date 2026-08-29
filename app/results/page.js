@@ -756,7 +756,7 @@ function ResultsInner() {
                       </div>
 
                       <div style={{ display: 'flex', gap: 18, marginTop: 14, fontSize: 15.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
-                        {(p.area || p.area_util) && <span>📐 {p.area || p.area_util} m²</span>}
+                        {p.area_util && <span>📐 {p.area_util} {t('meta_sqm_useful')}</span>}
                         <span>🛏 {p.bedrooms} {t('property_rooms').toLowerCase()}</span>
                         <span>🚿 {p.bathrooms} wc</span>
                       </div>

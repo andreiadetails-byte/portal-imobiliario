@@ -341,7 +341,7 @@ export default function HomePage() {
                     </div>
                     <div className="addr">{p.typology} · {displayAddress(p)}</div>
                     <div className="meta" style={{ marginBottom: 4 }}>
-                      {p.property_type}{(p.area || p.area_util) ? ` · ${p.area || p.area_util} m²` : ''}
+                      {p.property_type}{p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                       {p.bedrooms ? ` · ${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                     </div>
@@ -442,7 +442,7 @@ export default function HomePage() {
                     </div>
                     <div className="addr">{p.typology} · {displayAddress(p)}</div>
                     <div className="meta" style={{ marginBottom: 4 }}>
-                      {p.property_type}{(p.area || p.area_util) ? ` · ${p.area || p.area_util} m²` : ''}
+                      {p.property_type}{p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                       {p.bedrooms ? ` · ${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                     </div>

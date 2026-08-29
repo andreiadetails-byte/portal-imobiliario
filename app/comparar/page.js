@@ -21,7 +21,7 @@ export default function CompararPage() {
     { label: t('comparar_row_price'), get: (p) => `${Number(p.price).toLocaleString('pt-PT')} ${p.business_type === 'Arrendamento' ? t('comparar_month') : '€'}` },
     { label: t('comparar_row_business_type'), get: (p) => businessLabel(p.business_type) },
     { label: t('comparar_row_typology'), get: (p) => p.typology },
-    { label: t('comparar_row_area'), get: (p) => `${p.area || p.area_util || '—'} m²` },
+    { label: t('comparar_row_area'), get: (p) => (p.area_util ? `${p.area_util} m² (${t('prop_usable_area').toLowerCase()})` : p.area ? `${p.area} m²` : '—') },
     { label: t('comparar_row_bedrooms'), get: (p) => p.bedrooms },
     { label: t('comparar_row_bathrooms'), get: (p) => p.bathrooms },
     { label: t('comparar_row_floor'), get: (p) => p.floor || '—' },
