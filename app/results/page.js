@@ -67,6 +67,7 @@ function ResultsInner() {
   const [user, setUser] = useState(null);
   const [messageModalFor, setMessageModalFor] = useState(null); // guarda o imóvel (p) sendo contactado
   const [messageForm, setMessageForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState([]);
@@ -196,6 +197,7 @@ function ResultsInner() {
 
   async function openMessageModal(p) {
     setMessageSent(false);
+    setAcceptedPolicy(false);
     if (user) {
       const { data: myProfile } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
       setMessageForm({ name: myProfile?.full_name || '', email: user.email || '', phone: '', message: '' });
@@ -901,7 +903,26 @@ function ResultsInner() {
                     <label>{t('prop_message_to')} {messageModalFor.display_name || messageModalFor.profiles?.agency_name || messageModalFor.profiles?.full_name}</label>
                     <textarea required rows={4} value={messageForm.message} onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })} />
                   </div>
-                  <button type="submit" disabled={sendingMessage} className="btn btn-primary btn-block">
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      required
+                      checked={acceptedPolicy}
+                      onChange={(e) => setAcceptedPolicy(e.target.checked)}
+                      style={{ marginTop: 2, flexShrink: 0 }}
+                    />
+                    <span>
+                      {t('sw_read_accept')}{' '}
+                      <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                        {t('sw_privacy_policy')}
+                      </a>{' '}
+                      {t('sw_and_the')}{' '}
+                      <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                        {t('sw_terms_conditions')}
+                      </a>.
+                    </span>
+                  </label>
+                  <button type="submit" disabled={sendingMessage || !acceptedPolicy} className="btn btn-primary btn-block">
                     {sendingMessage ? t('sw_sending') : t('prop_send_message')}
                   </button>
                 </form>

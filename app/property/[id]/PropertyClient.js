@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
@@ -25,6 +25,7 @@ export default function PropertyClient() {
   const [sent, setSent] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [lead, setLead] = useState({ name: '', email: '', phone: '', message: t('prop_default_lead_message') });
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
 
   const [user, setUser] = useState(null);
   const [ownerProfile, setOwnerProfile] = useState(null);
@@ -34,6 +35,7 @@ export default function PropertyClient() {
   const [showQr, setShowQr] = useState(false);
   const [photos, setPhotos] = useState([]);
   const [activePhoto, setActivePhoto] = useState(0);
+  const touchStartX = useRef(null);
   const [lightbox, setLightbox] = useState(false);
   const [similar, setSimilar] = useState([]);
   const [reportModal, setReportModal] = useState(false);
@@ -116,6 +118,7 @@ export default function PropertyClient() {
   useEffect(() => {
     if (!property || loading) return;
     if (typeof window === 'undefined' || window.location.hash !== '#property-contact-box') return;
+    setAcceptedPolicy(false);
     setShowContactModal(true);
   }, [property, loading]);
 
@@ -240,9 +243,19 @@ export default function PropertyClient() {
                     src={photos[activePhoto]}
                     alt={`Foto ${activePhoto + 1} de ${photos.length} — ${property.typology}, ${property.address}`}
                     onClick={() => setLightbox(true)}
+                    onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                    onTouchEnd={(e) => {
+                      if (touchStartX.current === null) return;
+                      const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+                      if (Math.abs(deltaX) > 50) {
+                        if (deltaX < 0) setActivePhoto((i) => (i + 1) % photos.length);
+                        else setActivePhoto((i) => (i - 1 + photos.length) % photos.length);
+                      }
+                      touchStartX.current = null;
+                    }}
                     loading="eager"
                     fetchPriority="high"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in', touchAction: 'pan-y' }}
                   />
                   <div className="property-gallery-side" style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%' }}>
                     {[1, 2].map((offset) => {
@@ -581,7 +594,26 @@ export default function PropertyClient() {
                 <label>{t('prop_message_to')} {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
                 <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} placeholder={t('attr_interest_placeholder')} />
               </div>
-              <button type="submit" className="btn btn-primary btn-block">{t('prop_send_message')}</button>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  required
+                  checked={acceptedPolicy}
+                  onChange={(e) => setAcceptedPolicy(e.target.checked)}
+                  style={{ marginTop: 2, flexShrink: 0 }}
+                />
+                <span>
+                  {t('sw_read_accept')}{' '}
+                  <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                    {t('sw_privacy_policy')}
+                  </a>{' '}
+                  {t('sw_and_the')}{' '}
+                  <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                    {t('sw_terms_conditions')}
+                  </a>.
+                </span>
+              </label>
+              <button type="submit" className="btn btn-primary btn-block" disabled={!acceptedPolicy}>{t('prop_send_message')}</button>
               <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 10, textAlign: 'center' }}>
                 A mensagem, o seu nome e email ficam visíveis no chat, associados a esta conversa.
               </p>
@@ -657,7 +689,7 @@ export default function PropertyClient() {
     {!(user && user.id === property.owner_id) && (
       <div className="property-contact-bar">
         <button
-          onClick={() => setShowContactModal(true)}
+          onClick={() => { setAcceptedPolicy(false); setShowContactModal(true); }}
           style={{
             flex: 1, background: 'var(--telha)', color: '#fff', border: 'none', borderRadius: 9,
             padding: '17px 12px', fontSize: 18, fontWeight: 700, cursor: 'pointer',
@@ -736,9 +768,22 @@ export default function PropertyClient() {
     {lightbox && (
       <div
         onClick={() => setLightbox(false)}
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current === null) return;
+          const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+          // Um arrasto pequeno pode ser só um toque sem querer — só muda de
+          // foto se a pessoa arrastou o dedo pelo menos 50px para o lado.
+          if (Math.abs(deltaX) > 50) {
+            if (deltaX < 0) setActivePhoto((i) => (i + 1) % photos.length); // arrastou para a esquerda → foto seguinte
+            else setActivePhoto((i) => (i - 1 + photos.length) % photos.length); // arrastou para a direita → foto anterior
+          }
+          touchStartX.current = null;
+        }}
         style={{
           position: 'fixed', inset: 0, background: 'rgba(20,17,12,0.92)', zIndex: 200,
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16,
+          touchAction: 'pan-y',
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -758,6 +803,27 @@ export default function PropertyClient() {
             ›
           </button>
         </div>
+        {photos.length > 1 && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ display: 'flex', gap: 6, maxWidth: '90vw', overflowX: 'auto', padding: '2px 4px 6px' }}
+          >
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActivePhoto(i)}
+                aria-label={`${t('attr_go_to_photo')} ${i + 1}`}
+                style={{
+                  flexShrink: 0, width: 28, height: 28, borderRadius: '50%', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                  border: 'none', background: i === activePhoto ? '#fff' : 'rgba(255,255,255,0.2)',
+                  color: i === activePhoto ? 'var(--ink)' : '#fff',
+                }}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
         <button
           onClick={() => setLightbox(false)}
           style={{ position: 'absolute', top: 20, right: 24, background: 'none', border: 'none', color: '#fff', fontSize: 26, cursor: 'pointer' }}
@@ -839,7 +905,26 @@ export default function PropertyClient() {
                 <label>{t('prop_message_to')} {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
                 <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
               </div>
-              <button type="submit" className="btn btn-primary btn-block">{t('prop_send_message')}</button>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  required
+                  checked={acceptedPolicy}
+                  onChange={(e) => setAcceptedPolicy(e.target.checked)}
+                  style={{ marginTop: 2, flexShrink: 0 }}
+                />
+                <span>
+                  {t('sw_read_accept')}{' '}
+                  <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                    {t('sw_privacy_policy')}
+                  </a>{' '}
+                  {t('sw_and_the')}{' '}
+                  <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
+                    {t('sw_terms_conditions')}
+                  </a>.
+                </span>
+              </label>
+              <button type="submit" className="btn btn-primary btn-block" disabled={!acceptedPolicy}>{t('prop_send_message')}</button>
             </form>
           )}
         </div>
