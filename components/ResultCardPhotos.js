@@ -24,6 +24,19 @@ export default function ResultCardPhotos({ photos, typology, district }) {
     return () => window.removeEventListener('resize', checkSize);
   }, []);
 
+  // Vai pré-carregando a foto seguinte e anterior deste cartão em segundo
+  // plano — assim, ao arrastar ou clicar na seta, a foto já está pronta a
+  // mostrar, sem o "piscar" de estar à espera da rede.
+  useEffect(() => {
+    if (photos.length < 2) return;
+    const nextIdx = (activeIndex + 1) % photos.length;
+    const prevIdx = (activeIndex - 1 + photos.length) % photos.length;
+    [nextIdx, prevIdx].forEach((idx) => {
+      const img = new window.Image();
+      img.src = photos[idx].thumbnail_url || photos[idx].url;
+    });
+  }, [activeIndex, photos]);
+
   const firstPhoto = photos[0]?.thumbnail_url || photos[0]?.url;
 
   function handleTouchStart(e) {

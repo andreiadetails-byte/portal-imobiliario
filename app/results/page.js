@@ -357,7 +357,7 @@ function ResultsInner() {
 
         <div className="results-grid" style={{ display: 'grid', gridTemplateColumns: '200px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
 
-          <div className={showFiltersModal ? 'filters-modal-open' : ''}>
+          <div className={showFiltersModal ? 'filters-modal-open' : ''} style={{ gridColumn: 1, gridRow: 1 }}>
           <form onSubmit={runSearch} className="card filters-form" style={{ padding: 18, position: 'sticky', top: 90, overflow: 'visible' }}>
             <div className="filters-modal-header">
               <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)' }}>{t('results_filters_label')}</span>
@@ -575,7 +575,7 @@ function ResultsInner() {
           </form>
           </div>
 
-          <div id="map-section" style={{ marginTop: 16, gridColumn: 1 }}>
+          <div id="map-section" style={{ marginTop: 16, gridColumn: 1, gridRow: 2 }}>
             <div
               onClick={() => setShowMap((s) => !s)}
               style={{ fontSize: 12.5, color: 'var(--telha)', cursor: 'pointer', marginBottom: 8, textAlign: 'center' }}
@@ -602,7 +602,7 @@ function ResultsInner() {
             )}
           </div>
 
-          <div>
+          <div style={{ gridColumn: 2, gridRow: '1 / 3', minWidth: 0 }}>
             {isFromNaturalSearch && !loading && (
               <div style={{
                 background: 'linear-gradient(135deg, var(--telha) 0%, #3E4A32 100%)', borderRadius: 10,

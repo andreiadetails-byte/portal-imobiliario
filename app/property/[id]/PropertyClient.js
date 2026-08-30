@@ -396,6 +396,19 @@ export default function PropertyClient() {
               >
                 ▦ QR Code
               </button>
+              <a
+                href={
+                  property.latitude && property.longitude
+                    ? `https://www.google.com/maps?q=${property.latitude},${property.longitude}`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress(property))}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn"
+                style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
+              >
+                📍 Google Maps
+              </a>
               <button
                 onClick={toggleFavorite}
                 disabled={favLoading}

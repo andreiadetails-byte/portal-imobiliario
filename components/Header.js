@@ -272,7 +272,7 @@ export default function Header({ minimal = false }) {
           ) : (
             <Link href="/login" className="btn navbar-login-btn" style={{ marginRight: 12, flexShrink: 0 }}>{t('nav_login')}</Link>
           )}
-          {checked && user && (
+          {checked && (
             <Link href="/publish" className="btn btn-primary navbar-publish-btn" style={{ minWidth: 130, textAlign: 'center' }}>{t('nav_publish')}</Link>
           )}
         </div>
