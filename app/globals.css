@@ -210,7 +210,6 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .property-gallery{ grid-template-columns: 1fr !important; height: 260px !important; }
   .property-gallery-side{ display: none !important; }
   .property-gallery-main{ height: 260px !important; }
-  .property-gallery > img{ height: 260px !important; }
   .search-box-row{ flex-direction: column; }
   .home-tabs-search-row{ flex-wrap: wrap; }
   .home-tabs-search-row button.btn-primary{ font-size: 13px !important; padding: 9px 14px !important; }
@@ -301,6 +300,16 @@ textarea:focus-visible, [tabindex]:focus-visible{
    nunca ser preciso andar à procura de como contactar. No computador, o
    formulário já está sempre visível ao lado, por isso a barra fica
    escondida lá. */
+/* Marca de água "More·ada" — usada em cima de qualquer foto de imóvel no
+   site, para dificultar o uso das fotos fora daqui sem autorização. Cada
+   sítio que a usa só precisa de: 1) o contentor da foto ter
+   "position: relative", e 2) um <div className="photo-watermark">More·ada</div>
+   logo a seguir à própria <img>. */
+.photo-watermark{
+  position: absolute; bottom: 10px; right: 12px; color: rgba(255,255,255,0.85);
+  font-family: 'Playfair Display', Georgia, serif; font-size: 14px; font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7); pointer-events: none; user-select: none; letter-spacing: 0.02em;
+}
 .property-contact-bar{ display: none; }
 @media (max-width: 640px){
   /* No telemóvel, não faz sentido mostrar um código QR (a pessoa já está a

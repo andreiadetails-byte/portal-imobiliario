@@ -254,26 +254,29 @@ export default function PropertyClient() {
             <div style={{ marginBottom: 24 }}>
               {photos.length > 1 ? (
                 <div className="property-gallery" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, height: 380, borderRadius: 8, overflow: 'hidden' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className="property-gallery-main"
-                    src={photos[activePhoto]}
-                    alt={`Foto ${activePhoto + 1} de ${photos.length} — ${property.typology}, ${property.address}`}
-                    onClick={() => setLightbox(true)}
-                    onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
-                    onTouchEnd={(e) => {
-                      if (touchStartX.current === null) return;
-                      const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-                      if (Math.abs(deltaX) > 50) {
-                        if (deltaX < 0) setActivePhoto((i) => (i + 1) % photos.length);
-                        else setActivePhoto((i) => (i - 1 + photos.length) % photos.length);
-                      }
-                      touchStartX.current = null;
-                    }}
-                    loading="eager"
-                    fetchPriority="high"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in', touchAction: 'pan-y' }}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="property-gallery-main"
+                      src={photos[activePhoto]}
+                      alt={`Foto ${activePhoto + 1} de ${photos.length} — ${property.typology}, ${property.address}`}
+                      onClick={() => setLightbox(true)}
+                      onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                      onTouchEnd={(e) => {
+                        if (touchStartX.current === null) return;
+                        const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+                        if (Math.abs(deltaX) > 50) {
+                          if (deltaX < 0) setActivePhoto((i) => (i + 1) % photos.length);
+                          else setActivePhoto((i) => (i - 1 + photos.length) % photos.length);
+                        }
+                        touchStartX.current = null;
+                      }}
+                      loading="eager"
+                      fetchPriority="high"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in', touchAction: 'pan-y' }}
+                    />
+                    <div className="photo-watermark">More·ada</div>
+                  </div>
                   <div className="property-gallery-side" style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%' }}>
                     {[1, 2].map((offset) => {
                       const idx = (activePhoto + offset) % photos.length;
@@ -812,7 +815,10 @@ export default function PropertyClient() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photos[activePhoto]} alt={`Foto ${activePhoto + 1} de ${photos.length} — vista ampliada`} style={{ maxWidth: '90vw', maxHeight: '78vh', borderRadius: 6, objectFit: 'contain' }} />
+        <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '78vh' }}>
+          <img src={photos[activePhoto]} alt={`Foto ${activePhoto + 1} de ${photos.length} — vista ampliada`} style={{ maxWidth: '90vw', maxHeight: '78vh', borderRadius: 6, objectFit: 'contain', display: 'block' }} />
+          <div className="photo-watermark" style={{ fontSize: 17 }}>More·ada</div>
+        </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
           <button
             onClick={(e) => { e.stopPropagation(); setActivePhoto((i) => (i - 1 + photos.length) % photos.length); }}

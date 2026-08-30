@@ -340,8 +340,11 @@ export default function HomePage() {
                     {favoriteIds.includes(p.id) ? '♥' : '♡'}
                   </button>
                   {firstPhoto ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                    <div style={{ position: 'relative' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                      <div className="photo-watermark" style={{ fontSize: 11 }}>More·ada</div>
+                    </div>
                   ) : (
                     <div className="card-photo" />
                   )}
@@ -444,8 +447,11 @@ export default function HomePage() {
                     {favoriteIds.includes(p.id) ? '♥' : '♡'}
                   </button>
                   {firstPhoto ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                    <div style={{ position: 'relative' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                      <div className="photo-watermark" style={{ fontSize: 11 }}>More·ada</div>
+                    </div>
                   ) : (
                     <div className="card-photo" />
                   )}

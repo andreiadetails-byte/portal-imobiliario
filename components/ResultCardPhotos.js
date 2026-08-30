@@ -63,6 +63,7 @@ export default function ResultCardPhotos({ photos, typology, district }) {
           onTouchEnd={handleTouchEnd}
           style={{ width: '100%', height: '100%', objectFit: 'cover', touchAction: 'pan-y' }}
         />
+        <div className="photo-watermark">More·ada</div>
         {photos.length > 1 && (
           <div style={{
             position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.6)', color: '#fff',
@@ -72,28 +73,30 @@ export default function ResultCardPhotos({ photos, typology, district }) {
           </div>
         )}
         {photos.length > 1 && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'absolute', bottom: 8, left: 0, right: 0, display: 'flex', gap: 5,
-              justifyContent: 'center', flexWrap: 'wrap', padding: '0 8px',
-            }}
-          >
-            {photos.map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveIndex(i); }}
-                aria-label={`Foto ${i + 1}`}
-                style={{
-                  width: 22, height: 22, borderRadius: '50%', fontSize: 10.5, fontWeight: 700, cursor: 'pointer',
-                  border: 'none', background: i === activeIndex ? '#fff' : 'rgba(255,255,255,0.35)',
-                  color: i === activeIndex ? 'var(--ink)' : '#fff', flexShrink: 0,
-                }}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
+          <>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveIndex((i) => (i - 1 + photos.length) % photos.length); }}
+              aria-label="Foto anterior"
+              style={{
+                position: 'absolute', top: '50%', left: 8, transform: 'translateY(-50%)', width: 34, height: 34, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.45)', border: 'none', color: '#fff', fontSize: 18, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              ‹
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveIndex((i) => (i + 1) % photos.length); }}
+              aria-label="Foto seguinte"
+              style={{
+                position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)', width: 34, height: 34, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.45)', border: 'none', color: '#fff', fontSize: 18, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              ›
+            </button>
+          </>
         )}
       </div>
     );
@@ -103,8 +106,11 @@ export default function ResultCardPhotos({ photos, typology, district }) {
     <div style={{ height: 400, display: 'flex', flexDirection: 'column', gap: 4 }}>
       {photos.length > 1 ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={firstPhoto} alt={`Foto principal do imóvel ${typology} em ${district}`} loading="lazy" style={{ width: '100%', flex: '1 1 0', minHeight: 0, objectFit: 'cover' }} />
+          <div style={{ position: 'relative', flex: '1 1 0', minHeight: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={firstPhoto} alt={`Foto principal do imóvel ${typology} em ${district}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div className="photo-watermark">More·ada</div>
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, height: 110, flexShrink: 0 }}>
             {[1, 2].map((offset) => {
               const photo = photos[offset % photos.length];
@@ -128,8 +134,11 @@ export default function ResultCardPhotos({ photos, typology, district }) {
           </div>
         </>
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={firstPhoto} alt={`Foto do imóvel ${typology} em ${district}`} loading="lazy" style={{ width: '100%', height: 400, objectFit: 'cover' }} />
+        <div style={{ position: 'relative', height: 400 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={firstPhoto} alt={`Foto do imóvel ${typology} em ${district}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div className="photo-watermark">More·ada</div>
+        </div>
       )}
     </div>
   );
