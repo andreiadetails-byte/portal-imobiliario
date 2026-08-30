@@ -101,8 +101,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
     box-shadow: 0 -4px 16px rgba(0,0,0,0.18);
   }
   .bottom-nav-item{
-    flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:3px;
-    font-size:11px; font-weight:600; color:rgba(255,255,255,0.75); position:relative;
+    flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:2px;
+    font-size:10px; font-weight:600; color:rgba(255,255,255,0.75); position:relative; padding: 0 2px;
     transition: transform 0.15s ease, color 0.15s ease;
   }
   .bottom-nav-item span:last-child{
@@ -244,10 +244,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .navbar-mobile-rows{ display: flex !important; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
   .navbar-mobile-row{ display: flex; gap: 8px; }
   .navbar-mobile-row .btn{ flex: 1; text-align: center; justify-content: center; }
-  .support-widget{ bottom: 76px !important; right: 12px !important; }
+  .support-widget{ display: none !important; }
   .support-widget-panel{ max-width: calc(100vw - 90px) !important; }
-  .support-widget-text{ display: none !important; }
-  .support-widget-btn{ padding: 8px !important; border-radius: 50% !important; }
 
   /* Cabeçalho simplificado (só na página inicial): logótipo + PT + Entrar na mesma linha */
   .header-minimal .navbar{ flex-wrap: wrap !important; justify-content: space-between !important; row-gap: 8px; }
@@ -315,7 +313,6 @@ textarea:focus-visible, [tabindex]:focus-visible{
   .navbar-profile-btn-mobile{ display: none !important; }
 }
 @media (max-width: 900px){
-  .support-widget{ bottom: 78px !important; }
   .property-contact-bar{
     display: flex !important; gap: 10px;
     position: fixed; bottom: 64px; left: 0; right: 0; z-index: 55;

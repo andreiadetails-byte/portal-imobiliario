@@ -20,6 +20,15 @@ export default function SupportAgentWidget() {
   const { t } = useLanguage();
   const [agentName, setAgentName] = useState(null);
   const [open, setOpen] = useState(false);
+
+  // Permite abrir este balão a partir de outro sítio do site (o novo botão
+  // "Suporte" no menu fixo de baixo, no telemóvel) sem precisar de partilhar
+  // estado diretamente entre componentes.
+  useEffect(() => {
+    function handleOpenRequest() { setOpen(true); }
+    window.addEventListener('morada-open-support-widget', handleOpenRequest);
+    return () => window.removeEventListener('morada-open-support-widget', handleOpenRequest);
+  }, []);
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: '', contact: '', message: '' });

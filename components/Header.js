@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { logVisitIfNeeded } from '../lib/logVisit';
-import { Bell, Home, Search, Heart, MessageCircle, LogIn } from 'lucide-react';
+import { Bell, Home, Search, Heart, MessageCircle, LogIn, Headset } from 'lucide-react';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 import { isProfessionalAccount } from '../lib/accountTypes';
@@ -317,6 +317,14 @@ export default function Header({ minimal = false }) {
             </span>
           )}
         </Link>
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event('morada-open-support-widget'))}
+          className="bottom-nav-item"
+          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          <Headset size={21} /><span>{t('sw_support_label')}</span>
+        </button>
         <Link href={user ? '/dashboard' : '/login'} className="bottom-nav-item">
           {user ? <span style={{ fontSize: 21 }}>☰</span> : <LogIn size={21} />}
           <span>{user ? t('header_listings') : t('nav_login_short')}</span>
