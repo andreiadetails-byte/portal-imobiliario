@@ -35,9 +35,23 @@ export default function PropertyClient() {
   const [similarFavoriteIds, setSimilarFavoriteIds] = useState([]);
   const [showQr, setShowQr] = useState(false);
   const [photos, setPhotos] = useState([]);
+  const [photoThumbs, setPhotoThumbs] = useState([]);
   const [activePhoto, setActivePhoto] = useState(0);
   const touchStartX = useRef(null);
   const [lightbox, setLightbox] = useState(false);
+
+  // Enquanto a vista ampliada está aberta, vai pré-carregando a foto
+  // seguinte e anterior em segundo plano — assim, quando a pessoa avança ou
+  // recua, a foto já está pronta a mostrar, sem esperar pela rede.
+  useEffect(() => {
+    if (!lightbox || photos.length < 2) return;
+    const nextIdx = (activePhoto + 1) % photos.length;
+    const prevIdx = (activePhoto - 1 + photos.length) % photos.length;
+    [nextIdx, prevIdx].forEach((idx) => {
+      const img = new window.Image();
+      img.src = photos[idx];
+    });
+  }, [lightbox, activePhoto, photos]);
   const [similar, setSimilar] = useState([]);
   const [reportModal, setReportModal] = useState(false);
   const [reportSent, setReportSent] = useState(false);
@@ -53,8 +67,9 @@ export default function PropertyClient() {
         const { data: owner } = await supabase.from('profiles_public').select('id, full_name, agency_name, account_type, is_verified, phone_public').eq('id', data.owner_id).single();
         setOwnerProfile(owner);
 
-        const { data: photosData } = await supabase.from('property_photos').select('url').eq('property_id', data.id).order('position');
+        const { data: photosData } = await supabase.from('property_photos').select('url, thumbnail_url').eq('property_id', data.id).order('position');
         setPhotos((photosData || []).map((p) => p.url));
+        setPhotoThumbs((photosData || []).map((p) => p.thumbnail_url || p.url));
 
         supabase.from('properties').update({ views_count: (data.views_count || 0) + 1 }).eq('id', data.id).then(() => {});
         supabase.from('property_views').insert({ property_id: data.id }).then(() => {});
@@ -258,7 +273,7 @@ export default function PropertyClient() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       className="property-gallery-main"
-                      src={photos[activePhoto]}
+                      src={photoThumbs[activePhoto]}
                       alt={`Foto ${activePhoto + 1} de ${photos.length} — ${property.typology}, ${property.address}`}
                       onClick={() => setLightbox(true)}
                       onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
@@ -285,7 +300,7 @@ export default function PropertyClient() {
                       </div>
                     )}
                   </div>
-                  <div className="property-gallery-side" style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%' }}>
+                  <div className="property-gallery-side" style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 8, height: '100%' }}>
                     {[1, 2].map((offset) => {
                       const idx = (activePhoto + offset) % photos.length;
                       const isLast = offset === 2;
@@ -294,10 +309,10 @@ export default function PropertyClient() {
                         <div
                           key={offset}
                           onClick={() => (isLast && remaining > 0 ? setLightbox(true) : setActivePhoto(idx))}
-                          style={{ position: 'relative', flex: '1 1 0', minHeight: 0, cursor: 'pointer', borderRadius: 4, overflow: 'hidden' }}
+                          style={{ position: 'relative', minHeight: 0, cursor: 'pointer', borderRadius: 4, overflow: 'hidden' }}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={photos[idx]} alt={`Foto ${idx + 1} de ${photos.length} do imóvel`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={photoThumbs[idx]} alt={`Foto ${idx + 1} de ${photos.length} do imóvel`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           {isLast && remaining > 0 && (
                             <div style={{
                               position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', color: '#fff',
@@ -314,7 +329,7 @@ export default function PropertyClient() {
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
-                  src={photos[0]}
+                  src={photoThumbs[0]}
                   alt={`Foto do imóvel — ${property.typology}, ${property.address}`}
                   onClick={() => setLightbox(true)}
                   style={{ width: '100%', height: 380, objectFit: 'cover', borderRadius: 8, cursor: 'zoom-in' }}

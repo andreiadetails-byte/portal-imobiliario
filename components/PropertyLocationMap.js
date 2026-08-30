@@ -12,12 +12,12 @@ export default function PropertyLocationMap({ latitude, longitude, address }) {
         <h3 className="display" style={{ fontSize: 18, margin: 0 }}>Localização</h3>
         {address && (
           <a
-            href={`https://earth.google.com/web/search/${encodeURIComponent(address)}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ fontSize: 12.5, color: 'var(--telha)', fontWeight: 600 }}
           >
-            Ver no Google Earth ↗
+            Ver no Google Maps ↗
           </a>
         )}
       </div>
