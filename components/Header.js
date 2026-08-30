@@ -9,6 +9,7 @@ import { Bell, Home, Search, Heart, MessageCircle, LogIn } from 'lucide-react';
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 import { isProfessionalAccount } from '../lib/accountTypes';
+import { migrateLocalFavoritesToAccount } from '../lib/localFavorites';
 
 export default function Header({ minimal = false }) {
   const { t } = useLanguage();
@@ -31,6 +32,25 @@ export default function Header({ minimal = false }) {
         const { data: profile } = await supabase.from('profiles')
           .select('is_admin, is_blocked, account_type, subscription_status, subscription_paid_until')
           .eq('id', data.user.id).single();
+
+        // Quem entra pela primeira vez com o Google ainda não tem perfil
+        // criado no site (isso normalmente acontece só no registo normal,
+        // por email) — cria um perfil simples agora, para tudo o resto do
+        // site funcionar normalmente a partir daqui.
+        if (!profile) {
+          const googleName = data.user.user_metadata?.full_name || data.user.user_metadata?.name || '';
+          await supabase.from('profiles').insert({
+            id: data.user.id,
+            full_name: googleName,
+            account_type: 'particular',
+          });
+        }
+
+        // Se a pessoa tinha favoritos guardados só neste dispositivo (sem
+        // conta), junta-os agora à conta — cobre sobretudo quem entra pelo
+        // Google, que volta direto para o site sem passar pelo formulário
+        // normal de login.
+        await migrateLocalFavoritesToAccount(supabase, data.user.id);
 
         if (profile?.is_blocked) {
           await supabase.auth.signOut();

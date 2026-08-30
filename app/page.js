@@ -14,6 +14,7 @@ import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import { distritos } from '../lib/locations';
 import NaturalSearchBox from '../components/NaturalSearchBox';
 import LazyMount from '../components/LazyMount';
+import { getLocalFavoriteIds, toggleLocalFavorite } from '../lib/localFavorites';
 import dynamic from 'next/dynamic';
 
 const MiniMapPreview = dynamic(() => import('../components/MiniMapPreview'), { ssr: false });
@@ -54,6 +55,8 @@ export default function HomePage() {
         setUser(data.user);
         const { data: favs } = await supabase.from('favorites').select('property_id').eq('user_id', data.user.id);
         setFavoriteIds((favs || []).map((f) => f.property_id));
+      } else {
+        setFavoriteIds(getLocalFavoriteIds());
       }
     });
   }, []);
@@ -61,7 +64,11 @@ export default function HomePage() {
   async function toggleFavorite(e, propertyId) {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) { window.location.href = '/login'; return; }
+    if (!user) {
+      const updated = toggleLocalFavorite(propertyId);
+      setFavoriteIds(updated);
+      return;
+    }
     if (favoriteIds.includes(propertyId)) {
       await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
       setFavoriteIds((cur) => cur.filter((id) => id !== propertyId));

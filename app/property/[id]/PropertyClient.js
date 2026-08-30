@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
+import { getLocalFavoriteIds, toggleLocalFavorite } from '../../../lib/localFavorites';
 import Header from '../../../components/Header';
 import { displayAddress } from '../../../lib/displayAddress';
 import { accountTypeLabel } from '../../../lib/accountTypes';
@@ -106,6 +107,10 @@ export default function PropertyClient() {
 
         const { data: myProfile } = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
         setLead((cur) => ({ ...cur, name: myProfile?.full_name || '', email: currentUser.email || '' }));
+      } else if (data) {
+        const localIds = getLocalFavoriteIds();
+        setIsFavorite(localIds.includes(data.id));
+        setSimilarFavoriteIds(localIds);
       }
     }
     if (id) load();
@@ -123,7 +128,11 @@ export default function PropertyClient() {
   }, [property, loading]);
 
   async function toggleFavorite() {
-    if (!user) { router.push('/login'); return; }
+    if (!user) {
+      const updated = toggleLocalFavorite(property.id);
+      setIsFavorite(updated.includes(property.id));
+      return;
+    }
     setFavLoading(true);
     if (isFavorite) {
       await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', property.id);
@@ -138,7 +147,11 @@ export default function PropertyClient() {
   async function toggleSimilarFavorite(e, propertyId) {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) { router.push('/login'); return; }
+    if (!user) {
+      const updated = toggleLocalFavorite(propertyId);
+      setSimilarFavoriteIds(updated);
+      return;
+    }
     if (similarFavoriteIds.includes(propertyId)) {
       await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
       setSimilarFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
@@ -571,11 +584,19 @@ export default function PropertyClient() {
               {t('property_own_listing')}
             </p>
           ) : sent ? (
-            <p style={{ fontSize: 14 }}>
-              {user ? (
-                <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
-              ) : t('property_sent')}
-            </p>
+            <div>
+              <p style={{ fontSize: 14 }}>
+                {user ? (
+                  <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
+                ) : t('property_sent')}
+              </p>
+              {!user && (
+                <div style={{ marginTop: 14, padding: 12, borderRadius: 8, background: 'rgba(126,143,106,0.08)', border: '1px solid var(--azulejo)' }}>
+                  <p style={{ fontSize: 12.5, marginBottom: 8 }}>{t('prop_guest_sent_suggestion')}</p>
+                  <Link href="/login" className="btn btn-primary" style={{ fontSize: 12.5, padding: '7px 14px' }}>{t('fav_guest_create_account')}</Link>
+                </div>
+              )}
+            </div>
           ) : user ? (
             <form onSubmit={handleSendLead}>
               <div className="field">
@@ -882,11 +903,19 @@ export default function PropertyClient() {
               {t('property_own_listing')}
             </p>
           ) : sent ? (
-            <p style={{ fontSize: 14 }}>
-              {user ? (
-                <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
-              ) : t('property_sent')}
-            </p>
+            <div>
+              <p style={{ fontSize: 14 }}>
+                {user ? (
+                  <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
+                ) : t('property_sent')}
+              </p>
+              {!user && (
+                <div style={{ marginTop: 14, padding: 12, borderRadius: 8, background: 'rgba(126,143,106,0.08)', border: '1px solid var(--azulejo)' }}>
+                  <p style={{ fontSize: 12.5, marginBottom: 8 }}>{t('prop_guest_sent_suggestion')}</p>
+                  <Link href="/login" className="btn btn-primary" style={{ fontSize: 12.5, padding: '7px 14px' }}>{t('fav_guest_create_account')}</Link>
+                </div>
+              )}
+            </div>
           ) : (
             <form onSubmit={handleSendLead}>
               <div className="field">

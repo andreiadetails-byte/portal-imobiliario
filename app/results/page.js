@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 const MapDrawSearch = dynamic(() => import('../../components/MapDrawSearch'), { ssr: false });
 import { displayAddress } from '../../lib/displayAddress';
 import AdBanner from '../../components/AdBanner';
+import { getLocalFavoriteIds, toggleLocalFavorite } from '../../lib/localFavorites';
 
 function ResultsInner() {
   const searchParams = useSearchParams();
@@ -80,6 +81,8 @@ function ResultsInner() {
         setUser(data.user);
         const { data: favs } = await supabase.from('favorites').select('property_id').eq('user_id', data.user.id);
         setFavoriteIds((favs || []).map((f) => f.property_id));
+      } else {
+        setFavoriteIds(getLocalFavoriteIds());
       }
     });
   }, []);
@@ -87,7 +90,11 @@ function ResultsInner() {
   async function toggleFavorite(e, propertyId) {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) { window.location.href = '/login'; return; }
+    if (!user) {
+      const updated = toggleLocalFavorite(propertyId);
+      setFavoriteIds(updated);
+      return;
+    }
     if (favoriteIds.includes(propertyId)) {
       await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
       setFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
@@ -132,7 +139,10 @@ function ResultsInner() {
 
   async function saveSearch() {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { window.location.href = '/login'; return; }
+    if (!user) {
+      if (confirm(t('results_save_search_needs_account'))) window.location.href = '/login';
+      return;
+    }
 
     const name = district
       ? `${businessType === 'Arrendamento' ? 'Arrendar' : 'Comprar'} em ${district}`
@@ -880,11 +890,19 @@ function ResultsInner() {
                 <button onClick={() => setMessageModalFor(null)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
               </div>
               {messageSent ? (
-                <p style={{ fontSize: 14 }}>
-                  {user ? (
-                    <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
-                  ) : t('property_sent')}
-                </p>
+                <div>
+                  <p style={{ fontSize: 14 }}>
+                    {user ? (
+                      <>{t('prop_msg_sent')} <Link href="/chat" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>{t('prop_chat_link')}</Link>.</>
+                    ) : t('property_sent')}
+                  </p>
+                  {!user && (
+                    <div style={{ marginTop: 14, padding: 12, borderRadius: 8, background: 'rgba(126,143,106,0.08)', border: '1px solid var(--azulejo)' }}>
+                      <p style={{ fontSize: 12.5, marginBottom: 8 }}>{t('prop_guest_sent_suggestion')}</p>
+                      <Link href="/login" className="btn btn-primary" style={{ fontSize: 12.5, padding: '7px 14px' }}>{t('fav_guest_create_account')}</Link>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <form onSubmit={sendInlineMessage}>
                   <div className="field">

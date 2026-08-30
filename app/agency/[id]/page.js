@@ -338,7 +338,15 @@ export default function AgencyPage() {
                 <button onClick={() => setMessageModalFor(null)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
               </div>
               {messageSent ? (
-                <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+                <div>
+                  <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+                  {!user && (
+                    <div style={{ marginTop: 14, padding: 12, borderRadius: 8, background: 'rgba(126,143,106,0.08)', border: '1px solid var(--azulejo)' }}>
+                      <p style={{ fontSize: 12.5, marginBottom: 8 }}>{t('prop_guest_sent_suggestion')}</p>
+                      <Link href="/login" className="btn btn-primary" style={{ fontSize: 12.5, padding: '7px 14px' }}>{t('fav_guest_create_account')}</Link>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <form onSubmit={sendInlineMessage}>
                   <div className="field">

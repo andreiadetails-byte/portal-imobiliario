@@ -9,6 +9,7 @@ import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { displayAddress } from '../../lib/displayAddress';
 import { useCompareList } from '../../lib/useCompareList';
+import { getLocalFavoriteIds } from '../../lib/localFavorites';
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function FavoritesPage() {
   const [searches, setSearches] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
   const [tab, setTab] = useState('favoritos');
   const { ids: compareIds, toggle: toggleCompare } = useCompareList();
   const [messageModalFor, setMessageModalFor] = useState(null);
@@ -82,7 +84,23 @@ export default function FavoritesPage() {
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/login'); return; }
+
+      if (!user) {
+        // Sem conta — mostra os favoritos guardados localmente, sem as
+        // funcionalidades que precisam mesmo de uma conta (notas, pesquisas
+        // guardadas, sugestões personalizadas).
+        setIsGuest(true);
+        const localIds = getLocalFavoriteIds();
+        if (localIds.length > 0) {
+          const { data: propsData } = await supabase
+            .from('properties')
+            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+            .in('id', localIds);
+          setProperties((propsData || []).map((p) => ({ ...p, notes: '', price_at_save: null })));
+        }
+        setLoading(false);
+        return;
+      }
 
       const { data: favIds, error: favError } = await supabase
         .from('favorites')
@@ -197,6 +215,17 @@ export default function FavoritesPage() {
       <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
         <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('favorites_title')}</h1>
+
+        {isGuest && (
+          <div className="card" style={{ padding: 18, marginBottom: 24, background: 'rgba(126,143,106,0.08)', border: '1px solid var(--azulejo)' }}>
+            <p style={{ fontSize: 13.5, marginBottom: 10 }}>
+              {t('fav_guest_banner')}
+            </p>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <Link href="/login" className="btn btn-primary" style={{ fontSize: 13 }}>{t('fav_guest_create_account')}</Link>
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid var(--line)', marginBottom: 24 }}>
           {[['favoritos', `${t('fav_saved_tab')} (${properties.length})`], ['pesquisas', `${t('fav_saved_searches_tab')} (${searches.length})`]].map(([value, label]) => (
@@ -402,7 +431,15 @@ export default function FavoritesPage() {
               <button onClick={() => setMessageModalFor(null)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
             </div>
             {messageSent ? (
-              <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+              <div>
+                <p style={{ fontSize: 14 }}>{t('property_sent')}</p>
+                {!user && (
+                  <div style={{ marginTop: 14, padding: 12, borderRadius: 8, background: 'rgba(126,143,106,0.08)', border: '1px solid var(--azulejo)' }}>
+                    <p style={{ fontSize: 12.5, marginBottom: 8 }}>{t('prop_guest_sent_suggestion')}</p>
+                    <Link href="/login" className="btn btn-primary" style={{ fontSize: 12.5, padding: '7px 14px' }}>{t('fav_guest_create_account')}</Link>
+                  </div>
+                )}
+              </div>
             ) : (
               <form onSubmit={sendInlineMessage}>
                 <div className="field">
