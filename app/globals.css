@@ -204,7 +204,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .navbar{ padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
   .navbar-links{ flex-wrap: wrap !important; row-gap: 8px; width: 100%; justify-content: flex-start !important; }
   .hero-title{ font-size: 30px !important; }
-  .result-card{ grid-template-columns: 1fr !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+  .result-card{ grid-template-columns: 1fr !important; grid-template-rows: auto auto !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+  .result-card-photo-mobile-inner{ height: 240px !important; }
   .result-card-photo{ height: 280px !important; width: 100% !important; }
   .result-card *{ min-width: 0 !important; overflow-wrap: break-word !important; word-break: break-word !important; }
   .property-gallery{ grid-template-columns: 1fr !important; height: 260px !important; }
@@ -306,9 +307,10 @@ textarea:focus-visible, [tabindex]:focus-visible{
    "position: relative", e 2) um <div className="photo-watermark">More·ada</div>
    logo a seguir à própria <img>. */
 .photo-watermark{
-  position: absolute; bottom: 10px; right: 12px; color: rgba(255,255,255,0.85);
-  font-family: 'Playfair Display', Georgia, serif; font-size: 14px; font-weight: 600;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7); pointer-events: none; user-select: none; letter-spacing: 0.02em;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,0.75);
+  font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6); pointer-events: none; user-select: none; letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 .property-contact-bar{ display: none; }
 @media (max-width: 640px){

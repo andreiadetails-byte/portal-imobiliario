@@ -53,7 +53,7 @@ export default function ResultCardPhotos({ photos, typology, district }) {
 
   if (isMobile) {
     return (
-      <div style={{ height: 400, position: 'relative' }}>
+      <div className="result-card-photo-mobile-inner" style={{ height: 400, position: 'relative' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photos[activeIndex].thumbnail_url || photos[activeIndex].url}
@@ -64,14 +64,6 @@ export default function ResultCardPhotos({ photos, typology, district }) {
           style={{ width: '100%', height: '100%', objectFit: 'cover', touchAction: 'pan-y' }}
         />
         <div className="photo-watermark">More·ada</div>
-        {photos.length > 1 && (
-          <div style={{
-            position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.6)', color: '#fff',
-            fontSize: 12, fontWeight: 600, padding: '3px 9px', borderRadius: 10,
-          }}>
-            {activeIndex + 1}/{photos.length}
-          </div>
-        )}
         {photos.length > 1 && (
           <>
             <button

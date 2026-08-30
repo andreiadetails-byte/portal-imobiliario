@@ -276,6 +276,14 @@ export default function PropertyClient() {
                       style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in', touchAction: 'pan-y' }}
                     />
                     <div className="photo-watermark">More·ada</div>
+                    {photos.length > 1 && (
+                      <div style={{
+                        position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.6)', color: '#fff',
+                        fontSize: 12.5, fontWeight: 600, padding: '3px 9px', borderRadius: 10,
+                      }}>
+                        {activePhoto + 1}/{photos.length}
+                      </div>
+                    )}
                   </div>
                   <div className="property-gallery-side" style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%' }}>
                     {[1, 2].map((offset) => {
@@ -815,8 +823,8 @@ export default function PropertyClient() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '78vh' }}>
-          <img src={photos[activePhoto]} alt={`Foto ${activePhoto + 1} de ${photos.length} — vista ampliada`} style={{ maxWidth: '90vw', maxHeight: '78vh', borderRadius: 6, objectFit: 'contain', display: 'block' }} />
+        <div style={{ position: 'relative', width: 'min(90vw, 800px)', height: 'min(78vh, 550px)' }}>
+          <img src={photos[activePhoto]} alt={`Foto ${activePhoto + 1} de ${photos.length} — vista ampliada`} style={{ width: '100%', height: '100%', borderRadius: 6, objectFit: 'cover', display: 'block' }} />
           <div className="photo-watermark" style={{ fontSize: 17 }}>More·ada</div>
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>

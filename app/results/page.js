@@ -666,7 +666,7 @@ function ResultsInner() {
                           display: 'grid', gridTemplateColumns: '520px minmax(0, 1fr)', overflow: 'hidden', position: 'relative', cursor: 'pointer',
                           border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined,
                         }}>
-                    <div className="result-card-photo" style={{ position: 'relative', height: 400 }}>
+                    <div className="result-card-photo result-card-photo-mobile-inner" style={{ position: 'relative', height: 400 }}>
                       <ResultCardPhotos photos={sortedPhotos} typology={p.typology} district={p.district} />
 
                       {p.featured_status === 'active' && (
