@@ -117,7 +117,7 @@ export default function InvestmentProfitCalculator({ showTitle }) {
       )}
       <h3 className="display" style={{ fontSize: 18, marginBottom: 4 }}>{t('invest_title')}</h3>
       <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 20 }}>
-        {t('invest_disclaimer')}
+        {t('invest_disclaimer')} {t('invest_values_as_of')} {new Date().toLocaleDateString('pt-PT')}.
       </p>
 
       <div className="field">

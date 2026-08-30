@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 const MapDrawSearch = dynamic(() => import('../../components/MapDrawSearch'), { ssr: false });
 import { displayAddress } from '../../lib/displayAddress';
 import AdBanner from '../../components/AdBanner';
+import ResultCardPhotos from '../../components/ResultCardPhotos';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../../lib/localFavorites';
 
 function ResultsInner() {
@@ -96,11 +97,13 @@ function ResultsInner() {
       return;
     }
     if (favoriteIds.includes(propertyId)) {
-      await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      if (error) { console.error('Erro ao remover favorito:', error); alert(`Não foi possível remover dos favoritos: ${error.message}`); return; }
       setFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
     } else {
       const prop = properties.find((p) => p.id === propertyId);
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      if (error) { console.error('Erro ao guardar favorito:', error); alert(`Não foi possível guardar nos favoritos: ${error.message}`); return; }
       setFavoriteIds((cur) => [...cur, propertyId]);
     }
   }
@@ -663,39 +666,8 @@ function ResultsInner() {
                           display: 'grid', gridTemplateColumns: '520px minmax(0, 1fr)', overflow: 'hidden', position: 'relative', cursor: 'pointer',
                           border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined,
                         }}>
-                    <div className="result-card-photo" style={{ position: 'relative', height: 400, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {sortedPhotos.length > 1 ? (
-                        <>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={firstPhoto} alt={`Foto principal do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', flex: '1 1 0', minHeight: 0, objectFit: 'cover' }} />
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, height: 110, flexShrink: 0 }}>
-                            {[1, 2].map((offset) => {
-                              const photo = sortedPhotos[offset % sortedPhotos.length];
-                              const isLast = offset === 2;
-                              const remaining = sortedPhotos.length - 3;
-                              return (
-                                <div key={offset} style={{ position: 'relative', overflow: 'hidden' }}>
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img src={photo.thumbnail_url || photo.url} alt={`Foto adicional do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                  {isLast && remaining > 0 && (
-                                    <div style={{
-                                      position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', color: '#fff',
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600,
-                                    }}>
-                                      +{remaining}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </>
-                      ) : firstPhoto ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: 400, objectFit: 'cover' }} />
-                      ) : (
-                        <div className="card-photo" style={{ height: 400 }} />
-                      )}
+                    <div className="result-card-photo" style={{ position: 'relative', height: 400 }}>
+                      <ResultCardPhotos photos={sortedPhotos} typology={p.typology} district={p.district} />
 
                       {p.featured_status === 'active' && (
                         <span className="destaque-strip">★ DESTAQUE</span>
@@ -705,10 +677,10 @@ function ResultsInner() {
                         onClick={(e) => toggleFavorite(e, p.id)}
                         aria-label="Guardar nos favoritos"
                         style={{
-                          position: 'absolute', top: 10, right: 10, width: 32, height: 32, borderRadius: '50%',
-                          background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', fontSize: 16,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: isFav ? '#b8452f' : 'var(--ink)',
+                          position: 'absolute', top: 10, right: 10, width: 40, height: 40, borderRadius: '50%',
+                          background: isFav ? '#b8452f' : 'rgba(255,255,255,0.95)', border: 'none', cursor: 'pointer', fontSize: 20,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+                          color: isFav ? '#fff' : '#b8452f',
                         }}
                       >
                         {isFav ? '♥' : '♡'}
@@ -751,23 +723,23 @@ function ResultsInner() {
                     </div>
 
                     <div className="card-body" style={{ padding: 26, display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%', boxSizing: 'border-box', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                      <div className="price" style={{ fontSize: 28 }}>
+                      <div className="price" style={{ fontSize: 34, fontWeight: 800, color: 'var(--telha)' }}>
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
                       {p.previous_price && p.previous_price > p.price && (
                         <span style={{
-                          fontSize: 11.5, fontWeight: 700, padding: '3px 9px', borderRadius: 10,
+                          fontSize: 12.5, fontWeight: 700, padding: '3px 9px', borderRadius: 10,
                           background: 'rgba(126,143,106,0.18)', color: 'var(--telha)',
                         }}>
                           ↓ Reduzido
                         </span>
                       )}
-                      <div className="addr" style={{ fontSize: 20, marginTop: 8, fontWeight: 500 }}>{p.typology} · {displayAddress(p)}</div>
-                      <div className="meta" style={{ marginBottom: 0, fontSize: 16 }}>
+                      <div className="addr" style={{ fontSize: 21, marginTop: 8, fontWeight: 600 }}>{p.typology} · {displayAddress(p)}</div>
+                      <div className="meta" style={{ marginBottom: 0, fontSize: 17 }}>
                         {p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}
                       </div>
 
-                      <div style={{ display: 'flex', gap: 18, marginTop: 14, fontSize: 15.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 18, marginTop: 14, fontSize: 16.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
                         {p.area_util && <span>📐 {p.area_util} {t('meta_sqm_useful')}</span>}
                         <span>🛏 {p.bedrooms} {t('property_rooms').toLowerCase()}</span>
                         <span>🚿 {p.bathrooms} wc</span>
@@ -775,7 +747,7 @@ function ResultsInner() {
 
                       {p.description && (
                         <p style={{
-                          fontSize: 16, color: 'var(--ink)', marginTop: 16, lineHeight: 1.6,
+                          fontSize: 17, color: 'var(--ink)', marginTop: 16, lineHeight: 1.6,
                           display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                           width: '100%', maxWidth: '100%', boxSizing: 'border-box',
                         }}>
@@ -808,14 +780,14 @@ function ResultsInner() {
                           {new Date(p.created_at).toLocaleDateString('pt-PT')}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
                         <button
                           type="button"
                           onClick={(e) => { e.stopPropagation(); openMessageModal(p); }}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 15.5,
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 16,
                             fontWeight: 700, color: '#fff', background: 'var(--telha)', border: 'none',
-                            borderRadius: 8, padding: '12px 18px', cursor: 'pointer',
+                            borderRadius: 9, padding: '13px 20px', cursor: 'pointer', boxShadow: '0 3px 10px rgba(126,143,106,0.35)',
                           }}
                         >
                           💬 {t('prop_send_message')}
@@ -825,9 +797,9 @@ function ResultsInner() {
                             href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
                             onClick={(e) => e.stopPropagation()}
                             style={{
-                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 15.5,
-                              fontWeight: 700, color: 'var(--ink)', background: 'var(--paper)',
-                              border: '1.5px solid var(--line)', borderRadius: 8, padding: '12px 18px', textDecoration: 'none',
+                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 16,
+                              fontWeight: 700, color: '#fff', background: 'var(--azulejo)',
+                              border: 'none', borderRadius: 9, padding: '13px 20px', textDecoration: 'none', boxShadow: '0 3px 10px rgba(58,90,120,0.3)',
                             }}
                           >
                             📞 {t('prop_call')}

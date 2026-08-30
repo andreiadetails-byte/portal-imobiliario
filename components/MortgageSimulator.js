@@ -184,7 +184,19 @@ export default function MortgageSimulator({ price, showTitle }) {
 
       <div className="field">
         <label>{rateType === 'Mista' ? t('mortgage_rate_fixed_initial') : t('mortgage_rate_annual')}</label>
-        <input type="number" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} min={0} />
+        <input
+          type="number"
+          step="0.1"
+          value={rate}
+          onChange={(e) => {
+            const val = e.target.value;
+            // Se a pessoa apagar tudo, ou escrever algo inválido/negativo,
+            // não deixa o campo ficar vazio — mantém o último valor certo.
+            if (val === '' || isNaN(Number(val)) || Number(val) < 0) return;
+            setRate(Number(val));
+          }}
+          min={0}
+        />
         {rateType === 'Variável' && (
           <span className="hint" style={{ fontWeight: 400, fontSize: 11.5, color: 'var(--text-soft)' }}>
             {t('mortgage_euribor_hint')}

@@ -135,10 +135,12 @@ export default function PropertyClient() {
     }
     setFavLoading(true);
     if (isFavorite) {
-      await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', property.id);
+      const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', property.id);
+      if (error) { console.error('Erro ao remover favorito:', error); alert(`Não foi possível remover dos favoritos: ${error.message}`); setFavLoading(false); return; }
       setIsFavorite(false);
     } else {
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: property.id, price_at_save: property.price ?? null });
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, property_id: property.id, price_at_save: property.price ?? null });
+      if (error) { console.error('Erro ao guardar favorito:', error); alert(`Não foi possível guardar nos favoritos: ${error.message}`); setFavLoading(false); return; }
       setIsFavorite(true);
     }
     setFavLoading(false);
@@ -153,11 +155,13 @@ export default function PropertyClient() {
       return;
     }
     if (similarFavoriteIds.includes(propertyId)) {
-      await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      if (error) { console.error('Erro ao remover favorito:', error); alert(`Não foi possível remover dos favoritos: ${error.message}`); return; }
       setSimilarFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
     } else {
       const prop = similar.find((p) => p.id === propertyId);
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      if (error) { console.error('Erro ao guardar favorito:', error); alert(`Não foi possível guardar nos favoritos: ${error.message}`); return; }
       setSimilarFavoriteIds((cur) => [...cur, propertyId]);
     }
   }

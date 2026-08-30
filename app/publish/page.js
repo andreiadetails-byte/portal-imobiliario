@@ -277,7 +277,7 @@ function PublishForm() {
 
       const compressedFile = await compressImage(originalFile);
       const preview = URL.createObjectURL(compressedFile);
-      setPhotos((cur) => [...cur, { file: compressedFile, preview }].slice(0, 25));
+      setPhotos((cur) => [...cur, { file: compressedFile, preview }].slice(0, 20));
     }
     e.target.value = '';
   }
@@ -568,8 +568,8 @@ function PublishForm() {
     }
 
     if (!isEditMode) {
-      if (photos.length < 6) {
-        setError(`Por favor, adicione pelo menos 6 fotografias (tem ${photos.length}).`);
+      if (photos.length < 3) {
+        setError(`Por favor, adicione pelo menos 3 fotografias (tem ${photos.length}).`);
         scrollToInvalidField('field-photos');
         return;
       }
@@ -1292,8 +1292,8 @@ function PublishForm() {
           />
 
           {photos.length > 0 && !isEditMode && (
-            <p style={{ fontSize: 12.5, marginTop: 8, color: photos.length < 6 ? '#8a3b2a' : 'var(--text-soft)' }}>
-              {photos.length}/25 fotografias {photos.length < 6 && `(faltam pelo menos ${6 - photos.length})`}
+            <p style={{ fontSize: 12.5, marginTop: 8, color: photos.length < 3 ? '#8a3b2a' : 'var(--text-soft)' }}>
+              {photos.length}/20 fotografias {photos.length < 3 && `(faltam pelo menos ${3 - photos.length})`}
             </p>
           )}
           {photos.length > 1 && (

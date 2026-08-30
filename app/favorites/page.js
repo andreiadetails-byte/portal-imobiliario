@@ -19,6 +19,7 @@ export default function FavoritesPage() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
+  const [expandedSearchId, setExpandedSearchId] = useState(null);
   const [tab, setTab] = useState('favoritos');
   const { ids: compareIds, toggle: toggleCompare } = useCompareList();
   const [messageModalFor, setMessageModalFor] = useState(null);
@@ -203,6 +204,25 @@ export default function FavoritesPage() {
     if (filters.selectedTypologies?.length) parts.push(filters.selectedTypologies.join(', '));
     if (filters.maxPrice) parts.push(`${t('fav_up_to')} ${Number(filters.maxPrice).toLocaleString('pt-PT')} €`);
     return parts.join(' · ') || t('fav_no_extra_filters');
+  }
+
+  // Mostra todos os filtros de uma pesquisa guardada, de forma detalhada —
+  // não só o resumo curto que já aparece sempre visível.
+  function filterDetails(filters) {
+    const rows = [];
+    if (filters.businessType) rows.push([t('comparar_row_business_type'), filters.businessType === 'Arrendamento' ? t('comparar_rent') : t('comparar_sale')]);
+    if (filters.district) rows.push([t('results_location'), filters.district]);
+    if (filters.selectedTypes?.length) rows.push([t('results_type'), filters.selectedTypes.join(', ')]);
+    if (filters.selectedTypologies?.length) rows.push([t('comparar_row_typology'), filters.selectedTypologies.join(', ')]);
+    if (filters.selectedStates?.length) rows.push([t('comparar_row_state'), filters.selectedStates.join(', ')]);
+    if (filters.selectedAgency) rows.push([t('results_agency'), filters.selectedAgency.name || filters.selectedAgency]);
+    if (filters.minPrice) rows.push([t('results_min_price'), `${Number(filters.minPrice).toLocaleString('pt-PT')} €`]);
+    if (filters.maxPrice) rows.push([t('results_max_price'), `${Number(filters.maxPrice).toLocaleString('pt-PT')} €`]);
+    if (filters.minBedrooms) rows.push([t('results_min_bedrooms'), filters.minBedrooms]);
+    if (filters.minBathrooms) rows.push([t('results_wc_min'), filters.minBathrooms]);
+    if (filters.minArea) rows.push([t('results_min_area'), `${filters.minArea} m²`]);
+    if (filters.selectedAmenities?.length) rows.push([t('results_features'), filters.selectedAmenities.join(', ')]);
+    return rows;
   }
 
   if (loading) return (
@@ -399,20 +419,43 @@ export default function FavoritesPage() {
             {searches.length === 0 && <div className="empty-state">{t('fav_no_saved_search')}</div>}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {searches.map((s) => (
-                <div key={s.id} className="card" style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                  <div>
-                    <b style={{ fontSize: 14 }}>{s.name}</b>
-                    <div className="meta">{filterSummary(s.filters || {})}</div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-                      <input type="checkbox" checked={s.notify} onChange={() => toggleNotify(s.id, s.notify)} />
-                      {t('fav_email_alerts')}
-                    </label>
-                    <button onClick={() => deleteSearch(s.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#8a3b2a' }}>
-                      {t('fav_delete')}
+                <div key={s.id} className="card" style={{ padding: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => setExpandedSearchId((cur) => (cur === s.id ? null : s.id))}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0, flex: 1, minWidth: 0 }}
+                    >
+                      <b style={{ fontSize: 14 }}>{s.name}</b>
+                      <div className="meta">
+                        {filterSummary(s.filters || {})} {expandedSearchId === s.id ? '▲' : '▼'}
+                      </div>
                     </button>
+                    <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+                        <input type="checkbox" checked={s.notify} onChange={() => toggleNotify(s.id, s.notify)} />
+                        {t('fav_email_alerts')}
+                      </label>
+                      <button onClick={() => deleteSearch(s.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#8a3b2a' }}>
+                        {t('fav_delete')}
+                      </button>
+                    </div>
                   </div>
+                  {expandedSearchId === s.id && (
+                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--line)' }}>
+                      {filterDetails(s.filters || {}).length === 0 ? (
+                        <p style={{ fontSize: 13, color: 'var(--text-soft)' }}>{t('fav_no_extra_filters')}</p>
+                      ) : (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10 }}>
+                          {filterDetails(s.filters || {}).map(([label, value]) => (
+                            <div key={label}>
+                              <div style={{ fontSize: 11, color: 'var(--text-soft)' }}>{label}</div>
+                              <div style={{ fontSize: 13.5, fontWeight: 600 }}>{value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

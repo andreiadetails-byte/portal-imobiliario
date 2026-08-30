@@ -230,7 +230,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .chat-back-btn{ display: inline-block !important; }
   .navbar-nav-links{ display: none !important; }
   .navbar-profile-btn-mobile{ display: inline-flex !important; font-size: 12.5px !important; padding: 9px 10px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
-  .navbar-login-btn{ display: inline-flex !important; margin-right: 6px !important; font-size: 12.5px !important; padding: 9px 10px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+  .navbar{ flex-wrap: wrap; row-gap: 8px; }
+  .navbar-login-btn{ display: inline-flex !important; margin-right: 6px !important; font-size: 12.5px !important; padding: 9px 10px !important; white-space: nowrap; }
   .navbar-publish-btn{ display: inline-flex !important; min-width: 0 !important; font-size: 12.5px !important; padding: 9px 10px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
   .navbar-links{ flex-wrap: nowrap !important; min-width: 0; }
   .navbar-links > div:first-child{ flex-shrink: 0; } /* seletor de idioma nunca encolhe */
@@ -303,6 +304,13 @@ textarea:focus-visible, [tabindex]:focus-visible{
    formulário já está sempre visível ao lado, por isso a barra fica
    escondida lá. */
 .property-contact-bar{ display: none; }
+@media (max-width: 640px){
+  /* No telemóvel, não faz sentido mostrar um código QR (a pessoa já está a
+     ver a página no próprio telemóvel, não pode "digitalizar" o ecrã dela
+     mesma) — mostra só as instruções de texto para instalar. */
+  .install-qr-image{ display: none !important; }
+  .install-qr-section{ justify-content: flex-start !important; }
+}
 @media (min-width: 901px){
   .navbar-profile-btn-mobile{ display: none !important; }
 }

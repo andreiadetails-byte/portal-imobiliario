@@ -70,11 +70,13 @@ export default function HomePage() {
       return;
     }
     if (favoriteIds.includes(propertyId)) {
-      await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      if (error) { console.error('Erro ao remover favorito:', error); alert(`Não foi possível remover dos favoritos: ${error.message}`); return; }
       setFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
     } else {
       const prop = properties.find((p) => p.id === propertyId);
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      if (error) { console.error('Erro ao guardar favorito:', error); alert(`Não foi possível guardar nos favoritos: ${error.message}`); return; }
       setFavoriteIds((cur) => [...cur, propertyId]);
     }
   }
@@ -206,7 +208,7 @@ export default function HomePage() {
 
       <section style={{ padding: '0 0 40px' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
-          <div style={{
+          <div className="install-qr-section" style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap',
           }}>
@@ -217,6 +219,7 @@ export default function HomePage() {
               width={104}
               height={104}
               style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
+              className="install-qr-image"
             />
             <div>
               <div className="display" style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>{t('home_install_title')}</div>
@@ -356,18 +359,21 @@ export default function HomePage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                       <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}</div>
                       {p.profiles && (
-                        <div title={p.display_name || p.profiles.agency_name || p.profiles.full_name} style={{ flexShrink: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.profiles.avatar_url} alt="" loading="lazy" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                            <img src={p.profiles.avatar_url} alt="" loading="lazy" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                           ) : (
                             <div style={{
                               width: 26, height: 26, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0,
                             }}>
                               {(p.display_name || p.profiles.agency_name || p.profiles.full_name || '?')[0].toUpperCase()}
                             </div>
                           )}
+                          <span style={{ fontSize: 11.5, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 100 }}>
+                            {p.display_name || p.profiles.agency_name || p.profiles.full_name}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -457,18 +463,21 @@ export default function HomePage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                       <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}</div>
                       {p.profiles && (
-                        <div title={p.display_name || p.profiles.agency_name || p.profiles.full_name} style={{ flexShrink: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.profiles.avatar_url} alt="" loading="lazy" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                            <img src={p.profiles.avatar_url} alt="" loading="lazy" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                           ) : (
                             <div style={{
                               width: 26, height: 26, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0,
                             }}>
                               {(p.display_name || p.profiles.agency_name || p.profiles.full_name || '?')[0].toUpperCase()}
                             </div>
                           )}
+                          <span style={{ fontSize: 11.5, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 100 }}>
+                            {p.display_name || p.profiles.agency_name || p.profiles.full_name}
+                          </span>
                         </div>
                       )}
                     </div>
