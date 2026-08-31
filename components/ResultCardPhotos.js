@@ -116,15 +116,15 @@ export default function ResultCardPhotos({ photos, typology, district }) {
             <img src={firstPhoto} alt={`Foto principal do imóvel ${typology} em ${district}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             <div className="photo-watermark">More·ada</div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, height: 110, flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 4, height: 110, flexShrink: 0 }}>
             {[1, 2].map((offset) => {
               const photo = photos[offset % photos.length];
               const isLast = offset === 2;
               const remaining = photos.length - 3;
               return (
-                <div key={offset} style={{ position: 'relative', overflow: 'hidden' }}>
+                <div key={offset} style={{ position: 'relative', overflow: 'hidden', flex: '1 1 50%', height: 110 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photo.thumbnail_url || photo.url} alt={`Foto adicional do imóvel ${typology} em ${district}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={photo.thumbnail_url || photo.url} alt={`Foto adicional do imóvel ${typology} em ${district}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   {isLast && remaining > 0 && (
                     <div style={{
                       position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', color: '#fff',
