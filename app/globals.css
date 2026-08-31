@@ -31,7 +31,7 @@ body{
   color:var(--ink);
   font-family:'Inter',sans-serif;
   line-height:1.55;
-  font-size:19px;
+  font-size:17px;
   overflow-x:hidden;
   max-width:100%;
   padding-top:10px;
@@ -314,6 +314,16 @@ textarea:focus-visible, [tabindex]:focus-visible{
   white-space: nowrap;
 }
 .property-contact-bar{ display: none; }
+/* Os cartões de resultados ficam com texto maior por defeito (pensado para
+   o telemóvel, onde é bom ler bem sem apertar os olhos) — no computador,
+   onde há mais contexto à volta, reduz-se um pouco para não ficar
+   desproporcionado. */
+@media (min-width: 901px){
+  .result-card-price{ font-size: 26px !important; }
+  .result-card-addr{ font-size: 17px !important; }
+  .result-card-details{ font-size: 14px !important; }
+  .result-card-description{ font-size: 14px !important; }
+}
 @media (max-width: 640px){
   /* No telemóvel, não faz sentido mostrar um código QR (a pessoa já está a
      ver a página no próprio telemóvel, não pode "digitalizar" o ecrã dela

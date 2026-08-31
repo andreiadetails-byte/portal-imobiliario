@@ -300,7 +300,7 @@ export default function PropertyClient() {
                       </div>
                     )}
                   </div>
-                  <div className="property-gallery-side" style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 8, height: '100%' }}>
+                  <div className="property-gallery-side" style={{ display: 'flex', flexDirection: 'column', gap: 8, height: 380 }}>
                     {[1, 2].map((offset) => {
                       const idx = (activePhoto + offset) % photos.length;
                       const isLast = offset === 2;
@@ -309,7 +309,7 @@ export default function PropertyClient() {
                         <div
                           key={offset}
                           onClick={() => (isLast && remaining > 0 ? setLightbox(true) : setActivePhoto(idx))}
-                          style={{ position: 'relative', minHeight: 0, cursor: 'pointer', borderRadius: 4, overflow: 'hidden' }}
+                          style={{ position: 'relative', height: 186, flexShrink: 0, cursor: 'pointer', borderRadius: 4, overflow: 'hidden' }}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={photoThumbs[idx]} alt={`Foto ${idx + 1} de ${photos.length} do imóvel`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

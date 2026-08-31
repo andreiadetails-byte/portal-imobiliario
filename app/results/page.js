@@ -723,7 +723,7 @@ function ResultsInner() {
                     </div>
 
                     <div className="card-body" style={{ padding: 26, display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%', boxSizing: 'border-box', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                      <div className="price" style={{ fontSize: 34, fontWeight: 800, color: 'var(--telha)' }}>
+                      <div className="price result-card-price" style={{ fontSize: 28, fontWeight: 800, color: 'var(--telha)' }}>
                         {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                       </div>
                       {p.previous_price && p.previous_price > p.price && (
@@ -734,20 +734,20 @@ function ResultsInner() {
                           ↓ Reduzido
                         </span>
                       )}
-                      <div className="addr" style={{ fontSize: 21, marginTop: 8, fontWeight: 600 }}>{p.typology} · {displayAddress(p)}</div>
+                      <div className="addr result-card-addr" style={{ fontSize: 18, marginTop: 8, fontWeight: 600 }}>{p.typology} · {displayAddress(p)}</div>
                       <div className="meta" style={{ marginBottom: 0, fontSize: 17 }}>
                         {p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}
                       </div>
 
-                      <div style={{ display: 'flex', gap: 18, marginTop: 14, fontSize: 16.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
+                      <div className="result-card-details" style={{ display: 'flex', gap: 18, marginTop: 14, fontSize: 14.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
                         {p.area_util && <span>📐 {p.area_util} {t('meta_sqm_useful')}</span>}
                         <span>🛏 {p.bedrooms} {t('property_rooms').toLowerCase()}</span>
                         <span>🚿 {p.bathrooms} wc</span>
                       </div>
 
                       {p.description && (
-                        <p style={{
-                          fontSize: 17, color: 'var(--ink)', marginTop: 16, lineHeight: 1.6,
+                        <p className="result-card-description" style={{
+                          fontSize: 15, color: 'var(--ink)', marginTop: 16, lineHeight: 1.6,
                           display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                           width: '100%', maxWidth: '100%', boxSizing: 'border-box',
                         }}>

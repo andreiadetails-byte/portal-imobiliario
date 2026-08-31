@@ -168,8 +168,8 @@ export default function AgencyPage() {
             </div>
           )}
           <div style={{ flex: 1, minWidth: 0, paddingTop: 12 }}>
-            <h1 className="display" style={{ fontSize: 28, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', overflowWrap: 'break-word' }}>
-              {displayName}
+            <h1 className="display" style={{ fontSize: 28, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ minWidth: 0, overflowWrap: 'break-word' }}>{displayName}</span>
               {profile.is_verified && (
                 <span title={t('attr_verified_professional')} style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24,
