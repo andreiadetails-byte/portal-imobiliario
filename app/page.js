@@ -47,6 +47,23 @@ export default function HomePage() {
   const [businessType, setBusinessType] = useState('Venda');
   const [news, setNews] = useState([]);
   const [user, setUser] = useState(null);
+  const [installPrompt, setInstallPrompt] = useState(null);
+
+  useEffect(() => {
+    function handler(e) {
+      e.preventDefault();
+      setInstallPrompt(e);
+    }
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  async function handleInstallClick() {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+  }
   const [favoriteIds, setFavoriteIds] = useState([]);
 
   useEffect(() => {
@@ -226,12 +243,21 @@ export default function HomePage() {
               <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 6 }}>
                 {t('home_install_subtitle')}
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-soft)', lineHeight: 1.7 }}>
-                <b>{t('home_install_android_label')}</b><br />
-                {t('home_install_android_opt1')}<br />
-                {t('home_install_android_opt2')}<br /><br />
-                {t('home_install_ios')}
-              </div>
+              {installPrompt ? (
+                // No telemóvel, se o navegador conseguir instalar automaticamente
+                // (normalmente Android/Chrome), mostra só um botão direto — é mais
+                // rápido do que pedir para a pessoa ler instruções.
+                <button onClick={handleInstallClick} className="btn btn-primary install-app-btn" style={{ fontSize: 13.5, padding: '9px 18px' }}>
+                  📲 {t('home_install_button')}
+                </button>
+              ) : (
+                <div className="install-text-instructions" style={{ fontSize: 12, color: 'var(--text-soft)', lineHeight: 1.7 }}>
+                  <b>{t('home_install_android_label')}</b><br />
+                  {t('home_install_android_opt1')}<br />
+                  {t('home_install_android_opt2')}<br /><br />
+                  {t('home_install_ios')}
+                </div>
+              )}
             </div>
           </div>
         </div>
