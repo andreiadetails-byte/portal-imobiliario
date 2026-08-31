@@ -8,7 +8,7 @@ export default function PropertyLocationMap({ latitude, longitude, address }) {
 
   return (
     <div style={{ marginTop: 8 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 14, marginBottom: 10, flexWrap: 'wrap' }}>
         <h3 className="display" style={{ fontSize: 18, margin: 0 }}>Localização</h3>
         {address && (
           <a

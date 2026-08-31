@@ -641,7 +641,7 @@ function PublishForm() {
         propertyFields.price_reduced_at = new Date().toISOString();
       }
       if (hasOffensiveText) {
-        propertyFields.status = 'em_revisao';
+        propertyFields.moderation_flag_reason = 'Linguagem possivelmente ofensiva no título/descrição.';
       }
       const { error: updateError } = await supabase.from('properties').update(propertyFields).eq('id', editId);
       error = updateError;
@@ -727,15 +727,14 @@ function PublishForm() {
         }
       }
 
-      // Só decide aprovar automaticamente para anúncios NOVOS (não edições) —
-      // e só agora, com as fotos já todas prontas, para nunca aparecer "ativo"
-      // com um espaço em branco onde deviam estar as fotos.
+      // Aprova sempre automaticamente, mesmo quando algo parece suspeito —
+      // mas guarda o motivo, para a administradora poder rever depois com
+      // calma, sem atrasar a publicação de quem está a agir de boa-fé.
       if (!isEditMode) {
-        if (!hasOffensiveText && !imagesFlagged) {
-          await supabase.from('properties').update({ status: 'ativo' }).eq('id', propertyId);
-        } else if (imagesFlagged) {
-          await supabase.from('properties').update({ status: 'em_revisao', moderation_flag_reason: flagReason }).eq('id', propertyId);
-        }
+        const updates = { status: 'ativo' };
+        if (imagesFlagged) updates.moderation_flag_reason = flagReason;
+        else if (hasOffensiveText) updates.moderation_flag_reason = 'Linguagem possivelmente ofensiva no título/descrição.';
+        await supabase.from('properties').update(updates).eq('id', propertyId);
       }
     })();
   }
@@ -975,7 +974,7 @@ function PublishForm() {
         </div>
 
         <div className="field" id="field-energy_certificate">
-          <label>{t('pub_energy_cert')} <span style={{ color: '#b8452f', fontWeight: 700 }}>{t('pub_required')}</span></label>
+          <label>{t('pub_energy_cert')} <span style={{ color: '#b8452f', fontWeight: 700, fontSize: 12 }}>{t('pub_required')}</span></label>
           <select required value={form.energy_certificate} onChange={(e) => updateField('energy_certificate', e.target.value)}>
             <option value="">{t('pub_choose_option')}</option>
             {['A+', 'A', 'B', 'B-', 'C', 'D', 'E', 'F', 'Isento'].map((c) => <option key={c}>{c}</option>)}
@@ -987,7 +986,7 @@ function PublishForm() {
           <input
             type="number"
             min={1900}
-            max={new Date().getFullYear() + 2}
+            max={2030}
             value={form.construction_year}
             onChange={(e) => updateField('construction_year', e.target.value)}
             placeholder="ex: 2005"

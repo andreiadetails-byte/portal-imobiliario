@@ -326,14 +326,14 @@ export default function LoginPage() {
         {!forgotMode && (
           <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid var(--line)', marginBottom: 20 }}>
             <button
-              onClick={() => { setMode('login'); setEmail(''); setPassword(''); setError(''); }}
+              onClick={() => { setMode('login'); setEmail(''); setPassword(''); setError(''); recaptchaWidgetId.current = null; }}
               style={{ background: 'none', border: 'none', padding: '0 0 12px', fontWeight: 600, cursor: 'pointer',
                        color: mode === 'login' ? 'var(--ink)' : 'var(--text-soft)',
                        borderBottom: mode === 'login' ? '2px solid var(--telha)' : '2px solid transparent' }}>
               {t('login_login')}
             </button>
             <button
-              onClick={() => { setMode('signup'); setEmail(''); setPassword(''); setError(''); }}
+              onClick={() => { setMode('signup'); setEmail(''); setPassword(''); setError(''); loginRecaptchaWidgetId.current = null; }}
               style={{ background: 'none', border: 'none', padding: '0 0 12px', fontWeight: 600, cursor: 'pointer',
                        color: mode === 'signup' ? 'var(--ink)' : 'var(--text-soft)',
                        borderBottom: mode === 'signup' ? '2px solid var(--telha)' : '2px solid transparent' }}>

@@ -42,6 +42,7 @@ export default function Header({ minimal = false }) {
           await supabase.from('profiles').insert({
             id: data.user.id,
             full_name: googleName,
+            email: data.user.email,
             account_type: 'particular',
           });
         }

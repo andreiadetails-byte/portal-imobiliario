@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../../../lib/localFavorites';
+import PhoneDisplay from '../../../components/PhoneDisplay';
 import Header from '../../../components/Header';
 import { displayAddress } from '../../../lib/displayAddress';
 import { accountTypeLabel } from '../../../lib/accountTypes';
@@ -77,7 +78,7 @@ export default function PropertyClient() {
         // Tenta primeiro imóveis bem parecidos (mesmo distrito e tipo); se não
         // houver 6, vai alargando os critérios até chegar a 6 (ou esgotar).
         let foundSimilar = [];
-        const baseSelect = 'id, price, address, district, typology, business_type, property_type, property_photos(url, position)';
+        const baseSelect = 'id, price, address, district, typology, business_type, property_type, bedrooms, bathrooms, area_util, area, property_photos(url, position)';
 
         const { data: sameDistrictType } = await supabase
           .from('properties').select(baseSelect)
@@ -189,6 +190,7 @@ export default function PropertyClient() {
       details: reportForm.details,
       reporter_name: reportForm.name,
       reporter_contact: reportForm.contact,
+      reporter_user_id: user?.id || null,
     });
     setReportSent(true);
   }
@@ -479,16 +481,16 @@ export default function PropertyClient() {
           )}
 
           {ownerProfile?.phone_public && (
-            <a
-              href={`tel:${ownerProfile.phone_public.replace(/\s+/g, '')}`}
+            <PhoneDisplay
+              phone={ownerProfile.phone_public}
               style={{
-                display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, padding: '12px 16px',
+                display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, padding: '12px 16px', cursor: 'pointer',
                 background: 'var(--plaster)', borderRadius: 8, textDecoration: 'none', color: 'var(--ink)',
               }}
             >
               📞
               <span style={{ fontSize: 13.5, fontWeight: 600 }}>{ownerProfile.phone_public}</span>
-            </a>
+            </PhoneDisplay>
           )}
 
           <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -554,16 +556,9 @@ export default function PropertyClient() {
           {property.floor_plan_url && (
             <>
               <h3 className="display" style={{ fontSize: 19, margin: '24px 0 10px' }}>{t('prop_floorplan_title')}</h3>
-              {property.floor_plan_url.toLowerCase().endsWith('.pdf') ? (
-                <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer" className="btn">
-                  {t('prop_view_floorplan')}
-                </a>
-              ) : (
-                <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={property.floor_plan_url} alt={t('attr_floorplan_alt')} loading="lazy" style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid var(--line)' }} />
-                </a>
-              )}
+              <a href={property.floor_plan_url} target="_blank" rel="noopener noreferrer" className="btn">
+                {t('prop_view_floorplan')}
+              </a>
             </>
           )}
 
@@ -607,13 +602,13 @@ export default function PropertyClient() {
                   {accountTypeLabel(ownerProfile.account_type)}
                 </div>
                 {ownerProfile.phone_public && (
-                  <a
-                    href={`tel:${ownerProfile.phone_public.replace(/\s+/g, '')}`}
+                  <PhoneDisplay
+                    phone={ownerProfile.phone_public}
                     onClick={(e) => e.stopPropagation()}
-                    style={{ fontSize: 12, color: 'var(--telha)', fontWeight: 600, marginTop: 2, display: 'block', textDecoration: 'none' }}
+                    style={{ fontSize: 12, color: 'var(--telha)', fontWeight: 600, marginTop: 2, display: 'block', textDecoration: 'none', cursor: 'pointer' }}
                   >
                     📞 {ownerProfile.phone_public}
-                  </a>
+                  </PhoneDisplay>
                 )}
                 <span style={{ fontSize: 11.5, color: 'var(--telha)', fontWeight: 600, marginTop: 4, display: 'inline-block', textDecoration: 'underline' }}>
                   {t('prop_view_all_listings')}
@@ -655,7 +650,7 @@ export default function PropertyClient() {
                 <input value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
               </div>
               <div className="field">
-                <label>{t('prop_message_to')} {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
+                <label>{t('prop_message_to')} {property?.display_name || ownerProfile?.agency_name || ownerProfile?.full_name}</label>
                 <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} placeholder={t('attr_interest_placeholder')} />
               </div>
               <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>
@@ -741,6 +736,11 @@ export default function PropertyClient() {
                     </div>
                     <div className="addr">{s.typology} · {s.address}</div>
                     <div className="meta">{s.district}</div>
+                    <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 12.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
+                      {(s.area_util || s.area) && <span>📐 {s.area_util || s.area} m²</span>}
+                      {s.bedrooms != null && <span>🛏 {s.bedrooms}</span>}
+                      {s.bathrooms != null && <span>🚿 {s.bathrooms}</span>}
+                    </div>
                   </div>
                 </Link>
               );
@@ -763,16 +763,16 @@ export default function PropertyClient() {
           💬 {t('prop_send_message')}
         </button>
         {ownerProfile?.phone_public && (
-          <a
-            href={`tel:${ownerProfile.phone_public.replace(/\s+/g, '')}`}
+          <PhoneDisplay
+            phone={ownerProfile.phone_public}
             style={{
               flex: 1, background: 'var(--paper)', color: 'var(--ink)', border: '1.5px solid var(--line)', borderRadius: 9,
-              padding: '17px 12px', fontSize: 18, fontWeight: 700, textDecoration: 'none',
+              padding: '17px 12px', fontSize: 18, fontWeight: 700, textDecoration: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}
           >
             📞 {t('prop_call')}
-          </a>
+          </PhoneDisplay>
         )}
       </div>
     )}
@@ -977,7 +977,7 @@ export default function PropertyClient() {
                 <input value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
               </div>
               <div className="field">
-                <label>{t('prop_message_to')} {ownerProfile?.agency_name || ownerProfile?.full_name}</label>
+                <label>{t('prop_message_to')} {property?.display_name || ownerProfile?.agency_name || ownerProfile?.full_name}</label>
                 <textarea required rows={4} value={lead.message} onChange={(e) => setLead({ ...lead, message: e.target.value })} />
               </div>
               <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>

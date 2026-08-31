@@ -10,6 +10,7 @@ import BackButton from '../../components/BackButton';
 import { displayAddress } from '../../lib/displayAddress';
 import { useCompareList } from '../../lib/useCompareList';
 import { getLocalFavoriteIds } from '../../lib/localFavorites';
+import PhoneDisplay from '../../components/PhoneDisplay';
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -95,7 +96,7 @@ export default function FavoritesPage() {
         if (localIds.length > 0) {
           const { data: propsData } = await supabase
             .from('properties')
-            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
             .in('id', localIds);
           setProperties((propsData || []).map((p) => ({ ...p, notes: '', price_at_save: null })));
         }
@@ -115,7 +116,7 @@ export default function FavoritesPage() {
         const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
         const { data: propsData } = await supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
           .in('id', ids);
         favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '', price_at_save: priceAtSaveById[p.id] }));
         setProperties(favProperties);
@@ -136,7 +137,7 @@ export default function FavoritesPage() {
 
         let query = supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
           .eq('status', 'ativo')
           .gte('price', avgPrice * 0.7)
           .lte('price', avgPrice * 1.3)
@@ -183,7 +184,7 @@ export default function FavoritesPage() {
     // Vai buscar o próprio imóvel para o juntar à lista principal de favoritos, sem precisar de recarregar a página.
     const { data: newFav } = await supabase
       .from('properties')
-      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
       .eq('id', propertyId).single();
     if (newFav) setProperties((cur) => [newFav, ...cur]);
   }
@@ -332,16 +333,16 @@ export default function FavoritesPage() {
                         💬 {t('prop_send_message')}
                       </button>
                       {p.profiles?.phone_public && (
-                        <a
-                          href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                        <PhoneDisplay
+                          phone={p.profiles.phone_public}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
+                            display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, cursor: 'pointer',
                             fontWeight: 700, color: 'var(--ink)', background: 'var(--plaster)',
                             border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                           }}
                         >
                           📞 {t('prop_call')}
-                        </a>
+                        </PhoneDisplay>
                       )}
                     </div>
                     {p.price_at_save && Number(p.price_at_save) > Number(p.price) && (
@@ -498,7 +499,7 @@ export default function FavoritesPage() {
                   <input value={messageForm.phone} onChange={(e) => setMessageForm({ ...messageForm, phone: e.target.value })} />
                 </div>
                 <div className="field">
-                  <label>{t('prop_message_to')} {messageModalFor.profiles?.agency_name || messageModalFor.profiles?.full_name}</label>
+                  <label>{t('prop_message_to')} {messageModalFor.display_name || messageModalFor.profiles?.agency_name || messageModalFor.profiles?.full_name}</label>
                   <textarea required rows={4} value={messageForm.message} onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })} />
                 </div>
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>

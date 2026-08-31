@@ -8,6 +8,8 @@ import BackButton from '../../components/BackButton';
 import { useLanguage } from '../../lib/i18n';
 import { isPasswordValid, PASSWORD_RULES_TEXT } from '../../lib/passwordRules';
 import { compressImageFile } from '../../lib/imageCompression';
+import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes';
+import { PAYMENT_INFO } from '../../lib/paymentInfo';
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -19,6 +21,8 @@ export default function PerfilPage() {
   const [agencyName, setAgencyName] = useState('');
   const [amiLicense, setAmiLicense] = useState('');
   const [accountType, setAccountType] = useState('particular');
+  const [originalAccountType, setOriginalAccountType] = useState('particular');
+  const [nif, setNif] = useState('');
   const [phone, setPhone] = useState('');
   const [showPhonePublic, setShowPhonePublic] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
@@ -46,6 +50,8 @@ export default function PerfilPage() {
         setAgencyName(profile.agency_name || '');
         setAmiLicense(profile.agency_license || '');
         setAccountType(profile.account_type || 'particular');
+        setOriginalAccountType(profile.account_type || 'particular');
+        setNif(profile.nif || '');
         setPhone(profile.phone_real || '');
         setShowPhonePublic(!!profile.show_phone_public);
         setAvatarPreview(profile.avatar_url || null);
@@ -69,6 +75,20 @@ export default function PerfilPage() {
     setAvatarRemoved(true);
   }
 
+  function handleAccountTypeChange(newType) {
+    const wasParticular = accountType === 'particular';
+    const becomingProfessional = isProfessionalAccount(newType);
+
+    if (wasParticular && becomingProfessional && PAYMENT_INFO.subscriptionEnforced) {
+      const confirmed = confirm(
+        `Ao mudar para "${accountTypeLabel(newType)}", o seu primeiro mês fica grátis, com acesso total ao painel. ` +
+        `Depois desse período, a mensalidade passa a ser de ${PAYMENT_INFO.subscriptionFee.toFixed(2)} €/mês, por transferência bancária. Quer continuar?`
+      );
+      if (!confirmed) return;
+    }
+    setAccountType(newType);
+  }
+
   async function saveProfile(e) {
     e.preventDefault();
     setSavingProfile(true);
@@ -86,17 +106,30 @@ export default function PerfilPage() {
       }
     }
 
+    // Se está a mudar de "particular" para um tipo profissional agora,
+    // atribui o mês grátis, tal como acontece no registo normal.
+    let freeMonthFields = {};
+    if (originalAccountType === 'particular' && isProfessionalAccount(accountType) && PAYMENT_INFO.subscriptionEnforced) {
+      const freeUntil = new Date();
+      freeUntil.setMonth(freeUntil.getMonth() + 1);
+      freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
+    }
+
     const updates = {
       full_name: fullName,
+      account_type: accountType,
+      nif: nif || null,
       agency_name: accountType === 'agencia' ? agencyName : null,
-      agency_license: accountType === 'agencia' ? amiLicense : null,
+      agency_license: isProfessionalAccount(accountType) ? amiLicense : null,
       phone_real: phone || null,
       show_phone_public: showPhonePublic,
+      ...freeMonthFields,
     };
     if (avatar_url) updates.avatar_url = avatar_url;
     else if (avatarRemoved) updates.avatar_url = null;
 
     await supabase.from('profiles').update(updates).eq('id', user.id);
+    setOriginalAccountType(accountType);
 
     setSavingProfile(false);
     setAvatarRemoved(false);
@@ -109,7 +142,12 @@ export default function PerfilPage() {
     setPasswordError('');
     setPasswordSaved(false);
 
-    if (!currentPassword) {
+    // Quem entrou só pelo Google nunca teve palavra-passe — não faz sentido
+    // pedir para confirmar uma que nunca existiu. Nesse caso, definir uma
+    // nova passa a servir também para poder entrar sem o Google no futuro.
+    const hasPasswordAlready = user?.identities?.some((i) => i.provider === 'email');
+
+    if (hasPasswordAlready && !currentPassword) {
       setPasswordError('Introduza a sua palavra-passe atual, para confirmarmos que é mesmo você.');
       return;
     }
@@ -124,18 +162,20 @@ export default function PerfilPage() {
 
     setSavingPassword(true);
 
-    // Confirma a palavra-passe atual antes de deixar mudar — sem isto,
-    // alguém que ficasse com acesso à sua sessão (ex: computador partilhado)
-    // conseguia mudar a palavra-passe sem saber a antiga, e ficava com a
-    // conta, sem si conseguir voltar a entrar.
-    const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: currentPassword,
-    });
-    if (verifyError) {
-      setSavingPassword(false);
-      setPasswordError('A palavra-passe atual está incorreta.');
-      return;
+    if (hasPasswordAlready) {
+      // Confirma a palavra-passe atual antes de deixar mudar — sem isto,
+      // alguém que ficasse com acesso à sua sessão (ex: computador partilhado)
+      // conseguia mudar a palavra-passe sem saber a antiga, e ficava com a
+      // conta, sem si conseguir voltar a entrar.
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (verifyError) {
+        setSavingPassword(false);
+        setPasswordError('A palavra-passe atual está incorreta.');
+        return;
+      }
     }
 
     const { error } = await supabase.auth.updateUser({ password: newPassword });
@@ -194,17 +234,33 @@ export default function PerfilPage() {
             <input id="full-name-input" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
           </div>
 
+          <div className="field">
+            <label htmlFor="account-type-select">{t('perfil_account_type') || 'Tipo de conta'}</label>
+            <select id="account-type-select" value={accountType} onChange={(e) => handleAccountTypeChange(e.target.value)}>
+              <option value="particular">{accountTypeLabel('particular')}</option>
+              <option value="agencia">{accountTypeLabel('agencia')}</option>
+              <option value="consultor">{accountTypeLabel('consultor')}</option>
+              <option value="promotor">{accountTypeLabel('promotor')}</option>
+            </select>
+          </div>
+
+          <div className="field">
+            <label htmlFor="nif-input">NIF <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
+            <input id="nif-input" value={nif} onChange={(e) => setNif(e.target.value)} placeholder="ex: 123456789" />
+          </div>
+
           {accountType === 'agencia' && (
-            <>
-              <div className="field">
-                <label htmlFor="agency-name-input">{t('perfil_agency_name')}</label>
-                <input id="agency-name-input" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} />
-              </div>
-              <div className="field">
-                <label htmlFor="ami-input">{t('perfil_ami')}</label>
-                <input id="ami-input" value={amiLicense} onChange={(e) => setAmiLicense(e.target.value)} placeholder="ex: 12345" />
-              </div>
-            </>
+            <div className="field">
+              <label htmlFor="agency-name-input">{t('perfil_agency_name')}</label>
+              <input id="agency-name-input" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} />
+            </div>
+          )}
+
+          {isProfessionalAccount(accountType) && (
+            <div className="field">
+              <label htmlFor="ami-input">{t('perfil_ami')}</label>
+              <input id="ami-input" value={amiLicense} onChange={(e) => setAmiLicense(e.target.value)} placeholder="ex: 12345" />
+            </div>
           )}
 
           <div className="field">
@@ -256,10 +312,16 @@ export default function PerfilPage() {
         <form onSubmit={savePassword} className="card" style={{ padding: 24 }}>
           <h2 className="display" style={{ fontSize: 18, marginBottom: 18 }}>{t('perfil_change_password')}</h2>
 
-          <div className="field">
-            <label htmlFor="current-password-input">{t('perfil_current_password')}</label>
-            <input id="current-password-input" type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" />
-          </div>
+          {user?.identities?.some((i) => i.provider === 'email') ? (
+            <div className="field">
+              <label htmlFor="current-password-input">{t('perfil_current_password')}</label>
+              <input id="current-password-input" type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" />
+            </div>
+          ) : (
+            <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+              A sua conta entrou pelo Google, e ainda não tem palavra-passe definida. Ao definir uma agora, passa também a poder entrar diretamente com o email, sem precisar do Google.
+            </p>
+          )}
           <div className="field">
             <label htmlFor="new-password-input">{t('perfil_new_password')}</label>
             <input id="new-password-input" type="password" required minLength={8} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t('perfil_password_min')} autoComplete="new-password" />

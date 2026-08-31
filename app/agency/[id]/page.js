@@ -8,6 +8,7 @@ import { useLanguage } from '../../../lib/i18n';
 import Header from '../../../components/Header';
 import BackButton from '../../../components/BackButton';
 import { displayAddress } from '../../../lib/displayAddress';
+import PhoneDisplay from '../../../components/PhoneDisplay';
 import { accountTypeLabel } from '../../../lib/accountTypes';
 
 export default function AgencyPage() {
@@ -97,11 +98,13 @@ export default function AgencyPage() {
     e.stopPropagation();
     if (!user) { window.location.href = '/login'; return; }
     if (favoriteIds.includes(propertyId)) {
-      await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId);
+      if (error) { console.error('Erro ao remover favorito:', error); alert(`Não foi possível remover dos favoritos: ${error.message}`); return; }
       setFavoriteIds((cur) => cur.filter((id) => id !== propertyId));
     } else {
       const prop = properties.find((p) => p.id === propertyId);
-      await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId, price_at_save: prop?.price ?? null });
+      if (error) { console.error('Erro ao guardar favorito:', error); alert(`Não foi possível guardar nos favoritos: ${error.message}`); return; }
       setFavoriteIds((cur) => [...cur, propertyId]);
     }
   }
@@ -186,13 +189,13 @@ export default function AgencyPage() {
               {memberSince && ` · No Morada desde ${memberSince}`}
             </div>
             {profile.phone_public && (
-              <a
-                href={`tel:${profile.phone_public.replace(/\s+/g, '')}`}
+              <PhoneDisplay
+                phone={profile.phone_public}
                 className="btn"
-                style={{ fontSize: 13, marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                style={{ fontSize: 13, marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
               >
                 📞 {profile.phone_public}
-              </a>
+              </PhoneDisplay>
             )}
           </div>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
@@ -220,7 +223,11 @@ export default function AgencyPage() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, padding: '0 32px', color: '#fff', fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>
                 <span>{displayName}</span>
-                {profile.phone_public && <span style={{ opacity: 0.85 }}>· 📞 {profile.phone_public}</span>}
+                {profile.phone_public && (
+                  <PhoneDisplay phone={profile.phone_public} style={{ opacity: 0.85, color: '#fff', textDecoration: 'none', cursor: 'pointer' }}>
+                    · 📞 {profile.phone_public}
+                  </PhoneDisplay>
+                )}
                 <span style={{ color: 'var(--brass)' }}>· Comprar casa? É comigo! ·</span>
               </div>
             ))}
@@ -308,17 +315,17 @@ export default function AgencyPage() {
                       💬 {t('prop_send_message')}
                     </button>
                     {profile.phone_public && (
-                      <a
-                        href={`tel:${profile.phone_public.replace(/\s+/g, '')}`}
+                      <PhoneDisplay
+                        phone={profile.phone_public}
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 15,
+                          display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, cursor: 'pointer',
                           fontWeight: 700, color: 'var(--ink)', background: 'var(--plaster)',
                           border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                         }}
                       >
                         📞 {t('prop_call')}
-                      </a>
+                      </PhoneDisplay>
                     )}
                   </div>
                 </div>
@@ -362,7 +369,7 @@ export default function AgencyPage() {
                     <input value={messageForm.phone} onChange={(e) => setMessageForm({ ...messageForm, phone: e.target.value })} />
                   </div>
                   <div className="field">
-                    <label>{t('prop_message_to')} {profile.agency_name || profile.full_name}</label>
+                    <label>{t('prop_message_to')} {messageModalFor.display_name || profile.agency_name || profile.full_name}</label>
                     <textarea required rows={4} value={messageForm.message} onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })} />
                   </div>
                   <label style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12, cursor: 'pointer' }}>

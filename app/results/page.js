@@ -15,6 +15,7 @@ const MapDrawSearch = dynamic(() => import('../../components/MapDrawSearch'), { 
 import { displayAddress } from '../../lib/displayAddress';
 import AdBanner from '../../components/AdBanner';
 import ResultCardPhotos from '../../components/ResultCardPhotos';
+import PhoneDisplay from '../../components/PhoneDisplay';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../../lib/localFavorites';
 
 function ResultsInner() {
@@ -47,8 +48,8 @@ function ResultsInner() {
   );
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-  const [minBedrooms, setMinBedrooms] = useState('');
-  const [minBathrooms, setMinBathrooms] = useState('');
+  const [minBedrooms, setMinBedrooms] = useState('0');
+  const [minBathrooms, setMinBathrooms] = useState('0');
   const [minArea, setMinArea] = useState('');
   const [selectedAmenities, setSelectedAmenities] = useState(
     searchParams.get('amenities') ? searchParams.get('amenities').split(',') : []
@@ -378,10 +379,10 @@ function ResultsInner() {
 
             <div className="field">
               <label>{t('results_price_label')}</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', minWidth: 0 }}>
-                <input type="number" placeholder={t('results_price_from')} value={minPrice} onChange={(e) => setMinPrice(e.target.value)} style={{ minWidth: 0, flex: 1 }} />
-                <span style={{ color: 'var(--text-soft)', fontSize: 13 }}>—</span>
-                <input type="number" placeholder={t('results_price_to')} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} style={{ minWidth: 0, flex: 1 }} />
+              <div style={{ display: 'flex', gap: 4, alignItems: 'center', minWidth: 0 }}>
+                <input type="number" placeholder={t('results_price_from')} value={minPrice} onChange={(e) => setMinPrice(e.target.value)} style={{ minWidth: 0, flex: 1, fontSize: 12, padding: '8px 6px' }} />
+                <span style={{ color: 'var(--text-soft)', fontSize: 12, flexShrink: 0 }}>—</span>
+                <input type="number" placeholder={t('results_price_to')} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} style={{ minWidth: 0, flex: 1, fontSize: 12, padding: '8px 6px' }} />
               </div>
             </div>
 
@@ -493,18 +494,16 @@ function ResultsInner() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'start' }}>
               <div className="field">
                 <label>{t('results_min_bedrooms')}</label>
                 <select value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)}>
-                  <option value="">{t('results_any')}</option>
                   {[0, 1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
               <div className="field">
                 <label>{t('results_wc_min')}</label>
                 <select value={minBathrooms} onChange={(e) => setMinBathrooms(e.target.value)}>
-                  <option value="">{t('results_any')}</option>
                   {[0, 1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
@@ -793,17 +792,17 @@ function ResultsInner() {
                           💬 {t('prop_send_message')}
                         </button>
                         {p.profiles?.phone_public && (
-                          <a
-                            href={`tel:${p.profiles.phone_public.replace(/\s+/g, '')}`}
+                          <PhoneDisplay
+                            phone={p.profiles.phone_public}
                             onClick={(e) => e.stopPropagation()}
                             style={{
-                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 16,
+                              display: 'flex', alignItems: 'center', gap: 6, fontSize: 16, cursor: 'pointer',
                               fontWeight: 700, color: '#fff', background: 'var(--azulejo)',
                               border: 'none', borderRadius: 9, padding: '13px 20px', textDecoration: 'none', boxShadow: '0 3px 10px rgba(58,90,120,0.3)',
                             }}
                           >
                             📞 {t('prop_call')}
-                          </a>
+                          </PhoneDisplay>
                         )}
                       </div>
                     </div>

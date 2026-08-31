@@ -4,12 +4,13 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
+import PhoneDisplay from '../../components/PhoneDisplay';
 import { useLanguage } from '../../lib/i18n';
 import BackButton from '../../components/BackButton';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes';
 import { agentLabel } from '../../lib/agentNames';
-import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send } from 'lucide-react';
+import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send, Calculator } from 'lucide-react';
 import { compressImageFile } from '../../lib/imageCompression';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
@@ -110,6 +111,7 @@ function AdminInner() {
   const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
+  const [valuationRequests, setValuationRequests] = useState([]);
   const [leadsRevealed, setLeadsRevealed] = useState(false);
   const [leadsPinInput, setLeadsPinInput] = useState('');
   const [leadsPinError, setLeadsPinError] = useState('');
@@ -126,6 +128,7 @@ function AdminInner() {
   const [userSearch, setUserSearch] = useState('');
   const [userTypeFilter, setUserTypeFilter] = useState('todos');
   const [supportReplyText, setSupportReplyText] = useState({});
+  const [reportReplyText, setReportReplyText] = useState({});
   const [ads, setAds] = useState([]);
   const [adForm, setAdForm] = useState({ title: '', link_url: '' });
   const [adImage, setAdImage] = useState(null);
@@ -151,6 +154,7 @@ function AdminInner() {
       loadMortgageRate();
       loadAllUsers();
       loadAllLeads();
+      loadValuationRequests();
       loadAds();
     }
     checkAccess();
@@ -237,6 +241,17 @@ function AdminInner() {
       .select('*, properties(id, typology, address, district, owner_id, profiles(id, full_name, agency_name))')
       .order('created_at', { ascending: false });
     setAllLeads(data || []);
+  }
+
+  async function loadValuationRequests() {
+    const { data } = await supabase.from('valuation_requests').select('*').order('created_at', { ascending: false });
+    setValuationRequests(data || []);
+  }
+
+  async function deleteValuationRequest(id) {
+    if (!confirm('Apagar este pedido de avaliação? Esta ação não pode ser desfeita.')) return;
+    await supabase.from('valuation_requests').delete().eq('id', id);
+    setValuationRequests((cur) => cur.filter((v) => v.id !== id));
   }
 
   async function markLeadRead(id) {
@@ -369,6 +384,18 @@ function AdminInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowed]);
 
+  // Atualiza a lista de suporte em tempo real — assim que um utilizador
+  // escreve, aparece logo aqui, sem ser preciso sair e voltar a entrar.
+  useEffect(() => {
+    if (!allowed) return;
+    const channel = supabase
+      .channel('admin-support-messages')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_replies' }, () => loadSupportMessages())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_requests' }, () => loadSupportMessages())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [allowed]);
+
   // Só marca as mensagens de suporte como lidas quando a pessoa abre mesmo essa aba
   // (antes marcava logo ao carregar a página, mesmo sem ver nada — o aviso vermelho nunca aparecia).
   useEffect(() => {
@@ -430,6 +457,11 @@ function AdminInner() {
     setSupportMessages((cur) => cur.map((m) => (m.id === id ? { ...m, status: 'resolvida' } : m)));
   }
 
+  async function reopenSupportMessage(id) {
+    await supabase.from('support_requests').update({ status: 'aberta' }).eq('id', id);
+    setSupportMessages((cur) => cur.map((m) => (m.id === id ? { ...m, status: 'aberta' } : m)));
+  }
+
   async function deleteSupportMessage(id) {
     if (!confirm('Apagar esta mensagem de suporte? Esta ação não pode ser desfeita.')) return;
     await supabase.from('support_replies').delete().eq('support_request_id', id);
@@ -459,7 +491,7 @@ function AdminInner() {
   async function loadReports() {
     const { data } = await supabase
       .from('reports')
-      .select('id, reason, details, reporter_name, reporter_contact, status, created_at, properties(id, typology, address, owner_id, profiles(id, full_name, agency_name))')
+      .select('id, reason, details, reporter_name, reporter_contact, reporter_user_id, status, created_at, properties(id, typology, address, owner_id, profiles(id, full_name, agency_name))')
       .order('created_at', { ascending: false });
     setReports(data || []);
   }
@@ -467,6 +499,33 @@ function AdminInner() {
   async function resolveReport(id) {
     await supabase.from('reports').update({ status: 'resolvida' }).eq('id', id);
     setReports((cur) => cur.map((r) => (r.id === id ? { ...r, status: 'resolvida' } : r)));
+  }
+
+  async function replyToReport(report) {
+    const text = (reportReplyText[report.id] || '').trim();
+    if (!text) return;
+
+    // Se quem denunciou tinha sessão iniciada nessa altura, a resposta
+    // aparece na caixa de mensagens/notificações da conta dela.
+    if (report.reporter_user_id) {
+      await supabase.from('notifications').insert({
+        user_id: report.reporter_user_id,
+        message: `Resposta à sua denúncia sobre "${report.reason}": ${text}`,
+        link: '/',
+      });
+    }
+    // Se deixou um contacto que parece email, envia também por email —
+    // cobre quem denunciou sem ter conta no site.
+    if (report.reporter_contact?.includes('@')) {
+      await fetch('/api/notify-report-reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toEmail: report.reporter_contact, reportReason: report.reason, replyText: text }),
+      }).catch(() => {});
+    }
+
+    setReportReplyText((cur) => ({ ...cur, [report.id]: '' }));
+    alert('Resposta enviada.');
   }
 
   async function deleteReport(id) {
@@ -634,6 +693,26 @@ function AdminInner() {
     alert('Anúncio anulado. O anunciante não pode republicá-lo — terá de criar um novo.');
   }
 
+  async function adminDeleteProperty(propObj) {
+    if (!confirm(`Apagar definitivamente "${propObj.typology} · ${propObj.address}"? Esta ação não pode ser desfeita, e o anunciante vai ser avisado.`)) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/delete-property-permanently', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ propertyId: propObj.id }),
+    });
+
+    if (!res.ok) {
+      const { error } = await res.json();
+      alert(`Não foi possível apagar: ${error}`);
+      return;
+    }
+
+    setProperties((cur) => cur.filter((p) => p.id !== propObj.id));
+    alert('Anúncio apagado definitivamente. O anunciante foi avisado.');
+  }
+
   if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('admin_checking_access')}</div></>);
 
   if (!allowed) {
@@ -660,7 +739,7 @@ function AdminInner() {
           ['anuncios', ClipboardList, 'Anúncios', 0],
           ['denuncias', Flag, 'Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
           ['suporte', MessageCircle, 'Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
-          ['utilizadores', Users, 'Utilizadores', 0], ['leads', Mail, 'Leads', allLeads.filter((l) => l.status === 'novo').length], ['atividade', Footprints, 'Atividade', 0], ['campanha', Send, 'Campanha', 0], ['destaques', Star, 'Destaques', 0], ['agencias', Building2, 'Agências', 0],
+          ['utilizadores', Users, 'Utilizadores', 0], ['leads', Mail, 'Leads', allLeads.filter((l) => l.status === 'novo').length], ['avaliacoes', Calculator, 'Avaliações', valuationRequests.length], ['atividade', Footprints, 'Atividade', 0], ['campanha', Send, 'Campanha', 0], ['destaques', Star, 'Destaques', 0], ['agencias', Building2, 'Agências', 0],
           ['noticias', Newspaper, 'Notícias', 0], ['publicidade', Megaphone, 'Publicidade', 0], ['definicoes', Settings, 'Definições', 0],
         ].map(([value, Icon, label, count]) => (
           <button
@@ -775,6 +854,9 @@ function AdminInner() {
               {p.status === 'ativo' && (
                 <button onClick={() => cancelProperty(p)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>{t('admin_cancel_listing')}</button>
               )}
+              <button onClick={() => adminDeleteProperty(p)} className="btn" style={{ fontSize: 13, borderColor: '#8a3b2a', color: '#8a3b2a' }}>
+                🗑 Apagar definitivamente
+              </button>
             </div>
           </div>
         )}
@@ -801,7 +883,29 @@ function AdminInner() {
                     {r.properties ? `${r.properties.typology} · ${r.properties.address}` : 'Imóvel removido'} · {r.status}
                   </div>
                   {r.details && <p style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 4, maxWidth: 460 }}>{r.details}</p>}
-                  {r.reporter_contact && <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 4 }}>De: {r.reporter_name || 'sem nome'} · Contacto: {r.reporter_contact}</p>}
+                  {r.reporter_contact && (
+                    <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 4 }}>
+                      De: {r.reporter_name || 'sem nome'} · Contacto:{' '}
+                      {r.reporter_contact.includes('@') ? r.reporter_contact : (
+                        <PhoneDisplay phone={r.reporter_contact} style={{ color: 'var(--telha)', cursor: 'pointer' }}>
+                          📞 {r.reporter_contact}
+                        </PhoneDisplay>
+                      )}
+                    </p>
+                  )}
+                  {(r.reporter_user_id || r.reporter_contact?.includes('@')) && (
+                    <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+                      <input
+                        value={reportReplyText[r.id] || ''}
+                        onChange={(e) => setReportReplyText((cur) => ({ ...cur, [r.id]: e.target.value }))}
+                        placeholder="Responder a quem denunciou..."
+                        style={{ flex: 1, padding: '6px 10px', borderRadius: 16, border: '1px solid var(--line)', fontSize: 12.5 }}
+                      />
+                      <button onClick={() => replyToReport(r)} className="btn" style={{ fontSize: 11.5, padding: '4px 10px' }}>
+                        Enviar
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   {r.properties && (
@@ -875,15 +979,15 @@ function AdminInner() {
                   <input
                     value={supportReplyText[m.id] || ''}
                     onChange={(e) => setSupportReplyText((cur) => ({ ...cur, [m.id]: e.target.value }))}
-                    placeholder={m.user_id ? 'Escreva uma resposta...' : 'Sem conta associada — sem forma de responder na app'}
-                    disabled={!m.user_id}
+                    placeholder={!m.user_id ? 'Sem conta associada — sem forma de responder na app' : m.status === 'resolvida' ? 'Reabra a conversa para poder escrever' : 'Escreva uma resposta...'}
+                    disabled={!m.user_id || m.status === 'resolvida'}
                     style={{ flex: 1, padding: '8px 12px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 13 }}
                   />
                   <button
                     onClick={() => sendSupportReply(m.id)}
                     className="btn btn-primary"
                     style={{ fontSize: 12.5 }}
-                    disabled={!m.user_id}
+                    disabled={!m.user_id || m.status === 'resolvida'}
                   >
                     Enviar
                   </button>
@@ -907,9 +1011,14 @@ function AdminInner() {
                     </button>
                   )}
                   {m.status === 'resolvida' && (
-                    <button onClick={() => deleteSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5, color: '#b8452f' }}>
-                      🗑 Apagar
-                    </button>
+                    <>
+                      <button onClick={() => reopenSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5 }}>
+                        Reabrir
+                      </button>
+                      <button onClick={() => deleteSupportMessage(m.id)} className="btn" style={{ fontSize: 12.5, color: '#b8452f' }}>
+                        🗑 Apagar
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -972,7 +1081,9 @@ function AdminInner() {
                   <div>
                     <b style={{ fontSize: 14 }}>{u.agency_name || u.full_name}</b>
                     <div className="meta">
-                      {u.email}{u.phone_real ? ` · 📞 ${u.phone_real}` : ''}
+                      {u.email}{u.phone_real ? (
+                        <> · <PhoneDisplay phone={u.phone_real} style={{ color: 'inherit', cursor: 'pointer' }}>📞 {u.phone_real}</PhoneDisplay></>
+                      ) : ''}
                     </div>
                     <div className="meta" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <select
@@ -1088,7 +1199,9 @@ function AdminInner() {
                     <div>
                       <b style={{ fontSize: 14 }}>{l.name}</b>
                       <div className="meta">
-                        {l.email}{l.phone ? ` · 📞 ${l.phone}` : ''}
+                        {l.email}{l.phone ? (
+                          <> · <PhoneDisplay phone={l.phone} style={{ color: 'inherit', cursor: 'pointer' }}>📞 {l.phone}</PhoneDisplay></>
+                        ) : ''}
                       </div>
                     </div>
                     <span style={{
@@ -1120,6 +1233,41 @@ function AdminInner() {
                 </div>
               )}
             />
+          )}
+        </>
+      )}
+
+      {section === 'avaliacoes' && (
+        <>
+          <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
+            Pedidos de avaliação de imóvel, enviados através do formulário "Avaliar imóvel" do site.
+          </p>
+          {valuationRequests.length === 0 ? (
+            <p className="empty-state">Ainda não há pedidos de avaliação.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {valuationRequests.map((v) => (
+                <div key={v.id} className="card" style={{ padding: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+                    <div>
+                      <b style={{ fontSize: 14 }}>{v.name}</b>
+                      <div className="meta">{v.contact}</div>
+                    </div>
+                    <span className="meta">{new Date(v.created_at).toLocaleDateString('pt-PT')}</span>
+                  </div>
+                  <div style={{ fontSize: 13.5, marginBottom: 6 }}>
+                    <b>Morada:</b> {v.address}
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 10 }}>
+                    {v.typology && `${v.typology} · `}{v.area && `${v.area} m²`}
+                  </div>
+                  {v.notes && <p style={{ fontSize: 13, marginBottom: 10 }}>{v.notes}</p>}
+                  <button onClick={() => deleteValuationRequest(v.id)} className="btn" style={{ fontSize: 11.5, padding: '4px 10px', color: '#8a3b2a', borderColor: '#8a3b2a' }}>
+                    🗑 Apagar
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </>
       )}

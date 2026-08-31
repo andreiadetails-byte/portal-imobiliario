@@ -43,11 +43,15 @@ function parseDescription(text) {
   const typMatches = lower.match(/t\s?([0-5])/g) || [];
   result.typologies = [...new Set(typMatches.map((m) => `T${m.replace(/[^0-5]/g, '')}`))];
 
-  // Preço máximo — PT "até", EN "up to"/"under", ES "hasta"
-  const priceMatch = lower.match(/(?:até|up to|under|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)\s*([\d.,]+)\s*(mil|k|thousand|mil euros)?/);
+  // Preço máximo — PT "até" (aceita frases como "até aos", "até um máximo de"),
+  // EN "up to"/"under", ES "hasta". Em vez de exigir que o número venha logo a
+  // seguir à palavra-chave, aceita até 3 palavras pelo meio (ex: "até aos
+  // 100000€", "até um máximo de 100 mil") — muito mais tolerante a como as
+  // pessoas realmente escrevem.
+  const priceMatch = lower.match(/(?:até|up to|under|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(mil|k|thousand|€|eur|euros)?/);
   if (priceMatch) {
     let value = priceMatch[1].replace(/[.,]/g, '');
-    if (priceMatch[2]) value += '000';
+    if (priceMatch[2] && /mil|k|thousand/.test(priceMatch[2])) value += '000';
     result.maxPrice = value;
   }
 
@@ -89,6 +93,7 @@ export default function NaturalSearchBox() {
   const { lang } = useLanguage();
   const [text, setText] = useState('');
   const [listening, setListening] = useState(false);
+  const [requestingMic, setRequestingMic] = useState(false);
   const [interimText, setInterimText] = useState('');
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [voiceError, setVoiceError] = useState('');
@@ -110,7 +115,7 @@ export default function NaturalSearchBox() {
     recognition.continuous = true;
     recognition.maxAlternatives = 1;
 
-    recognition.onstart = () => { startingRef.current = false; setListening(true); setVoiceError(''); };
+    recognition.onstart = () => { startingRef.current = false; setRequestingMic(false); setListening(true); setVoiceError(''); };
 
     recognition.onresult = (event) => {
       let finalChunk = '';
@@ -128,9 +133,10 @@ export default function NaturalSearchBox() {
         setInterimText(interimChunk);
       }
     };
-    recognition.onend = () => { startingRef.current = false; setListening(false); setInterimText(''); };
+    recognition.onend = () => { startingRef.current = false; setRequestingMic(false); setListening(false); setInterimText(''); };
     recognition.onerror = (event) => {
       startingRef.current = false;
+      setRequestingMic(false);
       setListening(false);
       setInterimText('');
       if (event.error === 'not-allowed' || event.error === 'permission-denied') {
@@ -165,6 +171,7 @@ export default function NaturalSearchBox() {
     } else {
       baseTextRef.current = text;
       startingRef.current = true;
+      setRequestingMic(true);
       try {
         recognitionRef.current.start();
         // Rede de segurança: se o browser pedir permissão para o microfone e a
@@ -173,6 +180,7 @@ export default function NaturalSearchBox() {
         setTimeout(() => {
           if (startingRef.current) {
             startingRef.current = false;
+            setRequestingMic(false);
             try { recognitionRef.current.stop(); } catch (err2) { /* nada a fazer */ }
             setVoiceError(ui.mic_no_start);
           }
@@ -180,6 +188,7 @@ export default function NaturalSearchBox() {
       } catch (err) {
         // Já estava a começar (clique duplo) — para tudo e deixa a pessoa tentar de novo.
         startingRef.current = false;
+        setRequestingMic(false);
         try { recognitionRef.current.stop(); } catch (err2) { /* nada a fazer */ }
         setTimeout(() => {
           try { recognitionRef.current.start(); } catch (err3) { setVoiceError(ui.mic_retry); }
@@ -487,6 +496,24 @@ export default function NaturalSearchBox() {
 
   return (
     <form onSubmit={handleSubmit} className="card" style={{ padding: 18 }}>
+      {requestingMic && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(20,17,12,0.6)', zIndex: 300,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+          }}
+        >
+          <div className="card" style={{ padding: 28, maxWidth: 340, textAlign: 'center' }}>
+            <div style={{ fontSize: 44, marginBottom: 12 }}>🎙️</div>
+            <p style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}>
+              A pedir acesso ao microfone...
+            </p>
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>
+              Se aparecer um pedido de permissão do navegador, toque em "Permitir" para poder usar a pesquisa por voz.
+            </p>
+          </div>
+        </div>
+      )}
       <h3 className="display" style={{ fontSize: 19, marginBottom: 5, fontWeight: 600 }}>{ui.title}</h3>
       <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 12 }}>
         {ui.sub(voiceSupported)}

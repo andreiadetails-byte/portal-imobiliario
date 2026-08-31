@@ -174,7 +174,11 @@ export default function LocationAutocomplete({ onChange, onLevels, placeholder =
               <span>{item.label}</span>
               {!distrito && (
                 <span style={{ fontSize: 10.5, color: 'var(--text-soft)', flexShrink: 0 }}>
-                  {item.level === 'distrito' ? 'distrito' : item.level === 'concelho' ? item.distrito : `${item.concelho}, ${item.distrito}`}
+                  {item.level === 'distrito'
+                    ? '(distrito)'
+                    : item.level === 'concelho'
+                      ? `(concelho, ${item.distrito})`
+                      : `(freguesia, ${item.concelho})`}
                 </span>
               )}
             </div>

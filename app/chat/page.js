@@ -135,6 +135,8 @@ function ChatInner() {
   async function sendMessage(e) {
     e.preventDefault();
     if (!text.trim()) return;
+    const activeConv = conversations.find((c) => c.id === activeId);
+    if (activeConv?.status === 'tratada') return; // proteção extra — o campo já fica desativado neste caso
     const content = text.trim();
     setText('');
     const { data } = await supabase.from('messages').insert({ conversation_id: activeId, sender_id: user.id, content }).select().single();
@@ -461,10 +463,11 @@ function ChatInner() {
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder={t('chat_placeholder')}
+                placeholder={activeConversation?.status === 'tratada' ? t('chat_reopen_to_write') : t('chat_placeholder')}
+                disabled={activeConversation?.status === 'tratada'}
                 style={{ flex: 1, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 16 }}
               />
-              <button type="submit" className="btn btn-primary" style={{ borderRadius: '50%', width: 40, height: 40, padding: 0 }}>&rarr;</button>
+              <button type="submit" className="btn btn-primary" disabled={activeConversation?.status === 'tratada'} style={{ borderRadius: '50%', width: 40, height: 40, padding: 0 }}>&rarr;</button>
             </form>
           </div>
         </div>

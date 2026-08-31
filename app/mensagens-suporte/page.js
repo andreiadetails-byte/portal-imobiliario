@@ -28,6 +28,18 @@ export default function MensagensSuportePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
+  // Atualiza a conversa em tempo real — assim que o admin responde, a
+  // resposta aparece logo aqui, sem ser preciso sair e voltar a entrar.
+  useEffect(() => {
+    if (!userId) return;
+    const channel = supabase
+      .channel(`support-replies-${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_replies' }, () => loadSupport(userId))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_requests', filter: `user_id=eq.${userId}` }, () => loadSupport(userId))
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userId]);
+
   async function loadSupport(uid) {
     const { data: requests } = await supabase
       .from('support_requests').select('*').eq('user_id', uid).order('created_at', { ascending: false });
@@ -54,6 +66,11 @@ export default function MensagensSuportePage() {
     await supabase.from('support_replies').insert({ support_request_id: requestId, sender_role: 'user', message: text });
     setReplyText((cur) => ({ ...cur, [requestId]: '' }));
     loadSupport(userId);
+  }
+
+  async function reopenThread(requestId) {
+    await supabase.from('support_requests').update({ status: 'aberta' }).eq('id', requestId);
+    setSupportThreads((cur) => cur.map((r) => (r.id === requestId ? { ...r, status: 'aberta' } : r)));
   }
 
   async function deleteThread(requestId) {
@@ -151,13 +168,22 @@ export default function MensagensSuportePage() {
                 </div>
 
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <input
-                    value={replyText[r.id] || ''}
-                    onChange={(e) => setReplyText((cur) => ({ ...cur, [r.id]: e.target.value }))}
-                    placeholder={t('attr_write_message')}
-                    style={{ flex: 1, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 16 }}
-                  />
-                  <button onClick={() => sendSupportReply(r.id)} className="btn btn-primary" style={{ fontSize: 13.5 }}>{t('support_send')}</button>
+                  {r.status === 'resolvida' ? (
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: 'var(--plaster)', borderRadius: 8, padding: '10px 14px' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-soft)' }}>✓ Esta conversa foi marcada como tratada.</span>
+                      <button onClick={() => reopenThread(r.id)} className="btn" style={{ fontSize: 12.5, flexShrink: 0 }}>Reabrir</button>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        value={replyText[r.id] || ''}
+                        onChange={(e) => setReplyText((cur) => ({ ...cur, [r.id]: e.target.value }))}
+                        placeholder={t('attr_write_message')}
+                        style={{ flex: 1, padding: '10px 14px', borderRadius: 20, border: '1px solid var(--line)', fontSize: 16 }}
+                      />
+                      <button onClick={() => sendSupportReply(r.id)} className="btn btn-primary" style={{ fontSize: 13.5 }}>{t('support_send')}</button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

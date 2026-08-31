@@ -61,7 +61,7 @@ export async function POST(request) {
 
     const { data: property } = await supabaseAdmin
       .from('properties')
-      .select('owner_id, status, video_url, floor_plan_url, document_url')
+      .select('owner_id, status, video_url, floor_plan_url, document_url, typology, address')
       .eq('id', propertyId)
       .single();
 
@@ -115,6 +115,17 @@ export async function POST(request) {
 
     await supabaseAdmin.from('property_photos').delete().eq('property_id', propertyId);
     await supabaseAdmin.from('properties').delete().eq('id', propertyId);
+
+    // Se foi o admin a apagar o anúncio de outra pessoa (não o próprio
+    // dono), avisa essa pessoa — para não ficar sem saber porque é que o
+    // anúncio desapareceu.
+    if (property.owner_id !== userId) {
+      await supabaseAdmin.from('notifications').insert({
+        user_id: property.owner_id,
+        message: `Um administrador removeu o seu anúncio "${property.typology || ''} · ${property.address || ''}". Contacte o suporte se tiver dúvidas sobre este motivo.`,
+        link: '/dashboard',
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
