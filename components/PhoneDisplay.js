@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 
-// Mostra um número de telefone de forma diferente consoante o aparelho:
-// - No telemóvel, é um link "tel:" normal — um toque já liga.
-// - No computador, ao clicar copia o número para a área de transferência
-//   (com uma pequena confirmação visual) — mais útil do que abrir o Skype
-//   ou não fazer nada de todo.
+// Mostra sempre o texto normal (ex: "Chamar") primeiro. Só depois de se
+// clicar é que:
+// - No telemóvel, liga diretamente (como antes).
+// - No computador, revela o número por baixo do botão, e copia-o para a
+//   área de transferência — sem tentar abrir o Skype nem nada assim.
 export default function PhoneDisplay({ phone, style, className, children, onClick }) {
   const [isMobile, setIsMobile] = useState(null);
+  const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -25,26 +26,24 @@ export default function PhoneDisplay({ phone, style, className, children, onClic
     );
   }
 
-  async function handleCopy(e) {
+  async function handleClick(e) {
     onClick?.(e);
+    setRevealed(true);
     try {
       await navigator.clipboard.writeText(phone);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Se a cópia automática falhar por algum motivo, pelo menos o número
-      // já estava visível como texto normal, e a pessoa pode selecioná-lo à mão.
+      // Se a cópia automática falhar, o número já fica visível na mesma,
+      // e a pessoa pode selecioná-lo à mão.
     }
   }
 
   return (
-    <span
-      style={{ ...style, position: 'relative', cursor: 'pointer' }}
-      className={className}
-      title="Clique para copiar o número"
-      onClick={handleCopy}
-    >
-      {children}
+    <span style={{ position: 'relative', display: 'inline-block' }}>
+      <button type="button" onClick={handleClick} style={{ ...style, border: style?.border || 'none', cursor: 'pointer' }} className={className}>
+        {revealed ? `📞 ${phone}` : children}
+      </button>
       {copied && (
         <span style={{
           position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: 6,

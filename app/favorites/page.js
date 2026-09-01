@@ -341,7 +341,7 @@ export default function FavoritesPage() {
                             border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                           }}
                         >
-                          📞 {p.profiles.phone_public}
+                          📞 {t('prop_call')}
                         </PhoneDisplay>
                       )}
                     </div>

@@ -801,7 +801,7 @@ function ResultsInner() {
                               border: 'none', borderRadius: 9, padding: '13px 20px', textDecoration: 'none', boxShadow: '0 3px 10px rgba(58,90,120,0.3)',
                             }}
                           >
-                            📞 {p.profiles.phone_public}
+                            📞 {t('prop_call')}
                           </PhoneDisplay>
                         )}
                       </div>

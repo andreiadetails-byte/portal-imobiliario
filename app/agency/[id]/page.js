@@ -194,7 +194,7 @@ export default function AgencyPage() {
                 className="btn"
                 style={{ fontSize: 13, marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
               >
-                📞 {profile.phone_public}
+                📞 {t('prop_call')}
               </PhoneDisplay>
             )}
           </div>
@@ -324,7 +324,7 @@ export default function AgencyPage() {
                           border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                         }}
                       >
-                        📞 {profile.phone_public}
+                        📞 {t('prop_call')}
                       </PhoneDisplay>
                     )}
                   </div>

@@ -489,7 +489,7 @@ export default function PropertyClient() {
               }}
             >
               📞
-              <span style={{ fontSize: 13.5, fontWeight: 600 }}>{ownerProfile.phone_public}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 600 }}>{t('prop_call')}</span>
             </PhoneDisplay>
           )}
 
@@ -607,7 +607,7 @@ export default function PropertyClient() {
                     onClick={(e) => e.stopPropagation()}
                     style={{ fontSize: 12, color: 'var(--telha)', fontWeight: 600, marginTop: 2, display: 'block', textDecoration: 'none', cursor: 'pointer' }}
                   >
-                    📞 {ownerProfile.phone_public}
+                    📞 {t('prop_call')}
                   </PhoneDisplay>
                 )}
                 <span style={{ fontSize: 11.5, color: 'var(--telha)', fontWeight: 600, marginTop: 4, display: 'inline-block', textDecoration: 'underline' }}>

@@ -139,8 +139,20 @@ function ChatInner() {
     if (activeConv?.status === 'tratada') return; // proteção extra — o campo já fica desativado neste caso
     const content = text.trim();
     setText('');
-    const { data } = await supabase.from('messages').insert({ conversation_id: activeId, sender_id: user.id, content }).select().single();
-    if (data) setConversations((cur) => cur.map((c) => (c.id === activeId ? { ...c, lastMessage: data } : c)));
+    const { data, error } = await supabase.from('messages').insert({ conversation_id: activeId, sender_id: user.id, content }).select().single();
+    if (error) {
+      alert(`Não foi possível enviar a mensagem: ${error.message}`);
+      setText(content); // repõe o texto, para não se perder
+      return;
+    }
+    if (data) {
+      setConversations((cur) => cur.map((c) => (c.id === activeId ? { ...c, lastMessage: data } : c)));
+      // Mostra a mensagem já aqui, sem esperar pelo aviso de "tempo real" —
+      // assim, mesmo que essa parte falhe por algum motivo, continuas
+      // sempre a ver a tua própria mensagem assim que a envias. Evita
+      // duplicar, caso o aviso de tempo real também chegue a seguir.
+      setMessages((cur) => (cur.some((m) => m.id === data.id) ? cur : [...cur, data]));
+    }
   }
 
   async function deleteMessage(msg) {
