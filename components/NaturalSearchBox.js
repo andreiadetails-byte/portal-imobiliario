@@ -48,7 +48,7 @@ function parseDescription(text) {
   // seguir à palavra-chave, aceita até 3 palavras pelo meio (ex: "até aos
   // 100000€", "até um máximo de 100 mil") — muito mais tolerante a como as
   // pessoas realmente escrevem.
-  const priceMatch = lower.match(/(?:até|up to|under|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(mil|k|thousand|€|eur|euros)?/);
+  const priceMatch = lower.match(/(?:at[ée]|up to|under|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(mil|k|thousand|€|eur|euros)?/);
   if (priceMatch) {
     let value = priceMatch[1].replace(/[.,]/g, '');
     if (priceMatch[2] && /mil|k|thousand/.test(priceMatch[2])) value += '000';

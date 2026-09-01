@@ -496,13 +496,13 @@ function ResultsInner() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'start' }}>
               <div className="field">
-                <label>{t('results_min_bedrooms')}</label>
+                <label style={{ display: 'block', minHeight: 32 }}>{t('results_min_bedrooms')}</label>
                 <select value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)}>
                   {[0, 1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
               <div className="field">
-                <label>{t('results_wc_min')}</label>
+                <label style={{ display: 'block', minHeight: 32 }}>{t('results_wc_min')}</label>
                 <select value={minBathrooms} onChange={(e) => setMinBathrooms(e.target.value)}>
                   {[0, 1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
@@ -801,7 +801,7 @@ function ResultsInner() {
                               border: 'none', borderRadius: 9, padding: '13px 20px', textDecoration: 'none', boxShadow: '0 3px 10px rgba(58,90,120,0.3)',
                             }}
                           >
-                            📞 {t('prop_call')}
+                            📞 {p.profiles.phone_public}
                           </PhoneDisplay>
                         )}
                       </div>

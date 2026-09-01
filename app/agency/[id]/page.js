@@ -324,7 +324,7 @@ export default function AgencyPage() {
                           border: '1.5px solid var(--line)', borderRadius: 8, padding: '11px 16px', textDecoration: 'none',
                         }}
                       >
-                        📞 {t('prop_call')}
+                        📞 {profile.phone_public}
                       </PhoneDisplay>
                     )}
                   </div>
