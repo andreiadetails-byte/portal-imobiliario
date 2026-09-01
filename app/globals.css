@@ -324,13 +324,6 @@ textarea:focus-visible, [tabindex]:focus-visible{
   .result-card-details{ font-size: 14px !important; }
   .result-card-description{ font-size: 14px !important; }
 }
-@media (max-width: 640px){
-  /* No telemóvel, não faz sentido mostrar um código QR (a pessoa já está a
-     ver a página no próprio telemóvel, não pode "digitalizar" o ecrã dela
-     mesma) — mostra só as instruções de texto para instalar. */
-  .install-qr-image{ display: none !important; }
-  .install-qr-section{ justify-content: flex-start !important; }
-}
 @media (min-width: 901px){
   .navbar-profile-btn-mobile{ display: none !important; }
 }

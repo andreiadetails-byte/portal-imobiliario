@@ -1,13 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 // Mostra sempre o texto normal (ex: "Chamar") primeiro. Só depois de se
 // clicar é que:
 // - No telemóvel, liga diretamente (como antes).
 // - No computador, revela o número por baixo do botão, e copia-o para a
 //   área de transferência — sem tentar abrir o Skype nem nada assim.
-export default function PhoneDisplay({ phone, style, className, children, onClick }) {
+//
+// Se vier "propertyId" e "ownerId", também regista a tentativa de chamada
+// como um lead — assim o anunciante (e o admin) fica a saber que alguém
+// tentou ligar, mesmo sem preencher nenhum formulário.
+export default function PhoneDisplay({ phone, style, className, children, onClick, propertyId, ownerId }) {
   const [isMobile, setIsMobile] = useState(null);
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -18,9 +23,29 @@ export default function PhoneDisplay({ phone, style, className, children, onClic
 
   if (!phone) return null;
 
+  function logCallLead() {
+    if (!propertyId || !ownerId) return;
+    supabase.from('leads').insert({
+      property_id: propertyId,
+      owner_id: ownerId,
+      name: 'Alguém, por telefone',
+      email: '',
+      phone: '',
+      message: 'Tentou ligar através do botão "Chamar" no anúncio (sem preencher formulário).',
+      status: 'novo',
+    }).then(({ error }) => {
+      if (error) console.error('Erro ao registar tentativa de chamada:', error);
+    });
+  }
+
   if (isMobile) {
     return (
-      <a href={`tel:${phone.replace(/\s+/g, '')}`} style={style} className={className} onClick={onClick}>
+      <a
+        href={`tel:${phone.replace(/\s+/g, '')}`}
+        style={style}
+        className={className}
+        onClick={(e) => { onClick?.(e); logCallLead(); }}
+      >
         {children}
       </a>
     );
@@ -29,6 +54,7 @@ export default function PhoneDisplay({ phone, style, className, children, onClic
   async function handleClick(e) {
     onClick?.(e);
     setRevealed(true);
+    logCallLead();
     try {
       await navigator.clipboard.writeText(phone);
       setCopied(true);

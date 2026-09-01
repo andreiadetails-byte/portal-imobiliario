@@ -317,6 +317,8 @@ export default function AgencyPage() {
                     {profile.phone_public && (
                       <PhoneDisplay
                         phone={profile.phone_public}
+                        propertyId={p.id}
+                        ownerId={profile.id}
                         onClick={(e) => e.stopPropagation()}
                         style={{
                           display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, cursor: 'pointer',

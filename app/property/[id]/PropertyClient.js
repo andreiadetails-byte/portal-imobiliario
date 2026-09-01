@@ -483,6 +483,8 @@ export default function PropertyClient() {
           {ownerProfile?.phone_public && (
             <PhoneDisplay
               phone={ownerProfile.phone_public}
+              propertyId={property.id}
+              ownerId={property.owner_id}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, padding: '12px 16px', cursor: 'pointer',
                 background: 'var(--plaster)', borderRadius: 8, textDecoration: 'none', color: 'var(--ink)',
@@ -604,6 +606,8 @@ export default function PropertyClient() {
                 {ownerProfile.phone_public && (
                   <PhoneDisplay
                     phone={ownerProfile.phone_public}
+                    propertyId={property.id}
+                    ownerId={property.owner_id}
                     onClick={(e) => e.stopPropagation()}
                     style={{ fontSize: 12, color: 'var(--telha)', fontWeight: 600, marginTop: 2, display: 'block', textDecoration: 'none', cursor: 'pointer' }}
                   >
@@ -765,6 +769,8 @@ export default function PropertyClient() {
         {ownerProfile?.phone_public && (
           <PhoneDisplay
             phone={ownerProfile.phone_public}
+            propertyId={property.id}
+            ownerId={property.owner_id}
             style={{
               flex: 1, background: 'var(--paper)', color: 'var(--ink)', border: '1.5px solid var(--line)', borderRadius: 9,
               padding: '17px 12px', fontSize: 18, fontWeight: 700, textDecoration: 'none', cursor: 'pointer',

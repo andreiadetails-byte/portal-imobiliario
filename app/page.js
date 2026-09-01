@@ -422,6 +422,8 @@ export default function HomePage() {
                       {p.profiles?.phone_public && (
                         <PhoneDisplay
                           phone={p.profiles.phone_public}
+                          propertyId={p.id}
+                          ownerId={p.owner_id}
                           onClick={(e) => e.stopPropagation()}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, cursor: 'pointer',
@@ -529,6 +531,8 @@ export default function HomePage() {
                       {p.profiles?.phone_public && (
                         <PhoneDisplay
                           phone={p.profiles.phone_public}
+                          propertyId={p.id}
+                          ownerId={p.owner_id}
                           onClick={(e) => e.stopPropagation()}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, cursor: 'pointer',

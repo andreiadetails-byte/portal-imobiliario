@@ -254,6 +254,11 @@ function AdminInner() {
     setValuationRequests((cur) => cur.filter((v) => v.id !== id));
   }
 
+  async function markValuationRead(id) {
+    await supabase.from('valuation_requests').update({ status: 'lida' }).eq('id', id);
+    setValuationRequests((cur) => cur.map((v) => (v.id === id ? { ...v, status: 'lida' } : v)));
+  }
+
   async function markLeadRead(id) {
     await supabase.from('leads').update({ status: 'lida' }).eq('id', id);
     setAllLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: 'lida' } : l)));
@@ -739,7 +744,7 @@ function AdminInner() {
           ['anuncios', ClipboardList, 'Anúncios', 0],
           ['denuncias', Flag, 'Denúncias', reports.filter((r) => r.status !== 'resolvida').length],
           ['suporte', MessageCircle, 'Suporte', supportMessages.filter((m) => !m.read_by_admin).length],
-          ['utilizadores', Users, 'Utilizadores', 0], ['leads', Mail, 'Leads', allLeads.filter((l) => l.status === 'novo').length], ['avaliacoes', Calculator, 'Avaliações', valuationRequests.length], ['atividade', Footprints, 'Atividade', 0], ['campanha', Send, 'Campanha', 0], ['destaques', Star, 'Destaques', 0], ['agencias', Building2, 'Agências', 0],
+          ['utilizadores', Users, 'Utilizadores', 0], ['leads', Mail, 'Leads', allLeads.filter((l) => l.status === 'novo').length], ['avaliacoes', Calculator, 'Avaliações', valuationRequests.filter((v) => v.status !== 'lida').length], ['atividade', Footprints, 'Atividade', 0], ['campanha', Send, 'Campanha', 0], ['destaques', Star, 'Destaques', 0], ['agencias', Building2, 'Agências', 0],
           ['noticias', Newspaper, 'Notícias', 0], ['publicidade', Megaphone, 'Publicidade', 0], ['definicoes', Settings, 'Definições', 0],
         ].map(([value, Icon, label, count]) => (
           <button
@@ -1254,6 +1259,11 @@ function AdminInner() {
                       <div className="meta">{v.contact}</div>
                     </div>
                     <span className="meta">{new Date(v.created_at).toLocaleDateString('pt-PT')}</span>
+                    {v.status === 'lida' && (
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 12, background: 'var(--line)', color: 'var(--text-soft)' }}>
+                        Lida
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: 13.5, marginBottom: 6 }}>
                     <b>Morada:</b> {v.address}
@@ -1262,9 +1272,16 @@ function AdminInner() {
                     {v.typology && `${v.typology} · `}{v.area && `${v.area} m²`}
                   </div>
                   {v.notes && <p style={{ fontSize: 13, marginBottom: 10 }}>{v.notes}</p>}
-                  <button onClick={() => deleteValuationRequest(v.id)} className="btn" style={{ fontSize: 11.5, padding: '4px 10px', color: '#8a3b2a', borderColor: '#8a3b2a' }}>
-                    🗑 Apagar
-                  </button>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {v.status !== 'lida' && (
+                      <button onClick={() => markValuationRead(v.id)} className="btn" style={{ fontSize: 11.5, padding: '4px 10px' }}>
+                        ✓ Marcar como lida
+                      </button>
+                    )}
+                    <button onClick={() => deleteValuationRequest(v.id)} className="btn" style={{ fontSize: 11.5, padding: '4px 10px', color: '#8a3b2a', borderColor: '#8a3b2a' }}>
+                      🗑 Apagar
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

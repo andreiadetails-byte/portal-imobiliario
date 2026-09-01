@@ -109,15 +109,24 @@ export default function FavoritesPage() {
         .select('property_id, notes, price_at_save')
         .eq('user_id', user.id);
 
+      if (favError) {
+        console.error('Erro ao carregar favoritos:', favError);
+        alert(`Não foi possível carregar os favoritos: ${favError.message}`);
+      }
+
       let favProperties = [];
       if (!favError && favIds && favIds.length > 0) {
         const ids = favIds.map((f) => f.property_id);
         const notesById = Object.fromEntries(favIds.map((f) => [f.property_id, f.notes || '']));
         const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
-        const { data: propsData } = await supabase
+        const { data: propsData, error: propsError } = await supabase
           .from('properties')
           .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
           .in('id', ids);
+        if (propsError) {
+          console.error('Erro ao carregar os imóveis favoritos:', propsError);
+          alert(`Não foi possível carregar os dados dos imóveis: ${propsError.message}`);
+        }
         favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '', price_at_save: priceAtSaveById[p.id] }));
         setProperties(favProperties);
       } else {
@@ -335,6 +344,8 @@ export default function FavoritesPage() {
                       {p.profiles?.phone_public && (
                         <PhoneDisplay
                           phone={p.profiles.phone_public}
+                          propertyId={p.id}
+                          ownerId={p.owner_id}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, cursor: 'pointer',
                             fontWeight: 700, color: 'var(--ink)', background: 'var(--plaster)',
