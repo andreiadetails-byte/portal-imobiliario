@@ -238,7 +238,7 @@ function AdminInner() {
   async function loadAllLeads() {
     const { data } = await supabase
       .from('leads')
-      .select('*, properties(id, typology, address, district, owner_id, profiles(id, full_name, agency_name))')
+      .select('*, properties(id, typology, address, district, owner_id, profiles!owner_id(id, full_name, agency_name))')
       .order('created_at', { ascending: false });
     setAllLeads(data || []);
   }
@@ -496,7 +496,7 @@ function AdminInner() {
   async function loadReports() {
     const { data } = await supabase
       .from('reports')
-      .select('id, reason, details, reporter_name, reporter_contact, reporter_user_id, status, created_at, properties(id, typology, address, owner_id, profiles(id, full_name, agency_name))')
+      .select('id, reason, details, reporter_name, reporter_contact, reporter_user_id, status, created_at, properties(id, typology, address, owner_id, profiles!owner_id(id, full_name, agency_name))')
       .order('created_at', { ascending: false });
     setReports(data || []);
   }
@@ -551,7 +551,7 @@ function AdminInner() {
 
   async function loadFeatured() {
     const { data } = await supabase
-      .from('properties').select('id, typology, address, price, featured_status, featured_requested_at, profiles(id, full_name, agency_name)')
+      .from('properties').select('id, typology, address, price, featured_status, featured_requested_at, profiles!owner_id(id, full_name, agency_name)')
       .in('featured_status', ['pending', 'active'])
       .order('featured_requested_at', { ascending: false });
     setFeaturedList(data || []);
@@ -651,7 +651,7 @@ function AdminInner() {
 
   async function loadProperties(status) {
     setFilter(status);
-    let query = supabase.from('properties').select('*, profiles(id, full_name, agency_name, account_type)').order('created_at', { ascending: false });
+    let query = supabase.from('properties').select('*, profiles!owner_id(id, full_name, agency_name, account_type)').order('created_at', { ascending: false });
     if (status !== 'todos') query = query.eq('status', status);
     const { data } = await query;
     setProperties(data || []);

@@ -96,7 +96,7 @@ export default function FavoritesPage() {
         if (localIds.length > 0) {
           const { data: propsData } = await supabase
             .from('properties')
-            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
             .in('id', localIds);
           setProperties((propsData || []).map((p) => ({ ...p, notes: '', price_at_save: null })));
         }
@@ -121,7 +121,7 @@ export default function FavoritesPage() {
         const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
         const { data: propsData, error: propsError } = await supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
           .in('id', ids);
         if (propsError) {
           console.error('Erro ao carregar os imóveis favoritos:', propsError);
@@ -146,7 +146,7 @@ export default function FavoritesPage() {
 
         let query = supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
           .eq('status', 'ativo')
           .gte('price', avgPrice * 0.7)
           .lte('price', avgPrice * 1.3)
@@ -193,7 +193,7 @@ export default function FavoritesPage() {
     // Vai buscar o próprio imóvel para o juntar à lista principal de favoritos, sem precisar de recarregar a página.
     const { data: newFav } = await supabase
       .from('properties')
-      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles(phone_public, agency_name, full_name)')
+      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
       .eq('id', propertyId).single();
     if (newFav) setProperties((cur) => [newFav, ...cur]);
   }
