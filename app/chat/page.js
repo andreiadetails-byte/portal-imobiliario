@@ -17,9 +17,20 @@ function ChatInner() {
   const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [activeId, setActiveId] = useState(searchParams.get('c') || null);
+
+  // Se a pessoa já estiver na página de mensagens e clicar noutra
+  // notificação (para uma conversa diferente), isto garante que a
+  // conversa certa abre mesmo — só ler o link ao abrir a página pela
+  // primeira vez não chegava, porque a página não recarrega de propósito.
+  useEffect(() => {
+    const c = searchParams.get('c');
+    if (c && c !== activeId) setActiveId(c);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
   const [filter, setFilter] = useState('todas');
   const [search, setSearch] = useState('');
 
@@ -98,7 +109,22 @@ function ChatInner() {
     }
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [reloadTrigger]);
+
+  // Vigia mensagens novas em QUALQUER uma das conversas da pessoa — mesmo
+  // as que estavam escondidas por terem sido apagadas — para a lista se
+  // atualizar sozinha quando uma conversa "reaparece" (a outra pessoa
+  // escreveu de novo depois de a termos apagado).
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`chat-list-refresh-${user.id}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+        setReloadTrigger((n) => n + 1);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   useEffect(() => {
     if (!activeId || !user) return;
