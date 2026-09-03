@@ -29,7 +29,7 @@ function ChatInner() {
       if (!currentUser) { router.push('/login'); return; }
       setUser(currentUser);
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('conversations')
         .select(`
           id, property_id, buyer_id, seller_id, status, deleted_by_buyer, deleted_by_seller,
@@ -39,6 +39,11 @@ function ChatInner() {
         `)
         .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
         .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Erro ao carregar conversas:', error);
+        alert(`Não foi possível carregar as mensagens: ${error.message}`);
+      }
 
       const convs = (data || []).filter((c) => {
         const isBuyer = c.buyer_id === currentUser.id;

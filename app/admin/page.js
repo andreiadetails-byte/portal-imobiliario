@@ -255,18 +255,30 @@ function AdminInner() {
   }
 
   async function markValuationRead(id) {
-    const { error } = await supabase.from('valuation_requests').update({ status: 'lida' }).eq('id', id);
-    if (error) {
-      alert(`Não foi possível marcar como lida: ${error.message}`);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/admin-update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ table: 'valuation_requests', id, updates: { status: 'lida' } }),
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      alert(`Não foi possível marcar como lida: ${error || 'erro desconhecido'}`);
       return;
     }
     setValuationRequests((cur) => cur.map((v) => (v.id === id ? { ...v, status: 'lida' } : v)));
   }
 
   async function markLeadRead(id) {
-    const { error } = await supabase.from('leads').update({ status: 'lida' }).eq('id', id);
-    if (error) {
-      alert(`Não foi possível marcar como lida: ${error.message}`);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/admin-update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ table: 'leads', id, updates: { status: 'lida' } }),
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      alert(`Não foi possível marcar como lida: ${error || 'erro desconhecido'}`);
       return;
     }
     setAllLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: 'lida' } : l)));

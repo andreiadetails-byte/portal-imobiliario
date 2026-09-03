@@ -25,6 +25,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [accountType, setAccountType] = useState('particular');
+  const [couponCode, setCouponCode] = useState('');
+  const [showCoupon, setShowCoupon] = useState(false);
   const [amiLicense, setAmiLicense] = useState('');
   const [phone, setPhone] = useState('');
   const [showPhonePublic, setShowPhonePublic] = useState(false);
@@ -280,10 +282,14 @@ export default function LoginPage() {
       }
 
       // Agências novas ficam com o primeiro mês grátis, sem precisar de pagar já.
+      // Um cupão válido pode dar meses extra além desse primeiro mês.
+      const COUPON_CODES = { MOREADA3: 3 };
+      const couponMonths = COUPON_CODES[couponCode.trim().toUpperCase()] || 0;
+
       let freeMonthFields = {};
       if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType)) {
         const freeUntil = new Date();
-        freeUntil.setMonth(freeUntil.getMonth() + 1);
+        freeUntil.setMonth(freeUntil.getMonth() + 1 + couponMonths);
         freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
       }
 
@@ -474,6 +480,31 @@ export default function LoginPage() {
                 <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>
                   Número de licença AMI (obrigatório em Portugal para mediação imobiliária).
                 </span>
+              </div>
+            )}
+
+            {isProfessionalAccount(accountType) && (
+              <div className="field">
+                {!showCoupon ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowCoupon(true)}
+                    style={{ fontSize: 12.5, color: 'var(--telha)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    🎟️ Tenho um cupão de oferta
+                  </button>
+                ) : (
+                  <>
+                    <label htmlFor="coupon-input">Código do cupão</label>
+                    <input
+                      id="coupon-input"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      placeholder="ex: MOREADA3"
+                      style={{ textTransform: 'uppercase' }}
+                    />
+                  </>
+                )}
               </div>
             )}
 
