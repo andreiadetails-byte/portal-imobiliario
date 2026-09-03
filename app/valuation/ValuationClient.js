@@ -5,12 +5,14 @@ import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { useLanguage } from '../../lib/i18n';
+import HoneypotField from '../../components/HoneypotField';
 
 export default function ValuationClient() {
   const { t } = useLanguage();
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ address: '', typology: '', area: '', notes: '', name: '', contact: '' });
+  const [honeypot, setHoneypot] = useState('');
 
   function update(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -18,6 +20,7 @@ export default function ValuationClient() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (honeypot) return; // robô apanhado — não faz nada, silenciosamente
     setSending(true);
     await supabase.from('valuation_requests').insert({
       address: form.address,
@@ -48,6 +51,7 @@ export default function ValuationClient() {
             </p>
           ) : (
             <form onSubmit={handleSubmit}>
+              <HoneypotField value={honeypot} onChange={setHoneypot} />
               <div className="field">
                 <label>{t('valuation_address_label')}</label>
                 <input required value={form.address} onChange={(e) => update('address', e.target.value)} placeholder={t('valuation_address_placeholder')} />

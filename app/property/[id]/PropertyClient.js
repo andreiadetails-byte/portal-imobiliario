@@ -7,6 +7,7 @@ import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../../../lib/localFavorites';
 import PhoneDisplay from '../../../components/PhoneDisplay';
+import HoneypotField from '../../../components/HoneypotField';
 import Header from '../../../components/Header';
 import { displayAddress } from '../../../lib/displayAddress';
 import { accountTypeLabel } from '../../../lib/accountTypes';
@@ -57,6 +58,8 @@ export default function PropertyClient() {
   const [reportModal, setReportModal] = useState(false);
   const [reportSent, setReportSent] = useState(false);
   const [reportForm, setReportForm] = useState({ reason: 'Anúncio enganador ou falso', details: '', name: '', contact: '' });
+  const [reportHoneypot, setReportHoneypot] = useState('');
+  const [leadHoneypot, setLeadHoneypot] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -184,6 +187,7 @@ export default function PropertyClient() {
 
   async function submitReport(e) {
     e.preventDefault();
+    if (reportHoneypot) return; // robô apanhado — não faz nada, silenciosamente
     await supabase.from('reports').insert({
       property_id: property.id,
       reason: reportForm.reason,
@@ -219,6 +223,7 @@ export default function PropertyClient() {
 
   async function handleSendLead(e) {
     e.preventDefault();
+    if (leadHoneypot) return; // robô apanhado — não faz nada, silenciosamente
 
     if (user && user.id !== property.owner_id) {
       // Com sessão iniciada: um sistema só — vai diretamente para o chat, com o nome e email visíveis na conversa.
@@ -641,6 +646,7 @@ export default function PropertyClient() {
             </div>
           ) : user ? (
             <form onSubmit={handleSendLead}>
+              <HoneypotField value={leadHoneypot} onChange={setLeadHoneypot} />
               <div className="field">
                 <label>{t('prop_your_name')}</label>
                 <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
@@ -683,6 +689,7 @@ export default function PropertyClient() {
             </form>
           ) : (
             <form onSubmit={handleSendLead}>
+              <HoneypotField value={leadHoneypot} onChange={setLeadHoneypot} />
               <div className="field">
                 <label>{t('property_name')}</label>
                 <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
@@ -795,6 +802,7 @@ export default function PropertyClient() {
             <p style={{ fontSize: 14 }}>{t('prop_report_thanks')}</p>
           ) : (
             <form onSubmit={submitReport}>
+              <HoneypotField value={reportHoneypot} onChange={setReportHoneypot} />
               <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16, background: 'var(--plaster)', padding: 12, borderRadius: 6 }}>
                 🔒 A sua identidade e contacto não são partilhados com o anunciante em momento nenhum — só a nossa equipa tem acesso a esta denúncia.
               </p>
@@ -970,6 +978,7 @@ export default function PropertyClient() {
             </div>
           ) : (
             <form onSubmit={handleSendLead}>
+              <HoneypotField value={leadHoneypot} onChange={setLeadHoneypot} />
               <div className="field">
                 <label>{t('prop_your_name')}</label>
                 <input required value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />

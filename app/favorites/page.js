@@ -11,6 +11,7 @@ import { displayAddress } from '../../lib/displayAddress';
 import { useCompareList } from '../../lib/useCompareList';
 import { getLocalFavoriteIds } from '../../lib/localFavorites';
 import PhoneDisplay from '../../components/PhoneDisplay';
+import HoneypotField from '../../components/HoneypotField';
 
 // Em vez de pedir os imóveis e os perfis dos donos tudo junto numa só
 // pergunta à base de dados (o que estava a dar um erro persistente e
@@ -46,6 +47,7 @@ export default function FavoritesPage() {
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [inlineHoneypot, setInlineHoneypot] = useState('');
 
   async function openMessageModal(p) {
     setMessageSent(false);
@@ -62,6 +64,7 @@ export default function FavoritesPage() {
 
   async function sendInlineMessage(e) {
     e.preventDefault();
+    if (inlineHoneypot) return; // robô apanhado — não faz nada, silenciosamente
     if (!messageModalFor) return;
     setSendingMessage(true);
     const p = messageModalFor;
@@ -517,6 +520,7 @@ export default function FavoritesPage() {
               </div>
             ) : (
               <form onSubmit={sendInlineMessage}>
+                <HoneypotField value={inlineHoneypot} onChange={setInlineHoneypot} />
                 <div className="field">
                   <label>{t('prop_your_name')}</label>
                   <input required value={messageForm.name} onChange={(e) => setMessageForm({ ...messageForm, name: e.target.value })} />

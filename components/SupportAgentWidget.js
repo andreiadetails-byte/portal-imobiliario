@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import HoneypotField from './HoneypotField';
 import { supabase } from '../lib/supabaseClient';
 import { randomAgentName } from '../lib/agentNames';
 import { useLanguage } from '../lib/i18n';
@@ -33,6 +34,7 @@ export default function SupportAgentWidget() {
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: '', contact: '', message: '' });
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
+  const [honeypot, setHoneypot] = useState('');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export default function SupportAgentWidget() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (honeypot) return; // robô apanhado — não faz nada, silenciosamente
     if (!acceptedPolicy) return;
     setSending(true);
     await supabase.from('support_requests').insert({
@@ -112,6 +115,7 @@ export default function SupportAgentWidget() {
               </p>
             ) : (
               <form onSubmit={handleSubmit}>
+                <HoneypotField value={honeypot} onChange={setHoneypot} />
                 <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 10 }}>
                   {t('sw_help_question')}
                 </p>
