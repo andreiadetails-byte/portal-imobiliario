@@ -64,6 +64,10 @@ export default function PerfilPage() {
   function handleAvatarSelect(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      alert('Só são aceites imagens JPG, PNG ou WEBP.');
+      return;
+    }
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
     setAvatarRemoved(false);

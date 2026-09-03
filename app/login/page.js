@@ -62,6 +62,12 @@ export default function LoginPage() {
   function handleAvatarSelect(e) {
     const file = e.target.files?.[0];
     if (file) {
+      // Só aceita mesmo formatos de imagem normais — nunca SVG (pode conter
+      // código escondido lá dentro) nem qualquer outro tipo de ficheiro.
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        alert('Só são aceites imagens JPG, PNG ou WEBP.');
+        return;
+      }
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
     }

@@ -15,8 +15,8 @@ async function getVerifiedUserId(request) {
 
 // Regras próprias para cada tipo de ficheiro que este anúncio pode ter.
 const FILE_RULES = {
-  photo: { folder: 'photos', allowedPrefix: 'image/', maxMB: 20, label: 'A imagem' },
-  thumbnail: { folder: 'thumbnails', allowedPrefix: 'image/', maxMB: 5, label: 'A miniatura' },
+  photo: { folder: 'photos', allowedTypes: ['image/jpeg', 'image/png', 'image/webp'], maxMB: 20, label: 'A imagem' },
+  thumbnail: { folder: 'thumbnails', allowedTypes: ['image/jpeg', 'image/png', 'image/webp'], maxMB: 5, label: 'A miniatura' },
   video: { folder: 'videos', allowedPrefix: 'video/', maxMB: 100, label: 'O vídeo' },
   plan: { folder: 'plans', allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'], maxMB: 20, label: 'A planta' },
   document: { folder: 'documents', allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'], maxMB: 20, label: 'O documento' },

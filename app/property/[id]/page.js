@@ -63,7 +63,14 @@ export default async function PropertyPage({ params }) {
   return (
     <>
       {jsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script
+          type="application/ld+json"
+          // Escapa "<" para impedir que alguém consiga fechar esta tag <script>
+          // à força escrevendo "</script>" dentro da descrição do imóvel (um
+          // anunciante mal-intencionado podia injetar código que corria no
+          // navegador de quem visse o anúncio).
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        />
       )}
       <PropertyClient />
     </>
