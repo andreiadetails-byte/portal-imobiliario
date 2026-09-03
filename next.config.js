@@ -31,10 +31,12 @@ const nextConfig = {
             value: 'strict-origin-when-cross-origin',
           },
           {
-            // Desativa o acesso a câmara/microfone/localização por sites
-            // incorporados no teu, e restringe o pagamento só ao teu próprio site.
+            // Desativa o acesso a câmara/localização por sites incorporados
+            // no teu (não usamos isso), mas permite microfone para o
+            // próprio site (usado na pesquisa por voz), e restringe o
+            // pagamento só ao teu próprio site.
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(self), payment=(self)',
+            value: 'camera=(), microphone=(self), geolocation=(self), payment=(self)',
           },
           {
             // A proteção mais forte contra código malicioso injetado (XSS) —
