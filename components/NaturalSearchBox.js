@@ -103,17 +103,20 @@ export default function NaturalSearchBox() {
 
   const VOICE_LOCALES = { pt: 'pt-PT', en: 'en-US', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', nl: 'nl-NL', ru: 'ru-RU', it: 'it-IT', pl: 'pl-PL', sv: 'sv-SE', uk: 'uk-UA', zh: 'zh-CN', ar: 'ar-SA' };
 
-  // O reconhecimento é criado só uma vez. Trocar de idioma a meio de uma gravação
-  // não recria o objeto (o que às vezes deixava o microfone num estado confuso).
-  useEffect(() => {
+  // O reconhecimento é criado por uma função reutilizável — assim, se
+  // alguma vez ficar "preso" num estado mau depois de um erro (comum depois
+  // de a permissão do microfone ser negada e só depois concedida), podemos
+  // recriá-lo do zero, em vez de continuar a tentar usar o mesmo objeto
+  // avariado indefinidamente.
+  function createRecognition() {
     const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
-    if (!SpeechRecognition) return;
-    setVoiceSupported(true);
+    if (!SpeechRecognition) return null;
 
     const recognition = new SpeechRecognition();
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.maxAlternatives = 1;
+    recognition.lang = VOICE_LOCALES[lang] || 'pt-PT';
 
     recognition.onstart = () => { startingRef.current = false; setRequestingMic(false); setListening(true); setVoiceError(''); };
 
@@ -141,6 +144,11 @@ export default function NaturalSearchBox() {
       setInterimText('');
       if (event.error === 'not-allowed' || event.error === 'permission-denied') {
         setVoiceError(ui.mic_permission);
+        // Depois de uma negação de permissão, o objeto muitas vezes fica
+        // preso, mesmo que a pessoa depois mude a permissão nas
+        // definições do navegador. Recria-o do zero, para a próxima
+        // tentativa começar limpa.
+        recognitionRef.current = createRecognition();
       } else if (event.error === 'no-speech') {
         setVoiceError(ui.mic_no_sound);
       } else if (event.error !== 'aborted') {
@@ -148,11 +156,19 @@ export default function NaturalSearchBox() {
       }
     };
 
+    return recognition;
+  }
+
+  useEffect(() => {
+    const recognition = createRecognition();
+    if (!recognition) return;
+    setVoiceSupported(true);
     recognitionRef.current = recognition;
 
     return () => {
-      try { recognition.stop(); } catch (err) { /* já estava parado */ }
+      try { recognitionRef.current?.stop(); } catch (err) { /* já estava parado */ }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Atualiza só o idioma do microfone, sem recriar tudo — evita cortar uma gravação em curso.
@@ -182,6 +198,10 @@ export default function NaturalSearchBox() {
             startingRef.current = false;
             setRequestingMic(false);
             try { recognitionRef.current.stop(); } catch (err2) { /* nada a fazer */ }
+            // Nunca chegou a começar — o objeto pode ter ficado num estado
+            // preso. Recria-o do zero, para a próxima tentativa ter
+            // hipótese de funcionar, em vez de continuar sempre a falhar.
+            recognitionRef.current = createRecognition();
             setVoiceError(ui.mic_no_start);
           }
         }, 4000);

@@ -27,6 +27,11 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Falta o userId.' }, { status: 400 });
     }
 
+    // Apaga primeiro o perfil explicitamente (mesmo que normalmente
+    // desapareça sozinho ao apagar a conta) — garante que não fica nada a
+    // impedir a pessoa de voltar a registar-se com o mesmo email no futuro.
+    await supabaseAdmin.from('profiles').delete().eq('id', userId);
+
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

@@ -124,6 +124,7 @@ export async function POST(request) {
         user_id: property.owner_id,
         message: `Um administrador removeu o seu anúncio "${property.typology || ''} · ${property.address || ''}". Contacte o suporte se tiver dúvidas sobre este motivo.`,
         link: '/dashboard',
+        read: false,
       });
     }
 

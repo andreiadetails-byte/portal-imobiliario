@@ -19,6 +19,7 @@ const FILE_RULES = {
   thumbnail: { folder: 'thumbnails', allowedPrefix: 'image/', maxMB: 5, label: 'A miniatura' },
   video: { folder: 'videos', allowedPrefix: 'video/', maxMB: 100, label: 'O vídeo' },
   plan: { folder: 'plans', allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'], maxMB: 20, label: 'A planta' },
+  document: { folder: 'documents', allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'], maxMB: 20, label: 'O documento' },
 };
 
 function extensionFor(mimeType) {

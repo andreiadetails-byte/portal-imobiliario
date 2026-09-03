@@ -255,12 +255,20 @@ function AdminInner() {
   }
 
   async function markValuationRead(id) {
-    await supabase.from('valuation_requests').update({ status: 'lida' }).eq('id', id);
+    const { error } = await supabase.from('valuation_requests').update({ status: 'lida' }).eq('id', id);
+    if (error) {
+      alert(`Não foi possível marcar como lida: ${error.message}`);
+      return;
+    }
     setValuationRequests((cur) => cur.map((v) => (v.id === id ? { ...v, status: 'lida' } : v)));
   }
 
   async function markLeadRead(id) {
-    await supabase.from('leads').update({ status: 'lida' }).eq('id', id);
+    const { error } = await supabase.from('leads').update({ status: 'lida' }).eq('id', id);
+    if (error) {
+      alert(`Não foi possível marcar como lida: ${error.message}`);
+      return;
+    }
     setAllLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: 'lida' } : l)));
   }
 
@@ -450,6 +458,7 @@ function AdminInner() {
         user_id: request.user_id,
         message: '💬 Mensagem do suporte: recebeu uma resposta à sua mensagem.',
         link: '/dashboard',
+        read: false,
       });
     }
 
@@ -506,6 +515,59 @@ function AdminInner() {
     setReports((cur) => cur.map((r) => (r.id === id ? { ...r, status: 'resolvida' } : r)));
   }
 
+  const [valuationReplyText, setValuationReplyText] = useState({});
+  const [valuationReplyFile, setValuationReplyFile] = useState({});
+  const [sendingValuationReply, setSendingValuationReply] = useState({});
+
+  async function replyToValuation(v) {
+    const text = (valuationReplyText[v.id] || '').trim();
+    const file = valuationReplyFile[v.id];
+    if (!text && !file) return;
+    if (!v.contact?.includes('@')) {
+      alert('Este pedido não deixou um email de contacto — não é possível responder por aqui.');
+      return;
+    }
+
+    setSendingValuationReply((cur) => ({ ...cur, [v.id]: true }));
+
+    let attachmentUrl = null;
+    if (file) {
+      const { data: { session } } = await supabase.auth.getSession();
+      const body = new FormData();
+      body.append('file', file);
+      body.append('propertyId', `valuation-${v.id}`);
+      body.append('type', 'document');
+      const res = await fetch('/api/upload-photo-r2', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        attachmentUrl = data.url;
+      } else {
+        alert('Não foi possível enviar o documento. A resposta vai ser enviada só com o texto.');
+      }
+    }
+
+    const res = await fetch('/api/notify-valuation-reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toEmail: v.contact, toName: v.name, address: v.address, replyText: text, attachmentUrl }),
+    });
+
+    setSendingValuationReply((cur) => ({ ...cur, [v.id]: false }));
+
+    if (!res.ok) {
+      alert('Não foi possível enviar a resposta. Tenta outra vez.');
+      return;
+    }
+
+    setValuationReplyText((cur) => ({ ...cur, [v.id]: '' }));
+    setValuationReplyFile((cur) => ({ ...cur, [v.id]: null }));
+    alert('Resposta enviada por email.');
+  }
+
   async function replyToReport(report) {
     const text = (reportReplyText[report.id] || '').trim();
     if (!text) return;
@@ -516,7 +578,8 @@ function AdminInner() {
       await supabase.from('notifications').insert({
         user_id: report.reporter_user_id,
         message: `Resposta à sua denúncia sobre "${report.reason}": ${text}`,
-        link: '/',
+        link: report.properties?.id ? `/property/${report.properties.id}` : '/dashboard',
+        read: false,
       });
     }
     // Se deixou um contacto que parece email, envia também por email —
@@ -693,6 +756,7 @@ function AdminInner() {
       user_id: propObj.owner_id,
       message: `⚑ Aviso do Morada: o seu anúncio "${propObj.typology} · ${propObj.address}" foi anulado. Motivo: ${reason}`,
       link: '/dashboard',
+      read: false,
     });
     setProperties((cur) => cur.filter((p) => p.id !== propObj.id));
     alert('Anúncio anulado. O anunciante não pode republicá-lo — terá de criar um novo.');
@@ -1272,6 +1336,33 @@ function AdminInner() {
                     {v.typology && `${v.typology} · `}{v.area && `${v.area} m²`}
                   </div>
                   {v.notes && <p style={{ fontSize: 13, marginBottom: 10 }}>{v.notes}</p>}
+                  {v.contact?.includes('@') && (
+                    <div style={{ marginBottom: 10 }}>
+                      <textarea
+                        value={valuationReplyText[v.id] || ''}
+                        onChange={(e) => setValuationReplyText((cur) => ({ ...cur, [v.id]: e.target.value }))}
+                        placeholder="Escreva a sua resposta (opcional se anexar só o documento)..."
+                        rows={2}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--line)', fontSize: 12.5, marginBottom: 6, resize: 'vertical' }}
+                      />
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={(e) => setValuationReplyFile((cur) => ({ ...cur, [v.id]: e.target.files[0] || null }))}
+                          style={{ fontSize: 11.5 }}
+                        />
+                        <button
+                          onClick={() => replyToValuation(v)}
+                          disabled={sendingValuationReply[v.id]}
+                          className="btn btn-primary"
+                          style={{ fontSize: 11.5, padding: '5px 12px' }}
+                        >
+                          {sendingValuationReply[v.id] ? 'A enviar...' : '📧 Enviar avaliação por email'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     {v.status !== 'lida' && (
                       <button onClick={() => markValuationRead(v.id)} className="btn" style={{ fontSize: 11.5, padding: '4px 10px' }}>

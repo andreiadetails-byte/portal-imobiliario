@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../../lib/supabaseClient';
 import Header from '../../../../components/Header';
-import { accountTypeLabel } from '../../../../lib/accountTypes';
+import { accountTypeLabel, isProfessionalAccount } from '../../../../lib/accountTypes';
 
 const STATUS_LABELS = {
   ativo: { label: 'Publicado', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
@@ -26,6 +26,10 @@ export default function AdminUserPage() {
   const [checking, setChecking] = useState(true);
   const [profile, setProfile] = useState(null);
   const [properties, setProperties] = useState([]);
+  const [subUntil, setSubUntil] = useState('');
+  const [subIndefinite, setSubIndefinite] = useState(false);
+  const [savingSub, setSavingSub] = useState(false);
+  const [subSaved, setSubSaved] = useState(false);
 
   useEffect(() => {
     async function checkAndLoad() {
@@ -37,6 +41,11 @@ export default function AdminUserPage() {
 
       const { data: profileData } = await supabase.from('profiles').select('*').eq('id', id).single();
       setProfile(profileData);
+      if (profileData?.subscription_paid_until) {
+        const isFarFuture = new Date(profileData.subscription_paid_until) > new Date('2090-01-01');
+        setSubIndefinite(isFarFuture);
+        setSubUntil(isFarFuture ? '' : profileData.subscription_paid_until);
+      }
 
       // Sem filtro de estado — o administrador vê tudo, incluindo desativados, anulados e eliminados
       const { data: propsData } = await supabase
@@ -50,6 +59,27 @@ export default function AdminUserPage() {
     }
     checkAndLoad();
   }, [id, router]);
+
+  async function saveSubscription() {
+    if (!subIndefinite && !subUntil) {
+      alert('Escolha uma data, ou marque "sem data definida (até novas indicações)".');
+      return;
+    }
+    setSavingSub(true);
+    const paidUntil = subIndefinite ? '2099-12-31' : subUntil;
+    const { error } = await supabase.from('profiles').update({
+      subscription_status: 'active',
+      subscription_paid_until: paidUntil,
+    }).eq('id', profile.id);
+    setSavingSub(false);
+    if (error) {
+      alert(`Não foi possível guardar: ${error.message}`);
+      return;
+    }
+    setProfile((cur) => ({ ...cur, subscription_status: 'active', subscription_paid_until: paidUntil }));
+    setSubSaved(true);
+    setTimeout(() => setSubSaved(false), 2500);
+  }
 
   async function cancelProperty(propObj) {
     const reason = prompt('Motivo da anulação (visível ao anunciante):');
@@ -93,6 +123,41 @@ export default function AdminUserPage() {
             </div>
           </div>
         </div>
+
+        {isProfessionalAccount(profile.account_type) && (
+          <div className="card" style={{ padding: 20, marginBottom: 28 }}>
+            <h2 className="display" style={{ fontSize: 17, marginBottom: 12 }}>💳 Mensalidade / oferta</h2>
+            <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 14 }}>
+              Estado atual: <b>{profile.subscription_status === 'active' ? 'Ativa' : profile.subscription_status || 'Sem informação'}</b>
+              {profile.subscription_paid_until && (
+                <> · paga até{' '}
+                  <b>
+                    {new Date(profile.subscription_paid_until) > new Date('2090-01-01')
+                      ? 'sem data definida (até novas indicações)'
+                      : new Date(profile.subscription_paid_until).toLocaleDateString('pt-PT')}
+                  </b>
+                </>
+              )}
+            </div>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, marginBottom: 10, cursor: 'pointer' }}>
+              <input type="checkbox" checked={subIndefinite} onChange={(e) => setSubIndefinite(e.target.checked)} />
+              Sem data definida (fica ativo até se indicar o contrário)
+            </label>
+
+            {!subIndefinite && (
+              <div className="field" style={{ maxWidth: 220, marginBottom: 12 }}>
+                <label htmlFor="sub-until-input">Pago/oferecido até</label>
+                <input id="sub-until-input" type="date" value={subUntil} onChange={(e) => setSubUntil(e.target.value)} />
+              </div>
+            )}
+
+            <button onClick={saveSubscription} disabled={savingSub} className="btn btn-primary" style={{ fontSize: 13 }}>
+              {savingSub ? 'A guardar...' : 'Guardar'}
+            </button>
+            {subSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 10 }}>✓ Guardado</span>}
+          </div>
+        )}
 
         {properties.length === 0 && <p className="empty-state">Este utilizador ainda não publicou nenhum imóvel.</p>}
 
