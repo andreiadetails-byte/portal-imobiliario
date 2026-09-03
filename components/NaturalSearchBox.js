@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { Mic, Square, Search } from 'lucide-react';
 import { distritos, concelhosPorDistrito } from '../lib/locations';
 import { useLanguage } from '../lib/i18n';
 
@@ -144,11 +145,6 @@ export default function NaturalSearchBox() {
       setInterimText('');
       if (event.error === 'not-allowed' || event.error === 'permission-denied') {
         setVoiceError(ui.mic_permission);
-        // Depois de uma negação de permissão, o objeto muitas vezes fica
-        // preso, mesmo que a pessoa depois mude a permissão nas
-        // definições do navegador. Recria-o do zero, para a próxima
-        // tentativa começar limpa.
-        recognitionRef.current = createRecognition();
       } else if (event.error === 'no-speech') {
         setVoiceError(ui.mic_no_sound);
       } else if (event.error !== 'aborted') {
@@ -198,10 +194,6 @@ export default function NaturalSearchBox() {
             startingRef.current = false;
             setRequestingMic(false);
             try { recognitionRef.current.stop(); } catch (err2) { /* nada a fazer */ }
-            // Nunca chegou a começar — o objeto pode ter ficado num estado
-            // preso. Recria-o do zero, para a próxima tentativa ter
-            // hipótese de funcionar, em vez de continuar sempre a falhar.
-            recognitionRef.current = createRecognition();
             setVoiceError(ui.mic_no_start);
           }
         }, 4000);
@@ -333,7 +325,7 @@ export default function NaturalSearchBox() {
       title: 'O que procuras numa casa?',
       sub: (v) => `Sonhamos contigo. Partilha o que procuras${v ? ' — escreve ou fala' : ''}.`,
       placeholder: `Gostava de comprar um ${exampleTypology} até ${examplePrice}€, recente ou novo, em ${exampleCity}, com ${exampleAmenity}.`,
-      button: 'Tens o que procuro? 🔍',
+      button: 'Tens o que procuro?',
       mic_permission: 'Precisamos de acesso ao microfone. Verifica as permissões do browser.',
       mic_no_sound: 'Não ouvimos nada. Toca no microfone e tenta outra vez.',
       mic_unavailable: 'Não foi possível usar o microfone agora. Tenta outra vez.',
@@ -347,7 +339,7 @@ export default function NaturalSearchBox() {
       title: 'What are you looking for?',
       sub: (v) => `We dream with you. Share what you\u2019re looking for${v ? ' — type or speak' : ''}.`,
       placeholder: `I\u2019d like to buy a ${exampleTypologyEn} up to €${examplePrice}, new or recent, in ${exampleCity}, with ${exampleAmenityEn}.`,
-      button: 'Do you have what I\u2019m looking for? 🔍',
+      button: 'Do you have what I\u2019m looking for?',
       mic_permission: 'We need access to your microphone. Check your browser permissions.',
       mic_no_sound: 'We didn\'t hear anything. Tap the microphone and try again.',
       mic_unavailable: 'The microphone isn\'t available right now. Try again.',
@@ -361,7 +353,7 @@ export default function NaturalSearchBox() {
       title: '¿Qué buscas en una casa?',
       sub: (v) => `Soñamos contigo. Comparte lo que buscas${v ? ' — escribe o habla' : ''}.`,
       placeholder: `Me gustaría comprar un ${exampleTypology} hasta ${examplePrice}€, nuevo o reciente, en ${exampleCity}, con ${exampleAmenityEs}.`,
-      button: '¿Tienes lo que busco? 🔍',
+      button: '¿Tienes lo que busco?',
       mic_permission: 'Necesitamos acceso al micrófono. Compruebe los permisos del navegador.',
       mic_no_sound: 'No hemos oído nada. Toque el micrófono e inténtelo de nuevo.',
       mic_unavailable: 'No se pudo usar el micrófono ahora. Inténtelo de nuevo.',
@@ -375,7 +367,7 @@ export default function NaturalSearchBox() {
       title: 'Que recherchez-vous dans une maison ?',
       sub: (v) => `Nous rêvons avec vous. Partagez ce que vous cherchez${v ? ' — écrivez ou parlez' : ''}.`,
       placeholder: `Je voudrais acheter un ${exampleTypology} jusqu\u2019à ${examplePrice}€, neuf ou récent, à ${exampleCity}, avec ${exampleAmenityFr}.`,
-      button: 'Avez-vous ce que je cherche ? 🔍',
+      button: 'Avez-vous ce que je cherche ?',
       mic_permission: 'Nous avons besoin d\'accéder à votre microphone. Vérifiez les autorisations du navigateur.',
       mic_no_sound: 'Nous n\'avons rien entendu. Touchez le microphone et réessayez.',
       mic_unavailable: 'Impossible d\'utiliser le microphone pour le moment. Réessayez.',
@@ -389,7 +381,7 @@ export default function NaturalSearchBox() {
       title: 'Was suchen Sie in einem Zuhause?',
       sub: (v) => `Wir träumen mit Ihnen. Teilen Sie, wonach Sie suchen${v ? ' — schreiben oder sprechen Sie' : ''}.`,
       placeholder: `Ich möchte eine ${exampleTypologyDe} bis ${examplePrice}€ kaufen, neu oder neuwertig, in ${exampleCity}, mit ${exampleAmenityDe}.`,
-      button: 'Haben Sie, was ich suche? 🔍',
+      button: 'Haben Sie, was ich suche?',
       mic_permission: 'Wir benötigen Zugriff auf dein Mikrofon. Überprüfe die Browser-Berechtigungen.',
       mic_no_sound: 'Wir haben nichts gehört. Tippe auf das Mikrofon und versuche es erneut.',
       mic_unavailable: 'Das Mikrofon kann gerade nicht verwendet werden. Versuche es erneut.',
@@ -403,7 +395,7 @@ export default function NaturalSearchBox() {
       title: 'Wat zoekt u in een huis?',
       sub: (v) => `Wij dromen met u mee. Deel wat u zoekt${v ? ' — typ of spreek' : ''}.`,
       placeholder: `Ik zou graag een ${exampleTypologyNl} kopen tot €${examplePrice}, nieuw of recent, in ${exampleCity}, met ${exampleAmenityNl}.`,
-      button: 'Heeft u wat ik zoek? 🔍',
+      button: 'Heeft u wat ik zoek?',
       mic_permission: 'We hebben toegang tot je microfoon nodig. Controleer de browserrechten.',
       mic_no_sound: 'We hebben niets gehoord. Tik op de microfoon en probeer opnieuw.',
       mic_unavailable: 'De microfoon kan nu niet worden gebruikt. Probeer opnieuw.',
@@ -417,7 +409,7 @@ export default function NaturalSearchBox() {
       title: 'Что вы ищете в доме?',
       sub: (v) => `Мы мечтаем вместе с вами. Расскажите, что вы ищете${v ? ' — напишите или скажите' : ''}.`,
       placeholder: `Я хотел бы купить ${exampleTypologyRu} до ${examplePrice}€, новую или недавнюю, в ${exampleCityRu}, с ${exampleAmenityRu}.`,
-      button: 'Есть ли у вас то, что я ищу? 🔍',
+      button: 'Есть ли у вас то, что я ищу?',
       mic_permission: 'Нам нужен доступ к микрофону. Проверьте разрешения браузера.',
       mic_no_sound: 'Мы ничего не услышали. Нажмите на микрофон и попробуйте снова.',
       mic_unavailable: 'Сейчас микрофон недоступен. Попробуйте снова.',
@@ -431,7 +423,7 @@ export default function NaturalSearchBox() {
       title: 'Cosa cerchi in una casa?',
       sub: (v) => `Sogniamo con te. Condividi cosa cerchi${v ? ' — scrivi o parla' : ''}.`,
       placeholder: `Vorrei comprare un ${exampleTypologyIt} fino a ${examplePrice}€, nuovo o recente, a ${exampleCity}, con ${exampleAmenityIt}.`,
-      button: 'Hai quello che cerco? 🔍',
+      button: 'Hai quello che cerco?',
       mic_permission: 'Abbiamo bisogno di accedere al tuo microfono. Controlla le autorizzazioni del browser.',
       mic_no_sound: 'Non abbiamo sentito nulla. Tocca il microfono e riprova.',
       mic_unavailable: 'Il microfono non è disponibile ora. Riprova.',
@@ -445,7 +437,7 @@ export default function NaturalSearchBox() {
       title: 'Czego szukasz w domu?',
       sub: (v) => `Marzymy razem z Tobą. Podziel się tym, czego szukasz${v ? ' — napisz lub powiedz' : ''}.`,
       placeholder: `Chciałbym kupić ${exampleTypologyPl} do ${examplePrice}€, nowe lub niedawno wybudowane, w ${exampleCity}, z ${exampleAmenityPl}.`,
-      button: 'Masz to, czego szukam? 🔍',
+      button: 'Masz to, czego szukam?',
       mic_permission: 'Potrzebujemy dostępu do mikrofonu. Sprawdź uprawnienia przeglądarki.',
       mic_no_sound: 'Nic nie usłyszeliśmy. Dotknij mikrofonu i spróbuj ponownie.',
       mic_unavailable: 'Mikrofon jest teraz niedostępny. Spróbuj ponownie.',
@@ -459,7 +451,7 @@ export default function NaturalSearchBox() {
       title: 'Vad letar du efter i ett hem?',
       sub: (v) => `Vi drömmer med dig. Dela vad du letar efter${v ? ' — skriv eller tala' : ''}.`,
       placeholder: `Jag skulle vilja köpa en ${exampleTypologySv} upp till ${examplePrice}€, ny eller nybyggd, i ${exampleCity}, med ${exampleAmenitySv}.`,
-      button: 'Har du det jag letar efter? 🔍',
+      button: 'Har du det jag letar efter?',
       mic_permission: 'Vi behöver åtkomst till din mikrofon. Kontrollera webbläsarens behörigheter.',
       mic_no_sound: 'Vi hörde inget. Tryck på mikrofonen och försök igen.',
       mic_unavailable: 'Mikrofonen kan inte användas just nu. Försök igen.',
@@ -473,7 +465,7 @@ export default function NaturalSearchBox() {
       title: 'Що ви шукаєте в домі?',
       sub: (v) => `Ми мріємо разом з вами. Поділіться тим, що ви шукаєте${v ? ' — напишіть або скажіть' : ''}.`,
       placeholder: `Я хотів би купити ${exampleTypologyUk} до ${examplePrice}€, нову або нещодавно збудовану, в ${exampleCity}, з ${exampleAmenityUk}.`,
-      button: 'Чи є у вас те, що я шукаю? 🔍',
+      button: 'Чи є у вас те, що я шукаю?',
       mic_permission: 'Нам потрібен доступ до мікрофона. Перевірте дозволи браузера.',
       mic_no_sound: 'Ми нічого не почули. Натисніть на мікрофон і спробуйте ще раз.',
       mic_unavailable: 'Зараз мікрофон недоступний. Спробуйте ще раз.',
@@ -487,7 +479,7 @@ export default function NaturalSearchBox() {
       title: '您想找什么样的房子？',
       sub: (v) => `我们与您一起憧憬。分享您在寻找什么${v ? ' — 输入或说出来' : ''}。`,
       placeholder: `我想购买一套${exampleTypologyZh}，最高${examplePrice}€，全新或近期建成，位于${exampleCityZh}，带${exampleAmenityZh}。`,
-      button: '您有我在找的房子吗？🔍',
+      button: '您有我在找的房子吗？',
       mic_permission: '我们需要访问您的麦克风。请检查浏览器权限。',
       mic_no_sound: '我们没有听到任何声音。请点击麦克风并重试。',
       mic_unavailable: '麦克风目前无法使用。请重试。',
@@ -501,7 +493,7 @@ export default function NaturalSearchBox() {
       title: 'ماذا تبحث عنه في منزل؟',
       sub: (v) => `نحلم معك. شارك ما تبحث عنه${v ? ' — اكتب أو تحدث' : ''}.`,
       placeholder: `أرغب في شراء ${exampleTypologyAr} حتى ${examplePrice}€، جديدة أو حديثة، في ${exampleCityAr}، مع ${exampleAmenityAr}.`,
-      button: 'هل لديك ما أبحث عنه؟ 🔍',
+      button: 'هل لديك ما أبحث عنه؟',
       mic_permission: 'نحتاج إلى الوصول إلى الميكروفون. تحقق من أذونات المتصفح.',
       mic_no_sound: 'لم نسمع أي شيء. اضغط على الميكروفون وحاول مرة أخرى.',
       mic_unavailable: 'لا يمكن استخدام الميكروفون الآن. حاول مرة أخرى.',
@@ -515,7 +507,7 @@ export default function NaturalSearchBox() {
   const ui = UI_TEXT[lang] || UI_TEXT.pt;
 
   return (
-    <form onSubmit={handleSubmit} className="card" style={{ padding: 18 }}>
+    <form onSubmit={handleSubmit} className="card" style={{ padding: 20, border: '1.5px solid var(--brass)' }}>
       {requestingMic && (
         <div
           style={{
@@ -534,7 +526,7 @@ export default function NaturalSearchBox() {
           </div>
         </div>
       )}
-      <h3 className="display" style={{ fontSize: 19, marginBottom: 5, fontWeight: 600 }}>{ui.title}</h3>
+      <h3 className="display" style={{ fontSize: 19, fontWeight: 600, marginBottom: 5 }}>{ui.title}</h3>
       <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 12 }}>
         {ui.sub(voiceSupported)}
       </p>
@@ -565,8 +557,10 @@ export default function NaturalSearchBox() {
           onChange={(e) => { setText(e.target.value); baseTextRef.current = e.target.value; }}
           placeholder=""
           style={{
-            width: '100%', padding: 12, paddingRight: voiceSupported ? 52 : 12, border: listening ? '2px solid #b8452f' : '1px solid var(--line)', borderRadius: 6,
-            fontFamily: 'Inter, sans-serif', fontSize: 14.5, resize: 'vertical', boxSizing: 'border-box', marginBottom: 10,
+            width: '100%', padding: 14, paddingRight: voiceSupported ? 56 : 14,
+            border: listening ? '1.5px solid #b8452f' : '1.5px solid var(--line)', borderRadius: 12,
+            fontFamily: 'Inter, sans-serif', fontSize: 14.5, resize: 'vertical', boxSizing: 'border-box', marginBottom: 12,
+            background: 'var(--plaster)', transition: 'border-color 0.15s ease',
           }}
         />
         {voiceSupported && (
@@ -576,19 +570,27 @@ export default function NaturalSearchBox() {
             aria-label={listening ? ui.mic_stop : ui.mic_start}
             title={listening ? ui.mic_recording : ui.mic_start}
             style={{
-              position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: '50%',
+              position: 'absolute', top: 12, right: 12, width: 36, height: 36, borderRadius: '50%',
               border: 'none', cursor: 'pointer', fontSize: 16,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: listening ? '#b8452f' : 'var(--plaster)',
+              background: listening ? '#b8452f' : 'var(--paper)',
               color: listening ? '#fff' : 'var(--ink)',
+              boxShadow: listening ? 'none' : '0 1px 4px rgba(51,46,34,0.15)',
               animation: listening ? 'icon-breathe 1s ease-in-out infinite' : 'none',
             }}
           >
-            {listening ? '⏹' : '🎤'}
+            {listening ? <Square size={15} fill="currentColor" /> : <Mic size={17} strokeWidth={2} />}
           </button>
         )}
       </div>
-      <button type="submit" onClick={handleSubmit} className="btn btn-primary">{ui.button}</button>
+      <button
+        type="submit"
+        onClick={handleSubmit}
+        className="btn btn-primary"
+        style={{ width: '100%', fontSize: 15, padding: '13px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+      >
+        {ui.button} <Search size={16} strokeWidth={2} />
+      </button>
     </form>
   );
 }

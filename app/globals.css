@@ -87,6 +87,11 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 @media (max-width: 640px){
   .grid-listings{ grid-template-columns:1fr; }
   img, video, iframe { max-width: 100%; height: auto; }
+  /* No telemóvel já existe um aviso próprio, mais simples e automático
+     (InstallPrompt.js), que aparece sozinho quando faz sentido — por isso
+     esta secção com QR code e instruções de texto só precisa de aparecer
+     no computador. */
+  .install-qr-section{ display: none !important; }
 }
 
 .error-text{ color:#8a3b2a; font-size:13px; margin-top:8px; }
