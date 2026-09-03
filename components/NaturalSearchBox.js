@@ -49,6 +49,13 @@ function parseDescription(text) {
   // seguir à palavra-chave, aceita até 3 palavras pelo meio (ex: "até aos
   // 100000€", "até um máximo de 100 mil") — muito mais tolerante a como as
   // pessoas realmente escrevem.
+  // Se a pessoa pedir algo "grátis"/"gratuito" (ou o equivalente noutras
+  // línguas), não faz sentido mostrar tudo sem filtro nenhum — como não
+  // existem imóveis grátis a sério, mostra corretamente "nenhum resultado".
+  if (/\bgr[áa]tis\b|\bgratuito\b|\bfree\b|\bgratis\b|\bkostenlos\b|\bgratuit\b/.test(lower)) {
+    result.maxPrice = '0';
+  }
+
   const priceMatch = lower.match(/(?:at[ée]|abaixo de|menos de|up to|under|below|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(milh[aã]o|milhões|mil|k|thousand|million|€|eur|euros)?/);
   if (priceMatch) {
     let value = priceMatch[1].replace(/[.,]/g, '');

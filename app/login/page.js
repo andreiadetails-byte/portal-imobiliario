@@ -289,7 +289,7 @@ export default function LoginPage() {
       let freeMonthFields = {};
       if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType)) {
         const freeUntil = new Date();
-        freeUntil.setMonth(freeUntil.getMonth() + 1 + couponMonths);
+        freeUntil.setMonth(freeUntil.getMonth() + (couponMonths > 0 ? couponMonths : 1));
         freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
       }
 
