@@ -35,7 +35,7 @@ function escapeRegex(str) {
 
 function parseDescription(text) {
   const lower = text.toLowerCase();
-  const result = { location: '', business: 'Venda', typologies: [], maxPrice: '', amenities: [], elevator: false };
+  const result = { location: '', business: 'Venda', typologies: [], minPrice: '', maxPrice: '', amenities: [], elevator: false };
 
   // Comprar ou arrendar (PT: arrend..., EN: rent, ES: alquil...)
   if (/\barrend|\brent(ing)?\b|\balquil|\blouer|\blocation\b|\bmiete|\bmieten|\bverhuur|\bhuren\b|\bаренд|\bснять\b/.test(lower)) result.business = 'Arrendamento';
@@ -49,11 +49,23 @@ function parseDescription(text) {
   // seguir à palavra-chave, aceita até 3 palavras pelo meio (ex: "até aos
   // 100000€", "até um máximo de 100 mil") — muito mais tolerante a como as
   // pessoas realmente escrevem.
-  const priceMatch = lower.match(/(?:at[ée]|up to|under|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(mil|k|thousand|€|eur|euros)?/);
+  const priceMatch = lower.match(/(?:at[ée]|abaixo de|menos de|up to|under|below|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(milh[aã]o|milhões|mil|k|thousand|million|€|eur|euros)?/);
   if (priceMatch) {
     let value = priceMatch[1].replace(/[.,]/g, '');
-    if (priceMatch[2] && /mil|k|thousand/.test(priceMatch[2])) value += '000';
+    if (priceMatch[2] && /mil(?!h)|k|thousand/.test(priceMatch[2])) value += '000';
+    if (priceMatch[2] && /milh|million/.test(priceMatch[2])) value += '000000';
     result.maxPrice = value;
+  }
+
+  // Preço mínimo — PT "superior a", "acima de", "a partir de", "mais de",
+  // "desde"; EN "over"/"above"/"from"; ES "superior a", "desde". Mesma
+  // lógica tolerante do preço máximo, aceitando algumas palavras pelo meio.
+  const minPriceMatch = lower.match(/(?:superior a|acima de|a partir de|mais de|desde|over|above|from|más de)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(milh[aã]o|milhões|mil|k|thousand|million|€|eur|euros)?/);
+  if (minPriceMatch) {
+    let value = minPriceMatch[1].replace(/[.,]/g, '');
+    if (minPriceMatch[2] && /mil(?!h)|k|thousand/.test(minPriceMatch[2])) value += '000';
+    if (minPriceMatch[2] && /milh|million/.test(minPriceMatch[2])) value += '000000';
+    result.minPrice = value;
   }
 
   // Localidade — procura nomes de distritos e concelhos mencionados no texto
@@ -222,13 +234,14 @@ export default function NaturalSearchBox() {
       parsed = parseDescription(text);
     } catch (err) {
       // Se a deteção de palavras falhar por algum motivo, ainda assim vamos para os resultados.
-      parsed = { location: '', business: 'Venda', typologies: [], maxPrice: '', amenities: [], elevator: false };
+      parsed = { location: '', business: 'Venda', typologies: [], minPrice: '', maxPrice: '', amenities: [], elevator: false };
     }
 
     const params = new URLSearchParams();
     if (parsed.location) params.set('location', parsed.location);
     params.set('business', parsed.business);
     if (parsed.typologies.length > 0) params.set('typologies', parsed.typologies.join(','));
+    if (parsed.minPrice) params.set('minPrice', parsed.minPrice);
     if (parsed.maxPrice) params.set('maxPrice', parsed.maxPrice);
     if (parsed.amenities.length > 0) params.set('amenities', parsed.amenities.join(','));
     if (parsed.elevator) params.set('elevator', '1');
