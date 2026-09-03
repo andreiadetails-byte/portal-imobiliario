@@ -48,6 +48,16 @@ export async function POST(request) {
     const email = recipientAuth?.user?.email;
     if (!email) return Response.json({ skipped: true });
 
+    // Só envia email na primeira mensagem de cada conversa (é aí que faz
+    // sentido avisar por email, como se fosse uma "lead" nova) — nas
+    // respostas seguintes, a notificação no sino já chega, sem encher a
+    // caixa de correio com um email por cada mensagem trocada.
+    const { count: messageCount } = await supabaseAdmin
+      .from('messages').select('id', { count: 'exact', head: true }).eq('conversation_id', message.conversation_id);
+    if ((messageCount || 0) > 1) {
+      return Response.json({ skipped: true, reason: 'not_first_message' });
+    }
+
     const { data: recipientProfile } = await supabaseAdmin
       .from('profiles').select('full_name, agency_name').eq('id', recipientId).single();
     const recipientFirstName = (recipientProfile?.agency_name || recipientProfile?.full_name || '').split(' ')[0];
