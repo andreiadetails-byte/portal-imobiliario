@@ -67,15 +67,25 @@ export default function AdminUserPage() {
     }
     setSavingSub(true);
     const paidUntil = subIndefinite ? '2099-12-31' : subUntil;
-    const { error } = await supabase.from('profiles').update({
-      subscription_status: 'active',
-      subscription_paid_until: paidUntil,
-    }).eq('id', profile.id);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/admin-update-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({
+        userId: profile.id,
+        updates: { subscription_status: 'active', subscription_paid_until: paidUntil },
+      }),
+    });
+
     setSavingSub(false);
-    if (error) {
-      alert(`Não foi possível guardar: ${error.message}`);
+
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      alert(`Não foi possível guardar: ${error || 'erro desconhecido'}`);
       return;
     }
+
     setProfile((cur) => ({ ...cur, subscription_status: 'active', subscription_paid_until: paidUntil }));
     setSubSaved(true);
     setTimeout(() => setSubSaved(false), 2500);
