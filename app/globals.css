@@ -254,7 +254,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
   .header-minimal .navbar-bell,
   .header-minimal .navbar-nav-links,
   .header-minimal .navbar-mobile-rows{ display: none !important; }
-  .header-minimal .navbar-login-btn{ display: inline-flex !important; margin-right: 0 !important; white-space: nowrap; font-size: 12.5px !important; padding: 8px 12px !important; max-width: none !important; overflow: visible !important; text-overflow: unset !important; }
+  .header-minimal .navbar-login-btn{ display: inline-flex !important; margin-right: 8px !important; white-space: nowrap; font-size: 12.5px !important; padding: 8px 12px !important; max-width: none !important; overflow: visible !important; text-overflow: unset !important; }
   .header-minimal .navbar-publish-btn{ display: inline-flex !important; min-width: 0 !important; font-size: 12.5px !important; padding: 8px 12px !important; white-space: nowrap; }
   .header-minimal .navbar-links{ flex-wrap: wrap !important; min-width: 0; }
 }

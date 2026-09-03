@@ -250,7 +250,17 @@ function AdminInner() {
 
   async function deleteValuationRequest(id) {
     if (!confirm('Apagar este pedido de avaliação? Esta ação não pode ser desfeita.')) return;
-    await supabase.from('valuation_requests').delete().eq('id', id);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/admin-delete-record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ table: 'valuation_requests', id }),
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      alert(`Não foi possível apagar: ${error || 'erro desconhecido'}`);
+      return;
+    }
     setValuationRequests((cur) => cur.filter((v) => v.id !== id));
   }
 
@@ -490,8 +500,25 @@ function AdminInner() {
 
   async function deleteSupportMessage(id) {
     if (!confirm('Apagar esta mensagem de suporte? Esta ação não pode ser desfeita.')) return;
-    await supabase.from('support_replies').delete().eq('support_request_id', id);
-    await supabase.from('support_requests').delete().eq('id', id);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const authHeader = { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` };
+
+    const resReplies = await fetch('/api/admin-delete-record', {
+      method: 'POST', headers: authHeader,
+      body: JSON.stringify({ table: 'support_replies', id, matchColumn: 'support_request_id' }),
+    });
+    const resRequest = await fetch('/api/admin-delete-record', {
+      method: 'POST', headers: authHeader,
+      body: JSON.stringify({ table: 'support_requests', id }),
+    });
+
+    if (!resReplies.ok || !resRequest.ok) {
+      const { error } = await (!resRequest.ok ? resRequest : resReplies).json().catch(() => ({}));
+      alert(`Não foi possível apagar: ${error || 'erro desconhecido'}`);
+      return;
+    }
+
     setSupportMessages((cur) => cur.filter((m) => m.id !== id));
   }
 
@@ -610,7 +637,17 @@ function AdminInner() {
 
   async function deleteReport(id) {
     if (!confirm('Apagar esta denúncia? Esta ação não pode ser desfeita.')) return;
-    await supabase.from('reports').delete().eq('id', id);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/admin-delete-record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ table: 'reports', id }),
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      alert(`Não foi possível apagar: ${error || 'erro desconhecido'}`);
+      return;
+    }
     setReports((cur) => cur.filter((r) => r.id !== id));
   }
 
