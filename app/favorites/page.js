@@ -12,6 +12,24 @@ import { useCompareList } from '../../lib/useCompareList';
 import { getLocalFavoriteIds } from '../../lib/localFavorites';
 import PhoneDisplay from '../../components/PhoneDisplay';
 
+// Em vez de pedir os imóveis e os perfis dos donos tudo junto numa só
+// pergunta à base de dados (o que estava a dar um erro persistente e
+// difícil de diagnosticar), fazemos duas perguntas simples separadas, e
+// juntamos os resultados aqui, em JavaScript. Mais código, mas mais
+// garantido — não depende de nenhuma relação automática complicada.
+async function attachProfiles(properties) {
+  const ownerIds = [...new Set(properties.map((p) => p.owner_id).filter(Boolean))];
+  if (ownerIds.length === 0) return properties;
+
+  const { data: profilesData } = await supabase
+    .from('profiles')
+    .select('id, phone_public, agency_name, full_name')
+    .in('id', ownerIds);
+
+  const profilesById = Object.fromEntries((profilesData || []).map((p) => [p.id, p]));
+  return properties.map((p) => ({ ...p, profiles: profilesById[p.owner_id] || null }));
+}
+
 export default function FavoritesPage() {
   const router = useRouter();
   const { t } = useLanguage();
@@ -96,9 +114,10 @@ export default function FavoritesPage() {
         if (localIds.length > 0) {
           const { data: propsData } = await supabase
             .from('properties')
-            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
+            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position)')
             .in('id', localIds);
-          setProperties((propsData || []).map((p) => ({ ...p, notes: '', price_at_save: null })));
+          const withProfiles = await attachProfiles(propsData || []);
+          setProperties(withProfiles.map((p) => ({ ...p, notes: '', price_at_save: null })));
         }
         setLoading(false);
         return;
@@ -121,13 +140,14 @@ export default function FavoritesPage() {
         const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
         const { data: propsData, error: propsError } = await supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position)')
           .in('id', ids);
         if (propsError) {
           console.error('Erro ao carregar os imóveis favoritos:', propsError);
           alert(`Não foi possível carregar os dados dos imóveis: ${propsError.message}`);
         }
-        favProperties = (propsData || []).map((p) => ({ ...p, notes: notesById[p.id] || '', price_at_save: priceAtSaveById[p.id] }));
+        const withProfiles = await attachProfiles(propsData || []);
+        favProperties = withProfiles.map((p) => ({ ...p, notes: notesById[p.id] || '', price_at_save: priceAtSaveById[p.id] }));
         setProperties(favProperties);
       } else {
         setProperties([]);
@@ -146,7 +166,7 @@ export default function FavoritesPage() {
 
         let query = supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position)')
           .eq('status', 'ativo')
           .gte('price', avgPrice * 0.7)
           .lte('price', avgPrice * 1.3)
@@ -157,7 +177,7 @@ export default function FavoritesPage() {
         if (excludeIds.length > 0) query = query.not('id', 'in', `(${excludeIds.join(',')})`);
 
         const { data: matchData } = await query;
-        setSuggestions(matchData || []);
+        setSuggestions(await attachProfiles(matchData || []));
       }
 
       setLoading(false);

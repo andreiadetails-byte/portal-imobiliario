@@ -33,9 +33,7 @@ function ChatInner() {
         .from('conversations')
         .select(`
           id, property_id, buyer_id, seller_id, status, deleted_by_buyer, deleted_by_seller,
-          properties (id, address, typology, price, business_type, property_photos(url, position)),
-          buyer:profiles!conversations_buyer_id_fkey (full_name, agency_name),
-          seller:profiles!conversations_seller_id_fkey (full_name, agency_name)
+          properties (id, address, typology, price, business_type, property_photos(url, position))
         `)
         .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
         .order('created_at', { ascending: false });
@@ -45,7 +43,24 @@ function ChatInner() {
         alert(`Não foi possível carregar as mensagens: ${error.message}`);
       }
 
-      const convs = (data || []).filter((c) => {
+      // Vai buscar os nomes de quem está do outro lado de cada conversa
+      // separadamente, em vez de pedir tudo junto de uma vez — evita um
+      // erro persistente da base de dados quando há mais do que uma forma
+      // possível de ligar tabelas.
+      const otherPartyIds = [...new Set((data || []).flatMap((c) => [c.buyer_id, c.seller_id]))];
+      let profilesById = {};
+      if (otherPartyIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles').select('id, full_name, agency_name').in('id', otherPartyIds);
+        profilesById = Object.fromEntries((profilesData || []).map((p) => [p.id, p]));
+      }
+      const dataWithProfiles = (data || []).map((c) => ({
+        ...c,
+        buyer: profilesById[c.buyer_id] || null,
+        seller: profilesById[c.seller_id] || null,
+      }));
+
+      const convs = dataWithProfiles.filter((c) => {
         const isBuyer = c.buyer_id === currentUser.id;
         return isBuyer ? !c.deleted_by_buyer : !c.deleted_by_seller;
       });
