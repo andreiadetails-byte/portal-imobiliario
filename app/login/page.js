@@ -288,9 +288,23 @@ export default function LoginPage() {
       }
 
       // Agências novas ficam com o primeiro mês grátis, sem precisar de pagar já.
-      // Um cupão válido pode dar meses extra além desse primeiro mês.
-      const COUPON_CODES = { MOREADA3: 3 };
-      const couponMonths = COUPON_CODES[couponCode.trim().toUpperCase()] || 0;
+      // Um cupão válido (verificado e registado no servidor, para não poder
+      // ser usado repetidamente com o mesmo email) pode dar meses extra.
+      let couponMonths = 0;
+      if (couponCode.trim()) {
+        try {
+          const couponRes = await fetch('/api/redeem-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, couponCode: couponCode.trim() }),
+          });
+          const couponData = await couponRes.json();
+          couponMonths = couponData.months || 0;
+        } catch (err) {
+          // Se a verificação do cupão falhar por algum motivo, segue em
+          // frente sem o benefício extra — nunca bloqueia o registo em si.
+        }
+      }
 
       let freeMonthFields = {};
       if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType)) {

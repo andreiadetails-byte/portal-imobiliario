@@ -56,7 +56,7 @@ function parseDescription(text) {
     result.maxPrice = '0';
   }
 
-  const priceMatch = lower.match(/(?:at[ée]|abaixo de|menos de|up to|under|below|hasta|jusqu.à|jusqu.a|bis zu|bis|tot maximaal|tot|до)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(milh[aã]o|milhões|mil|k|thousand|million|€|eur|euros)?/);
+  const priceMatch = lower.match(/(?:at[ée]|abaixo de|inferior a|por baixo de|menos de|não mais de|nao mais de|que não ultrapasse|que nao ultrapasse|que não passe de|que nao passe de|não exceda|nao exceda|no m[áa]ximo|m[áa]ximo de|orçamento m[áa]ximo de|orcamento maximo de|limite de|teto de|up to|under|below|no more than|not exceeding|less than|max(?:imum)? of|max budget of|hasta|menos de|no más de|no mas de|máximo de|maximo de|jusqu.à|jusqu.a|maximum de|pas plus de|bis zu|bis|maximal|nicht mehr als|tot maximaal|tot|hoogstens|до|не более|максимум)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(milh[aã]o|milhões|mil|k|thousand|million|€|eur|euros)?/);
   if (priceMatch) {
     let value = priceMatch[1].replace(/[.,]/g, '');
     if (priceMatch[2] && /mil(?!h)|k|thousand/.test(priceMatch[2])) value += '000';
@@ -67,7 +67,7 @@ function parseDescription(text) {
   // Preço mínimo — PT "superior a", "acima de", "a partir de", "mais de",
   // "desde"; EN "over"/"above"/"from"; ES "superior a", "desde". Mesma
   // lógica tolerante do preço máximo, aceitando algumas palavras pelo meio.
-  const minPriceMatch = lower.match(/(?:superior a|acima de|a partir de|mais de|desde|over|above|from|más de)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(milh[aã]o|milhões|mil|k|thousand|million|€|eur|euros)?/);
+  const minPriceMatch = lower.match(/(?:superior a|acima de|por cima de|a partir de|(?<!não |nao )mais de|não menos de|nao menos de|que ultrapasse|que passe de|desde|no m[íi]nimo|m[íi]nimo de|orçamento m[íi]nimo de|orcamento minimo de|over|above|from|starting from|no less than|at least|más de|mas de|mínimo de|minimo de|plus de|au moins de|à partir de|mehr als|mindestens|ab|meer dan|vanaf|minstens|от|более|минимум)(?:\s+\S+){0,3}?\s+([\d.,]+)\s*(milh[aã]o|milhões|mil|k|thousand|million|€|eur|euros)?/);
   if (minPriceMatch) {
     let value = minPriceMatch[1].replace(/[.,]/g, '');
     if (minPriceMatch[2] && /mil(?!h)|k|thousand/.test(minPriceMatch[2])) value += '000';

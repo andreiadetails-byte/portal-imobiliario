@@ -39,7 +39,7 @@ export default function FaqContent() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, '\\u003c') }} />
       <TextPage title={t('faq_title')}>
         {faqs.map((f, i) => (
           <div key={i} style={{ marginBottom: 22 }}>

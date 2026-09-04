@@ -105,14 +105,29 @@ export default function HomePage() {
         .from('properties')
         .select('id, owner_id, title, price, display_name, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, featured_status, created_at, property_photos(url, thumbnail_url, position)')
         .eq('status', 'ativo')
+        .eq('featured_status', 'active')
         .order('created_at', { ascending: false })
-        .limit(60);
+        .limit(100);
 
       if (!error) {
         const all = data || [];
-        const featured = shuffle(all.filter((p) => p.featured_status === 'active'));
-        const rest = shuffle(all.filter((p) => p.featured_status !== 'active'));
-        const chosen = [...featured, ...rest].slice(0, 6);
+        // A consulta já só traz imóveis com destaque ativo — aqui só
+        // baralhamos a ordem, e garantimos que nunca aparecem dois do
+        // mesmo dono (normalmente o mesmo empreendimento) nem com a mesma
+        // foto principal ao mesmo tempo, para não parecer repetido.
+        const featuredPool = shuffle(all);
+        const chosen = [];
+        const usedOwnerIds = new Set();
+        const usedMainPhotoUrls = new Set();
+        for (const p of featuredPool) {
+          if (chosen.length >= 6) break;
+          if (p.owner_id && usedOwnerIds.has(p.owner_id)) continue;
+          const mainPhoto = p.property_photos?.sort((a, b) => (a.position ?? 0) - (b.position ?? 0))[0]?.url;
+          if (mainPhoto && usedMainPhotoUrls.has(mainPhoto)) continue;
+          chosen.push(p);
+          if (p.owner_id) usedOwnerIds.add(p.owner_id);
+          if (mainPhoto) usedMainPhotoUrls.add(mainPhoto);
+        }
 
         const ownerIds = [...new Set(chosen.map((p) => p.owner_id).filter(Boolean))];
         let ownersById = {};
@@ -212,7 +227,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 40px' }}>
+      <section style={{ padding: '40px 0', background: 'var(--paper)' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
             <div className="tile-strip" />
@@ -224,7 +239,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 40px' }}>
+      <section style={{ padding: '40px 0', background: 'rgba(126,143,106,0.28)' }}>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <Link
+            href="/simulador-investimento"
+            style={{
+              borderRadius: 12, padding: '22px 26px', background: 'linear-gradient(135deg, var(--azulejo) 0%, var(--telha) 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', textDecoration: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <span style={{ fontSize: 34, flexShrink: 0 }}>📈</span>
+              <div>
+                <div className="display" style={{ fontSize: 19, fontWeight: 600, color: '#fff', marginBottom: 3 }}>{t('home_investor_title')}</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)' }}>
+                  {t('home_investor_text')}
+                </div>
+              </div>
+            </div>
+            <span style={{
+              background: '#fff', color: 'var(--ink)', fontSize: 13.5, fontWeight: 600,
+              padding: '11px 22px', borderRadius: 6, whiteSpace: 'nowrap',
+            }}>
+              {t('home_investor_cta')}
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      <section style={{ padding: '40px 0', background: 'var(--paper)' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div className="install-qr-section" style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
@@ -264,35 +307,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 40px' }}>
-        <div className="wrap" style={{ maxWidth: 760 }}>
-          <Link
-            href="/simulador-investimento"
-            style={{
-              borderRadius: 12, padding: '22px 26px', background: 'linear-gradient(135deg, var(--azulejo) 0%, var(--telha) 100%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', textDecoration: 'none',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontSize: 34, flexShrink: 0 }}>📈</span>
-              <div>
-                <div className="display" style={{ fontSize: 19, fontWeight: 600, color: '#fff', marginBottom: 3 }}>{t('home_investor_title')}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)' }}>
-                  {t('home_investor_text')}
-                </div>
-              </div>
-            </div>
-            <span style={{
-              background: '#fff', color: 'var(--ink)', fontSize: 13.5, fontWeight: 600,
-              padding: '11px 22px', borderRadius: 6, whiteSpace: 'nowrap',
-            }}>
-              {t('home_investor_cta')}
-            </span>
-          </Link>
-        </div>
-      </section>
-
-      <section style={{ padding: '0 0 64px' }}>
+      <section style={{ padding: '40px 0 64px', background: 'rgba(126,143,106,0.28)' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div className="card" style={{ padding: '26px 28px' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
