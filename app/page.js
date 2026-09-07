@@ -109,16 +109,25 @@ export default function HomePage() {
         .order('created_at', { ascending: false })
         .limit(100);
 
+      if (error) {
+        console.error('Erro ao carregar imóveis em destaque:', error);
+      }
+
       if (!error) {
         const all = data || [];
-        // A consulta já só traz imóveis com destaque ativo — aqui só
-        // baralhamos a ordem, e garantimos que nunca aparecem dois do
-        // mesmo dono (normalmente o mesmo empreendimento) nem com a mesma
-        // foto principal ao mesmo tempo, para não parecer repetido.
+        // A consulta já só traz imóveis com destaque ativo. Aqui baralhamos
+        // a ordem e tentamos ao máximo intercalar donos diferentes — para
+        // nunca aparecerem vários imóveis do mesmo empreendimento ao mesmo
+        // tempo. Mas se não houver donos suficientes para preencher os 6
+        // lugares, prefere mostrar repetidos a deixar lugares vazios (é
+        // perfeitamente normal um dono ter vários imóveis em destaque, só
+        // não convém verem-se todos juntos na mesma vista).
         const featuredPool = shuffle(all);
         const chosen = [];
-        const usedOwnerIds = new Set();
         const usedMainPhotoUrls = new Set();
+        const usedOwnerIds = new Set();
+
+        // 1ª passagem: só aceita donos ainda não escolhidos.
         for (const p of featuredPool) {
           if (chosen.length >= 6) break;
           if (p.owner_id && usedOwnerIds.has(p.owner_id)) continue;
@@ -127,6 +136,20 @@ export default function HomePage() {
           chosen.push(p);
           if (p.owner_id) usedOwnerIds.add(p.owner_id);
           if (mainPhoto) usedMainPhotoUrls.add(mainPhoto);
+        }
+
+        // 2ª passagem (só se ainda faltarem lugares): já aceita repetir
+        // donos, mas continua a nunca repetir a mesma foto principal.
+        if (chosen.length < 6) {
+          const chosenIds = new Set(chosen.map((p) => p.id));
+          for (const p of featuredPool) {
+            if (chosen.length >= 6) break;
+            if (chosenIds.has(p.id)) continue;
+            const mainPhoto = p.property_photos?.sort((a, b) => (a.position ?? 0) - (b.position ?? 0))[0]?.url;
+            if (mainPhoto && usedMainPhotoUrls.has(mainPhoto)) continue;
+            chosen.push(p);
+            if (mainPhoto) usedMainPhotoUrls.add(mainPhoto);
+          }
         }
 
         const ownerIds = [...new Set(chosen.map((p) => p.owner_id).filter(Boolean))];
@@ -295,11 +318,11 @@ export default function HomePage() {
                   📲 {t('home_install_button')}
                 </button>
               ) : (
-                <div className="install-text-instructions" style={{ fontSize: 14, color: 'var(--text-soft)', lineHeight: 1.7 }}>
-                  <b>{t('home_install_android_label')}</b><br />
-                  {t('home_install_android_opt1')}<br />
-                  {t('home_install_android_opt2')}<br /><br />
-                  {t('home_install_ios')}
+                // No computador, a pessoa vai digitalizar o código no telemóvel —
+                // os passos detalhados (Android/iPhone) fazem mais sentido só
+                // depois, quando já estiver lá, por isso aqui fica só o essencial.
+                <div className="install-text-instructions" style={{ fontSize: 14, color: 'var(--text-soft)' }}>
+                  {t('home_install_simple_hint')}
                 </div>
               )}
             </div>
