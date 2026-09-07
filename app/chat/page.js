@@ -173,7 +173,16 @@ function ChatInner() {
         (payload) => {
           setMessages((cur) => cur.filter((m) => m.id !== payload.old.id));
         })
-      .subscribe();
+      .subscribe((status, err) => {
+        // Diagnóstico temporário: mostra se a ligação de tempo real
+        // conseguiu mesmo estabelecer-se, ou se falhou silenciosamente
+        // (o que explicaria porque as mensagens só aparecem depois de
+        // atualizar a página manualmente).
+        console.log('Estado da ligação de tempo real do chat:', status, err || '');
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error('A ligação de tempo real falhou:', status, err);
+        }
+      });
 
     return () => { supabase.removeChannel(channel); };
   }, [activeId, user]);
