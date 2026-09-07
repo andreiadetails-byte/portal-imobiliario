@@ -479,7 +479,7 @@ function AdminInner() {
       await supabase.from('notifications').insert({
         user_id: request.user_id,
         message: '💬 Mensagem do suporte: recebeu uma resposta à sua mensagem.',
-        link: '/dashboard',
+        link: `/mensagens-suporte?id=${requestId}`,
         read: false,
       });
     }

@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 import { agentLabel } from '../../lib/agentNames';
 
-export default function MensagensSuportePage() {
+function MensagensSuporteInner() {
   const { t } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const highlightedId = searchParams.get('id');
   const [userId, setUserId] = useState(null);
   const [supportThreads, setSupportThreads] = useState([]);
   const [replyText, setReplyText] = useState({});
@@ -27,6 +29,15 @@ export default function MensagensSuportePage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
+  // Se se veio de uma notificação (com o id da conversa específica), desloca
+  // a página até essa conversa e destaca-a por uns segundos, para nunca
+  // mais se cair numa mensagem "aleatória" sem ser a certa.
+  useEffect(() => {
+    if (!highlightedId || supportThreads.length === 0) return;
+    const el = document.getElementById(`support-thread-${highlightedId}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightedId, supportThreads]);
 
   // Atualiza a conversa em tempo real — assim que o admin responde, a
   // resposta aparece logo aqui, sem ser preciso sair e voltar a entrar.
@@ -107,7 +118,16 @@ export default function MensagensSuportePage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {supportThreads.map((r) => (
-              <div key={r.id} className="card" style={{ padding: 20 }}>
+              <div
+                key={r.id}
+                id={`support-thread-${r.id}`}
+                className="card"
+                style={{
+                  padding: 20,
+                  border: highlightedId === r.id ? '2px solid var(--telha)' : undefined,
+                  boxShadow: highlightedId === r.id ? '0 0 0 4px rgba(90,107,73,0.15)' : undefined,
+                }}
+              >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <span style={{ fontSize: 15, fontWeight: 600 }}>
                     Conversa com {agentLabel(r.agent_name)}
@@ -191,5 +211,13 @@ export default function MensagensSuportePage() {
         )}
       </main>
     </>
+  );
+}
+
+export default function MensagensSuportePage() {
+  return (
+    <Suspense fallback={<div className="wrap" style={{ padding: 60 }}>...</div>}>
+      <MensagensSuporteInner />
+    </Suspense>
   );
 }

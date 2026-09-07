@@ -202,7 +202,11 @@ export default function Header({ minimal = false }) {
                         key={n.id}
                         href={n.link || '#'}
                         onClick={() => { setNotifOpen(false); setNotifications((cur) => cur.filter((x) => x.id !== n.id)); }}
-                        style={{ display: 'block', padding: '12px 14px', borderBottom: '1px solid var(--line)', fontSize: 12.5 }}
+                        style={{
+                          display: 'block', padding: '12px 14px', borderBottom: '1px solid var(--line)', fontSize: 12.5,
+                          background: !n.read ? 'rgba(184,69,47,0.08)' : 'transparent',
+                          borderLeft: !n.read ? '3px solid var(--telha)' : '3px solid transparent',
+                        }}
                       >
                         {n.message}
                         <div style={{ fontSize: 10.5, color: 'var(--text-soft)', marginTop: 4 }}>
