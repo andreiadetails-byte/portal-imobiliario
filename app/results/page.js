@@ -61,7 +61,7 @@ function ResultsInner() {
   // Conta quantos filtros a pessoa já escolheu, para mostrar "Filtros (5)"
   // no telemóvel — tal como noutros portais imobiliários conhecidos.
   const activeFilterCount = [
-    district, minPrice, maxPrice, minBedrooms, minBathrooms, minArea,
+    district, minPrice, maxPrice, minBedrooms !== '0' && minBedrooms, minBathrooms !== '0' && minBathrooms, minArea,
     selectedStates.length > 0, selectedTypologies.length > 0, elevatorOnly,
   ].filter(Boolean).length;
   const [sortBy, setSortBy] = useState('recent');
