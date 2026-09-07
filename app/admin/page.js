@@ -1395,12 +1395,29 @@ function AdminInner() {
                         style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--line)', fontSize: 12.5, marginBottom: 6, resize: 'vertical' }}
                       />
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <label
+                          htmlFor={`valuation-file-${v.id}`}
+                          className="btn"
+                          style={{ fontSize: 11.5, padding: '5px 12px', cursor: 'pointer' }}
+                        >
+                          📎 {valuationReplyFile[v.id] ? valuationReplyFile[v.id].name : 'Anexar documento'}
+                        </label>
                         <input
+                          id={`valuation-file-${v.id}`}
                           type="file"
                           accept="image/*,application/pdf"
                           onChange={(e) => setValuationReplyFile((cur) => ({ ...cur, [v.id]: e.target.files[0] || null }))}
-                          style={{ fontSize: 11.5 }}
+                          style={{ display: 'none' }}
                         />
+                        {valuationReplyFile[v.id] && (
+                          <button
+                            type="button"
+                            onClick={() => setValuationReplyFile((cur) => ({ ...cur, [v.id]: null }))}
+                            style={{ fontSize: 11.5, background: 'none', border: 'none', color: 'var(--text-soft)', cursor: 'pointer', textDecoration: 'underline' }}
+                          >
+                            remover
+                          </button>
+                        )}
                         <button
                           onClick={() => replyToValuation(v)}
                           disabled={sendingValuationReply[v.id]}
