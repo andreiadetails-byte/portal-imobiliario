@@ -187,6 +187,25 @@ function ChatInner() {
     return () => { supabase.removeChannel(channel); };
   }, [activeId, user]);
 
+  // Rede de segurança: além do "tempo real" (que nem sempre consegue
+  // ligar-se, por exemplo em certas redes/firewalls), verifica também a
+  // cada poucos segundos se há mensagens novas que ainda não apareceram.
+  // Isto garante que o chat funciona sempre, mesmo quando a ligação de
+  // tempo real falha silenciosamente.
+  useEffect(() => {
+    if (!activeId || !user) return;
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from('messages').select('*').eq('conversation_id', activeId).order('created_at', { ascending: true });
+      if (!data) return;
+      setMessages((cur) => {
+        if (data.length === cur.length) return cur; // nada de novo, evita voltar a desenhar sem necessidade
+        return data;
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [activeId, user]);
+
   async function sendMessage(e) {
     e.preventDefault();
     if (!text.trim()) return;
