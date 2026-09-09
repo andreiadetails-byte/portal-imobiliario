@@ -704,7 +704,7 @@ function AdminInner() {
 
   async function loadFeatured() {
     const { data } = await supabase
-      .from('properties').select('id, typology, address, price, featured_status, featured_requested_at, profiles!owner_id(id, full_name, agency_name)')
+      .from('properties').select('id, typology, address, price, featured_status, featured_requested_at, featured_days, featured_until, featured_proof_url, profiles!owner_id(id, full_name, agency_name)')
       .in('featured_status', ['pending', 'active'])
       .order('featured_requested_at', { ascending: false });
     setFeaturedList(data || []);
@@ -1609,7 +1609,12 @@ function AdminInner() {
                     )}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                  {p.featured_proof_url && (
+                    <a href={p.featured_proof_url} target="_blank" rel="noopener noreferrer" className="btn" style={{ fontSize: 13 }}>
+                      📎 Ver comprovativo
+                    </a>
+                  )}
                   {p.featured_status === 'pending' && (
                     <button onClick={() => activateFeatured(p.id, p.featured_days)} className="btn btn-primary" style={{ fontSize: 13 }}>
                       Confirmar pagamento e ativar

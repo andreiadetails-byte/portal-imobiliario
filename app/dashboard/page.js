@@ -51,6 +51,8 @@ function DashboardInner() {
   }
   const [loading, setLoading] = useState(true);
   const [featuredModal, setFeaturedModal] = useState(null);
+  const [featuredProofFile, setFeaturedProofFile] = useState(null);
+  const [uploadingFeaturedProof, setUploadingFeaturedProof] = useState(false);
   const [featuredPaymentMethod, setFeaturedPaymentMethod] = useState('transferencia');
   const [featuredDays, setFeaturedDays] = useState(7);
   const [viewsChartId, setViewsChartId] = useState(null);
@@ -176,14 +178,42 @@ function DashboardInner() {
       setFeaturedModal(null);
       return;
     }
+
+    let proofUrl = null;
+    if (featuredProofFile) {
+      setUploadingFeaturedProof(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const body = new FormData();
+        body.append('file', featuredProofFile);
+        body.append('propertyId', `featured-${id}`);
+        body.append('type', 'document');
+        const res = await fetch('/api/upload-photo-r2', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          proofUrl = data.url;
+        }
+      } catch (err) {
+        // Se o envio do comprovativo falhar, o pedido segue mesmo assim —
+        // a pessoa pode sempre mostrar o comprovativo depois, por email.
+      }
+      setUploadingFeaturedProof(false);
+    }
+
     await supabase.from('properties').update({
       featured_status: 'pending',
       featured_requested_at: new Date().toISOString(),
       featured_days: featuredDays,
+      featured_proof_url: proofUrl,
     }).eq('id', id);
     setProperties((cur) => cur.map((p) => (p.id === id ? { ...p, featured_status: 'pending' } : p)));
     setFeaturedModal(null);
     setFeaturedDays(7);
+    setFeaturedProofFile(null);
   }
 
   if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
@@ -504,13 +534,30 @@ function DashboardInner() {
                 <div><b>IBAN:</b> {PAYMENT_INFO.iban}</div>
                 <div><b>BIC/SWIFT:</b> {PAYMENT_INFO.bic}</div>
               </div>
-              <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 18 }}>
+              <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 12 }}>
                 Transfira <b>{(PAYMENT_INFO.activationFee + PAYMENT_INFO.dailyFee * featuredDays).toFixed(2)} €</b> e indique o número de referência <b>{featuredModal.slice(0, 8)}</b> na descrição da transferência.
                 Depois de recebermos o pagamento, o destaque é ativado manualmente (normalmente em 1 dia útil), e dura {featuredDays} dias a partir da ativação.
               </p>
 
-              <button onClick={() => requestFeatured(featuredModal)} className="btn btn-primary btn-block" style={{ marginBottom: 8 }}>
-                Já fiz a transferência
+              <div style={{ marginBottom: 14 }}>
+                <label
+                  htmlFor="featured-proof-input"
+                  className="btn"
+                  style={{ fontSize: 12.5, padding: '7px 14px', cursor: 'pointer', display: 'inline-block' }}
+                >
+                  📎 {featuredProofFile ? featuredProofFile.name : 'Anexar comprovativo (opcional)'}
+                </label>
+                <input
+                  id="featured-proof-input"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => setFeaturedProofFile(e.target.files?.[0] || null)}
+                  style={{ display: 'none' }}
+                />
+              </div>
+
+              <button onClick={() => requestFeatured(featuredModal)} className="btn btn-primary btn-block" style={{ marginBottom: 8 }} disabled={uploadingFeaturedProof}>
+                {uploadingFeaturedProof ? 'A enviar...' : 'Já fiz a transferência'}
               </button>
               <button onClick={() => setFeaturedModal(null)} className="btn btn-block">{t('dash_cancel')}</button>
             </>
