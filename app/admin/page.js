@@ -108,6 +108,9 @@ function AdminInner() {
   const [rateSaved, setRateSaved] = useState(false);
   const [euriborRate, setEuriborRate] = useState('');
   const [savingEuribor, setSavingEuribor] = useState(false);
+  const [retranslating, setRetranslating] = useState(false);
+  const [retranslateDone, setRetranslateDone] = useState(false);
+  const [retranslateProgress, setRetranslateProgress] = useState({ done: 0, total: 0 });
   const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
@@ -403,6 +406,40 @@ function AdminInner() {
     setSavingRate(false);
     setRateSaved(true);
     setTimeout(() => setRateSaved(false), 2500);
+  }
+
+  async function retranslateMissingProperties() {
+    setRetranslating(true);
+    setRetranslateDone(false);
+    const { data: { session } } = await supabase.auth.getSession();
+
+    // Vai buscar todos os imóveis que ainda não têm nenhuma tradução
+    // guardada (title_translations vazio) — normalmente porque ficaram
+    // por traduzir quando a chave de tradução atingiu o limite.
+    const { data: missing } = await supabase
+      .from('properties')
+      .select('id')
+      .is('title_translations', null);
+
+    const ids = (missing || []).map((p) => p.id);
+    setRetranslateProgress({ done: 0, total: ids.length });
+
+    for (let i = 0; i < ids.length; i++) {
+      try {
+        await fetch('/api/translate-property', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+          body: JSON.stringify({ propertyId: ids[i] }),
+        });
+      } catch (err) {
+        // Continua para o próximo, mesmo que um falhe — não vale a pena
+        // parar tudo por causa de um único imóvel com problema.
+      }
+      setRetranslateProgress({ done: i + 1, total: ids.length });
+    }
+
+    setRetranslating(false);
+    setRetranslateDone(true);
   }
 
   async function saveEuriborRate(e) {
@@ -1838,6 +1875,23 @@ function AdminInner() {
             </button>
             {euriborSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 12 }}>✓ Guardado</span>}
           </form>
+        </div>
+      )}
+
+      {section === 'definicoes' && (
+        <div className="card" style={{ padding: 20, maxWidth: 400, marginTop: 16 }}>
+          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>🌍 Traduzir imóveis em falta</h3>
+          <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+            Traduz automaticamente (para todos os idiomas) os imóveis que ainda não têm traduções guardadas — por exemplo, se algum ficou por traduzir por a chave de tradução ter atingido o limite anteriormente. Pode demorar alguns minutos, dependendo de quantos imóveis houver.
+          </p>
+          <button onClick={retranslateMissingProperties} className="btn btn-primary" disabled={retranslating}>
+            {retranslating ? `A traduzir... (${retranslateProgress.done}/${retranslateProgress.total})` : 'Traduzir imóveis em falta'}
+          </button>
+          {retranslateDone && !retranslating && (
+            <p style={{ fontSize: 12.5, color: 'var(--telha)', marginTop: 10 }}>
+              ✓ Concluído — {retranslateProgress.done} imóveis traduzidos.
+            </p>
+          )}
         </div>
       )}
     </main>
