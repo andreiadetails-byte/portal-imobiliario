@@ -111,6 +111,7 @@ function AdminInner() {
   const [retranslating, setRetranslating] = useState(false);
   const [retranslateDone, setRetranslateDone] = useState(false);
   const [retranslateProgress, setRetranslateProgress] = useState({ done: 0, total: 0 });
+  const [retranslateFailCount, setRetranslateFailCount] = useState(0);
   const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
@@ -427,21 +428,27 @@ function AdminInner() {
 
     const ids = (missing || []).map((p) => p.id);
     setRetranslateProgress({ done: 0, total: ids.length });
+    let failCount = 0;
 
     for (let i = 0; i < ids.length; i++) {
       try {
-        await fetch('/api/translate-property', {
+        const res = await fetch('/api/translate-property', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
           body: JSON.stringify({ propertyId: ids[i] }),
         });
+        if (!res.ok) failCount++;
       } catch (err) {
-        // Continua para o próximo, mesmo que um falhe — não vale a pena
-        // parar tudo por causa de um único imóvel com problema.
+        failCount++;
       }
       setRetranslateProgress({ done: i + 1, total: ids.length });
+      // Uma pequena pausa entre cada pedido, para não sobrecarregar a API
+      // de tradução com demasiados pedidos ao mesmo tempo (o que podia
+      // fazer alguns falharem silenciosamente).
+      await new Promise((resolve) => setTimeout(resolve, 300));
     }
 
+    setRetranslateFailCount(failCount);
     setRetranslating(false);
     setRetranslateDone(true);
   }
@@ -1897,8 +1904,10 @@ function AdminInner() {
             {retranslating ? `A traduzir... (${retranslateProgress.done}/${retranslateProgress.total})` : 'Traduzir imóveis em falta'}
           </button>
           {retranslateDone && !retranslating && (
-            <p style={{ fontSize: 12.5, color: 'var(--telha)', marginTop: 10 }}>
-              ✓ Concluído — {retranslateProgress.done} imóveis traduzidos.
+            <p style={{ fontSize: 12.5, color: retranslateFailCount > 0 ? '#8a6a1f' : 'var(--telha)', marginTop: 10 }}>
+              {retranslateFailCount > 0
+                ? `⚠ Concluído — ${retranslateProgress.done - retranslateFailCount} traduzidos com sucesso, ${retranslateFailCount} falharam. Corre a ferramenta outra vez para tentar de novo os que falharam.`
+                : `✓ Concluído — ${retranslateProgress.done} imóveis traduzidos.`}
             </p>
           )}
         </div>
