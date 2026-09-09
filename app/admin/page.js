@@ -416,10 +416,14 @@ function AdminInner() {
     // Vai buscar todos os imóveis que ainda não têm nenhuma tradução
     // guardada (title_translations vazio) — normalmente porque ficaram
     // por traduzir quando a chave de tradução atingiu o limite.
-    const { data: missing } = await supabase
-      .from('properties')
-      .select('id')
-      .is('title_translations', null);
+    // Filtra do lado do código (não da base de dados), para apanhar tanto
+    // os que nunca tiveram tradução nenhuma (null) como os que ficaram com
+    // um objeto vazio "{}" guardado (quando a tradução falhou a meio, por
+    // exemplo por a chave ter atingido o limite).
+    const { data: allProps } = await supabase.from('properties').select('id, title_translations');
+    const missing = (allProps || []).filter(
+      (p) => !p.title_translations || Object.keys(p.title_translations).length === 0
+    );
 
     const ids = (missing || []).map((p) => p.id);
     setRetranslateProgress({ done: 0, total: ids.length });
