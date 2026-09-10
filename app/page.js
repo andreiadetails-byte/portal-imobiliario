@@ -387,13 +387,13 @@ export default function HomePage() {
 
       <section style={{ padding: '72px 0 88px' }}>
         <div className="wrap">
-          <h2 className="display" style={{ fontSize: 32, marginBottom: 32 }}>{t('home_featured')}</h2>
+          <h2 className="display" style={{ fontSize: 32, marginBottom: 32, color: '#fff' }}>{t('home_featured')}</h2>
 
-          {loading && <p>{t('home_loading')}</p>}
+          {loading && <p style={{ color: '#fff' }}>{t('home_loading')}</p>}
 
           {!loading && properties.length === 0 && (
             <div className="empty-state">
-              <p>{t('home_empty')}</p>
+              <p style={{ color: '#fff' }}>{t('home_empty')}</p>
             </div>
           )}
 
