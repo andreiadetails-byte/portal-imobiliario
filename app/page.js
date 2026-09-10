@@ -250,7 +250,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '40px 0', background: 'var(--paper)' }}>
+      <section style={{ padding: '64px 0', background: 'var(--paper)' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
             <div className="tile-strip" />
@@ -262,7 +262,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '40px 0', background: 'rgba(126,143,106,0.28)' }}>
+      <section style={{ padding: '64px 0', background: 'rgba(126,143,106,0.28)' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <Link
             href="/simulador-investimento"
@@ -290,7 +290,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '40px 0', background: 'var(--paper)' }}>
+      <section style={{ padding: '64px 0', background: 'var(--paper)' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div className="install-qr-section" style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
@@ -349,8 +349,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '40px 0 64px', background: 'rgba(126,143,106,0.28)' }}>
-        <div className="wrap" style={{ maxWidth: 760 }}>
+      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/estante.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <div className="card" style={{ padding: '26px 28px' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16 }}>
@@ -383,9 +385,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '48px 0 64px' }}>
+      <section style={{ padding: '72px 0 88px' }}>
         <div className="wrap">
-          <h2 className="display" style={{ fontSize: 26, marginBottom: 24 }}>{t('home_featured')}</h2>
+          <h2 className="display" style={{ fontSize: 32, marginBottom: 32 }}>{t('home_featured')}</h2>
 
           {loading && <p>{t('home_loading')}</p>}
 
@@ -609,7 +611,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 64px' }}>
+      <section style={{ padding: '0 0 88px' }}>
         <div className="wrap">
           <div style={{
             position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220,
@@ -661,15 +663,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 64px' }}>
+      <section style={{ padding: '0 0 88px' }}>
         <div className="wrap" style={{ maxWidth: 620 }}>
           <PricePerM2Lookup />
         </div>
       </section>
 
-      <section style={{ padding: '0 0 64px' }}>
+      <section style={{ padding: '0 0 88px' }}>
         <div className="wrap">
-          <h2 className="display" style={{ fontSize: 22, marginBottom: 4 }}>{t('home_districts_title')}</h2>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('home_districts_title')}</h2>
           <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {distritos.map((d) => (
@@ -686,7 +688,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 64px' }}>
+      <section style={{ padding: '0 0 88px' }}>
         <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>{t('home_testimonials_title')}</h2>
@@ -701,9 +703,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 80px' }}>
+      <section style={{ padding: '0 0 104px' }}>
         <div className="wrap">
-          <h2 className="display" style={{ fontSize: 22, marginBottom: 20 }}>{t('home_news_title')}</h2>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 24 }}>{t('home_news_title')}</h2>
           {news.length === 0 ? (
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>{t('home_no_news')}</p>
           ) : (
