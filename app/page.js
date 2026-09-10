@@ -330,22 +330,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: 0, position: 'relative', minHeight: 340, display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#2A2F20' }}>
         <img
           src="/mood/escritorio.jpg"
           alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(36,31,24,0.72) 0%, rgba(36,31,24,0.35) 55%, rgba(36,31,24,0.1) 100%)' }} />
-        <div className="wrap" style={{ position: 'relative', maxWidth: 900 }}>
-          <div style={{ maxWidth: 420 }}>
-            <div className="display" style={{ fontSize: 26, fontWeight: 600, color: '#fff', marginBottom: 10, lineHeight: 1.25 }}>
-              {t('home_mood_title')}
-            </div>
-            <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>
-              {t('home_mood_text')}
-            </p>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(36,41,26,0.55) 0%, rgba(36,41,26,0.88) 100%)' }} />
+        <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
+          <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+            {t('home_mood_title')}
           </div>
+          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: 460, margin: '0 auto' }}>
+            {t('home_mood_text')}
+          </p>
         </div>
       </section>
 
