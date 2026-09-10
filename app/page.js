@@ -129,7 +129,7 @@ export default function HomePage() {
 
         // 1ª passagem: só aceita donos ainda não escolhidos.
         for (const p of featuredPool) {
-          if (chosen.length >= 6) break;
+          if (chosen.length >= 3) break;
           if (p.owner_id && usedOwnerIds.has(p.owner_id)) continue;
           const mainPhoto = p.property_photos?.sort((a, b) => (a.position ?? 0) - (b.position ?? 0))[0]?.url;
           if (mainPhoto && usedMainPhotoUrls.has(mainPhoto)) continue;
@@ -143,7 +143,7 @@ export default function HomePage() {
         if (chosen.length < 6) {
           const chosenIds = new Set(chosen.map((p) => p.id));
           for (const p of featuredPool) {
-            if (chosen.length >= 6) break;
+            if (chosen.length >= 3) break;
             if (chosenIds.has(p.id)) continue;
             const mainPhoto = p.property_photos?.sort((a, b) => (a.position ?? 0) - (b.position ?? 0))[0]?.url;
             if (mainPhoto && usedMainPhotoUrls.has(mainPhoto)) continue;
