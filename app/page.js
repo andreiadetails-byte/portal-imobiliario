@@ -669,8 +669,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 88px' }}>
-        <div className="wrap">
+      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(241,232,214,0.88)' }} />
+        <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('home_districts_title')}</h2>
           <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -705,8 +707,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 104px' }}>
-        <div className="wrap">
+      <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(241,232,214,0.85)' }} />
+        <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 24 }}>{t('home_news_title')}</h2>
           {news.length === 0 ? (
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>{t('home_no_news')}</p>

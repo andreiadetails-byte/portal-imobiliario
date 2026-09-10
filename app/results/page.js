@@ -333,12 +333,19 @@ function ResultsInner() {
     <>
       <Header />
 
-      <main id="main-content" className="wrap" style={{ paddingTop: 32, paddingBottom: 32 }}>
-        <BackButton fallback="/" />
-        <h1 className="display" style={{ fontSize: 26, marginBottom: 4 }}>{t('results_title')}</h1>
-        <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>
-          {loading ? t('results_searching') : `${mapFilterIds ? mapFilterIds.length : count} ${t('results_found')}`}
-        </p>
+      <div style={{ position: 'relative', overflow: 'hidden', padding: '28px 0', marginBottom: 8 }}>
+        <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.72)' }} />
+        <div className="wrap" style={{ position: 'relative' }}>
+          <BackButton fallback="/" />
+          <h1 className="display" style={{ fontSize: 26, marginBottom: 4, color: '#fff' }}>{t('results_title')}</h1>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)' }}>
+            {loading ? t('results_searching') : `${mapFilterIds ? mapFilterIds.length : count} ${t('results_found')}`}
+          </p>
+        </div>
+      </div>
+
+      <main id="main-content" className="wrap" style={{ paddingTop: 8, paddingBottom: 32 }}>
 
         <div className="results-mobile-toolbar">
           <button type="button" onClick={() => setShowFiltersModal(true)} className="btn">
