@@ -349,6 +349,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <div style={{ height: 24, background: 'var(--paper)' }} />
+
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/estante.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
