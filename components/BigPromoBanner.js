@@ -25,7 +25,7 @@ export default function BigPromoBanner() {
   return (
     <div style={{
       height: 130, borderRadius: 10, overflow: 'hidden',
-      background: 'linear-gradient(135deg, var(--telha) 0%, #3E4A32 100%)',
+      background: 'linear-gradient(135deg, #8FA36C 0%, #6B7A52 100%)',
       display: 'flex', alignItems: 'center',
     }}>
       <div style={{ display: 'flex', width: 'max-content', animation: 'promo-scroll 14s linear infinite' }}>

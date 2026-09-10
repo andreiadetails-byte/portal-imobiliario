@@ -24,13 +24,15 @@ export default function TextPage({ title, children }) {
         <button
           onClick={handleBack}
           className="btn"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px', background: '#fff' }}
         >
           {t('back_to_previous_page')}
         </button>
-        <h1 className="display" style={{ fontSize: 30, marginBottom: 24 }}>{title}</h1>
-        <div style={{ fontSize: 14.5, color: 'var(--text-soft)', lineHeight: 1.7 }}>
-          {children}
+        <div className="card" style={{ padding: '32px 36px' }}>
+          <h1 className="display" style={{ fontSize: 30, marginBottom: 24 }}>{title}</h1>
+          <div style={{ fontSize: 14.5, color: 'var(--text-soft)', lineHeight: 1.7 }}>
+            {children}
+          </div>
         </div>
       </main>
     </>
