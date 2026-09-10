@@ -262,8 +262,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '64px 0', background: 'rgba(126,143,106,0.28)' }}>
-        <div className="wrap" style={{ maxWidth: 760 }}>
+      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/mesa-verde.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.42)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <Link
             href="/simulador-investimento"
             style={{
@@ -686,14 +688,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 88px' }}>
-        <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      <section style={{ padding: '56px 0 88px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.5)' }} />
+        <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative' }}>
           <div>
-            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>{t('home_testimonials_title')}</h2>
+            <h2 className="display" style={{ fontSize: 20, marginBottom: 14, color: '#fff' }}>{t('home_testimonials_title')}</h2>
             <TestimonialsCarousel />
           </div>
           <div>
-            <h2 className="display" style={{ fontSize: 20, marginBottom: 14 }}>{t('home_map_title')}</h2>
+            <h2 className="display" style={{ fontSize: 20, marginBottom: 14, color: '#fff' }}>{t('home_map_title')}</h2>
             <LazyMount placeholderHeight={340}>
               <MiniMapPreview />
             </LazyMount>
