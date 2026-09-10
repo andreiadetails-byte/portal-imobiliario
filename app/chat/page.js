@@ -194,9 +194,11 @@ function ChatInner() {
   // tempo real falha silenciosamente.
   useEffect(() => {
     if (!activeId || !user) return;
+    console.log('Rede de segurança do chat iniciada para a conversa:', activeId);
     const interval = setInterval(async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('messages').select('*').eq('conversation_id', activeId).order('created_at', { ascending: true });
+      console.log('Rede de segurança: verificação executada, mensagens encontradas:', data?.length, error || '');
       if (!data) return;
       setMessages((cur) => {
         if (data.length === cur.length) return cur; // nada de novo, evita voltar a desenhar sem necessidade

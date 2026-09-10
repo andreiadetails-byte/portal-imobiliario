@@ -330,6 +330,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section style={{ padding: 0, position: 'relative', minHeight: 340, display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+        <img
+          src="/mood/escritorio.jpg"
+          alt=""
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(36,31,24,0.72) 0%, rgba(36,31,24,0.35) 55%, rgba(36,31,24,0.1) 100%)' }} />
+        <div className="wrap" style={{ position: 'relative', maxWidth: 900 }}>
+          <div style={{ maxWidth: 420 }}>
+            <div className="display" style={{ fontSize: 26, fontWeight: 600, color: '#fff', marginBottom: 10, lineHeight: 1.25 }}>
+              {t('home_mood_title')}
+            </div>
+            <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>
+              {t('home_mood_text')}
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section style={{ padding: '40px 0 64px', background: 'rgba(126,143,106,0.28)' }}>
         <div className="wrap" style={{ maxWidth: 760 }}>
           <div className="card" style={{ padding: '26px 28px' }}>
