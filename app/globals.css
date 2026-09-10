@@ -28,9 +28,7 @@ img, video, iframe{ max-width: 100%; height: auto; }
 input, select, textarea, button{ min-width: 0; }
 img{ -webkit-user-drag:none; user-drag:none; }
 body{
-  background-color: #5A6B3E;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj4KPGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSB0eXBlPSJ0dXJidWxlbmNlIiBiYXNlRnJlcXVlbmN5PSIwLjAxMiAwLjA5IiBudW1PY3RhdmVzPSI0IiBzZWVkPSI3IiByZXN1bHQ9Im5vaXNlIi8+CjxmZUNvbG9yTWF0cml4IGluPSJub2lzZSIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMC41NSAgMCAwIDAgMCAwLjYgIDAgMCAwIDAgMC4zNSAgMCAwIDAgMC44NSAwIi8+PC9maWx0ZXI+CjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==");
-  background-repeat: repeat;
+  background: #DCE4CC;
   color:var(--ink);
   font-family:'Inter',sans-serif;
   line-height:1.55;
