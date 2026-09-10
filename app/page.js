@@ -615,22 +615,7 @@ export default function HomePage() {
 
       <section style={{ padding: '0 0 88px' }}>
         <div className="wrap">
-          <div style={{
-            position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220,
-            backgroundImage: 'url(/images/avaliacao-foto.jpg)', backgroundSize: 'cover', backgroundPosition: 'center center',
-          }}>
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
-            }} />
-            <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
-              <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
-              <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
-            </div>
-          </div>
-
-          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginTop: 110 }}>
+          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
             <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: 150, backgroundImage: 'url(/images/simulador-arrendar.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
               <div style={{ padding: '30px 30px 36px' }}>
@@ -660,6 +645,21 @@ export default function HomePage() {
                 </p>
                 <Link href="/simulador-credito" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>{t('home_credit_btn')}</Link>
               </div>
+            </div>
+          </div>
+
+          <div style={{
+            position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220, marginTop: 40,
+            backgroundImage: 'url(/images/avaliacao-foto.jpg)', backgroundSize: 'cover', backgroundPosition: 'center center',
+          }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
+            }} />
+            <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
+              <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
+              <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
             </div>
           </div>
         </div>
