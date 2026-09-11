@@ -45,9 +45,9 @@ export default function NoticiaPage() {
     <>
       <Header />
       <main id="main-content" className="wrap" style={{ maxWidth: 1080, padding: '24px 32px 56px' }}>
-        <div style={{ background: 'var(--paper)', borderRadius: 16, padding: '24px 32px 40px', marginBottom: 24 }}>
-          <Link href="/" style={{ fontSize: 13, color: 'var(--telha)' }}>&larr; {t('news_back_home')}</Link>
-          <p className="display" style={{ fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-soft)', marginTop: 16, marginBottom: 0 }}>
+        <div style={{ background: '#3D4A2E', borderRadius: 16, padding: '32px 32px 36px', marginBottom: 24, textAlign: 'center' }}>
+          <Link href="/" style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', display: 'block', marginBottom: 14 }}>&larr; {t('news_back_home')}</Link>
+          <p className="display" style={{ fontSize: 40, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>
             {t('news_masthead')}
           </p>
         </div>
