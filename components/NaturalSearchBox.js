@@ -149,8 +149,16 @@ export default function NaturalSearchBox() {
         else interimChunk += chunk;
       }
       if (finalChunk) {
-        baseTextRef.current = baseTextRef.current ? `${baseTextRef.current} ${finalChunk}` : finalChunk;
-        setText(baseTextRef.current);
+        // Bug conhecido do reconhecimento de voz contínuo: às vezes repete o
+        // mesmo trecho várias vezes seguidas. Evitamos isso comparando com o
+        // que já foi dito, e ignorando se for uma repetição direta.
+        const trimmedChunk = finalChunk.trim();
+        const currentBase = baseTextRef.current.trim();
+        const alreadyEndsWithChunk = currentBase.toLowerCase().endsWith(trimmedChunk.toLowerCase());
+        if (trimmedChunk && !alreadyEndsWithChunk) {
+          baseTextRef.current = currentBase ? `${currentBase} ${trimmedChunk}` : trimmedChunk;
+          setText(baseTextRef.current);
+        }
         setInterimText('');
       } else {
         setInterimText(interimChunk);
