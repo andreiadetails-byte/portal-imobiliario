@@ -20,13 +20,13 @@ export default function NoticiaPage() {
     });
   }, [id]);
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
-  if (!news) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('news_not_found')}</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>);
+  if (!news) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('news_not_found')}</div></>);
 
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ maxWidth: 720, padding: '40px 32px 80px' }}>
+      <main id="main-content" className="wrap" style={{ maxWidth: 720, padding: '24px 32px 56px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <Link href="/" style={{ fontSize: 13, color: 'var(--telha)' }}>&larr; {t('news_back_home')}</Link>
 
         <div style={{ marginTop: 20 }}>

@@ -1710,6 +1710,12 @@ function AdminInner() {
                 <option value="top">Topo</option>
                 <option value="center">Centro</option>
                 <option value="bottom">Base</option>
+                <option value="left">Esquerda</option>
+                <option value="right">Direita</option>
+                <option value="top left">Topo esquerda</option>
+                <option value="top right">Topo direita</option>
+                <option value="bottom left">Base esquerda</option>
+                <option value="bottom right">Base direita</option>
               </select>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
