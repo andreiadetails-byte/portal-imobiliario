@@ -52,7 +52,7 @@ export default function NoticiaPage() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: otherNews.length > 0 ? '1fr 320px' : '1fr', gap: 24, alignItems: 'start' }}>
+        <div className="news-detail-grid" style={{ display: 'grid', gridTemplateColumns: otherNews.length > 0 ? '1fr 320px' : '1fr', gap: 24, alignItems: 'start' }}>
           {/* Notícia principal, em destaque */}
           <div style={{ background: 'var(--paper)', borderRadius: 16, padding: '24px 32px 40px' }}>
             <span style={{
