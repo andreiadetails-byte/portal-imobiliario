@@ -44,18 +44,20 @@ export default function ImagePositionPicker({ imageUrl, value, onChange }) {
         ref={boxRef}
         onClick={handleClick}
         style={{
-          position: 'relative', width: 220, maxWidth: '100%', height: 150, borderRadius: 8, overflow: 'hidden',
-          cursor: 'crosshair', border: '1.5px solid var(--line)', userSelect: 'none',
+          position: 'relative', width: 220, maxWidth: '100%', height: 150, borderRadius: 8, overflow: 'visible',
+          cursor: 'crosshair', userSelect: 'none',
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageUrl} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, borderRadius: 8, overflow: 'hidden', border: '1.5px solid var(--line)' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageUrl} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${x}% ${y}%`, display: 'block', pointerEvents: 'none' }} />
+        </div>
         <div
           style={{
             position: 'absolute', left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)',
             width: 24, height: 24, borderRadius: '50%', border: '3px solid #fff',
             background: 'rgba(90,107,62,0.85)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.4)',
-            pointerEvents: 'none',
+            pointerEvents: 'none', zIndex: 2,
           }}
         />
       </div>

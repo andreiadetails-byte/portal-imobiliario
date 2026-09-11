@@ -1730,9 +1730,6 @@ function AdminInner() {
                   value={newsForm.cover_image_position}
                   onChange={(pos) => setNewsForm({ ...newsForm, cover_image_position: pos })}
                 />
-                <p style={{ fontSize: 11, color: 'red', marginTop: 4 }}>
-                  DEBUG — valor atual: {newsForm.cover_image_position}
-                </p>
               </div>
             )}
             <div style={{ display: 'flex', gap: 10 }}>
