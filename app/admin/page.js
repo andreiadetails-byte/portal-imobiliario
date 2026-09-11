@@ -12,6 +12,7 @@ import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes'
 import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send, Calculator } from 'lucide-react';
 import { compressImageFile } from '../../lib/imageCompression';
+import ImagePositionPicker from '../../components/ImagePositionPicker';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -97,6 +98,8 @@ function AdminInner() {
   const [translatingNewsId, setTranslatingNewsId] = useState(null);
   const [newsForm, setNewsForm] = useState({ category: 'Habitação', title: '', body: '', cover_image_position: 'center' });
   const [newsImage, setNewsImage] = useState(null);
+  const [newsImagePreviewUrl, setNewsImagePreviewUrl] = useState(null);
+  const [currentNewsImageUrl, setCurrentNewsImageUrl] = useState(null);
   const [editingNewsId, setEditingNewsId] = useState(null);
   const [savingNews, setSavingNews] = useState(false);
   const [featuredList, setFeaturedList] = useState([]);
@@ -770,6 +773,8 @@ function AdminInner() {
 
     setNewsForm({ category: 'Habitação', title: '', body: '', cover_image_position: 'center' });
     setNewsImage(null);
+    setNewsImagePreviewUrl(null);
+    setCurrentNewsImageUrl(null);
     setEditingNewsId(null);
     setSavingNews(false);
     loadNews();
@@ -779,6 +784,7 @@ function AdminInner() {
     setEditingNewsId(n.id);
     setNewsForm({ category: n.category, title: n.title, body: n.body, cover_image_position: n.cover_image_position || 'center' });
     setNewsImage(null);
+    setCurrentNewsImageUrl(n.cover_image_url || null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -786,6 +792,8 @@ function AdminInner() {
     setEditingNewsId(null);
     setNewsForm({ category: 'Habitação', title: '', body: '', cover_image_position: 'center' });
     setNewsImage(null);
+    setNewsImagePreviewUrl(null);
+    setCurrentNewsImageUrl(null);
   }
 
   async function translateNews(id) {
@@ -1700,24 +1708,30 @@ function AdminInner() {
                   textAlign: 'center', color: 'var(--text-soft)', fontSize: 13, cursor: 'pointer',
                 }}
               >
-                {newsImage ? `🖼️ ${newsImage.name}` : 'Clique para escolher uma imagem'}
+                {newsImage ? `🖼️ ${newsImage.name}` : currentNewsImageUrl ? '🖼️ Imagem atual (clica para substituir)' : 'Clique para escolher uma imagem'}
               </label>
-              <input id="news-image-input" type="file" accept="image/*" onChange={(e) => setNewsImage(e.target.files?.[0] || null)} style={{ display: 'none' }} />
+              <input
+                id="news-image-input"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setNewsImage(file);
+                  setNewsImagePreviewUrl(file ? URL.createObjectURL(file) : null);
+                }}
+                style={{ display: 'none' }}
+              />
             </div>
-            <div className="field">
-              <label>Posição da imagem <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(qual a parte mais importante a mostrar)</span></label>
-              <select value={newsForm.cover_image_position} onChange={(e) => setNewsForm({ ...newsForm, cover_image_position: e.target.value })}>
-                <option value="top">Topo</option>
-                <option value="center">Centro</option>
-                <option value="bottom">Base</option>
-                <option value="left">Esquerda</option>
-                <option value="right">Direita</option>
-                <option value="top left">Topo esquerda</option>
-                <option value="top right">Topo direita</option>
-                <option value="bottom left">Base esquerda</option>
-                <option value="bottom right">Base direita</option>
-              </select>
-            </div>
+            {(newsImagePreviewUrl || currentNewsImageUrl) && (
+              <div className="field">
+                <label>Posição da imagem</label>
+                <ImagePositionPicker
+                  imageUrl={newsImagePreviewUrl || currentNewsImageUrl}
+                  value={newsForm.cover_image_position}
+                  onChange={(pos) => setNewsForm({ ...newsForm, cover_image_position: pos })}
+                />
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 10 }}>
               <button type="submit" className="btn btn-primary" disabled={savingNews}>
                 {savingNews ? 'A guardar...' : editingNewsId ? 'Guardar alterações' : 'Publicar notícia'}

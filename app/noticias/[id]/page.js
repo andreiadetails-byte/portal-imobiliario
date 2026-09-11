@@ -77,7 +77,7 @@ export default function NoticiaPage() {
 
           {/* Outras notícias, à volta, como num jornal */}
           {otherNews.length > 0 && (
-            <div style={{ background: 'var(--paper)', borderRadius: 16, padding: '24px 20px' }}>
+            <div style={{ background: 'var(--plaster)', border: '1px solid var(--line)', borderRadius: 16, padding: '24px 20px' }}>
               <h3 className="display" style={{ fontSize: 16, marginBottom: 16 }}>{t('news_other_articles')}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {otherNews.map((n) => (
