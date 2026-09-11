@@ -389,13 +389,13 @@ export default function HomePage() {
 
       <section style={{ padding: '72px 0 88px' }}>
         <div className="wrap">
-          <h2 className="display" style={{ fontSize: 32, marginBottom: 32 }}>{t('home_featured')}</h2>
+          <h2 className="display" style={{ fontSize: 32, marginBottom: 32, color: '#fff' }}>{t('home_featured')}</h2>
 
-          {loading && <p>{t('home_loading')}</p>}
+          {loading && <p style={{ color: '#fff' }}>{t('home_loading')}</p>}
 
           {!loading && properties.length === 0 && (
             <div className="empty-state">
-              <p>{t('home_empty')}</p>
+              <p style={{ color: '#fff' }}>{t('home_empty')}</p>
             </div>
           )}
 
@@ -673,10 +673,10 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(241,232,214,0.88)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.75)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
-          <h2 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('home_districts_title')}</h2>
-          <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 8, color: '#fff' }}>{t('home_districts_title')}</h2>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {distritos.map((d) => (
               <Link
@@ -711,11 +711,11 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(241,232,214,0.85)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.72)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
-          <h2 className="display" style={{ fontSize: 28, marginBottom: 24 }}>{t('home_news_title')}</h2>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 24, color: '#fff' }}>{t('home_news_title')}</h2>
           {news.length === 0 ? (
-            <p style={{ fontSize: 13.5, color: 'var(--text-soft)' }}>{t('home_no_news')}</p>
+            <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.8)' }}>{t('home_no_news')}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {news.map((n) => (
