@@ -671,6 +671,16 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section style={{ padding: '72px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
+        <img src="/mood/cadeiras.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(61,74,46,0.3) 0%, rgba(61,74,46,0.75) 100%)' }} />
+        <div className="wrap" style={{ position: 'relative', maxWidth: 560, textAlign: 'center' }}>
+          <p className="display" style={{ fontSize: 24, fontWeight: 600, color: '#fff', lineHeight: 1.35, marginBottom: 0 }}>
+            {t('home_bench_quote')}
+          </p>
+        </div>
+      </section>
+
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.75)' }} />
