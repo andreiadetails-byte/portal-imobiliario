@@ -12,6 +12,7 @@ import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes'
 import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send, Calculator } from 'lucide-react';
 import { compressImageFile } from '../../lib/imageCompression';
+import { geocodeAddress } from '../../lib/geocode';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -114,6 +115,10 @@ function AdminInner() {
   const [retranslateDone, setRetranslateDone] = useState(false);
   const [retranslateProgress, setRetranslateProgress] = useState({ done: 0, total: 0 });
   const [retranslateFailCount, setRetranslateFailCount] = useState(0);
+  const [geocoding, setGeocoding] = useState(false);
+  const [geocodeDone, setGeocodeDone] = useState(false);
+  const [geocodeProgress, setGeocodeProgress] = useState({ done: 0, total: 0 });
+  const [geocodeFailCount, setGeocodeFailCount] = useState(0);
   const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
@@ -453,6 +458,45 @@ function AdminInner() {
     setRetranslateFailCount(failCount);
     setRetranslating(false);
     setRetranslateDone(true);
+  }
+
+  async function geocodeMissingProperties() {
+    setGeocoding(true);
+    setGeocodeDone(false);
+
+    // Vai buscar todos os imóveis sem coordenadas — normalmente porque
+    // foram criados antes de existir o mapa/pesquisa por zona, e por isso
+    // nunca passaram pela geocodificação da morada.
+    const { data: allProps } = await supabase
+      .from('properties')
+      .select('id, address, municipality, parish, district')
+      .or('latitude.is.null,longitude.is.null');
+
+    const missing = allProps || [];
+    setGeocodeProgress({ done: 0, total: missing.length });
+    let failCount = 0;
+
+    for (let i = 0; i < missing.length; i++) {
+      const p = missing[i];
+      try {
+        const fullAddress = [p.address, p.parish, p.municipality, p.district].filter(Boolean).join(', ');
+        const { latitude, longitude } = await geocodeAddress(fullAddress);
+        if (latitude != null && longitude != null) {
+          await supabase.from('properties').update({ latitude, longitude }).eq('id', p.id);
+        } else {
+          failCount++;
+        }
+      } catch (err) {
+        failCount++;
+      }
+      setGeocodeProgress({ done: i + 1, total: missing.length });
+      // Pausa entre pedidos, para respeitar o limite gratuito do serviço de geocodificação.
+      await new Promise((resolve) => setTimeout(resolve, 1100));
+    }
+
+    setGeocodeFailCount(failCount);
+    setGeocoding(false);
+    setGeocodeDone(true);
   }
 
   async function saveEuriborRate(e) {
@@ -1926,6 +1970,25 @@ function AdminInner() {
               {retranslateFailCount > 0
                 ? `⚠ Concluído — ${retranslateProgress.done - retranslateFailCount} traduzidos com sucesso, ${retranslateFailCount} falharam. Corre a ferramenta outra vez para tentar de novo os que falharam.`
                 : `✓ Concluído — ${retranslateProgress.done} imóveis traduzidos.`}
+            </p>
+          )}
+        </div>
+      )}
+
+      {section === 'definicoes' && (
+        <div className="card" style={{ padding: 20, maxWidth: 400, marginTop: 16 }}>
+          <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>📍 Atribuir coordenadas em falta</h3>
+          <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+            Calcula automaticamente a latitude/longitude dos imóveis que ainda não têm — normalmente porque foram criados antes de existir o mapa. Sem coordenadas, um imóvel não aparece nem no mapa normal, nem na pesquisa por zona desenhada. Pode demorar alguns minutos.
+          </p>
+          <button onClick={geocodeMissingProperties} className="btn btn-primary" disabled={geocoding}>
+            {geocoding ? `A calcular... (${geocodeProgress.done}/${geocodeProgress.total})` : 'Atribuir coordenadas em falta'}
+          </button>
+          {geocodeDone && !geocoding && (
+            <p style={{ fontSize: 12.5, color: geocodeFailCount > 0 ? '#8a6a1f' : 'var(--telha)', marginTop: 10 }}>
+              {geocodeFailCount > 0
+                ? `⚠ Concluído — ${geocodeProgress.done - geocodeFailCount} atualizados com sucesso, ${geocodeFailCount} falharam (morada não encontrada). Corre a ferramenta outra vez para tentar de novo.`
+                : `✓ Concluído — ${geocodeProgress.done} imóveis atualizados.`}
             </p>
           )}
         </div>
