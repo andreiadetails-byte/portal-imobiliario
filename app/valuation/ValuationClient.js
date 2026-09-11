@@ -37,14 +37,14 @@ export default function ValuationClient() {
   return (
     <>
       <Header />
-      <div className="wrap" style={{ maxWidth: 560, padding: '48px 32px 80px' }}>
+      <div className="wrap" style={{ maxWidth: 560, padding: '32px 32px 56px', background: 'var(--paper)', borderRadius: 16, marginTop: 24, marginBottom: 40 }}>
         <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 28, marginBottom: 8 }}>{t('valuation_title')}</h1>
         <p style={{ fontSize: 14, color: 'var(--text-soft)', marginBottom: 24 }}>
           {t('valuation_subtitle')}
         </p>
 
-        <div className="card" style={{ padding: 28 }}>
+        <div className="card" style={{ padding: 28, background: 'var(--plaster)' }}>
           {sent ? (
             <p style={{ fontSize: 14.5 }}>
               {t('valuation_thanks')}

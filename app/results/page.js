@@ -345,7 +345,7 @@ function ResultsInner() {
         </div>
       </div>
 
-      <main id="main-content" className="wrap" style={{ paddingTop: 8, paddingBottom: 32 }}>
+      <main id="main-content" className="wrap" style={{ paddingTop: 24, paddingBottom: 32, background: 'var(--paper)', borderRadius: 16, marginTop: -16, position: 'relative' }}>
 
         <div className="results-mobile-toolbar">
           <button type="button" onClick={() => setShowFiltersModal(true)} className="btn">

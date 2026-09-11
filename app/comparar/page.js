@@ -71,7 +71,7 @@ export default function CompararPage() {
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ maxWidth: 1180, padding: '48px 32px 100px' }}>
+      <main id="main-content" className="wrap" style={{ maxWidth: 1180, padding: '32px 32px 100px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <Link href="/favorites" className="btn no-print" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 600, marginBottom: 20, padding: '10px 18px' }}>
           {t('comparar_back_favorites')}
         </Link>

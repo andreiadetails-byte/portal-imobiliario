@@ -32,7 +32,7 @@ export default function FeedbackPage() {
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ maxWidth: 480, padding: '48px 32px 80px' }}>
+      <main id="main-content" className="wrap" style={{ maxWidth: 480, padding: '32px 32px 56px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <BackButton fallback="/" />
 
         {sent ? (
