@@ -65,7 +65,7 @@ export default function NoticiaPage() {
 
             {news.cover_image_url && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={news.cover_image_url} alt={(news.title_translations && news.title_translations[lang]) || news.title} style={{ width: '100%', maxHeight: 380, objectFit: 'cover', objectPosition: news.cover_image_position || 'center', borderRadius: 8, marginBottom: 28 }} />
+                <img src={news.cover_image_url} alt={(news.title_translations && news.title_translations[lang]) || news.title} style={{ width: '100%', maxHeight: 380, objectFit: 'contain', background: 'var(--plaster)', borderRadius: 8, marginBottom: 28 }} />
             )}
 
             {((news.body_translations && news.body_translations[lang]) || news.body).split(/\n{2,}/).map((paragraph, i) => (
@@ -88,7 +88,7 @@ export default function NoticiaPage() {
                         src={n.cover_image_url}
                         alt={(n.title_translations && n.title_translations[lang]) || n.title}
                         loading="lazy"
-                        style={{ width: 70, height: 70, objectFit: 'cover', objectPosition: n.cover_image_position || 'center', borderRadius: 6, flexShrink: 0 }}
+                        style={{ width: 70, height: 70, objectFit: 'contain', background: 'var(--plaster)', borderRadius: 6, flexShrink: 0 }}
                       />
                     )}
                     <div>

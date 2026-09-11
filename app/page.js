@@ -744,7 +744,7 @@ export default function HomePage() {
                 }}>
                   {n.cover_image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={n.cover_image_url} alt={(n.title_translations && n.title_translations[lang]) || n.title} loading="lazy" style={{ width: '100%', height: '100%', minHeight: 150, objectFit: 'cover', objectPosition: n.cover_image_position || 'center' }} />
+                    <img src={n.cover_image_url} alt={(n.title_translations && n.title_translations[lang]) || n.title} loading="lazy" style={{ width: '100%', height: '100%', minHeight: 150, objectFit: 'contain', background: 'var(--plaster)' }} />
                   )}
                   <div style={{ padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <span style={{

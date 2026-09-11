@@ -12,7 +12,6 @@ import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes'
 import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send, Calculator } from 'lucide-react';
 import { compressImageFile } from '../../lib/imageCompression';
-import ImagePositionPicker from '../../components/ImagePositionPicker';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -1722,16 +1721,6 @@ function AdminInner() {
                 style={{ display: 'none' }}
               />
             </div>
-            {(newsImagePreviewUrl || currentNewsImageUrl) && (
-              <div className="field">
-                <label>Posição da imagem</label>
-                <ImagePositionPicker
-                  imageUrl={newsImagePreviewUrl || currentNewsImageUrl}
-                  value={newsForm.cover_image_position}
-                  onChange={(pos) => setNewsForm({ ...newsForm, cover_image_position: pos })}
-                />
-              </div>
-            )}
             <div style={{ display: 'flex', gap: 10 }}>
               <button type="submit" className="btn btn-primary" disabled={savingNews}>
                 {savingNews ? 'A guardar...' : editingNewsId ? 'Guardar alterações' : 'Publicar notícia'}

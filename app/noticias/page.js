@@ -56,7 +56,7 @@ export default function NoticiasPage() {
                   src={news[0].cover_image_url}
                   alt={(news[0].title_translations && news[0].title_translations[lang]) || news[0].title}
                   loading="eager"
-                  style={{ width: '100%', height: 280, objectFit: 'cover', objectPosition: news[0].cover_image_position || 'center' }}
+                  style={{ width: '100%', height: 280, objectFit: 'contain', background: 'var(--plaster)' }}
                 />
               )}
               <div style={{ padding: '22px 24px' }}>
@@ -91,7 +91,7 @@ export default function NoticiasPage() {
                         src={n.cover_image_url}
                         alt={(n.title_translations && n.title_translations[lang]) || n.title}
                         loading="lazy"
-                        style={{ width: '100%', height: 150, objectFit: 'cover', objectPosition: n.cover_image_position || 'center' }}
+                        style={{ width: '100%', height: 150, objectFit: 'contain', background: 'var(--plaster)' }}
                       />
                     )}
                     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', flex: 1 }}>
