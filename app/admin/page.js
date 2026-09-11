@@ -96,6 +96,8 @@ function AdminInner() {
   const [section, setSection] = useState(searchParams.get('tab') || 'anuncios');
   const [news, setNews] = useState([]);
   const [translatingNewsId, setTranslatingNewsId] = useState(null);
+  const [notifyingNewsId, setNotifyingNewsId] = useState(null);
+  const [notifiedNewsIds, setNotifiedNewsIds] = useState([]);
   const [newsForm, setNewsForm] = useState({ category: 'Habitação', title: '', body: '', cover_image_position: 'center' });
   const [newsImage, setNewsImage] = useState(null);
   const [newsImagePreviewUrl, setNewsImagePreviewUrl] = useState(null);
@@ -854,6 +856,26 @@ function AdminInner() {
       alert(`Não foi possível traduzir: ${error}`);
     }
     setTranslatingNewsId(null);
+  }
+
+  async function notifyNews(id) {
+    if (!confirm('Enviar esta notícia por email a TODOS os utilizadores registados? Esta ação não pode ser desfeita.')) return;
+    setNotifyingNewsId(id);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/notify-news', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ newsId: id }),
+    });
+    if (res.ok) {
+      const { sentCount, failedCount, total } = await res.json();
+      alert(`Notificações enviadas: ${sentCount} de ${total} (${failedCount} falharam).`);
+      setNotifiedNewsIds((cur) => [...cur, id]);
+    } else {
+      const { error } = await res.json();
+      alert(`Não foi possível notificar: ${error}`);
+    }
+    setNotifyingNewsId(null);
   }
 
   async function deleteNews(id) {
@@ -1798,6 +1820,15 @@ function AdminInner() {
                     title={n.title_translations ? t('admin_already_translated_hint') : t('admin_not_translated_hint')}
                   >
                     {translatingNewsId === n.id ? t('admin_translating') : n.title_translations ? t('admin_translated') : t('admin_translate_btn')}
+                  </button>
+                  <button
+                    onClick={() => notifyNews(n.id)}
+                    disabled={notifyingNewsId === n.id || notifiedNewsIds.includes(n.id)}
+                    className="btn"
+                    style={{ fontSize: 12, color: notifiedNewsIds.includes(n.id) ? 'var(--telha)' : 'var(--text-soft)' }}
+                    title="Enviar esta notícia por email a todos os utilizadores registados"
+                  >
+                    {notifyingNewsId === n.id ? '📤 A enviar...' : notifiedNewsIds.includes(n.id) ? '✓ Notificado' : '📤 Notificar utilizadores'}
                   </button>
                   <button onClick={() => startEditNews(n)} className="btn" style={{ fontSize: 12 }}>{t('admin_edit')}</button>
                   <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12 }}>{t('admin_delete')}</button>
