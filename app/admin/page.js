@@ -12,7 +12,6 @@ import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes'
 import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send, Calculator } from 'lucide-react';
 import { compressImageFile } from '../../lib/imageCompression';
-import { geocodeAddress } from '../../lib/geocode';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -465,13 +464,14 @@ function AdminInner() {
   async function geocodeMissingProperties() {
     setGeocoding(true);
     setGeocodeDone(false);
+    const { data: { session } } = await supabase.auth.getSession();
 
     // Vai buscar todos os imóveis sem coordenadas — normalmente porque
     // foram criados antes de existir o mapa/pesquisa por zona, e por isso
     // nunca passaram pela geocodificação da morada.
     const { data: allProps } = await supabase
       .from('properties')
-      .select('id, address, municipality, parish, district')
+      .select('id')
       .or('latitude.is.null,longitude.is.null');
 
     const missing = allProps || [];
@@ -479,20 +479,19 @@ function AdminInner() {
     let failCount = 0;
 
     for (let i = 0; i < missing.length; i++) {
-      const p = missing[i];
       try {
-        const fullAddress = [p.address, p.parish, p.municipality, p.district].filter(Boolean).join(', ');
-        const { latitude, longitude } = await geocodeAddress(fullAddress);
-        if (latitude != null && longitude != null) {
-          await supabase.from('properties').update({ latitude, longitude }).eq('id', p.id);
-        } else {
-          failCount++;
-        }
+        const res = await fetch('/api/geocode-property', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+          body: JSON.stringify({ propertyId: missing[i].id }),
+        });
+        const result = await res.json();
+        if (!res.ok || !result.success) failCount++;
       } catch (err) {
         failCount++;
       }
       setGeocodeProgress({ done: i + 1, total: missing.length });
-      // Pausa entre pedidos, para respeitar o limite gratuito do serviço de geocodificação.
+      // Pausa entre pedidos, para respeitar o limite do serviço gratuito de geocodificação.
       await new Promise((resolve) => setTimeout(resolve, 1100));
     }
 
