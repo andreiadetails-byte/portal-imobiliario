@@ -250,6 +250,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <div style={{ height: 24, background: 'var(--paper)' }} />
+
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/parede-pedra.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.55)' }} />
@@ -265,7 +267,7 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
-        <img src="/mood/mesa-verde.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src="/mood/estante.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.42)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <Link
@@ -356,10 +358,10 @@ export default function HomePage() {
       <div style={{ height: 24, background: 'var(--paper)' }} />
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
-        <img src="/mood/estante.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
-          <div className="card" style={{ padding: '26px 28px' }}>
+          <div className="card" style={{ padding: '26px 28px', background: 'var(--plaster)' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16 }}>
               {t('home_doubts_text')}
