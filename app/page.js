@@ -250,8 +250,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '64px 0', background: 'var(--paper)' }}>
-        <div className="wrap" style={{ maxWidth: 760 }}>
+      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/parede-pedra.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.55)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
             <div className="tile-strip" />
             <div style={{ padding: 18 }}>
@@ -292,8 +294,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '64px 0', background: 'var(--paper)' }}>
-        <div className="wrap" style={{ maxWidth: 760 }}>
+      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <div className="install-qr-section" style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap',
