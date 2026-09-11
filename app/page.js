@@ -240,8 +240,9 @@ export default function HomePage() {
             <Link
               href="/results?draw=1"
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                fontSize: 13.5, fontWeight: 600, color: '#fff', textDecoration: 'underline', textUnderlineOffset: 3,
+                display: 'inline-flex', alignItems: 'center',
+                fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.88)',
+                borderBottom: '1px solid rgba(255,255,255,0.4)', paddingBottom: 2,
               }}
             >
               {t('home_draw_map')}
