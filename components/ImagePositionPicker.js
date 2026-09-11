@@ -1,19 +1,19 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 // Permite escolher qual a parte mais importante de uma imagem, clicando ou
 // arrastando dentro de uma pré-visualização. Guarda a posição como
 // percentagens (ex: "30% 70%"), usadas depois em object-position no CSS.
+// A pré-visualização usa a mesma proporção (220x150) dos cartões no site,
+// para o que se escolhe aqui corresponder ao que se vê depois.
 export default function ImagePositionPicker({ imageUrl, value, onChange }) {
   const boxRef = useRef(null);
   const [dragging, setDragging] = useState(false);
 
-  // Extrai as percentagens do valor guardado (ex: "30% 70%" -> [30, 70]).
-  // Aceita também valores antigos tipo "top", "center", "bottom left", etc.
   function parsePosition(pos) {
     if (!pos) return [50, 50];
-    if (pos.includes('%')) {
+    if (typeof pos === 'string' && pos.includes('%')) {
       const parts = pos.split(' ').map((p) => parseFloat(p));
       if (parts.length === 2 && !parts.some(Number.isNaN)) return parts;
     }
@@ -26,32 +26,45 @@ export default function ImagePositionPicker({ imageUrl, value, onChange }) {
 
   const [x, y] = parsePosition(value);
 
-  const updateFromEvent = useCallback((clientX, clientY) => {
+  function positionFromPoint(clientX, clientY) {
     const box = boxRef.current;
-    if (!box) return;
+    if (!box) return null;
     const rect = box.getBoundingClientRect();
     let px = ((clientX - rect.left) / rect.width) * 100;
     let py = ((clientY - rect.top) / rect.height) * 100;
     px = Math.max(0, Math.min(100, px));
     py = Math.max(0, Math.min(100, py));
-    onChange(`${px.toFixed(0)}% ${py.toFixed(0)}%`);
-  }, [onChange]);
+    return `${px.toFixed(0)}% ${py.toFixed(0)}%`;
+  }
 
-  function handleDown(e) {
+  function handlePointerDown(e) {
+    e.preventDefault();
     setDragging(true);
-    const point = e.touches ? e.touches[0] : e;
-    updateFromEvent(point.clientX, point.clientY);
+    const pos = positionFromPoint(e.clientX, e.clientY);
+    if (pos) onChange(pos);
   }
 
-  function handleMove(e) {
-    if (!dragging) return;
-    const point = e.touches ? e.touches[0] : e;
-    updateFromEvent(point.clientX, point.clientY);
-  }
+  // Usa listeners no window durante o arrastar, para continuar a funcionar
+  // mesmo que o rato saia da caixa por um instante — mais fiável.
+  useEffect(() => {
+    if (!dragging) return undefined;
 
-  function handleUp() {
-    setDragging(false);
-  }
+    function handleMove(e) {
+      const pos = positionFromPoint(e.clientX, e.clientY);
+      if (pos) onChange(pos);
+    }
+    function handleUp() {
+      setDragging(false);
+    }
+
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    return () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dragging, onChange]);
 
   if (!imageUrl) return null;
 
@@ -59,15 +72,9 @@ export default function ImagePositionPicker({ imageUrl, value, onChange }) {
     <div>
       <div
         ref={boxRef}
-        onMouseDown={handleDown}
-        onMouseMove={handleMove}
-        onMouseUp={handleUp}
-        onMouseLeave={handleUp}
-        onTouchStart={handleDown}
-        onTouchMove={handleMove}
-        onTouchEnd={handleUp}
+        onPointerDown={handlePointerDown}
         style={{
-          position: 'relative', width: '100%', height: 180, borderRadius: 8, overflow: 'hidden',
+          position: 'relative', width: 220, maxWidth: '100%', height: 150, borderRadius: 8, overflow: 'hidden',
           cursor: dragging ? 'grabbing' : 'crosshair', border: '1.5px solid var(--line)', userSelect: 'none', touchAction: 'none',
         }}
       >
@@ -76,13 +83,13 @@ export default function ImagePositionPicker({ imageUrl, value, onChange }) {
         <div
           style={{
             position: 'absolute', left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)',
-            width: 26, height: 26, borderRadius: '50%', border: '3px solid #fff',
+            width: 24, height: 24, borderRadius: '50%', border: '3px solid #fff',
             background: 'rgba(90,107,62,0.85)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.4)',
             pointerEvents: 'none',
           }}
         />
       </div>
-      <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 6 }}>
+      <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 6, maxWidth: 220 }}>
         Clica ou arrasta dentro da imagem para escolher a parte mais importante a mostrar.
       </p>
     </div>
