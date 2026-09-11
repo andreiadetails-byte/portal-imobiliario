@@ -1,15 +1,13 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 
-// Permite escolher qual a parte mais importante de uma imagem, clicando ou
-// arrastando dentro de uma pré-visualização. Guarda a posição como
-// percentagens (ex: "30% 70%"), usadas depois em object-position no CSS.
-// A pré-visualização usa a mesma proporção (220x150) dos cartões no site,
-// para o que se escolhe aqui corresponder ao que se vê depois.
+// Permite escolher qual a parte mais importante de uma imagem, clicando
+// dentro de uma pré-visualização. Guarda a posição como percentagens
+// (ex: "30% 70%"), usadas depois em object-position no CSS.
 export default function ImagePositionPicker({ imageUrl, value, onChange }) {
   const boxRef = useRef(null);
-  const [dragging, setDragging] = useState(false);
+  const [marker, setMarker] = useState(null); // posição visual imediata, para feedback instantâneo
 
   function parsePosition(pos) {
     if (!pos) return [50, 50];
@@ -24,47 +22,19 @@ export default function ImagePositionPicker({ imageUrl, value, onChange }) {
     return map[pos] || [50, 50];
   }
 
-  const [x, y] = parsePosition(value);
+  const [x, y] = marker || parsePosition(value);
 
-  function positionFromPoint(clientX, clientY) {
+  function handleClick(e) {
     const box = boxRef.current;
-    if (!box) return null;
+    if (!box) return;
     const rect = box.getBoundingClientRect();
-    let px = ((clientX - rect.left) / rect.width) * 100;
-    let py = ((clientY - rect.top) / rect.height) * 100;
+    let px = ((e.clientX - rect.left) / rect.width) * 100;
+    let py = ((e.clientY - rect.top) / rect.height) * 100;
     px = Math.max(0, Math.min(100, px));
     py = Math.max(0, Math.min(100, py));
-    return `${px.toFixed(0)}% ${py.toFixed(0)}%`;
+    setMarker([px, py]);
+    onChange(`${px.toFixed(0)}% ${py.toFixed(0)}%`);
   }
-
-  function handlePointerDown(e) {
-    e.preventDefault();
-    setDragging(true);
-    const pos = positionFromPoint(e.clientX, e.clientY);
-    if (pos) onChange(pos);
-  }
-
-  // Usa listeners no window durante o arrastar, para continuar a funcionar
-  // mesmo que o rato saia da caixa por um instante — mais fiável.
-  useEffect(() => {
-    if (!dragging) return undefined;
-
-    function handleMove(e) {
-      const pos = positionFromPoint(e.clientX, e.clientY);
-      if (pos) onChange(pos);
-    }
-    function handleUp() {
-      setDragging(false);
-    }
-
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
-    return () => {
-      window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerup', handleUp);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dragging, onChange]);
 
   if (!imageUrl) return null;
 
@@ -72,10 +42,10 @@ export default function ImagePositionPicker({ imageUrl, value, onChange }) {
     <div>
       <div
         ref={boxRef}
-        onPointerDown={handlePointerDown}
+        onClick={handleClick}
         style={{
           position: 'relative', width: 220, maxWidth: '100%', height: 150, borderRadius: 8, overflow: 'hidden',
-          cursor: dragging ? 'grabbing' : 'crosshair', border: '1.5px solid var(--line)', userSelect: 'none', touchAction: 'none',
+          cursor: 'crosshair', border: '1.5px solid var(--line)', userSelect: 'none',
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -90,7 +60,7 @@ export default function ImagePositionPicker({ imageUrl, value, onChange }) {
         />
       </div>
       <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 6, maxWidth: 220 }}>
-        Clica ou arrasta dentro da imagem para escolher a parte mais importante a mostrar.
+        Clica dentro da imagem para escolher a parte mais importante a mostrar.
       </p>
     </div>
   );
