@@ -790,7 +790,7 @@ function PublishForm() {
   return (
     <>
       <Header />
-    <main id="main-content" className="wrap" style={{ maxWidth: 720, padding: '48px 32px' }}>
+    <main id="main-content" className="wrap" style={{ maxWidth: 720, padding: '32px 32px 48px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
       <BackButton fallback="/dashboard" />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 className="display" style={{ fontSize: 28 }}>{isEditMode ? 'Editar anúncio' : t('publish_title')}</h1>

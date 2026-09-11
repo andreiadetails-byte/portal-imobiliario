@@ -155,7 +155,7 @@ export default function AgencyPage() {
         display: 'flex', alignItems: 'flex-end', overflow: 'hidden', position: 'relative',
       }} />
 
-      <main id="main-content" className="wrap" style={{ paddingTop: 0 }}>
+      <main id="main-content" className="wrap" style={{ paddingTop: 24, paddingBottom: 56, background: 'var(--paper)', borderRadius: 16 }}>
         <div style={{ display: 'flex', gap: 22, alignItems: 'flex-end', paddingBottom: 24, borderBottom: '1px solid var(--line)', flexWrap: 'wrap' }}>
           {profile.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element

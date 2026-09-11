@@ -265,7 +265,7 @@ export default function FavoritesPage() {
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
+      <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('favorites_title')}</h1>
 

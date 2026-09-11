@@ -124,7 +124,7 @@ export default function AssinaturaPage() {
   return (
     <>
       <Header />
-      <div className="wrap" style={{ maxWidth: 480, paddingTop: 60, paddingBottom: 80 }}>
+      <div className="wrap" style={{ maxWidth: 480, paddingTop: 32, paddingBottom: 56, background: 'var(--paper)', borderRadius: 16, marginTop: 24, paddingLeft: 32, paddingRight: 32 }}>
         <BackButton fallback="/dashboard" />
         <div className="card" style={{ padding: 30 }}>
           <h1 className="display" style={{ fontSize: 24, marginBottom: 8 }}>{t('sub_agency_title')}</h1>

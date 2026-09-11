@@ -107,7 +107,7 @@ function MensagensSuporteInner() {
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ maxWidth: 760, padding: '40px 32px 80px' }}>
+      <main id="main-content" className="wrap" style={{ maxWidth: 760, padding: '24px 32px 80px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 26, marginBottom: 24 }}>{t('support_title')}</h1>
 
