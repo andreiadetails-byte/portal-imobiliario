@@ -163,32 +163,19 @@ function ResultsInner() {
   // Vai buscar TODOS os imóveis com coordenadas que respeitem os filtros atuais (sem limite de página),
   // para a pesquisa por zona desenhada no mapa conseguir procurar em todo o lado, não só na página à vista.
   async function fetchAllForMapZone() {
-    let query = supabase
+    // Simplificado de propósito: ao desenhar uma zona no mapa, mostra TODOS os
+    // imóveis ativos desse tipo de negócio, independentemente dos outros
+    // filtros (preço, tipologia, etc.) que possam estar definidos na barra
+    // lateral — o objetivo aqui é só escolher por localização.
+    const { data } = await supabase
       .from('properties')
       .select('id, latitude, longitude')
       .eq('status', 'ativo')
       .eq('business_type', businessType)
       .not('latitude', 'is', null)
-      .not('longitude', 'is', null);
+      .not('longitude', 'is', null)
+      .limit(2000);
 
-    if (district) {
-      const pattern = `%${district.trim().split(/\s+/).filter(Boolean).join('%')}%`;
-      query = query.or(`district.ilike.${pattern},address.ilike.${pattern},municipality.ilike.${pattern},parish.ilike.${pattern}`);
-    }
-    if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
-    if (selectedStates.length > 0) query = query.in('state', selectedStates);
-    if (selectedAgency) query = query.eq('owner_id', selectedAgency.id);
-    if (selectedTypologies.length > 0) query = query.in('typology', selectedTypologies);
-    if (minPrice) query = query.gte('price', Number(minPrice));
-    if (maxPrice) query = query.lte('price', Number(maxPrice));
-    if (minBedrooms) query = query.gte('bedrooms', Number(minBedrooms));
-    if (minBathrooms) query = query.gte('bathrooms', Number(minBathrooms));
-    if (minArea) query = query.gte('area', Number(minArea));
-    selectedAmenities.forEach((col) => { query = query.eq(col, true); });
-    if (selectedEnergy.length > 0) query = query.in('energy_certificate', selectedEnergy);
-    if (elevatorOnly) query = query.contains('features', ['Elevador']);
-
-    const { data } = await query;
     return data || [];
   }
 
