@@ -269,7 +269,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/estante.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.42)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.2)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <Link
             href="/simulador-investimento"
