@@ -95,7 +95,7 @@ function AdminInner() {
   const [section, setSection] = useState(searchParams.get('tab') || 'anuncios');
   const [news, setNews] = useState([]);
   const [translatingNewsId, setTranslatingNewsId] = useState(null);
-  const [newsForm, setNewsForm] = useState({ category: 'Habitação', title: '', body: '' });
+  const [newsForm, setNewsForm] = useState({ category: 'Habitação', title: '', body: '', cover_image_position: 'center' });
   const [newsImage, setNewsImage] = useState(null);
   const [editingNewsId, setEditingNewsId] = useState(null);
   const [savingNews, setSavingNews] = useState(false);
@@ -758,6 +758,7 @@ function AdminInner() {
       category: newsForm.category,
       title: (newsForm.title || '').replace(/\*+/g, ''),
       body: (newsForm.body || '').replace(/\*+/g, ''),
+      cover_image_position: newsForm.cover_image_position || 'center',
       ...(cover_image_url !== undefined ? { cover_image_url } : {}),
     };
 
@@ -767,7 +768,7 @@ function AdminInner() {
       await supabase.from('news').insert({ ...payload, published: true });
     }
 
-    setNewsForm({ category: 'Habitação', title: '', body: '' });
+    setNewsForm({ category: 'Habitação', title: '', body: '', cover_image_position: 'center' });
     setNewsImage(null);
     setEditingNewsId(null);
     setSavingNews(false);
@@ -776,14 +777,14 @@ function AdminInner() {
 
   function startEditNews(n) {
     setEditingNewsId(n.id);
-    setNewsForm({ category: n.category, title: n.title, body: n.body });
+    setNewsForm({ category: n.category, title: n.title, body: n.body, cover_image_position: n.cover_image_position || 'center' });
     setNewsImage(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function cancelEditNews() {
     setEditingNewsId(null);
-    setNewsForm({ category: 'Habitação', title: '', body: '' });
+    setNewsForm({ category: 'Habitação', title: '', body: '', cover_image_position: 'center' });
     setNewsImage(null);
   }
 
@@ -1702,6 +1703,14 @@ function AdminInner() {
                 {newsImage ? `🖼️ ${newsImage.name}` : 'Clique para escolher uma imagem'}
               </label>
               <input id="news-image-input" type="file" accept="image/*" onChange={(e) => setNewsImage(e.target.files?.[0] || null)} style={{ display: 'none' }} />
+            </div>
+            <div className="field">
+              <label>Posição da imagem <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(qual a parte mais importante a mostrar)</span></label>
+              <select value={newsForm.cover_image_position} onChange={(e) => setNewsForm({ ...newsForm, cover_image_position: e.target.value })}>
+                <option value="top">Topo</option>
+                <option value="center">Centro</option>
+                <option value="bottom">Base</option>
+              </select>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button type="submit" className="btn btn-primary" disabled={savingNews}>

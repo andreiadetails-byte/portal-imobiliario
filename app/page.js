@@ -727,7 +727,12 @@ export default function HomePage() {
         <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.72)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
-          <h2 className="display" style={{ fontSize: 28, marginBottom: 24, color: '#fff' }}>{t('home_news_title')}</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
+            <h2 className="display" style={{ fontSize: 28, margin: 0, color: '#fff' }}>{t('home_news_title')}</h2>
+            <Link href="/noticias" style={{ fontSize: 13.5, fontWeight: 600, color: '#fff', textDecoration: 'underline' }}>
+              {t('home_news_see_all')}
+            </Link>
+          </div>
           {news.length === 0 ? (
             <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.8)' }}>{t('home_no_news')}</p>
           ) : (
@@ -739,7 +744,7 @@ export default function HomePage() {
                 }}>
                   {n.cover_image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={n.cover_image_url} alt={(n.title_translations && n.title_translations[lang]) || n.title} loading="lazy" style={{ width: '100%', height: '100%', minHeight: 150, objectFit: 'cover' }} />
+                    <img src={n.cover_image_url} alt={(n.title_translations && n.title_translations[lang]) || n.title} loading="lazy" style={{ width: '100%', height: '100%', minHeight: 150, objectFit: 'cover', objectPosition: n.cover_image_position || 'center' }} />
                   )}
                   <div style={{ padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <span style={{

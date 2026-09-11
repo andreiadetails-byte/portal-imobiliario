@@ -40,7 +40,7 @@ export default function NoticiaPage() {
 
           {news.cover_image_url && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={news.cover_image_url} alt={(news.title_translations && news.title_translations[lang]) || news.title} style={{ width: '100%', maxHeight: 380, objectFit: 'cover', borderRadius: 8, marginBottom: 28 }} />
+            <img src={news.cover_image_url} alt={(news.title_translations && news.title_translations[lang]) || news.title} style={{ width: '100%', maxHeight: 380, objectFit: 'cover', objectPosition: news.cover_image_position || 'center', borderRadius: 8, marginBottom: 28 }} />
           )}
 
           {((news.body_translations && news.body_translations[lang]) || news.body).split(/\n{2,}/).map((paragraph, i) => (
