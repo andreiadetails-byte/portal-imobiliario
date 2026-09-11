@@ -100,9 +100,15 @@ export default function MapDrawSearch({ properties, onFilter, fetchAllWithCoords
     // Procura em TODOS os imóveis com coordenadas (não só nos que já estavam à vista nesta página).
     const allWithCoords = fetchAllWithCoords ? await fetchAllWithCoords() : withCoords;
 
+    console.log('[DEBUG mapa] Pontos desenhados:', points);
+    console.log('[DEBUG mapa] Total de imóveis com coordenadas encontrados:', allWithCoords.length);
+    console.log('[DEBUG mapa] Coordenadas desses imóveis:', allWithCoords.map((p) => [p.id, p.latitude, p.longitude]));
+
     const matchingIds = allWithCoords
       .filter((p) => p.latitude != null && p.longitude != null && pointInPolygon([p.latitude, p.longitude], points))
       .map((p) => p.id);
+
+    console.log('[DEBUG mapa] IDs que ficaram dentro da zona:', matchingIds);
 
     setSearching(false);
     setDrawing(false);
