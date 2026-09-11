@@ -332,7 +332,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#2A2F20' }}>
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
         <img
           src="/mood/escritorio.jpg"
           alt=""
@@ -673,7 +673,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.75)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.75)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 8, color: '#fff' }}>{t('home_districts_title')}</h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
@@ -694,7 +694,7 @@ export default function HomePage() {
 
       <section style={{ padding: '56px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.5)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.5)' }} />
         <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative' }}>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14, color: '#fff' }}>{t('home_testimonials_title')}</h2>
@@ -711,7 +711,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.72)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.72)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 24, color: '#fff' }}>{t('home_news_title')}</h2>
           {news.length === 0 ? (

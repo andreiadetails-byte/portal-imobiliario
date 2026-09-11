@@ -28,7 +28,7 @@ img, video, iframe{ max-width: 100%; height: auto; }
 input, select, textarea, button{ min-width: 0; }
 img{ -webkit-user-drag:none; user-drag:none; }
 body{
-  background: #2A2F20;
+  background: #3D4A2E;
   color:var(--ink);
   font-family:'Inter',sans-serif;
   line-height:1.55;

@@ -719,7 +719,7 @@ export default function PropertyClient() {
         <>
           <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 12, padding: '48px 0', margin: '40px 0', textAlign: 'center' }}>
             <img src="/mood/parede-pedra.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.68)' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.68)' }} />
             <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', padding: '0 20px' }}>
               <p className="display" style={{ fontSize: 20, color: '#fff', fontWeight: 600, lineHeight: 1.4 }}>
                 {t('prop_similar_mood')}

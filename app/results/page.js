@@ -335,7 +335,7 @@ function ResultsInner() {
 
       <div style={{ position: 'relative', overflow: 'hidden', padding: '28px 0', marginBottom: 8 }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(42,47,32,0.72)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.72)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <BackButton fallback="/" />
           <h1 className="display" style={{ fontSize: 26, marginBottom: 4, color: '#fff' }}>{t('results_title')}</h1>
