@@ -61,6 +61,15 @@ export default function LoginPage() {
 
   async function handleGoogleLogin() {
     setError('');
+    // Guarda as escolhas feitas (tipo de conta, cupão) antes de sair para o
+    // Google — como o Google nos traz de volta diretamente, sem passar pelo
+    // resto do formulário, isto é a única forma de as recuperar depois.
+    if (mode === 'signup' && typeof window !== 'undefined') {
+      window.localStorage.setItem('morada_pending_signup', JSON.stringify({
+        accountType,
+        couponCode: couponCode.trim(),
+      }));
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin },
@@ -231,6 +240,46 @@ export default function LoginPage() {
 
         {!forgotMode && !signupEmailSent && (
           <>
+            {mode === 'signup' && (
+              <>
+                <div className="field">
+                  <label>{t('login_account_type')}</label>
+                  <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
+                    <option value="particular">{t('login_particular_opt')}</option>
+                    <option value="agencia">{t('login_agency_opt')}</option>
+                    <option value="consultor">{t('login_consultant_opt')}</option>
+                    <option value="promotor">{t('login_developer_opt')}</option>
+                  </select>
+                </div>
+                {isProfessionalAccount(accountType) && (
+                  <div className="field">
+                    {!showCoupon ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowCoupon(true)}
+                        style={{ fontSize: 12.5, color: 'var(--telha)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+                      >
+                        🎟️ Tenho um cupão de oferta
+                      </button>
+                    ) : (
+                      <>
+                        <label htmlFor="coupon-input-google">Código do cupão</label>
+                        <input
+                          id="coupon-input-google"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          placeholder="ex: MOREADA3"
+                          style={{ textTransform: 'uppercase' }}
+                        />
+                      </>
+                    )}
+                  </div>
+                )}
+                <p style={{ fontSize: 11.5, color: 'var(--text-soft)', marginBottom: 14 }}>
+                  Escolhido acima? Continua com o Google abaixo, ou preenche o formulário completo mais em baixo.
+                </p>
+              </>
+            )}
             <button
               type="button"
               onClick={handleGoogleLogin}

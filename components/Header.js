@@ -9,6 +9,7 @@ import { Bell, Home, Search, Heart, MessageCircle, LogIn, Headset } from 'lucide
 import { useLanguage } from '../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 import { isProfessionalAccount } from '../lib/accountTypes';
+import { PAYMENT_INFO } from '../lib/paymentInfo';
 import { migrateLocalFavoritesToAccount } from '../lib/localFavorites';
 
 export default function Header({ minimal = false }) {
@@ -39,11 +40,50 @@ export default function Header({ minimal = false }) {
         // site funcionar normalmente a partir daqui.
         if (!profile) {
           const googleName = data.user.user_metadata?.full_name || data.user.user_metadata?.name || '';
+
+          // Se a pessoa tinha escolhido um tipo de conta (ex: Agência) e/ou
+          // um cupão antes de ir para o Google, recupera essa escolha agora.
+          let pendingAccountType = 'particular';
+          let pendingCouponCode = '';
+          if (typeof window !== 'undefined') {
+            try {
+              const pending = JSON.parse(window.localStorage.getItem('morada_pending_signup') || '{}');
+              if (pending.accountType) pendingAccountType = pending.accountType;
+              if (pending.couponCode) pendingCouponCode = pending.couponCode;
+              window.localStorage.removeItem('morada_pending_signup');
+            } catch (err) {
+              // Se não conseguir ler, segue com os valores por defeito.
+            }
+          }
+
+          let couponMonths = 0;
+          if (pendingCouponCode) {
+            try {
+              const couponRes = await fetch('/api/redeem-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: data.user.email, couponCode: pendingCouponCode }),
+              });
+              const couponData = await couponRes.json();
+              couponMonths = couponData.months || 0;
+            } catch (err) {
+              // Se a verificação do cupão falhar, segue em frente sem o benefício extra.
+            }
+          }
+
+          let freeMonthFields = {};
+          if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(pendingAccountType)) {
+            const freeUntil = new Date();
+            freeUntil.setMonth(freeUntil.getMonth() + (couponMonths > 0 ? couponMonths : 1));
+            freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
+          }
+
           await supabase.from('profiles').insert({
             id: data.user.id,
             full_name: googleName,
             email: data.user.email,
-            account_type: 'particular',
+            account_type: pendingAccountType,
+            ...freeMonthFields,
           });
         }
 
