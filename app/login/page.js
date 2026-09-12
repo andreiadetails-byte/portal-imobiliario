@@ -34,15 +34,7 @@ export default function LoginPage() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [recaptchaAlreadyOk, setRecaptchaAlreadyOk] = useState(false);
 
-  useEffect(() => {
-    const RECAPTCHA_VALID_HOURS = 24;
-    const lastVerified = typeof window !== 'undefined' ? localStorage.getItem('morada_recaptcha_ok') : null;
-    if (lastVerified && (Date.now() - Number(lastVerified)) < RECAPTCHA_VALID_HOURS * 60 * 60 * 1000) {
-      setRecaptchaAlreadyOk(true);
-    }
-  }, []);
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [signupEmailSent, setSignupEmailSent] = useState(false);
@@ -86,45 +78,33 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
 
-    // Só pede para confirmar "não sou um robô" uma vez por dia — depois de
-    // confirmado, os logins seguintes nesse dia entram diretamente. Continua
-    // a proteger contra tentativas automáticas em massa (que nunca teriam
-    // essa confirmação guardada), sem incomodar quem entra várias vezes.
-    const RECAPTCHA_VALID_HOURS = 24;
-    const lastVerified = typeof window !== 'undefined' ? localStorage.getItem('morada_recaptcha_ok') : null;
-    const stillValid = lastVerified && (Date.now() - Number(lastVerified)) < RECAPTCHA_VALID_HOURS * 60 * 60 * 1000;
-
-    if (!stillValid) {
-      const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha && loginRecaptchaWidgetId.current !== null
-        ? window.grecaptcha.getResponse(loginRecaptchaWidgetId.current)
-        : '';
-      if (!recaptchaToken) {
-        setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
-        return;
-      }
-
-      setLoading(true);
-      const verifyRes = await fetch('/api/verify-recaptcha', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: recaptchaToken }),
-      });
-      const verifyData = await verifyRes.json();
-      if (!verifyData.success) {
-        setError('Não foi possível confirmar que não é um robô. Tente novamente.');
-        if (window.grecaptcha && loginRecaptchaWidgetId.current !== null) window.grecaptcha.reset(loginRecaptchaWidgetId.current);
-        setLoading(false);
-        return;
-      }
-      localStorage.setItem('morada_recaptcha_ok', String(Date.now()));
+    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha?.enterprise && loginRecaptchaWidgetId.current !== null
+      ? window.grecaptcha.enterprise.getResponse(loginRecaptchaWidgetId.current)
+      : '';
+    if (!recaptchaToken) {
+      setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
+      return;
     }
 
     setLoading(true);
+    const verifyRes = await fetch('/api/verify-recaptcha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: recaptchaToken, action: 'login' }),
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyData.success) {
+      setError('Não foi possível confirmar que não é um robô. Tente novamente.');
+      if (window.grecaptcha?.enterprise && loginRecaptchaWidgetId.current !== null) window.grecaptcha.enterprise.reset(loginRecaptchaWidgetId.current);
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       setError(error.message);
-      if (window.grecaptcha && loginRecaptchaWidgetId.current !== null) window.grecaptcha.reset(loginRecaptchaWidgetId.current);
+      if (window.grecaptcha?.enterprise && loginRecaptchaWidgetId.current !== null) window.grecaptcha.enterprise.reset(loginRecaptchaWidgetId.current);
       return;
     }
     if (data.user) {
@@ -155,29 +135,6 @@ export default function LoginPage() {
     router.push('/');
   }
 
-  // Quando a pessoa volta atrás para esta página (botão do browser), o
-  // Chrome/Safari por vezes reaproveitam a página tal como estava guardada
-  // em memória ("bfcache"), em vez de a carregarem de novo — e a caixa do
-  // reCAPTCHA não sobrevive bem a isso. Isto deteta essa situação e força
-  // a caixa a ser desenhada outra vez.
-  useEffect(() => {
-    function handlePageShow(event) {
-      if (!event.persisted) return; // só nos interessa quando veio do cache
-      if (window.grecaptcha) {
-        recaptchaWidgetId.current = null;
-        loginRecaptchaWidgetId.current = null;
-        // Limpa o conteúdo antigo das caixas, para o Google não recusar
-        // desenhar de novo com "já existe uma caixa aqui".
-        if (recaptchaRef.current) recaptchaRef.current.innerHTML = '';
-        if (loginRecaptchaRef.current) loginRecaptchaRef.current.innerHTML = '';
-        setRecaptchaScriptReady(false);
-        setTimeout(() => setRecaptchaScriptReady(true), 0);
-      }
-    }
-    window.addEventListener('pageshow', handlePageShow);
-    return () => window.removeEventListener('pageshow', handlePageShow);
-  }, []);
-
   // Desenha a caixa "Não sou um robô" à mão, só quando o formulário de registo
   // está mesmo visível — o Google não a encontra sozinho porque só existe depois
   // de a pessoa clicar em "Registar" (o site troca entre Login e Registar).
@@ -185,28 +142,22 @@ export default function LoginPage() {
     if (mode !== 'signup' || !recaptchaScriptReady) return;
     if (recaptchaWidgetId.current !== null) return; // já desenhada, não repetir
 
-    // Tenta desenhar a caixa repetidamente, de pouco em pouco tempo, até
-    // conseguir — evita o caso em que o script do Google fica pronto antes
-    // do sítio onde a caixa deve aparecer existir na página (não teria
-    // mais nenhuma oportunidade de tentar outra vez, senão).
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
       if (recaptchaWidgetId.current !== null) { clearInterval(interval); return; }
-      if (recaptchaRef.current && window.grecaptcha && window.grecaptcha.render) {
+      if (recaptchaRef.current && window.grecaptcha?.enterprise && window.grecaptcha.enterprise.render) {
         try {
-          recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+          recaptchaWidgetId.current = window.grecaptcha.enterprise.render(recaptchaRef.current, {
             sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+            action: 'signup',
           });
         } catch (err) {
-          // Se falhar (ex: chave errada, ou já existe uma caixa desenhada
-          // ali), regista no consola para ser mais fácil de diagnosticar,
-          // em vez de falhar silenciosamente sem explicação nenhuma.
           console.error('Erro ao desenhar reCAPTCHA:', err);
         }
         clearInterval(interval);
-      } else if (attempts > 120) { // desiste ao fim de ~30 segundos, em vez de só 10
-        console.error('reCAPTCHA não carregou a tempo (30s). Verifica a ligação à internet, ou a configuração NEXT_PUBLIC_RECAPTCHA_SITE_KEY.');
+      } else if (attempts > 120) {
+        console.error('reCAPTCHA não carregou a tempo (30s).');
         clearInterval(interval);
       }
     }, 250);
@@ -216,29 +167,30 @@ export default function LoginPage() {
   // O mesmo, mas para o formulário de login — protege contra alguém tentar
   // adivinhar passwords em massa (ataques de "força bruta").
   useEffect(() => {
-    if (mode !== 'login' || !recaptchaScriptReady || recaptchaAlreadyOk) return;
+    if (mode !== 'login' || !recaptchaScriptReady) return;
     if (loginRecaptchaWidgetId.current !== null) return;
 
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
       if (loginRecaptchaWidgetId.current !== null) { clearInterval(interval); return; }
-      if (loginRecaptchaRef.current && window.grecaptcha && window.grecaptcha.render) {
+      if (loginRecaptchaRef.current && window.grecaptcha?.enterprise && window.grecaptcha.enterprise.render) {
         try {
-          loginRecaptchaWidgetId.current = window.grecaptcha.render(loginRecaptchaRef.current, {
+          loginRecaptchaWidgetId.current = window.grecaptcha.enterprise.render(loginRecaptchaRef.current, {
             sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+            action: 'login',
           });
         } catch (err) {
           console.error('Erro ao desenhar reCAPTCHA:', err);
         }
         clearInterval(interval);
       } else if (attempts > 120) {
-        console.error('reCAPTCHA não carregou a tempo (30s). Verifica a ligação à internet, ou a configuração NEXT_PUBLIC_RECAPTCHA_SITE_KEY.');
+        console.error('reCAPTCHA não carregou a tempo (30s).');
         clearInterval(interval);
       }
     }, 250);
     return () => clearInterval(interval);
-  }, [mode, recaptchaScriptReady, recaptchaAlreadyOk]);
+  }, [mode, recaptchaScriptReady]);
 
   async function handleSignup(e) {
     e.preventDefault();
@@ -251,8 +203,8 @@ export default function LoginPage() {
       setError(PASSWORD_RULES_TEXT);
       return;
     }
-    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha && recaptchaWidgetId.current !== null
-      ? window.grecaptcha.getResponse(recaptchaWidgetId.current)
+    const recaptchaToken = typeof window !== 'undefined' && window.grecaptcha?.enterprise && recaptchaWidgetId.current !== null
+      ? window.grecaptcha.enterprise.getResponse(recaptchaWidgetId.current)
       : '';
     if (!recaptchaToken) {
       setError('Confirme que não é um robô, marcando a caixa "Não sou um robô".');
@@ -262,12 +214,12 @@ export default function LoginPage() {
     const verifyRes = await fetch('/api/verify-recaptcha', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: recaptchaToken }),
+      body: JSON.stringify({ token: recaptchaToken, action: 'signup' }),
     });
     const verifyData = await verifyRes.json();
     if (!verifyData.success) {
       setError('Não foi possível confirmar que não é um robô. Tente novamente.');
-      if (window.grecaptcha && recaptchaWidgetId.current !== null) window.grecaptcha.reset(recaptchaWidgetId.current);
+      if (window.grecaptcha?.enterprise && recaptchaWidgetId.current !== null) window.grecaptcha.enterprise.reset(recaptchaWidgetId.current);
       setLoading(false);
       return;
     }
@@ -276,7 +228,7 @@ export default function LoginPage() {
       password,
       options: { data: { full_name: fullName, account_type: accountType } },
     });
-    if (error) { setError(error.message); setLoading(false); if (window.grecaptcha && recaptchaWidgetId.current !== null) window.grecaptcha.reset(recaptchaWidgetId.current); return; }
+    if (error) { setError(error.message); setLoading(false); if (window.grecaptcha?.enterprise && recaptchaWidgetId.current !== null) window.grecaptcha.enterprise.reset(recaptchaWidgetId.current); return; }
 
     // O Supabase não devolve um erro claro quando o email já existe (por segurança,
     // para não revelar quais emails já têm conta) — em vez disso, devolve uma resposta
@@ -365,14 +317,14 @@ export default function LoginPage() {
         {!forgotMode && (
           <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid var(--line)', marginBottom: 20 }}>
             <button
-              onClick={() => { setMode('login'); setEmail(''); setPassword(''); setError(''); recaptchaWidgetId.current = null; }}
+              onClick={() => { setMode('login'); setEmail(''); setPassword(''); setError(''); }}
               style={{ background: 'none', border: 'none', padding: '0 0 12px', fontWeight: 600, cursor: 'pointer',
                        color: mode === 'login' ? 'var(--ink)' : 'var(--text-soft)',
                        borderBottom: mode === 'login' ? '2px solid var(--telha)' : '2px solid transparent' }}>
               {t('login_login')}
             </button>
             <button
-              onClick={() => { setMode('signup'); setEmail(''); setPassword(''); setError(''); loginRecaptchaWidgetId.current = null; }}
+              onClick={() => { setMode('signup'); setEmail(''); setPassword(''); setError(''); }}
               style={{ background: 'none', border: 'none', padding: '0 0 12px', fontWeight: 600, cursor: 'pointer',
                        color: mode === 'signup' ? 'var(--ink)' : 'var(--text-soft)',
                        borderBottom: mode === 'signup' ? '2px solid var(--telha)' : '2px solid transparent' }}>
@@ -476,7 +428,7 @@ export default function LoginPage() {
               <input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="error-text">{error}</p>}
-            {!recaptchaAlreadyOk && <div ref={loginRecaptchaRef} style={{ marginBottom: 16 }} />}
+            <div ref={loginRecaptchaRef} style={{ marginBottom: 16 }} />
             <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
               {t('login_login')}
             </button>
@@ -618,7 +570,7 @@ export default function LoginPage() {
         <Link href="/" style={{ fontSize: 13, color: 'var(--text-soft)' }}>&larr; {t('login_back')}</Link>
       </p>
       <Script
-        src="https://www.google.com/recaptcha/api.js?render=explicit"
+        src="https://www.google.com/recaptcha/enterprise.js?render=explicit"
         strategy="lazyOnload"
         onLoad={() => setRecaptchaScriptReady(true)}
       />
