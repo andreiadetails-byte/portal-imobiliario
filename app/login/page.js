@@ -177,13 +177,21 @@ export default function LoginPage() {
         }
       }
 
-      let freeMonthFields = {};
+      let signupFreeMonthsValue = 1;
       if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType)) {
-        const freeUntil = new Date();
-        const finalMonths = couponMonths > 0 ? couponMonths : 1;
-        freeUntil.setMonth(freeUntil.getMonth() + finalMonths);
-        freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
-        setSignupFreeMonths(finalMonths);
+        try {
+          const trialRes = await fetch('/api/activate-free-trial', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: data.user.id, accountType, couponMonths }),
+          });
+          const trialData = await trialRes.json();
+          if (trialData.months) signupFreeMonthsValue = trialData.months;
+        } catch (err) {
+          // Se isto falhar, a conta continua criada — o admin pode
+          // confirmar a subscrição manualmente mais tarde.
+        }
+        setSignupFreeMonths(signupFreeMonthsValue);
       }
 
       await supabase.from('profiles').upsert({
@@ -193,7 +201,6 @@ export default function LoginPage() {
         phone_real: phone || null,
         show_phone_public: showPhonePublic,
         ...(isProfessionalAccount(accountType) && accountType !== 'promotor' && { agency_license: amiLicense.trim() }),
-        ...freeMonthFields,
         ...(avatar_url && { avatar_url }),
       }, { onConflict: 'id' });
     }

@@ -71,20 +71,25 @@ export default function Header({ minimal = false }) {
             }
           }
 
-          let freeMonthFields = {};
-          if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(pendingAccountType)) {
-            const freeUntil = new Date();
-            freeUntil.setMonth(freeUntil.getMonth() + (couponMonths > 0 ? couponMonths : 1));
-            freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
-          }
-
           await supabase.from('profiles').insert({
             id: data.user.id,
             full_name: googleName,
             email: data.user.email,
             account_type: pendingAccountType,
-            ...freeMonthFields,
           });
+
+          if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(pendingAccountType)) {
+            try {
+              await fetch('/api/activate-free-trial', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: data.user.id, accountType: pendingAccountType, couponMonths }),
+              });
+            } catch (err) {
+              // Se isto falhar, a conta continua criada — o admin pode
+              // confirmar a subscrição manualmente mais tarde.
+            }
+          }
         }
 
         // Se a pessoa tinha favoritos guardados só neste dispositivo (sem
