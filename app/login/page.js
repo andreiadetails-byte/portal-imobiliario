@@ -194,11 +194,19 @@ export default function LoginPage() {
       attempts++;
       if (recaptchaWidgetId.current !== null) { clearInterval(interval); return; }
       if (recaptchaRef.current && window.grecaptcha && window.grecaptcha.render) {
-        recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-        });
+        try {
+          recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+            sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+          });
+        } catch (err) {
+          // Se falhar (ex: chave errada, ou já existe uma caixa desenhada
+          // ali), regista no consola para ser mais fácil de diagnosticar,
+          // em vez de falhar silenciosamente sem explicação nenhuma.
+          console.error('Erro ao desenhar reCAPTCHA:', err);
+        }
         clearInterval(interval);
-      } else if (attempts > 40) { // desiste ao fim de ~10 segundos
+      } else if (attempts > 120) { // desiste ao fim de ~30 segundos, em vez de só 10
+        console.error('reCAPTCHA não carregou a tempo (30s). Verifica a ligação à internet, ou a configuração NEXT_PUBLIC_RECAPTCHA_SITE_KEY.');
         clearInterval(interval);
       }
     }, 250);
@@ -216,11 +224,16 @@ export default function LoginPage() {
       attempts++;
       if (loginRecaptchaWidgetId.current !== null) { clearInterval(interval); return; }
       if (loginRecaptchaRef.current && window.grecaptcha && window.grecaptcha.render) {
-        loginRecaptchaWidgetId.current = window.grecaptcha.render(loginRecaptchaRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-        });
+        try {
+          loginRecaptchaWidgetId.current = window.grecaptcha.render(loginRecaptchaRef.current, {
+            sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+          });
+        } catch (err) {
+          console.error('Erro ao desenhar reCAPTCHA:', err);
+        }
         clearInterval(interval);
-      } else if (attempts > 40) {
+      } else if (attempts > 120) {
+        console.error('reCAPTCHA não carregou a tempo (30s). Verifica a ligação à internet, ou a configuração NEXT_PUBLIC_RECAPTCHA_SITE_KEY.');
         clearInterval(interval);
       }
     }, 250);
