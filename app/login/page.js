@@ -32,6 +32,7 @@ export default function LoginPage() {
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [signupEmailSent, setSignupEmailSent] = useState(false);
+  const [signupFreeMonths, setSignupFreeMonths] = useState(1);
 
   async function handleForgotPassword(e) {
     e.preventDefault();
@@ -179,8 +180,10 @@ export default function LoginPage() {
       let freeMonthFields = {};
       if (PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType)) {
         const freeUntil = new Date();
-        freeUntil.setMonth(freeUntil.getMonth() + (couponMonths > 0 ? couponMonths : 1));
+        const finalMonths = couponMonths > 0 ? couponMonths : 1;
+        freeUntil.setMonth(freeUntil.getMonth() + finalMonths);
         freeMonthFields = { subscription_status: 'active', subscription_paid_until: freeUntil.toISOString().slice(0, 10) };
+        setSignupFreeMonths(finalMonths);
       }
 
       await supabase.from('profiles').upsert({
@@ -319,9 +322,11 @@ export default function LoginPage() {
             </p>
             {PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType) && (
               <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, marginBottom: 20, textAlign: 'left' }}>
-                <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>🎁 O seu primeiro mês é grátis</p>
+                <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+                  🎁 {signupFreeMonths === 1 ? 'O seu primeiro mês é grátis' : `Tem ${signupFreeMonths} meses grátis`}
+                </p>
                 <p style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
-                  Depois de confirmar o email, tem acesso total ao painel durante 1 mês, sem qualquer custo.
+                  Depois de confirmar o email, tem acesso total ao painel durante {signupFreeMonths === 1 ? '1 mês' : `${signupFreeMonths} meses`}, sem qualquer custo.
                   Passado esse período, a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €/mês, por transferência bancária.
                 </p>
               </div>
