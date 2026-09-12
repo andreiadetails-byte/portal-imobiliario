@@ -223,7 +223,18 @@ function DashboardInner() {
       <Header />
     <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
       <BackButton fallback="/" />
-      {isWelcomeAgency && !welcomeDismissed && (
+      {isWelcomeAgency && !welcomeDismissed && (() => {
+        // Calcula quantos meses grátis a conta realmente tem (pode ser mais
+        // do que 1, se tiver usado um cupão de oferta), em vez de assumir
+        // sempre "1 mês" — antes esta mensagem estava fixa, mesmo quando a
+        // pessoa tinha direito a mais meses.
+        let freeMonths = 1;
+        if (profile?.subscription_paid_until) {
+          const now = new Date();
+          const paidUntil = new Date(profile.subscription_paid_until);
+          freeMonths = Math.max(1, Math.round((paidUntil - now) / (1000 * 60 * 60 * 24 * 30)));
+        }
+        return (
         <div style={{
           background: 'linear-gradient(135deg, var(--telha) 0%, #3E4A32 100%)', borderRadius: 10,
           padding: '20px 24px', marginBottom: 28, color: '#fff', position: 'relative',
@@ -236,15 +247,16 @@ function DashboardInner() {
             <X size={16} />
           </button>
           <div className="display" style={{ fontSize: 19, fontWeight: 600, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Gift size={20} /> Bem-vinda! O seu primeiro mês é grátis
+            <Gift size={20} /> {freeMonths === 1 ? 'Bem-vinda! O seu primeiro mês é grátis' : `Bem-vinda! Tem ${freeMonths} meses grátis`}
           </div>
           <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.9)', maxWidth: 560 }}>
-            Como conta de agência, tem acesso total ao painel durante 1 mês, sem qualquer custo. Depois desse período,
+            Como conta de agência, tem acesso total ao painel durante {freeMonths === 1 ? '1 mês' : `${freeMonths} meses`}, sem qualquer custo. Depois desse período,
             a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €/mês, com pagamento por transferência bancária.
-            Vai receber um aviso antes de o mês grátis terminar.
+            Vai receber um aviso antes do período grátis terminar.
           </p>
         </div>
-      )}
+        );
+      })()}
 
       <h1 className="display" style={{ fontSize: 28, marginBottom: 32 }}>{t('dashboard_hi')}, {profile?.full_name || ''}</h1>
 
