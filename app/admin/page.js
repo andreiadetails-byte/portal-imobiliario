@@ -120,6 +120,7 @@ function AdminInner() {
   const [geocodeDone, setGeocodeDone] = useState(false);
   const [geocodeProgress, setGeocodeProgress] = useState({ done: 0, total: 0 });
   const [geocodeFailCount, setGeocodeFailCount] = useState(0);
+  const [geocodeFailedAddresses, setGeocodeFailedAddresses] = useState([]);
   const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
@@ -477,6 +478,7 @@ function AdminInner() {
     const missing = allProps || [];
     setGeocodeProgress({ done: 0, total: missing.length });
     let failCount = 0;
+    const failedAddrs = [];
 
     for (let i = 0; i < missing.length; i++) {
       try {
@@ -486,7 +488,10 @@ function AdminInner() {
           body: JSON.stringify({ propertyId: missing[i].id }),
         });
         const result = await res.json();
-        if (!res.ok || !result.success) failCount++;
+        if (!res.ok || !result.success) {
+          failCount++;
+          if (result.address) failedAddrs.push(result.address);
+        }
       } catch (err) {
         failCount++;
       }
@@ -496,6 +501,7 @@ function AdminInner() {
     }
 
     setGeocodeFailCount(failCount);
+    setGeocodeFailedAddresses(failedAddrs);
     setGeocoding(false);
     setGeocodeDone(true);
   }
@@ -2006,7 +2012,7 @@ function AdminInner() {
       )}
 
       {section === 'definicoes' && (
-        <div className="card" style={{ padding: 20, maxWidth: 400, marginTop: 16 }}>
+        <div className="card" style={{ padding: 20, maxWidth: 500, marginTop: 16 }}>
           <h3 className="display" style={{ fontSize: 17, marginBottom: 4 }}>📍 Atribuir coordenadas em falta</h3>
           <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
             Calcula automaticamente a latitude/longitude dos imóveis que ainda não têm — normalmente porque foram criados antes de existir o mapa. Sem coordenadas, um imóvel não aparece nem no mapa normal, nem na pesquisa por zona desenhada. Pode demorar alguns minutos.
@@ -2015,11 +2021,21 @@ function AdminInner() {
             {geocoding ? `A calcular... (${geocodeProgress.done}/${geocodeProgress.total})` : 'Atribuir coordenadas em falta'}
           </button>
           {geocodeDone && !geocoding && (
+            <>
             <p style={{ fontSize: 12.5, color: geocodeFailCount > 0 ? '#8a6a1f' : 'var(--telha)', marginTop: 10 }}>
               {geocodeFailCount > 0
-                ? `⚠ Concluído — ${geocodeProgress.done - geocodeFailCount} atualizados com sucesso, ${geocodeFailCount} falharam (morada não encontrada). Corre a ferramenta outra vez para tentar de novo.`
+                ? `⚠ Concluído — ${geocodeProgress.done - geocodeFailCount} atualizados com sucesso, ${geocodeFailCount} falharam. Corre a ferramenta outra vez para tentar de novo.`
                 : `✓ Concluído — ${geocodeProgress.done} imóveis atualizados.`}
             </p>
+            {geocodeFailedAddresses.length > 0 && (
+              <div style={{ marginTop: 10, padding: 12, background: 'var(--plaster)', borderRadius: 6, maxHeight: 200, overflowY: 'auto' }}>
+                <p style={{ fontSize: 11.5, fontWeight: 600, marginBottom: 6 }}>Moradas que falharam:</p>
+                {geocodeFailedAddresses.map((addr, i) => (
+                  <p key={i} style={{ fontSize: 11, color: 'var(--text-soft)', marginBottom: 3 }}>{addr}</p>
+                ))}
+              </div>
+            )}
+            </>
           )}
         </div>
       )}
