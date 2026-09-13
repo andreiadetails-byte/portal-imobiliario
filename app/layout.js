@@ -9,7 +9,7 @@ import InstallPrompt from '../components/InstallPrompt';
 import Script from 'next/script';
 
 export const metadata = {
-  metadataBase: new URL('https://portalimobiliario.netlify.app'),
+  metadataBase: new URL('https://www.moreada.pt'),
   title: { default: 'More·ada — Portal imobiliário Portugal', template: '%s' },
   description: 'Compre, arrende ou publique o seu imóvel diretamente em Portugal — sem intermediários obrigatórios. Milhares de imóveis, chat direto com anunciantes, simuladores de crédito e IMT.',
   manifest: '/manifest.json',

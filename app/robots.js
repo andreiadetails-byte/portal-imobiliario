@@ -9,6 +9,6 @@ export default function robots() {
         '/testemunho-resposta', '/comparar', '/api/',
       ],
     },
-    sitemap: 'https://portalimobiliario.netlify.app/sitemap.xml',
+    sitemap: 'https://www.moreada.pt/sitemap.xml',
   };
 }
