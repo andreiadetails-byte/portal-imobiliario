@@ -1,4 +1,5 @@
 import './globals.css';
+import { Suspense } from 'react';
 import { LanguageProvider } from '../lib/i18n';
 import SupportAgentWidget from '../components/SupportAgentWidget';
 import ImageProtection from '../components/ImageProtection';
@@ -6,7 +7,7 @@ import CookieConsent from '../components/CookieConsent';
 import CompareBar from '../components/CompareBar';
 import GoogleAnalytics from '../components/GoogleAnalytics';
 import InstallPrompt from '../components/InstallPrompt';
-import Script from 'next/script';
+import ScrollToTop from '../components/ScrollToTop';
 
 export const metadata = {
   metadataBase: new URL('https://www.moreada.pt'),
@@ -45,6 +46,7 @@ export default function RootLayout({ children }) {
       <body>
         <a href="#main-content" className="skip-link">Saltar para o conteúdo</a>
         <LanguageProvider>
+          <Suspense fallback={null}><ScrollToTop /></Suspense>
           {children}
           <SupportAgentWidget />
           <ImageProtection />
@@ -53,12 +55,6 @@ export default function RootLayout({ children }) {
           <GoogleAnalytics />
           <InstallPrompt />
         </LanguageProvider>
-        {/* TEMPORÁRIO — ferramenta de depuração visível no ecrã, para apanhar
-            o motivo do problema de layout no telemóvel. Remover depois de resolvido. */}
-        <Script src="https://cdn.jsdelivr.net/npm/eruda" strategy="afterInteractive" />
-        <Script id="eruda-init" strategy="afterInteractive">
-          {`if (typeof eruda !== 'undefined') eruda.init();`}
-        </Script>
       </body>
     </html>
   );

@@ -117,7 +117,7 @@ export default function FavoritesPage() {
         if (localIds.length > 0) {
           const { data: propsData } = await supabase
             .from('properties')
-            .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position)')
+            .select('id, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, created_at, property_photos(url, thumbnail_url, position)')
             .in('id', localIds);
           const withProfiles = await attachProfiles(propsData || []);
           setProperties(withProfiles.map((p) => ({ ...p, notes: '', price_at_save: null })));
@@ -143,7 +143,7 @@ export default function FavoritesPage() {
         const priceAtSaveById = Object.fromEntries(favIds.map((f) => [f.property_id, f.price_at_save]));
         const { data: propsData, error: propsError } = await supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, created_at, property_photos(url, thumbnail_url, position)')
           .in('id', ids);
         if (propsError) {
           console.error('Erro ao carregar os imóveis favoritos:', propsError);
@@ -169,7 +169,7 @@ export default function FavoritesPage() {
 
         let query = supabase
           .from('properties')
-          .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position)')
+          .select('id, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, created_at, property_photos(url, thumbnail_url, position)')
           .eq('status', 'ativo')
           .gte('price', avgPrice * 0.7)
           .lte('price', avgPrice * 1.3)
@@ -216,7 +216,7 @@ export default function FavoritesPage() {
     // Vai buscar o próprio imóvel para o juntar à lista principal de favoritos, sem precisar de recarregar a página.
     const { data: newFav } = await supabase
       .from('properties')
-      .select('id, price, address, district, municipality, parish, show_full_address, typology, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
+      .select('id, price, address, district, municipality, parish, show_full_address, typology, property_type, area, area_util, bedrooms, bathrooms, business_type, owner_id, display_name, created_at, property_photos(url, thumbnail_url, position), profiles!owner_id(phone_public, agency_name, full_name)')
       .eq('id', propertyId).single();
     if (newFav) setProperties((cur) => [newFav, ...cur]);
   }
@@ -350,7 +350,20 @@ export default function FavoritesPage() {
                     </label>
                     <Link href={`/property/${p.id}`}>
                       <div className="addr">{p.typology} · {displayAddress(p)}</div>
-                      <div className="meta">{p.district} · {p.area_util ? `${p.area_util} ${t('meta_sqm_useful')}` : '—'} · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
+                      <div className="meta">
+                        {p.property_type ? `${p.property_type} · ` : ''}
+                        {p.area_util ? `${p.area_util} ${t('meta_sqm_useful')} · ` : ''}
+                        {p.bedrooms} {t('property_rooms').toLowerCase()}
+                        {p.bathrooms ? ` · ${p.bathrooms} wc` : ''}
+                      </div>
+                      {p.created_at && (
+                        <div style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 2 }}>
+                          {t('meta_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}
+                        </div>
+                      )}
+                      <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginTop: 2 }}>
+                        {p.district}{p.municipality ? ` · ${p.municipality}` : ''}
+                      </div>
                     </Link>
                     <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
                       <button

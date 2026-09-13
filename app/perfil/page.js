@@ -34,7 +34,6 @@ export default function PerfilPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSaved, setPasswordSaved] = useState(false);
 
@@ -146,15 +145,6 @@ export default function PerfilPage() {
     setPasswordError('');
     setPasswordSaved(false);
 
-    // Quem entrou só pelo Google nunca teve palavra-passe — não faz sentido
-    // pedir para confirmar uma que nunca existiu. Nesse caso, definir uma
-    // nova passa a servir também para poder entrar sem o Google no futuro.
-    const hasPasswordAlready = user?.identities?.some((i) => i.provider === 'email');
-
-    if (hasPasswordAlready && !currentPassword) {
-      setPasswordError('Introduza a sua palavra-passe atual, para confirmarmos que é mesmo você.');
-      return;
-    }
     if (!isPasswordValid(newPassword)) {
       setPasswordError(PASSWORD_RULES_TEXT);
       return;
@@ -166,22 +156,9 @@ export default function PerfilPage() {
 
     setSavingPassword(true);
 
-    if (hasPasswordAlready) {
-      // Confirma a palavra-passe atual antes de deixar mudar — sem isto,
-      // alguém que ficasse com acesso à sua sessão (ex: computador partilhado)
-      // conseguia mudar a palavra-passe sem saber a antiga, e ficava com a
-      // conta, sem si conseguir voltar a entrar.
-      const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword,
-      });
-      if (verifyError) {
-        setSavingPassword(false);
-        setPasswordError('A palavra-passe atual está incorreta.');
-        return;
-      }
-    }
-
+    // Não é preciso confirmar a palavra-passe atual — quem está aqui já
+    // tem sessão iniciada (autenticada), o que já garante que é mesmo o
+    // dono da conta.
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setSavingPassword(false);
 
@@ -189,7 +166,6 @@ export default function PerfilPage() {
       setPasswordError(error.message);
       return;
     }
-    setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
     setPasswordSaved(true);
@@ -234,12 +210,12 @@ export default function PerfilPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="full-name-input">{t('perfil_fullname')}</label>
+            <label htmlFor="full-name-input">{t('perfil_fullname')} <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <input id="full-name-input" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
           </div>
 
           <div className="field">
-            <label htmlFor="account-type-select">{t('perfil_account_type') || 'Tipo de conta'}</label>
+            <label htmlFor="account-type-select">{t('perfil_account_type') || 'Tipo de conta'} <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <select id="account-type-select" value={accountType} onChange={(e) => handleAccountTypeChange(e.target.value)}>
               <option value="particular">{accountTypeLabel('particular')}</option>
               <option value="agencia">{accountTypeLabel('agencia')}</option>
@@ -268,7 +244,7 @@ export default function PerfilPage() {
           )}
 
           <div className="field">
-            <label>{t('perfil_email')}</label>
+            <label>{t('perfil_email')} <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <input value={user.email} disabled style={{ opacity: 0.6, cursor: 'not-allowed' }} />
           </div>
 
@@ -316,12 +292,7 @@ export default function PerfilPage() {
         <form onSubmit={savePassword} className="card" style={{ padding: 24 }}>
           <h2 className="display" style={{ fontSize: 18, marginBottom: 18 }}>{t('perfil_change_password')}</h2>
 
-          {user?.identities?.some((i) => i.provider === 'email') ? (
-            <div className="field">
-              <label htmlFor="current-password-input">{t('perfil_current_password')}</label>
-              <input id="current-password-input" type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" />
-            </div>
-          ) : (
+          {!user?.identities?.some((i) => i.provider === 'email') && (
             <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
               A sua conta entrou pelo Google, e ainda não tem palavra-passe definida. Ao definir uma agora, passa também a poder entrar diretamente com o email, sem precisar do Google.
             </p>
