@@ -537,7 +537,7 @@ function ChatInner() {
                         style={{
                           padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                           minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
-                          background: isMine ? 'var(--telha)' : 'var(--azulejo)',
+                          background: isMine ? 'var(--telha)' : 'var(--terracota)',
                           color: '#fff',
                         }}
                       >
