@@ -246,7 +246,16 @@ export default function PropertyClient() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionData?.session?.access_token}` },
             body: JSON.stringify({ messageId: newMessage.id }),
-          }).catch(() => {});
+          })
+            .then((res) => res.json().then((result) => ({ status: res.status, result })))
+            .then(({ status, result }) => {
+              console.log('[notify-chat-message]', status, result);
+              alert(`Diagnóstico notificação: estado ${status} — ${JSON.stringify(result)}`);
+            })
+            .catch((err) => {
+              console.error('[notify-chat-message] falhou:', err);
+              alert(`Diagnóstico: erro de rede ao chamar a notificação — ${err.message}`);
+            });
         }
       }
     } else {
