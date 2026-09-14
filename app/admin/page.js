@@ -143,6 +143,8 @@ function AdminInner() {
   const [campaignDrafts, setCampaignDrafts] = useState([]);
   const [savingDraft, setSavingDraft] = useState(false);
   const [allFeedback, setAllFeedback] = useState([]);
+  const [campaignImage, setCampaignImage] = useState(null);
+  const [campaignImagePreview, setCampaignImagePreview] = useState(null);
   const [userSearch, setUserSearch] = useState('');
   const [userTypeFilter, setUserTypeFilter] = useState('todos');
   const [supportReplyText, setSupportReplyText] = useState({});
@@ -292,11 +294,31 @@ function AdminInner() {
   }
 
   async function loadAllFeedback() {
-    const { data } = await supabase
+    const { data: feedbackData, error } = await supabase
       .from('feedback')
-      .select('*, profiles!user_id(full_name, agency_name, email, phone_real)')
+      .select('*')
       .order('created_at', { ascending: false });
-    setAllFeedback(data || []);
+
+    if (error) {
+      console.error('Erro ao carregar feedback:', error);
+      setAllFeedback([]);
+      return;
+    }
+
+    // Vai buscar os perfis separadamente (em vez de tentar uma junção
+    // direta) — mais seguro, porque não depende de uma relação de chave
+    // estrangeira estar configurada exatamente da forma esperada.
+    const userIds = [...new Set((feedbackData || []).map((f) => f.user_id).filter(Boolean))];
+    let profilesById = {};
+    if (userIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, full_name, agency_name, email, phone_real')
+        .in('id', userIds);
+      profilesById = Object.fromEntries((profilesData || []).map((p) => [p.id, p]));
+    }
+
+    setAllFeedback((feedbackData || []).map((f) => ({ ...f, profiles: profilesById[f.user_id] || null })));
   }
 
   async function loadValuationRequests() {
@@ -371,12 +393,30 @@ function AdminInner() {
   }
 
   async function sendCampaign() {
+    if (!campaignImage && !campaignImagePreview) {
+      alert('Escolhe uma imagem para o email antes de enviar.');
+      return;
+    }
     const audienceLabel = campaignAudience === 'todos' ? 'TODOS os utilizadores' : campaignAudience === 'agencias' ? 'todas as agências' : 'todos os particulares';
     if (!confirm(`Vai enviar este email a ${audienceLabel}. Tem a certeza?`)) return;
 
     setSendingCampaign(true);
     setCampaignResult(null);
     const { data: { user } } = await supabase.auth.getUser();
+
+    // Se foi escolhida uma imagem nova, envia-a primeiro para o Supabase
+    // Storage, para termos um link público a usar no email.
+    let imageUrl = campaignImagePreview && !campaignImage ? campaignImagePreview : null;
+    if (campaignImage) {
+      const compressedImage = await compressImageFile(campaignImage, 900);
+      const ext = compressedImage.name.split('.').pop();
+      const path = `campaigns/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('property-photos').upload(path, compressedImage, { cacheControl: '31536000' });
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(path);
+        imageUrl = publicUrlData.publicUrl;
+      }
+    }
 
     try {
       const { data: sessionData } = await supabase.auth.getSession();
@@ -390,6 +430,7 @@ function AdminInner() {
           subject: campaignSubject,
           message: campaignMessage,
           audience: campaignAudience,
+          imageUrl,
         }),
       });
       const data = await res.json();
@@ -1682,6 +1723,30 @@ function AdminInner() {
               onChange={(e) => setCampaignMessage(e.target.value)}
               rows={10}
               style={{ fontSize: 14 }}
+            />
+          </div>
+
+          <div className="field">
+            <label>Imagem do email <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
+            <label
+              htmlFor="campaign-image-input"
+              style={{
+                display: 'block', border: '1.5px dashed var(--line)', borderRadius: 6, padding: '14px 16px',
+                textAlign: 'center', color: 'var(--text-soft)', fontSize: 13, cursor: 'pointer',
+              }}
+            >
+              {campaignImage ? `🖼️ ${campaignImage.name}` : campaignImagePreview ? '🖼️ Imagem escolhida (clica para trocar)' : 'Clique para escolher uma imagem'}
+            </label>
+            <input
+              id="campaign-image-input"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setCampaignImage(file);
+                setCampaignImagePreview(file ? URL.createObjectURL(file) : null);
+              }}
+              style={{ display: 'none' }}
             />
           </div>
 

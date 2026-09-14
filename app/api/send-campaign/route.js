@@ -36,7 +36,7 @@ export async function POST(request) {
       return Response.json({ error: 'Não autorizado.' }, { status: 403 });
     }
 
-    const { subject, message, audience } = await request.json();
+    const { subject, message, audience, imageUrl } = await request.json();
 
     // A pessoa escreve texto normal (sem HTML) — aqui convertemos
     // automaticamente: cada linha em branco separa um parágrafo novo, e
@@ -46,6 +46,10 @@ export async function POST(request) {
       .split(/\n{2,}/)
       .map((paragraph) => `<p style="margin:0 0 14px; font-size:15px;">${paragraph.replace(/\n/g, '<br>')}</p>`)
       .join('');
+
+    const imageHtml = imageUrl
+      ? `<img src="${imageUrl}" alt="" style="width:100%; max-height:260px; object-fit:cover; border-radius:8px; margin-bottom:16px; display:block;" />`
+      : '';
 
     if (!subject || !message) {
       return Response.json({ error: 'Faltam dados.' }, { status: 400 });
@@ -69,6 +73,7 @@ export async function POST(request) {
 
       const bodyHtml = `
         <p style="margin:0 0 14px; font-size:15px;">Olá${firstName ? ` ${firstName}` : ''},</p>
+        ${imageHtml}
         ${messageHtml}
       `;
 

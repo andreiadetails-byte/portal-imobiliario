@@ -61,6 +61,7 @@ export async function POST(request) {
         <span style="font-family: 'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#7E8F6A; display:block; margin-bottom:8px;">
           ${news.category || 'Notícia'}
         </span>
+        ${news.cover_image_url ? `<img src="${news.cover_image_url}" alt="" style="width:100%; max-height:220px; object-fit:cover; border-radius:8px; margin-bottom:14px; display:block;" />` : ''}
         <h2 style="font-size:19px; color:#332E22; margin: 0 0 10px;">${news.title}</h2>
         <p style="margin:0 0 4px; color:#332E22;">${(news.body || '').slice(0, 200)}${(news.body || '').length > 200 ? '...' : ''}</p>
       `;
