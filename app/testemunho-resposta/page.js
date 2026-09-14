@@ -24,7 +24,7 @@ function Content() {
   }
 
   return (
-    <main id="main-content" className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center' }}>
+    <main id="main-content" className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
       <div style={{ textAlign: 'left', marginBottom: 12 }}>
         <BackButton fallback="/" />
       </div>

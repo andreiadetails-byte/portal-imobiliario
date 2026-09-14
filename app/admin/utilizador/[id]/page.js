@@ -103,14 +103,14 @@ export default function AdminUserPage() {
     setProperties((cur) => cur.map((p) => (p.id === propObj.id ? { ...p, status: 'anulado_suporte', cancellation_reason: reason } : p)));
   }
 
-  if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>A verificar acesso...</div></>);
-  if (!allowed) return (<><Header /><div className="wrap" style={{ padding: 60 }}>Esta página é só para administradores.</div></>);
-  if (!profile) return (<><Header /><div className="wrap" style={{ padding: 60 }}>Utilizador não encontrado.</div></>);
+  if (checking) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>A verificar acesso...</div></>);
+  if (!allowed) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>Esta página é só para administradores.</div></>);
+  if (!profile) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>Utilizador não encontrado.</div></>);
 
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ padding: '40px 32px 80px' }}>
+      <main id="main-content" className="wrap" style={{ padding: '24px 32px 56px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <Link href="/admin" style={{ fontSize: 13, color: 'var(--telha)' }}>&larr; Voltar ao admin</Link>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '18px 0 28px' }}>

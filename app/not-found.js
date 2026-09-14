@@ -9,7 +9,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ maxWidth: 560, padding: '80px 32px', textAlign: 'center' }}>
+      <main id="main-content" className="wrap" style={{ maxWidth: 560, padding: '80px 32px', textAlign: 'center', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <div className="display" style={{ fontSize: 72, fontWeight: 600, color: 'var(--azulejo)', marginBottom: 8 }}>404</div>
         <h1 className="display" style={{ fontSize: 24, marginBottom: 12 }}>Esta página não existe</h1>
         <p style={{ fontSize: 14.5, color: 'var(--text-soft)', marginBottom: 28 }}>

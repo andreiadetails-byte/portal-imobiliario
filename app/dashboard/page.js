@@ -81,6 +81,10 @@ function DashboardInner() {
         if (!isActive) { router.push('/assinatura'); return; }
       }
 
+      // Verifica e desativa destaques que já passaram dos 7 dias, antes de
+      // mostrar a lista de anúncios — assim fica sempre atualizado.
+      fetch('/api/expire-featured', { method: 'POST' }).catch(() => {});
+
       await loadProperties(user.id);
 
       setLoading(false);
@@ -158,21 +162,40 @@ function DashboardInner() {
   }
 
   async function toggleFeaturedButtonClick(id) {
-    if (!profile?.is_admin && (await countFeatured()) >= 3) {
-      alert('Só pode ter até 3 anúncios em destaque ao mesmo tempo. Tem de anular o destaque de um deles antes de destacar outro.');
+    // Contas profissionais (agência/consultor/promotor) podem ter até 3
+    // imóveis em destaque ao mesmo tempo; contas particulares só 1.
+    const featuredLimit = profile?.is_admin ? Infinity : (isProfessionalAccount(profile?.account_type) ? 3 : 1);
+    if ((await countFeatured()) >= featuredLimit) {
+      alert(`Só pode ter até ${featuredLimit} anúncio${featuredLimit > 1 ? 's' : ''} em destaque ao mesmo tempo. Tem de anular o destaque de um deles antes de destacar outro.`);
       return;
     }
+
+    // Não deixa destacar o mesmo imóvel duas vezes no mesmo mês — verifica
+    // quando foi a última vez que este imóvel específico esteve em destaque.
+    const target = properties.find((p) => p.id === id);
+    if (target?.featured_activated_at && !profile?.is_admin) {
+      const lastDate = new Date(target.featured_activated_at);
+      const now = new Date();
+      if (lastDate.getMonth() === now.getMonth() && lastDate.getFullYear() === now.getFullYear()) {
+        alert('Este imóvel já esteve em destaque este mês. Pode voltar a destacá-lo a partir do próximo mês.');
+        return;
+      }
+    }
+
     if (PAYMENT_INFO.featuredEnforced && !profile?.is_admin) {
       setFeaturedPaymentMethod('transferencia');
       setFeaturedModal(id);
       return;
     }
-    // Destaque grátis por agora (ou administradora, sempre): ativa logo, sem pedir pagamento.
+    // Destaque grátis, por 7 dias: ativa logo, sem pedir pagamento.
+    const featuredUntil = new Date();
+    featuredUntil.setDate(featuredUntil.getDate() + 7);
     await supabase.from('properties').update({
       featured_status: 'active',
       featured_activated_at: new Date().toISOString(),
+      featured_until: featuredUntil.toISOString(),
     }).eq('id', id);
-    setProperties((cur) => cur.map((p) => (p.id === id ? { ...p, featured_status: 'active' } : p)));
+    setProperties((cur) => cur.map((p) => (p.id === id ? { ...p, featured_status: 'active', featured_activated_at: new Date().toISOString(), featured_until: featuredUntil.toISOString() } : p)));
   }
 
   async function requestFeatured(id) {
