@@ -313,7 +313,7 @@ function ChatInner() {
         <div className="card chat-grid" style={{ display: 'grid', gridTemplateColumns: '460px 1fr', height: 'calc(100vh - 200px)', minHeight: 420, maxHeight: 700, overflow: 'hidden' }}>
           <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, position: 'relative' }}>
             <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.55)', zIndex: 0 }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(126,143,106,0.78)', zIndex: 0 }} />
             <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             <div style={{ padding: 14, borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
               <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -359,11 +359,11 @@ function ChatInner() {
                       display: 'flex', gap: 12, padding: '16px 16px', margin: '0 10px 12px',
                       border: c.id === activeId ? '1.5px solid var(--telha)' : '1px solid var(--line)',
                       borderRadius: 8, cursor: 'pointer',
-                      background: c.id === activeId ? 'var(--telha)' : 'rgba(79,139,74,0.82)', alignItems: 'flex-start',
+                      background: c.id === activeId ? 'var(--plaster)' : 'rgba(255,255,255,0.8)', alignItems: 'flex-start',
                     }}
                   >
                     <div style={{
-                      width: 42, height: 42, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', color: '#fff',
+                      width: 42, height: 42, borderRadius: '50%', background: 'var(--telha)', color: '#fff',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, flexShrink: 0,
                     }}>
                       {initials || '?'}
@@ -371,8 +371,8 @@ function ChatInner() {
 
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
-                        <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, color: '#fff' }}>{name}</b>
-                        <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.85)', flexShrink: 0, textAlign: 'right' }}>
+                        <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, color: 'var(--ink)' }}>{name}</b>
+                        <span style={{ fontSize: 11.5, color: 'var(--text-soft)', flexShrink: 0, textAlign: 'right' }}>
                           {c.lastMessage ? (
                             <>
                               {new Date(c.lastMessage.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
@@ -383,7 +383,7 @@ function ChatInner() {
                         </span>
                       </div>
                       {contact && (
-                        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                        <div style={{ fontSize: 13, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                           {contact}
                         </div>
                       )}
@@ -551,7 +551,7 @@ function ChatInner() {
                         style={{
                           padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                           minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
-                          background: isMine ? 'var(--green-vivid)' : 'var(--terracota)',
+                          background: isMine ? 'var(--green-vivid)' : 'var(--green-aqua)',
                           color: '#fff',
                         }}
                       >
