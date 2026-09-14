@@ -160,8 +160,8 @@ function MensagensSuporteInner() {
                           style={{
                             padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                             minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
-                            background: rep.sender_role === 'admin' ? 'var(--plaster)' : 'var(--telha)',
-                            color: rep.sender_role === 'admin' ? 'var(--ink)' : '#fff',
+                            background: rep.sender_role === 'admin' ? 'var(--azulejo)' : 'var(--telha)',
+                            color: '#fff',
                           }}
                         >
                           {rep.message}
