@@ -311,7 +311,7 @@ function ChatInner() {
         <div className="empty-state">{t('chat_empty')}</div>
       ) : (
         <div className="card chat-grid" style={{ display: 'grid', gridTemplateColumns: '460px 1fr', height: 'calc(100vh - 200px)', minHeight: 420, maxHeight: 700, overflow: 'hidden' }}>
-          <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+          <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, background: 'linear-gradient(160deg, rgba(139,90,60,0.12) 0%, rgba(201,162,39,0.10) 45%, rgba(216,201,163,0.18) 100%)' }}>
             <div style={{ padding: 14, borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
               <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
                 {[['todas', t('chat_filter_all')], ['nao_lidos', t('chat_filter_unread')], ['pendentes', t('chat_filter_pending')], ['tratadas', t('chat_filter_handled')]].map(([value, label]) => (
@@ -356,7 +356,7 @@ function ChatInner() {
                       display: 'flex', gap: 12, padding: '16px 16px', margin: '0 10px 12px',
                       border: c.id === activeId ? '1.5px solid var(--telha)' : '1px solid var(--line)',
                       borderRadius: 8, cursor: 'pointer',
-                      background: c.id === activeId ? 'var(--plaster)' : 'var(--paper)', alignItems: 'flex-start',
+                      background: c.id === activeId ? 'var(--plaster)' : 'rgba(255,255,255,0.55)', alignItems: 'flex-start',
                     }}
                   >
                     <div style={{
@@ -547,7 +547,7 @@ function ChatInner() {
                         style={{
                           padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                           minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
-                          background: isMine ? 'var(--telha)' : 'var(--terracota)',
+                          background: isMine ? 'var(--green-vivid)' : 'var(--terracota)',
                           color: '#fff',
                         }}
                       >
@@ -556,7 +556,13 @@ function ChatInner() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3, justifyContent: isMine ? 'flex-end' : 'flex-start', paddingLeft: isMine ? 0 : 2, paddingRight: isMine ? 2 : 0 }}>
                       <span style={{ fontSize: 10, color: 'var(--text-soft)' }}>
-                        {new Date(m.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                        {(() => {
+                          const msgDate = new Date(m.created_at);
+                          const isToday = msgDate.toDateString() === new Date().toDateString();
+                          const time = msgDate.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+                          if (isToday) return time;
+                          return `${msgDate.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })} · ${time}`;
+                        })()}
                       </span>
                       {isMine && (
                         <span style={{ fontSize: 10, color: m.read ? 'var(--telha)' : 'var(--text-soft)' }} title={m.read ? 'Lida' : 'Enviada'}>
