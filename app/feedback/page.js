@@ -1,30 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
 
-export default function FeedbackPage() {
+function FeedbackForm() {
+  const searchParams = useSearchParams();
+  const nameFromLink = searchParams.get('name') || '';
+  const emailFromLink = searchParams.get('email') || '';
+  const identifiedByLink = !!emailFromLink;
+
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(nameFromLink);
+  const [email, setEmail] = useState(emailFromLink);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    // Se a pessoa já tiver sessão iniciada, pré-preenche o nome e email —
-    // mas mesmo assim ficam editáveis, e guardados diretamente na
-    // resposta (não só ligados à conta), para nunca aparecer como "Anónimo".
+    // Se a pessoa veio de um link de email, já sabemos quem é — não é
+    // preciso ir buscar mais nada. Caso contrário (visita direta ao site),
+    // tenta preencher a partir da sessão iniciada, se houver.
+    if (identifiedByLink) return;
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return;
       setEmail(user.email || '');
       const { data: profile } = await supabase.from('profiles').select('full_name, agency_name').eq('id', user.id).single();
       setName(profile?.agency_name || profile?.full_name || '');
     });
-  }, []);
+  }, [identifiedByLink]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -67,15 +74,23 @@ export default function FeedbackPage() {
             </p>
 
             <form onSubmit={handleSubmit} className="card" style={{ padding: 24 }}>
-              <div className="field">
-                <label>O seu nome <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
-                <input value={name} onChange={(e) => setName(e.target.value)} required />
-              </div>
+              {identifiedByLink ? (
+                <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 18 }}>
+                  A responder como <b style={{ color: 'var(--ink)' }}>{name || email}</b>.
+                </p>
+              ) : (
+                <>
+                  <div className="field">
+                    <label>O seu nome <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
+                    <input value={name} onChange={(e) => setName(e.target.value)} required />
+                  </div>
 
-              <div className="field">
-                <label>O seu email <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </div>
+                  <div className="field">
+                    <label>O seu email <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  </div>
+                </>
+              )}
 
               <div className="field">
                 <label>A sua avaliação</label>
@@ -118,5 +133,13 @@ export default function FeedbackPage() {
         )}
       </main>
     </>
+  );
+}
+
+export default function FeedbackPage() {
+  return (
+    <Suspense fallback={null}>
+      <FeedbackForm />
+    </Suspense>
   );
 }

@@ -84,7 +84,7 @@ export async function POST(request) {
           preheader: subject,
           bodyHtml,
           ctaText: 'Deixar a minha opinião',
-          ctaUrl: `${SITE_URL}/feedback`,
+          ctaUrl: `${SITE_URL}/feedback?name=${encodeURIComponent(profile.agency_name || profile.full_name || '')}&email=${encodeURIComponent(email)}`,
         }),
       });
 
