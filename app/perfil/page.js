@@ -40,6 +40,8 @@ export default function PerfilPage() {
   const [deleteReason, setDeleteReason] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [sendingSuggestion, setSendingSuggestion] = useState(false);
+  const [suggestionSent, setSuggestionSent] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -174,6 +176,21 @@ export default function PerfilPage() {
     setConfirmPassword('');
     setPasswordSaved(true);
     setTimeout(() => setPasswordSaved(false), 3000);
+  }
+
+  async function handleSendAsSuggestion() {
+    setSendingSuggestion(true);
+    await supabase.from('support_requests').insert({
+      agent_name: 'Sofia',
+      name: fullName || user?.email || 'Utilizador',
+      contact: user?.email || '',
+      message: `[Mensagem deixada ao tentar eliminar a conta, sem chegar a eliminar]\n\n${deleteReason.trim()}`,
+      user_id: user?.id || null,
+    });
+    setSendingSuggestion(false);
+    setSuggestionSent(true);
+    setDeleteReason('');
+    setTimeout(() => { setShowDeleteAccount(false); setSuggestionSent(false); }, 3000);
   }
 
   async function handleDeleteAccount() {
@@ -358,8 +375,21 @@ export default function PerfilPage() {
                 <textarea id="delete-reason" rows={3} value={deleteReason} onChange={(e) => setDeleteReason(e.target.value)} placeholder="ex: já encontrei o que procurava, não voltei a usar, preços, outro motivo..." />
               </div>
               {deleteError && <p className="error-text">{deleteError}</p>}
-              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+              {suggestionSent && (
+                <p style={{ fontSize: 12.5, color: 'var(--telha)', marginBottom: 10 }}>✓ Obrigada! A sua mensagem foi enviada para a nossa equipa.</p>
+              )}
+              <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
                 <button type="button" onClick={() => setShowDeleteAccount(false)} className="btn">Afinal não, cancelar</button>
+                {deleteReason.trim() && (
+                  <button
+                    type="button"
+                    onClick={handleSendAsSuggestion}
+                    disabled={sendingSuggestion}
+                    className="btn"
+                  >
+                    {sendingSuggestion ? 'A enviar...' : 'Não eliminar, mas enviar esta mensagem à equipa'}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={handleDeleteAccount}
