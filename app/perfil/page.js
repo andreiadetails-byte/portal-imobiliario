@@ -365,18 +365,20 @@ export default function PerfilPage() {
             </button>
           ) : (
             <div>
-              <h2 className="display" style={{ fontSize: 17, marginBottom: 10, color: '#8a3b2a' }}>Eliminar a minha conta</h2>
-              <p style={{ fontSize: 13.5, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 14 }}>
+              <h2 className="display" style={{ fontSize: 19, marginBottom: 12, color: 'var(--ink)' }}>Eliminar a minha conta</h2>
+              <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 14 }}>
                 Antes de avançar, temos pena de o ver sair. O More·ada foi feito para juntar particulares, agências e profissionais num só sítio, sem intermediários obrigatórios — a comunidade só cresce e melhora com quem cá está. Se houver algo que possamos corrigir ou melhorar, diga-nos, temos todo o gosto em ouvir.
               </p>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Tem mesmo a certeza? Esta ação é definitiva e não pode ser desfeita — todos os seus anúncios, mensagens e favoritos serão apagados.</p>
+              <p style={{ fontSize: 14, color: '#8a3b2a', fontWeight: 600, lineHeight: 1.6, marginBottom: 16 }}>
+                Tem mesmo a certeza? Esta ação é definitiva e não pode ser desfeita — todos os seus anúncios, mensagens e favoritos serão apagados.
+              </p>
               <div className="field">
-                <label htmlFor="delete-reason">Pode dizer-nos porquê? (opcional, mas ajuda-nos a melhorar)</label>
-                <textarea id="delete-reason" rows={3} value={deleteReason} onChange={(e) => setDeleteReason(e.target.value)} placeholder="ex: já encontrei o que procurava, não voltei a usar, preços, outro motivo..." />
+                <label htmlFor="delete-reason" style={{ fontSize: 14 }}>Pode dizer-nos porquê? (opcional, mas ajuda-nos a melhorar)</label>
+                <textarea id="delete-reason" rows={3} value={deleteReason} onChange={(e) => setDeleteReason(e.target.value)} placeholder="ex: já encontrei o que procurava, não voltei a usar, preços, outro motivo..." style={{ fontSize: 14 }} />
               </div>
-              {deleteError && <p className="error-text">{deleteError}</p>}
+              {deleteError && <p className="error-text" style={{ fontSize: 13.5 }}>{deleteError}</p>}
               {suggestionSent && (
-                <p style={{ fontSize: 12.5, color: 'var(--telha)', marginBottom: 10 }}>✓ Obrigado! A sua mensagem foi enviada para a nossa equipa.</p>
+                <p style={{ fontSize: 13.5, color: 'var(--telha)', fontWeight: 600, marginBottom: 10 }}>✓ Obrigado! A sua mensagem foi enviada para a nossa equipa.</p>
               )}
               <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
                 <button

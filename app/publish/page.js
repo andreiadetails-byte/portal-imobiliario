@@ -144,10 +144,10 @@ function PublishForm() {
           district: prop.district || '', municipality: prop.municipality || '', parish: prop.parish || '',
           floor: prop.floor || '', area_util: prop.area_util ?? '', house_subtype: prop.house_subtype || '',
           is_top_floor: !!prop.is_top_floor,
-          has_storage: prop.has_storage, has_parking: prop.has_parking, has_balcony: prop.has_balcony,
-          is_furnished: prop.is_furnished, pets_allowed: prop.pets_allowed, near_transit: prop.near_transit,
-          has_garden: prop.has_garden, has_pool: prop.has_pool, has_gym: prop.has_gym, has_coworking: prop.has_coworking,
-          show_full_address: prop.show_full_address,
+          has_storage: prop.has_storage ?? false, has_parking: prop.has_parking ?? false, has_balcony: prop.has_balcony ?? false,
+          is_furnished: prop.is_furnished ?? false, pets_allowed: prop.pets_allowed ?? false, near_transit: prop.near_transit ?? false,
+          has_garden: prop.has_garden ?? false, has_pool: prop.has_pool ?? false, has_gym: prop.has_gym ?? false, has_coworking: prop.has_coworking ?? false,
+          show_full_address: prop.show_full_address ?? false,
         });
         setFeatures(prop.features || []);
         setSolarOrientations(prop.solar_orientations || []);
@@ -1117,7 +1117,7 @@ function PublishForm() {
                 }}
                 disabled={!form.municipality}
               >
-                <option value="">{t('pub_choose_option')}</option>
+                <option value="">{t('pub_choose')}</option>
                 {(freguesiasPorConcelho[form.municipality] || []).map((f) => <option key={f}>{f}</option>)}
                 <option value="__outro__">✎ Não encontras a tua? Escreve aqui</option>
               </select>
@@ -1211,6 +1211,7 @@ function PublishForm() {
             >
               <option value="Venda" disabled={form.property_type === 'Quarto'}>{t('pub_sale')}</option>
               <option value="Arrendamento">{t('pub_rent')}</option>
+              <option value="Trespasse" disabled={form.property_type === 'Quarto'}>{t('pub_trespass')}</option>
             </select>
             {form.property_type === 'Quarto' && (
               <span className="hint" style={{ fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_rooms_rent_only')}</span>

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
-import { translateToAllLanguages } from '../../../lib/translateText';
+import { translateToAllLanguages, lastTranslateError } from '../../../lib/translateText';
 
 async function getVerifiedUserId(request) {
   const authHeader = request.headers.get('authorization') || '';
@@ -60,7 +60,7 @@ export async function POST(request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, translateWarning: lastTranslateError || undefined });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

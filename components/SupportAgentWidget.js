@@ -21,6 +21,24 @@ export default function SupportAgentWidget() {
   const { t } = useLanguage();
   const [agentName, setAgentName] = useState(null);
   const [open, setOpen] = useState(false);
+  const [nearFooter, setNearFooter] = useState(false);
+
+  // Esconde o botão flutuante quando se está perto do fundo da página —
+  // assim não tapa links do rodapé, como o "Livro de Reclamações".
+  useEffect(() => {
+    function checkFooterProximity() {
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const pageHeight = document.documentElement.scrollHeight;
+      setNearFooter(pageHeight - scrollBottom < 180);
+    }
+    checkFooterProximity();
+    window.addEventListener('scroll', checkFooterProximity, { passive: true });
+    window.addEventListener('resize', checkFooterProximity);
+    return () => {
+      window.removeEventListener('scroll', checkFooterProximity);
+      window.removeEventListener('resize', checkFooterProximity);
+    };
+  }, []);
 
   // Permite abrir este balão a partir de outro sítio do site (o novo botão
   // "Suporte" no menu fixo de baixo, no telemóvel) sem precisar de partilhar
@@ -159,7 +177,15 @@ export default function SupportAgentWidget() {
         </div>
       )}
 
-      <div className="support-widget" style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 50 }}>
+      <div
+        className="support-widget"
+        style={{
+          position: 'fixed', bottom: 20, left: 20, zIndex: 50,
+          opacity: (nearFooter && !open) ? 0 : 1,
+          pointerEvents: (nearFooter && !open) ? 'none' : 'auto',
+          transition: 'opacity 0.2s',
+        }}
+      >
         <button
           onClick={() => setOpen((o) => !o)}
           className="support-widget-btn"

@@ -371,6 +371,7 @@ function ResultsInner() {
               <select value={businessType} onChange={(e) => setBusinessType(e.target.value)}>
                 <option value="Venda">{t('results_buy')}</option>
                 <option value="Arrendamento">{t('results_rent')}</option>
+                <option value="Trespasse">{t('pub_trespass')}</option>
               </select>
             </div>
 

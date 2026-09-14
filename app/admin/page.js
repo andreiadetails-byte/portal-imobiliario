@@ -116,6 +116,7 @@ function AdminInner() {
   const [retranslateDone, setRetranslateDone] = useState(false);
   const [retranslateProgress, setRetranslateProgress] = useState({ done: 0, total: 0 });
   const [retranslateFailCount, setRetranslateFailCount] = useState(0);
+  const [retranslateLastError, setRetranslateLastError] = useState('');
   const [geocoding, setGeocoding] = useState(false);
   const [geocodeDone, setGeocodeDone] = useState(false);
   const [geocodeProgress, setGeocodeProgress] = useState({ done: 0, total: 0 });
@@ -536,7 +537,14 @@ function AdminInner() {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
           body: JSON.stringify({ propertyId: ids[i] }),
         });
-        if (!res.ok) failCount++;
+        if (!res.ok) {
+          failCount++;
+          const errBody = await res.json().catch(() => ({}));
+          if (errBody.error) setRetranslateLastError(errBody.error);
+        } else {
+          const okBody = await res.json().catch(() => ({}));
+          if (okBody.translateWarning) setRetranslateLastError(okBody.translateWarning);
+        }
       } catch (err) {
         failCount++;
       }
@@ -2294,6 +2302,11 @@ function AdminInner() {
               {retranslateFailCount > 0
                 ? `⚠ Concluído — ${retranslateProgress.done - retranslateFailCount} traduzidos com sucesso, ${retranslateFailCount} falharam. Corre a ferramenta outra vez para tentar de novo os que falharam.`
                 : `✓ Concluído — ${retranslateProgress.done} imóveis traduzidos.`}
+            </p>
+          )}
+          {retranslateLastError && (
+            <p style={{ fontSize: 12, color: '#8a3b2a', marginTop: 8, fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              Último erro capturado: {retranslateLastError}
             </p>
           )}
         </div>

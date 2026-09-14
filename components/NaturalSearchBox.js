@@ -173,7 +173,7 @@ export default function NaturalSearchBox() {
       // se já ficou algum texto reconhecido, avança logo para a pesquisa —
       // sem isto, parecia que "ouvia, parava, e não fazia nada".
       if (baseTextRef.current.trim()) {
-        setTimeout(() => handleSubmit(), 150);
+        setTimeout(() => handleSubmit(null, baseTextRef.current), 150);
       }
     };
     recognition.onerror = (event) => {
@@ -247,9 +247,10 @@ export default function NaturalSearchBox() {
     }
   }
 
-  function handleSubmit(e) {
+  function handleSubmit(e, overrideText) {
     if (e) e.preventDefault();
-    if (!text.trim()) return;
+    const searchText = overrideText != null ? overrideText : text;
+    if (!searchText.trim()) return;
     if (recognitionRef.current && listening) {
       recognitionRef.current.stop();
       setListening(false);
@@ -257,7 +258,7 @@ export default function NaturalSearchBox() {
 
     let parsed;
     try {
-      parsed = parseDescription(text);
+      parsed = parseDescription(searchText);
     } catch (err) {
       // Se a deteção de palavras falhar por algum motivo, ainda assim vamos para os resultados.
       parsed = { location: '', business: 'Venda', typologies: [], minPrice: '', maxPrice: '', amenities: [], elevator: false };

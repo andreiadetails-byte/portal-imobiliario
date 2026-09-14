@@ -213,7 +213,7 @@ export default function HomePage() {
           <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760, margin: '0 auto', boxShadow: '0 8px 30px rgba(0,0,0,0.25)', overflow: 'visible' }}>
             <div className="home-tabs-search-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
               <div style={{ display: 'flex', gap: 4 }}>
-                {['Venda', 'Arrendamento'].map((bt) => (
+                {['Venda', 'Arrendamento', 'Trespasse'].map((bt) => (
                   <button
                     key={bt}
                     type="button"
@@ -225,7 +225,7 @@ export default function HomePage() {
                       borderBottom: businessType === bt ? '2px solid var(--telha)' : '2px solid transparent',
                     }}
                   >
-                    {bt === 'Venda' ? t('results_buy') : t('results_rent')}
+                    {bt === 'Venda' ? t('results_buy') : bt === 'Arrendamento' ? t('results_rent') : t('pub_trespass')}
                   </button>
                 ))}
               </div>

@@ -60,10 +60,41 @@ export default function PricePerM2Lookup() {
       return;
     }
 
-    // Tenta o nível mais específico primeiro (freguesia), e se não houver imóveis
-    // suficientes, alarga automaticamente para o concelho, depois para o distrito —
-    // assim aparecem sempre resultados reais do site sempre que possível, em vez de
-    // saltar logo para o valor do INE só porque uma freguesia tem poucos anúncios.
+    // Tenta primeiro os valores de referência oficiais (os que foram
+    // fornecidos), do nível mais específico (freguesia) até ao mais
+    // amplo (distrito) — só recorre aos imóveis publicados no site como
+    // último recurso, se não houver nenhum valor de referência disponível.
+    const geoNamesToTry = [levels.freguesia, levels.concelho, levels.distrito].filter(Boolean);
+    let ineMatch = null;
+    let ineWidenedLabel = null;
+    for (const name of geoNamesToTry) {
+      const { data: ineData } = await supabase
+        .from('ine_reference_prices')
+        .select('*')
+        .ilike('geo_name', name)
+        .eq('business_type', businessType)
+        .limit(1)
+        .maybeSingle();
+      if (ineData) {
+        ineMatch = ineData;
+        // Se o valor encontrado não é do nível mais específico pedido, marca
+        // claramente que veio de uma zona mais larga — nunca mostrar um
+        // valor sem dizer exatamente a que zona ele se refere de verdade.
+        if (name !== geoNamesToTry[0]) ineWidenedLabel = name;
+        break;
+      }
+    }
+
+    if (ineMatch) {
+      setResult({ count: 0, ine: ineMatch, ineWidenedLabel });
+      setLoading(false);
+      return;
+    }
+
+    // Sem valor de referência disponível para esta zona — calcula a partir
+    // dos imóveis realmente publicados no site, do nível mais específico
+    // (freguesia) até ao mais amplo (distrito), alargando automaticamente
+    // se não houver imóveis suficientes.
     const levelsToTry = [
       levels.freguesia && { column: 'parish', value: levels.freguesia, label: levels.freguesia },
       levels.concelho && { column: 'municipality', value: levels.concelho, label: levels.concelho },
@@ -98,28 +129,7 @@ export default function PricePerM2Lookup() {
     }
 
     if (!bestMatch) {
-      // Sem imóveis suficientes em nenhum nível — tenta um valor de referência oficial do INE.
-      const geoNamesToTry = [levels.freguesia, levels.concelho, levels.distrito].filter(Boolean);
-      let ineMatch = null;
-      let ineWidenedLabel = null;
-      for (const name of geoNamesToTry) {
-        const { data: ineData } = await supabase
-          .from('ine_reference_prices')
-          .select('*')
-          .ilike('geo_name', name)
-          .eq('business_type', businessType)
-          .limit(1)
-          .maybeSingle();
-        if (ineData) {
-          ineMatch = ineData;
-          // Se o valor encontrado não é do nível mais específico pedido, marca
-          // claramente que veio de uma zona mais larga — nunca mostrar um
-          // valor sem dizer exatamente a que zona ele se refere de verdade.
-          if (name !== geoNamesToTry[0]) ineWidenedLabel = name;
-          break;
-        }
-      }
-      setResult({ count: 0, ine: ineMatch, ineWidenedLabel });
+      setResult({ count: 0, ine: null, ineWidenedLabel: null });
     } else {
       const { pricesPerM2, label, widened } = bestMatch;
       const avg = pricesPerM2.reduce((sum, v) => sum + v, 0) / pricesPerM2.length;
@@ -137,7 +147,7 @@ export default function PricePerM2Lookup() {
     <div className="card" style={{ padding: 24 }}>
       <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('pricem2_title')}</h3>
       <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
-        Consulta o preço médio de venda por m² numa freguesia, concelho ou distrito, com base nos imóveis publicados no site.
+        Consulta o preço médio de venda por m² numa freguesia, concelho ou distrito, com base em valores de referência oficiais.
       </p>
 
       <div style={{ position: 'relative' }}>
