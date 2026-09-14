@@ -101,7 +101,11 @@ function MensagensSuporteInner() {
 
   async function deleteReply(requestId, replyId) {
     if (!confirm('Apagar esta mensagem? Esta ação não pode ser desfeita.')) return;
-    await supabase.from('support_replies').delete().eq('id', replyId);
+    const { data, error } = await supabase.from('support_replies').delete().eq('id', replyId).select();
+    if (error || !data || data.length === 0) {
+      alert('Não foi possível apagar esta mensagem (sem permissão ou já foi apagada). Tente novamente ou contacte o suporte.');
+      return;
+    }
     setSupportThreads((cur) => cur.map((r) => (
       r.id === requestId ? { ...r, replies: r.replies.filter((rep) => rep.id !== replyId) } : r
     )));
@@ -216,7 +220,7 @@ function MensagensSuporteInner() {
                           >
                             {rep.message}
                           </div>
-                          {rep.sender_role === 'user' && !rep.read_at && (
+                          {rep.sender_role === 'user' && (
                             <button
                               onClick={() => deleteReply(activeThread.id, rep.id)}
                               aria-label={t('attr_delete_message')}
