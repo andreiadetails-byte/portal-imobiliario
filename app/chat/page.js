@@ -311,7 +311,10 @@ function ChatInner() {
         <div className="empty-state">{t('chat_empty')}</div>
       ) : (
         <div className="card chat-grid" style={{ display: 'grid', gridTemplateColumns: '460px 1fr', height: 'calc(100vh - 200px)', minHeight: 420, maxHeight: 700, overflow: 'hidden' }}>
-          <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, background: 'linear-gradient(160deg, rgba(139,90,60,0.38) 0%, rgba(107,122,82,0.32) 35%, rgba(201,162,39,0.30) 70%, rgba(216,201,163,0.4) 100%)' }}>
+          <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, position: 'relative' }}>
+            <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.55)', zIndex: 0 }} />
+            <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             <div style={{ padding: 14, borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
               <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
                 {[['todas', t('chat_filter_all')], ['nao_lidos', t('chat_filter_unread')], ['pendentes', t('chat_filter_pending')], ['tratadas', t('chat_filter_handled')]].map(([value, label]) => (
@@ -445,6 +448,7 @@ function ChatInner() {
                 );
               })}
             </div>
+          </div>
           </div>
 
           <div className={`chat-thread-col${activeId ? '' : ' chat-hide-mobile'}`} style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
