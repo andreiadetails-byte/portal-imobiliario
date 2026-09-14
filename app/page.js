@@ -776,9 +776,9 @@ export default function HomePage() {
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
         <div className="wrap" style={{ padding: '48px 32px 32px' }}>
           <div style={{ background: 'var(--plaster)', borderRadius: 12, padding: '28px 32px', marginBottom: 40, textAlign: 'center' }}>
-            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>📬 Subscreva a nossa newsletter semanal</h3>
+            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('newsletter_title')}</h3>
             <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto' }}>
-              Novidades do mercado imobiliário, e os melhores imóveis novos, direto no seu email — uma vez por semana, sem spam.
+              {t('newsletter_subtitle')}
             </p>
             <div style={{ maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
               <NewsletterSignup />

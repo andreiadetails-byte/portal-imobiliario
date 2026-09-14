@@ -298,7 +298,7 @@ function ChatInner() {
       return name.toLowerCase().includes(term) || contact.includes(term) || propText.includes(term);
     });
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>);
 
   return (
     <>
@@ -359,11 +359,11 @@ function ChatInner() {
                       display: 'flex', gap: 12, padding: '16px 16px', margin: '0 10px 12px',
                       border: c.id === activeId ? '1.5px solid var(--telha)' : '1px solid var(--line)',
                       borderRadius: 8, cursor: 'pointer',
-                      background: c.id === activeId ? 'var(--plaster)' : 'rgba(255,255,255,0.55)', alignItems: 'flex-start',
+                      background: c.id === activeId ? 'var(--telha)' : 'rgba(79,139,74,0.82)', alignItems: 'flex-start',
                     }}
                   >
                     <div style={{
-                      width: 42, height: 42, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
+                      width: 42, height: 42, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', color: '#fff',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, flexShrink: 0,
                     }}>
                       {initials || '?'}
@@ -371,8 +371,8 @@ function ChatInner() {
 
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
-                        <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{name}</b>
-                        <span style={{ fontSize: 11.5, color: 'var(--text-soft)', flexShrink: 0, textAlign: 'right' }}>
+                        <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, color: '#fff' }}>{name}</b>
+                        <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.85)', flexShrink: 0, textAlign: 'right' }}>
                           {c.lastMessage ? (
                             <>
                               {new Date(c.lastMessage.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
@@ -383,7 +383,7 @@ function ChatInner() {
                         </span>
                       </div>
                       {contact && (
-                        <div style={{ fontSize: 13, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                           {contact}
                         </div>
                       )}
@@ -599,7 +599,7 @@ function ChatInner() {
 
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div className="wrap" style={{ padding: 60 }}>...</div>}>
+    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div>}>
       <ChatInner />
     </Suspense>
   );

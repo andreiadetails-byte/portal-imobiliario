@@ -11,7 +11,7 @@ export default function SimuladorInvestimentoPage() {
   return (
     <>
       <Header />
-      <div className="wrap" style={{ maxWidth: 560, padding: '48px 32px 80px' }}>
+      <div className="wrap" style={{ maxWidth: 560, padding: '48px 32px 80px' , background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <BackButton fallback="/" />
         <InvestmentProfitCalculator showTitle />
       </div>

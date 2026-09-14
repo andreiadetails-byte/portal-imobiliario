@@ -251,7 +251,7 @@ function DashboardInner() {
     setFeaturedProofFile(null);
   }
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>);
 
   return (
     <>
@@ -635,7 +635,7 @@ function DashboardInner() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="wrap" style={{ padding: 60 }}>...</div>}>
+    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div>}>
       <DashboardInner />
     </Suspense>
   );

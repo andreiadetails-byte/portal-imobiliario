@@ -130,8 +130,8 @@ export default function AgencyPage() {
     if (id) load();
   }, [id]);
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
-  if (!profile) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('agency_profile_not_found')}</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>);
+  if (!profile) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('agency_profile_not_found')}</div></>);
 
   const displayName = displayNameOverride || profile.agency_name || profile.full_name;
   const initials = (displayName || '?')

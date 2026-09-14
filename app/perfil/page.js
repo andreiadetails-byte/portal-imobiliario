@@ -212,7 +212,7 @@ export default function PerfilPage() {
     }
   }
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('perfil_loading')}</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('perfil_loading')}</div></>);
 
   return (
     <>
@@ -367,7 +367,7 @@ export default function PerfilPage() {
             <div>
               <h2 className="display" style={{ fontSize: 17, marginBottom: 10, color: '#8a3b2a' }}>Eliminar a minha conta</h2>
               <p style={{ fontSize: 13.5, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 14 }}>
-                Antes de avançar, temos pena de a ver sair. O More·ada foi feito para juntar particulares, agências e profissionais num só sítio, sem intermediários obrigatórios — a comunidade só cresce e melhora com quem cá está. Se houver algo que possamos corrigir ou melhorar, diga-nos, temos todo o gosto em ouvir.
+                Antes de avançar, temos pena de o ver sair. O More·ada foi feito para juntar particulares, agências e profissionais num só sítio, sem intermediários obrigatórios — a comunidade só cresce e melhora com quem cá está. Se houver algo que possamos corrigir ou melhorar, diga-nos, temos todo o gosto em ouvir.
               </p>
               <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Tem mesmo a certeza? Esta ação é definitiva e não pode ser desfeita — todos os seus anúncios, mensagens e favoritos serão apagados.</p>
               <div className="field">
@@ -376,20 +376,17 @@ export default function PerfilPage() {
               </div>
               {deleteError && <p className="error-text">{deleteError}</p>}
               {suggestionSent && (
-                <p style={{ fontSize: 12.5, color: 'var(--telha)', marginBottom: 10 }}>✓ Obrigada! A sua mensagem foi enviada para a nossa equipa.</p>
+                <p style={{ fontSize: 12.5, color: 'var(--telha)', marginBottom: 10 }}>✓ Obrigado! A sua mensagem foi enviada para a nossa equipa.</p>
               )}
               <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
-                <button type="button" onClick={() => setShowDeleteAccount(false)} className="btn">Afinal não, cancelar</button>
-                {deleteReason.trim() && (
-                  <button
-                    type="button"
-                    onClick={handleSendAsSuggestion}
-                    disabled={sendingSuggestion}
-                    className="btn"
-                  >
-                    {sendingSuggestion ? 'A enviar...' : 'Não eliminar, mas enviar esta mensagem à equipa'}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={handleSendAsSuggestion}
+                  disabled={sendingSuggestion || !deleteReason.trim()}
+                  className="btn"
+                >
+                  {sendingSuggestion ? 'A enviar...' : 'Não eliminar, mas enviar esta mensagem à equipa'}
+                </button>
                 <button
                   type="button"
                   onClick={handleDeleteAccount}

@@ -13,11 +13,11 @@ export default function HoneypotField({ value, onChange }) {
   return (
     <input
       type="text"
-      name="website"
+      name="hp_field_x7q"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       tabIndex={-1}
-      autoComplete="off"
+      autoComplete="new-password"
       aria-hidden="true"
       style={{
         position: 'absolute', left: '-9999px', width: 1, height: 1,

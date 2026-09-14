@@ -11,7 +11,7 @@ export default function SimuladorArrendarComprarPage() {
   return (
     <>
       <Header />
-      <div className="wrap" style={{ maxWidth: 620, padding: '48px 32px 80px' }}>
+      <div className="wrap" style={{ maxWidth: 620, padding: '48px 32px 80px' , background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <BackButton fallback="/" />
         <RentVsBuyCalculator price={200000} showTitle />
       </div>

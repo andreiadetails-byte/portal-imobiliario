@@ -259,7 +259,7 @@ export default function FavoritesPage() {
   }
 
   if (loading) return (
-    <><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>
+    <><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>
   );
 
   return (

@@ -33,6 +33,7 @@ export default function LoginPage() {
   const [forgotSent, setForgotSent] = useState(false);
   const [signupEmailSent, setSignupEmailSent] = useState(false);
   const [signupFreeMonths, setSignupFreeMonths] = useState(1);
+  const [requiresImmediatePayment, setRequiresImmediatePayment] = useState(false);
 
   async function handleForgotPassword(e) {
     e.preventDefault();
@@ -187,6 +188,7 @@ export default function LoginPage() {
           });
           const trialData = await trialRes.json();
           if (trialData.months) signupFreeMonthsValue = trialData.months;
+          if (trialData.reason === 'previously_deleted') setRequiresImmediatePayment(true);
         } catch (err) {
           // Se isto falhar, a conta continua criada — o admin pode
           // confirmar a subscrição manualmente mais tarde.
@@ -278,7 +280,7 @@ export default function LoginPage() {
                           id="coupon-input-google"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
-                          placeholder="ex: MOREADA3"
+                          placeholder=""
                           style={{ textTransform: 'uppercase' }}
                         />
                       </>
@@ -329,13 +331,26 @@ export default function LoginPage() {
             </p>
             {PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType) && (
               <div style={{ background: 'var(--plaster)', borderRadius: 8, padding: 16, marginBottom: 20, textAlign: 'left' }}>
-                <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-                  🎁 {signupFreeMonths === 1 ? 'O seu primeiro mês é grátis' : `Tem ${signupFreeMonths} meses grátis`}
-                </p>
-                <p style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
-                  Depois de confirmar o email, tem acesso total ao painel durante {signupFreeMonths === 1 ? '1 mês' : `${signupFreeMonths} meses`}, sem qualquer custo.
-                  Passado esse período, a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €/mês, por transferência bancária.
-                </p>
+                {requiresImmediatePayment ? (
+                  <>
+                    <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+                      💳 Esta conta precisa de pagamento já
+                    </p>
+                    <p style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
+                      Depois de confirmar o email, para ativar a conta é preciso fazer a transferência da mensalidade de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €, e anexar o comprovativo no seu painel.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+                      🎁 {signupFreeMonths === 1 ? 'O seu primeiro mês é grátis' : `Tem ${signupFreeMonths} meses grátis`}
+                    </p>
+                    <p style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
+                      Depois de confirmar o email, tem acesso total ao painel durante {signupFreeMonths === 1 ? '1 mês' : `${signupFreeMonths} meses`}, sem qualquer custo.
+                      Passado esse período, a mensalidade é de {PAYMENT_INFO.subscriptionFee.toFixed(2)} €/mês, por transferência bancária.
+                    </p>
+                  </>
+                )}
               </div>
             )}
             <button
@@ -441,7 +456,7 @@ export default function LoginPage() {
                       id="coupon-input"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
-                      placeholder="ex: MOREADA3"
+                      placeholder=""
                       style={{ textTransform: 'uppercase' }}
                     />
                   </>

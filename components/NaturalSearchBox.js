@@ -164,7 +164,18 @@ export default function NaturalSearchBox() {
         setInterimText(interimChunk);
       }
     };
-    recognition.onend = () => { startingRef.current = false; setRequestingMic(false); setListening(false); setInterimText(''); };
+    recognition.onend = () => {
+      startingRef.current = false;
+      setRequestingMic(false);
+      setListening(false);
+      setInterimText('');
+      // Quando o microfone para (silêncio, ou a pessoa carregou para parar),
+      // se já ficou algum texto reconhecido, avança logo para a pesquisa —
+      // sem isto, parecia que "ouvia, parava, e não fazia nada".
+      if (baseTextRef.current.trim()) {
+        setTimeout(() => handleSubmit(), 150);
+      }
+    };
     recognition.onerror = (event) => {
       startingRef.current = false;
       setRequestingMic(false);

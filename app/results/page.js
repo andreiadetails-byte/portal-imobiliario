@@ -931,7 +931,7 @@ function ResultsInner() {
 
 export default function ResultsPage() {
   return (
-    <Suspense fallback={<div className="wrap" style={{ padding: 60 }}>...</div>}>
+    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div>}>
       <ResultsInner />
     </Suspense>
   );

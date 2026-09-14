@@ -39,6 +39,7 @@ export default function CompararPage() {
     { label: t('comparar_row_transit'), get: (p) => yesNo(p.near_transit) },
     { label: t('comparar_row_furnished'), get: (p) => (p.is_furnished ? t('comparar_yes') : p.business_type === 'Arrendamento' ? t('comparar_no') : '—') },
     { label: t('comparar_row_pets'), get: (p) => (p.pets_allowed ? t('comparar_yes') : p.business_type === 'Arrendamento' ? t('comparar_no') : '—') },
+    { label: 'As minhas notas', get: (p) => p.personalNote || '—' },
   ];
 
   useEffect(() => {
@@ -49,8 +50,20 @@ export default function CompararPage() {
         .from('properties')
         .select('*, property_photos(url, thumbnail_url, position)')
         .in('id', ids);
+
+      // Vai também buscar as notas pessoais que a pessoa escreveu nestes
+      // imóveis nos favoritos, para aparecerem na comparação e no PDF.
+      const { data: { user } } = await supabase.auth.getUser();
+      let notesById = {};
+      if (user) {
+        const { data: favData } = await supabase
+          .from('favorites').select('property_id, notes').eq('user_id', user.id).in('property_id', ids);
+        notesById = Object.fromEntries((favData || []).map((f) => [f.property_id, f.notes || '']));
+      }
+
       // Mantém a ordem em que foram selecionados.
-      const ordered = ids.map((id) => (data || []).find((p) => p.id === id)).filter(Boolean);
+      const ordered = ids.map((id) => (data || []).find((p) => p.id === id)).filter(Boolean)
+        .map((p) => ({ ...p, personalNote: notesById[p.id] || '' }));
       setProperties(ordered);
       setLoading(false);
     }

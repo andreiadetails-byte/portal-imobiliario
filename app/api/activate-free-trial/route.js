@@ -20,6 +20,23 @@ export async function POST(request) {
       return Response.json({ success: true, applied: false });
     }
 
+    // Se este email já teve uma conta eliminada antes, não volta a ter
+    // direito ao período grátis inicial — evita que alguém elimine e crie
+    // conta de novo só para repetir o desconto.
+    const { data: { user: authUser } } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const email = authUser?.email;
+    if (email) {
+      const { data: priorDeletion } = await supabaseAdmin
+        .from('account_deletions').select('id').eq('email', email).limit(1).maybeSingle();
+      if (priorDeletion) {
+        // Marca a conta como precisando de pagar já, sem período grátis.
+        await supabaseAdmin.from('profiles').update({
+          subscription_status: 'pending',
+        }).eq('id', userId);
+        return Response.json({ success: true, applied: false, reason: 'previously_deleted' });
+      }
+    }
+
     const months = couponMonths > 0 ? couponMonths : 1;
     const freeUntil = new Date();
     freeUntil.setMonth(freeUntil.getMonth() + months);

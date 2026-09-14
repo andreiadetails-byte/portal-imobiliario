@@ -70,7 +70,7 @@ export default function AssinaturaPage() {
     router.push('/');
   }
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>...</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>);
 
   function renewalBlock() {
     return (

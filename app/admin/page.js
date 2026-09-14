@@ -1048,13 +1048,13 @@ function AdminInner() {
     alert('Anúncio apagado definitivamente. O anunciante foi avisado.');
   }
 
-  if (checking) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('admin_checking_access')}</div></>);
+  if (checking) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('admin_checking_access')}</div></>);
 
   if (!allowed) {
     return (
       <>
         <Header />
-        <div className="wrap" style={{ padding: 60 }}>
+        <div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
           <h1 className="display" style={{ fontSize: 22 }}>{t('admin_no_access_title')}</h1>
           <p style={{ color: 'var(--text-soft)' }}>{t('admin_no_access_text')}</p>
         </div>
@@ -1858,6 +1858,42 @@ function AdminInner() {
 
       {section === 'atividade' && (
         <>
+          <h3 className="display" style={{ fontSize: 16, marginBottom: 4 }}>Contas criadas recentemente</h3>
+          <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
+            As últimas 20 contas a aderirem ao More·ada.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 32 }}>
+            {[...allUsers]
+              .filter((u) => u.created_at)
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .slice(0, 20)
+              .map((u) => (
+                <div key={u.id} className="card" style={{ padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    {u.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={u.avatar_url} alt="" loading="lazy" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{
+                        width: 32, height: 32, borderRadius: '50%', background: 'var(--gold-strong)', color: '#fff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13,
+                      }}>
+                        {(u.agency_name || u.full_name || '?')[0].toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <b style={{ fontSize: 13.5 }}>{u.agency_name || u.full_name}</b>
+                      <div className="meta">{u.email}</div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
+                    {new Date(u.created_at).toLocaleDateString('pt-PT')} às {new Date(u.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              ))}
+          </div>
+
+          <h3 className="display" style={{ fontSize: 16, marginBottom: 4 }}>Última visita</h3>
           <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 20 }}>
             Última vez que cada utilizador com conta visitou o site (atualizado no máximo de hora a hora, por visita).
             Visitantes sem conta não aparecem aqui — para esses, usa o Google Analytics.
@@ -2298,7 +2334,7 @@ function AdminInner() {
 
 export default function AdminPage() {
   return (
-    <Suspense fallback={<div className="wrap" style={{ padding: 60 }}>...</div>}>
+    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div>}>
       <AdminInner />
     </Suspense>
   );

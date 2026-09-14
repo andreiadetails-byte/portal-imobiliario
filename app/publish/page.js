@@ -58,6 +58,7 @@ function PublishForm() {
   const [user, setUser] = useState(null);
   const [loadingEdit, setLoadingEdit] = useState(isEditMode);
   const [existingPhotoCount, setExistingPhotoCount] = useState(0);
+  const [existingPhotos, setExistingPhotos] = useState([]);
   const [limitReached, setLimitReached] = useState(false);
   const [accountLimit, setAccountLimit] = useState(50);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -79,8 +80,8 @@ function PublishForm() {
   const [documentFile, setDocumentFile] = useState(null);
 
   const [form, setForm] = useState({
-    title: '', internal_reference: '', description: '', property_type: 'Apartamento', typology: 'T3',
-    business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: 3, bathrooms: 2,
+    title: '', internal_reference: '', description: '', property_type: '', typology: '',
+    business_type: 'Venda', price: '', condo_fee: '', area: '', bedrooms: '', bathrooms: '',
     state: '', energy_certificate: '', construction_year: '', address: '', district: '', municipality: '', parish: '',
     floor: '', area_util: '', house_subtype: '', is_top_floor: false,
     has_storage: null, has_parking: null, has_balcony: null,
@@ -158,8 +159,9 @@ function PublishForm() {
           setParishManual(true);
         }
 
-        const { count } = await supabase.from('property_photos').select('id', { count: 'exact', head: true }).eq('property_id', editId);
-        setExistingPhotoCount(count || 0);
+        const { data: photosData } = await supabase.from('property_photos').select('id, url, thumbnail_url, position').eq('property_id', editId).order('position');
+        setExistingPhotos(photosData || []);
+        setExistingPhotoCount(photosData?.length || 0);
 
         setLoadingEdit(false);
       }
@@ -497,6 +499,13 @@ function PublishForm() {
     setTimeout(() => el.classList.remove('field-invalid'), 2500);
   }
 
+  async function deleteExistingPhoto(photoId) {
+    if (!confirm('Apagar esta foto? Esta ação não pode ser desfeita.')) return;
+    await supabase.from('property_photos').delete().eq('id', photoId);
+    setExistingPhotos((cur) => cur.filter((p) => p.id !== photoId));
+    setExistingPhotoCount((cur) => Math.max(0, cur - 1));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
@@ -739,13 +748,13 @@ function PublishForm() {
     })();
   }
 
-  if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('pub_checking_session')}</div></>);
+  if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('pub_checking_session')}</div></>);
 
   if (limitReached) {
     return (
       <>
         <Header />
-        <div className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center' }}>
+        <div className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
           <div style={{
             width: 56, height: 56, borderRadius: '50%', background: '#b8452f', color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, margin: '0 auto 20px',
@@ -766,7 +775,7 @@ function PublishForm() {
     return (
       <>
         <Header />
-        <div className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center' }}>
+        <div className="wrap" style={{ maxWidth: 480, padding: '80px 32px', textAlign: 'center', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
           <div style={{
             width: 56, height: 56, borderRadius: '50%', background: 'var(--azulejo)', color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, margin: '0 auto 20px',
@@ -866,14 +875,15 @@ function PublishForm() {
                 }
               }}
             >
+              <option value="" disabled>-- Escolha --</option>
               {TIPOS_IMOVEL.map((t) => <option key={t}>{t}</option>)}
             </select>
           </div>
           {['Apartamento', 'Moradia'].includes(form.property_type) && (
             <div className="field">
-              <label>{t('pub_typology')}</label>
+              <label>{t('pub_typology')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
               <select
-                value={form.typology || 'T0'}
+                value={form.typology || ''}
                 onChange={(e) => {
                   const novaTipologia = e.target.value;
                   updateField('typology', novaTipologia);
@@ -881,6 +891,7 @@ function PublishForm() {
                   if (sugerido !== undefined) updateField('bedrooms', sugerido);
                 }}
               >
+                <option value="" disabled>-- Escolha --</option>
                 {['T0', 'T1', 'T2', 'T3', 'T4', 'T5+'].map((t) => <option key={t}>{t}</option>)}
               </select>
             </div>
@@ -1260,6 +1271,28 @@ function PublishForm() {
 
         <div className="field" id="field-photos">
           <label>{t('pub_photos')} {isEditMode && <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_already_has_photos').replace('{n}', existingPhotoCount)}</span>}</label>
+          {isEditMode && existingPhotos.length > 0 && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+              {existingPhotos.map((p) => (
+                <div key={p.id} style={{ position: 'relative', width: 80, height: 64 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.thumbnail_url || p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 5 }} />
+                  <button
+                    type="button"
+                    onClick={() => deleteExistingPhoto(p.id)}
+                    aria-label="Apagar esta foto"
+                    style={{
+                      position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%',
+                      background: '#8a3b2a', color: '#fff', border: '2px solid #fff', cursor: 'pointer',
+                      fontSize: 11, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 8 }}>
             <label
               htmlFor="photo-input"
@@ -1385,7 +1418,7 @@ function PublishForm() {
 
 export default function PublishPage() {
   return (
-    <Suspense fallback={<div className="wrap" style={{ padding: 60 }}>...</div>}>
+    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div>}>
       <PublishForm />
     </Suspense>
   );

@@ -264,7 +264,16 @@ export default function PropertyClient() {
       <Header />
     <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
       <button
-        onClick={() => (typeof window !== 'undefined' && window.history.length > 1 ? router.back() : router.push('/results'))}
+        onClick={() => {
+          if (typeof window === 'undefined') return;
+          if (window.history.length > 1) { router.back(); return; }
+          // Se não há histórico (ex: abriu-se numa aba nova a partir de um
+          // link nas mensagens), tenta fechar essa aba — a página de onde
+          // veio continua aberta noutra aba. Só cai para resultados se o
+          // navegador não deixar fechar (ex: aba não aberta por script).
+          window.close();
+          setTimeout(() => { if (!window.closed) router.push('/results'); }, 200);
+        }}
         className="btn"
         style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 20, padding: '9px 16px' }}
       >
