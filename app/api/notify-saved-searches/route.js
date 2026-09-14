@@ -30,7 +30,16 @@ export async function POST(request) {
       return Response.json({ error: 'Não autorizado.' }, { status: 401 });
     }
 
-    const payload = await request.json();
+    // Lê o corpo como texto simples e interpreta manualmente como JSON —
+    // mais tolerante do que request.json(), que às vezes falha consoante o
+    // cabeçalho Content-Type exato que o Supabase envia.
+    const rawBody = await request.text();
+    let payload;
+    try {
+      payload = JSON.parse(rawBody);
+    } catch {
+      return Response.json({ error: 'Corpo do pedido inválido (não é JSON válido).' }, { status: 400 });
+    }
     const property = payload.record;
     const oldProperty = payload.old_record;
 
