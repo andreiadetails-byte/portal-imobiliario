@@ -79,7 +79,7 @@ export async function POST(request) {
       </div>
     `;
 
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: email,
       subject: `Nova mensagem de ${senderName}${property ? ` — ${property.typology} · ${property.address}` : ''}`,
       html: renderEmail({
@@ -89,6 +89,13 @@ export async function POST(request) {
         ctaUrl: `${SITE_URL}/chat?c=${message.conversation_id}`,
       }),
     });
+
+    if (emailResult.error) {
+      // A notificação no sino já foi criada com sucesso (acima) — isto só
+      // regista que o EMAIL especificamente falhou, sem afetar essa parte.
+      console.error('Falha ao enviar email de nova mensagem:', emailResult.error);
+      return Response.json({ notificationCreated: true, emailError: emailResult.error }, { status: 200 });
+    }
 
     return Response.json({ success: true });
   } catch (err) {
