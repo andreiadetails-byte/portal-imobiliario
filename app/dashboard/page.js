@@ -165,7 +165,8 @@ function DashboardInner() {
     // Contas profissionais (agência/consultor/promotor) podem ter até 3
     // imóveis em destaque ao mesmo tempo; contas particulares só 1.
     const featuredLimit = profile?.is_admin ? Infinity : (isProfessionalAccount(profile?.account_type) ? 3 : 1);
-    if ((await countFeatured()) >= featuredLimit) {
+    const currentCount = await countFeatured();
+    if (currentCount >= featuredLimit) {
       alert(`Só pode ter até ${featuredLimit} anúncio${featuredLimit > 1 ? 's' : ''} em destaque ao mesmo tempo. Tem de anular o destaque de um deles antes de destacar outro.`);
       return;
     }
@@ -187,6 +188,14 @@ function DashboardInner() {
       setFeaturedModal(id);
       return;
     }
+
+    // Explica exatamente o que vai acontecer, antes de confirmar — quantos
+    // já tem em destaque, por quanto tempo, e como isso aparece no site.
+    if (!profile?.is_admin) {
+      const confirmMsg = `Vai destacar este imóvel (${currentCount + 1}/${featuredLimit} destaques usados).\n\nFica em destaque durante 7 dias, com a etiqueta "★ DESTAQUE" a aparecer de forma aleatória entre os imóveis em destaque na página principal do More·ada.\n\nAo fim dos 7 dias, o destaque termina automaticamente e é avisado(a) por notificação.\n\nConfirma?`;
+      if (!confirm(confirmMsg)) return;
+    }
+
     // Destaque grátis, por 7 dias: ativa logo, sem pedir pagamento.
     const featuredUntil = new Date();
     featuredUntil.setDate(featuredUntil.getDate() + 7);

@@ -375,7 +375,14 @@ function ChatInner() {
                         </div>
                       )}
 
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
+                      <div
+                        onClick={(e) => {
+                          if (!c.properties?.id) return;
+                          e.stopPropagation();
+                          window.open(`/property/${c.properties.id}`, '_blank');
+                        }}
+                        style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6, cursor: c.properties?.id ? 'pointer' : 'default' }}
+                      >
                         {photo ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={photo} alt={t('attr_photo_conversation')} loading="lazy" style={{ width: 32, height: 26, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
@@ -383,7 +390,7 @@ function ChatInner() {
                           <div style={{ width: 32, height: 26, borderRadius: 3, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
                         )}
                         <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                          <div style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textDecoration: c.properties?.id ? 'underline' : 'none', textDecorationColor: 'var(--line)' }}>
                             {c.properties?.typology} · {c.properties?.address}
                           </div>
                           <div style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
