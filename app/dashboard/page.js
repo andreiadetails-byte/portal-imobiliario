@@ -439,13 +439,13 @@ function DashboardInner() {
                 )}
 
                 {totalPages > 1 && (
-                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                       <button
                         key={pageNum}
                         onClick={() => setListingPages((cur) => ({ ...cur, [activeGroup.key]: pageNum }))}
                         className="btn"
-                        style={{ fontSize: 13, background: currentPage === pageNum ? 'var(--telha)' : 'var(--paper)', color: currentPage === pageNum ? '#fff' : 'var(--ink)' }}
+                        style={{ fontSize: 13, minWidth: 36, padding: '6px 10px', background: currentPage === pageNum ? 'var(--telha)' : 'var(--paper)', color: currentPage === pageNum ? '#fff' : 'var(--ink)' }}
                       >
                         {pageNum}
                       </button>
