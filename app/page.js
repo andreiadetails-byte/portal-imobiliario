@@ -13,6 +13,7 @@ import PricePerM2Lookup from '../components/PricePerM2Lookup';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import { distritos } from '../lib/locations';
 import NaturalSearchBox from '../components/NaturalSearchBox';
+import NewsletterSignup from '../components/NewsletterSignup';
 import LazyMount from '../components/LazyMount';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../lib/localFavorites';
 import PhoneDisplay from '../components/PhoneDisplay';
@@ -774,6 +775,15 @@ export default function HomePage() {
 
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
         <div className="wrap" style={{ padding: '48px 32px 32px' }}>
+          <div style={{ background: 'var(--plaster)', borderRadius: 12, padding: '28px 32px', marginBottom: 40, textAlign: 'center' }}>
+            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>📬 Subscreva a nossa newsletter semanal</h3>
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto' }}>
+              Novidades do mercado imobiliário, e os melhores imóveis novos, direto no seu email — uma vez por semana, sem spam.
+            </p>
+            <div style={{ maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
+              <NewsletterSignup />
+            </div>
+          </div>
           <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 32 }}>
             <div>
               <h5 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-soft)', marginBottom: 14 }}>

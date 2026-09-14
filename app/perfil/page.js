@@ -36,6 +36,10 @@ export default function PerfilPage() {
   const [savingPassword, setSavingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSaved, setPasswordSaved] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -170,6 +174,25 @@ export default function PerfilPage() {
     setConfirmPassword('');
     setPasswordSaved(true);
     setTimeout(() => setPasswordSaved(false), 3000);
+  }
+
+  async function handleDeleteAccount() {
+    setDeleteError('');
+    setDeletingAccount(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/delete-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ reason: deleteReason.trim() }),
+    });
+    if (res.ok) {
+      await supabase.auth.signOut();
+      router.push('/');
+    } else {
+      const { error } = await res.json();
+      setDeleteError(error || 'Não foi possível eliminar a conta. Tente novamente.');
+      setDeletingAccount(false);
+    }
   }
 
   if (loading) return (<><Header /><div className="wrap" style={{ padding: 60 }}>{t('perfil_loading')}</div></>);
@@ -313,6 +336,43 @@ export default function PerfilPage() {
           </button>
           {passwordSaved && <span style={{ fontSize: 12.5, color: 'var(--telha)', marginLeft: 12 }}>✓ {t('perfil_password_changed')}</span>}
         </form>
+
+        <div className="card" style={{ padding: 24, marginTop: 24, borderColor: '#e0c9c0' }}>
+          {!showDeleteAccount ? (
+            <button
+              type="button"
+              onClick={() => setShowDeleteAccount(true)}
+              style={{ background: 'none', border: 'none', color: '#8a3b2a', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+            >
+              Quero eliminar a minha conta
+            </button>
+          ) : (
+            <div>
+              <h2 className="display" style={{ fontSize: 17, marginBottom: 10, color: '#8a3b2a' }}>Eliminar a minha conta</h2>
+              <p style={{ fontSize: 13.5, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 14 }}>
+                Antes de avançar, temos pena de a ver sair. O More·ada foi feito para juntar particulares, agências e profissionais num só sítio, sem intermediários obrigatórios — a comunidade só cresce e melhora com quem cá está. Se houver algo que possamos corrigir ou melhorar, diga-nos, temos todo o gosto em ouvir.
+              </p>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Tem mesmo a certeza? Esta ação é definitiva e não pode ser desfeita — todos os seus anúncios, mensagens e favoritos serão apagados.</p>
+              <div className="field">
+                <label htmlFor="delete-reason">Pode dizer-nos porquê? (opcional, mas ajuda-nos a melhorar)</label>
+                <textarea id="delete-reason" rows={3} value={deleteReason} onChange={(e) => setDeleteReason(e.target.value)} placeholder="ex: já encontrei o que procurava, não voltei a usar, preços, outro motivo..." />
+              </div>
+              {deleteError && <p className="error-text">{deleteError}</p>}
+              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+                <button type="button" onClick={() => setShowDeleteAccount(false)} className="btn">Afinal não, cancelar</button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount}
+                  className="btn"
+                  style={{ background: '#8a3b2a', color: '#fff', borderColor: '#8a3b2a' }}
+                >
+                  {deletingAccount ? 'A eliminar...' : 'Sim, eliminar definitivamente'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </>
   );

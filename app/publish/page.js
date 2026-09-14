@@ -15,7 +15,7 @@ import { containsOffensiveLanguage, containsLink } from '../../lib/contentModera
 
 const CARACTERISTICAS = [
   'Elevador', 'Cozinha equipada', 'Aquecimento central', 'Ar condicionado', 'Terraço',
-  'Mobilado', 'Painéis solares', 'Vista de mar', 'Vista de rio', 'Portaria / segurança', 'Lareira',
+  'Mobilado', 'Painéis solares', 'Vista de mar', 'Vista de rio', 'Portaria / segurança', 'Lareira', 'Autocarro',
 ];
 
 const TIPOS_IMOVEL = ['Apartamento', 'Moradia', 'Terreno', 'Espaço comercial', 'Armazém', 'Escritório', 'Quarto'];
@@ -27,7 +27,7 @@ function YesNoField({ label, value, onChange, id }) {
   const { t } = useLanguage();
   return (
     <div className="field" id={id}>
-      <label>{label}</label>
+      <label>{label} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
       <div style={{ display: 'flex', gap: 8 }}>
         {[{ v: true, l: t('yesno_yes') }, { v: false, l: t('yesno_no') }].map((opt) => (
           <button
@@ -585,7 +585,7 @@ function PublishForm() {
     const stripAsterisks = (text) => (text || '').replace(/\*+/g, '');
 
     const propertyFields = {
-      title: stripAsterisks(form.title) || `${form.typology || form.property_type} · ${form.address}`,
+      title: stripAsterisks(form.title) || `${form.property_type || 'Imóvel'} ${form.typology || ''} na ${form.address}${form.municipality ? `, no concelho de ${form.municipality}` : ''}`.replace(/\s+/g, ' ').trim(),
       internal_reference: form.internal_reference || null,
       display_name: form.display_name || null,
       description: stripAsterisks(form.description),
@@ -851,7 +851,7 @@ function PublishForm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>{t('pub_property_type')}</label>
+            <label>{t('pub_property_type')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <select
               value={form.property_type}
               onChange={(e) => {
@@ -890,7 +890,7 @@ function PublishForm() {
         {['Apartamento', 'Moradia'].includes(form.property_type) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>{t('pub_bedrooms')}</label>
+            <label>{t('pub_bedrooms')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <input type="number" min={0} required value={form.bedrooms} onChange={(e) => updateField('bedrooms', e.target.value)} />
           </div>
           <div className="field">
@@ -920,7 +920,7 @@ function PublishForm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field" id="field-floor">
-            <label>{t('pub_floor')}</label>
+            <label>{t('pub_floor')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <select required value={form.floor} onChange={(e) => updateField('floor', e.target.value)}>
               <option value="">{t('pub_choose_option')}</option>
               {PISOS.map((p) => <option key={p}>{p}</option>)}
@@ -994,7 +994,7 @@ function PublishForm() {
         </div>
 
         <div className="field">
-          <label>{t('pub_address')}</label>
+          <label>{t('pub_address')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
           <div style={{ display: 'flex', gap: 8 }}>
             <select
               value={addressType}
@@ -1020,7 +1020,7 @@ function PublishForm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
           <div className="field" id="field-district">
-            <label>{t('pub_district')}</label>
+            <label>{t('pub_district')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <select
               value={form.district}
               onChange={(e) => {
@@ -1034,7 +1034,7 @@ function PublishForm() {
             </select>
           </div>
           <div className="field">
-            <label>{t('pub_municipality')}</label>
+            <label>{t('pub_municipality')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             {municipalityManual ? (
               <div style={{ display: 'flex', gap: 6 }}>
                 <input
@@ -1073,7 +1073,7 @@ function PublishForm() {
             )}
           </div>
           <div className="field">
-            <label>{t('pub_parish')}</label>
+            <label>{t('pub_parish')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             {parishManual ? (
               <div style={{ display: 'flex', gap: 6 }}>
                 <input
@@ -1115,7 +1115,7 @@ function PublishForm() {
         </div>
 
         <div className="field" id="field-show_full_address">
-          <label>{t('pub_show_full_address')}</label>
+          <label>{t('pub_show_full_address')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
           <p style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: -2, marginBottom: 8 }}>
             {t('pub_address_visibility_hint')}
           </p>
@@ -1139,7 +1139,7 @@ function PublishForm() {
         </div>
 
         <div className="field" id="field-description">
-          <label>{t('pub_description')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_min_50_chars')}</span></label>
+          <label>{t('pub_description')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span> <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_min_50_chars')}</span></label>
           <textarea required rows={9} style={{ minHeight: 180 }} value={form.description} onChange={(e) => updateField('description', e.target.value)} />
           <p style={{ fontSize: 11.5, marginTop: 4, color: form.description.length < 50 ? '#8a3b2a' : 'var(--text-soft)' }}>
             {form.description.length}/50 {t('pub_characters')} {form.description.length < 50 && `(${t('pub_missing_chars').replace('{n}', 50 - form.description.length)})`}
@@ -1192,7 +1192,7 @@ function PublishForm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field">
-            <label>{t('pub_business_type')}</label>
+            <label>{t('pub_business_type')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <select
               value={form.business_type}
               disabled={form.property_type === 'Quarto'}
@@ -1206,7 +1206,7 @@ function PublishForm() {
             )}
           </div>
           <div className="field">
-            <label>{t('pub_price_eur')}</label>
+            <label>{t('pub_price_eur')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
             <input type="number" required value={form.price} onChange={(e) => updateField('price', e.target.value)} />
           </div>
         </div>

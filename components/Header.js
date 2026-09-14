@@ -162,7 +162,7 @@ export default function Header({ minimal = false }) {
 
   async function loadNotifications(userId) {
     const { data } = await supabase
-      .from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(20);
+      .from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(200);
     setNotifications(data || []);
   }
 
@@ -177,22 +177,41 @@ export default function Header({ minimal = false }) {
   }
 
   async function toggleNotifications() {
-    const wasOpen = notifOpen;
     setNotifOpen((o) => !o);
-    if (!wasOpen && user) {
+    if (!notifOpen && user) {
       const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
       if (unreadIds.length > 0) {
         await supabase.from('notifications').update({ read: true }).in('id', unreadIds);
         setNotifications((cur) => cur.map((n) => ({ ...n, read: true })));
       }
-    } else if (wasOpen) {
-      // Ao fechar o sino, as notificações já lidas desaparecem da lista —
-      // só ficam visíveis enquanto a pessoa as está mesmo a ver.
-      setNotifications((cur) => cur.filter((n) => !n.read));
     }
+    // As notificações ficam sempre visíveis no histórico, mesmo depois de
+    // lidas e de fechar o sino — só desaparecem se a pessoa as apagar
+    // manualmente.
   }
 
   const unreadNotifCount = notifications.filter((n) => !n.read).length;
+
+  // Ao clicar numa notificação de uma conversa (ex: "nova mensagem de..."),
+  // confirma que essa conversa ainda existe antes de lá navegar — se a
+  // pessoa já a tiver apagado entretanto, mostra um aviso em vez de abrir
+  // uma página vazia/confusa.
+  async function handleNotificationClick(e, notification) {
+    setNotifOpen(false);
+    const link = notification.link || '';
+    const chatMatch = link.match(/\/chat\?c=([a-zA-Z0-9-]+)/);
+    if (chatMatch) {
+      e.preventDefault();
+      const conversationId = chatMatch[1];
+      const { data: conv } = await supabase
+        .from('conversations').select('id').eq('id', conversationId).maybeSingle();
+      if (!conv) {
+        alert('Já eliminaste a conversa relacionada com esta notificação.');
+        return;
+      }
+      router.push(link);
+    }
+  }
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -246,7 +265,7 @@ export default function Header({ minimal = false }) {
                       <Link
                         key={n.id}
                         href={n.link || '#'}
-                        onClick={() => { setNotifOpen(false); setNotifications((cur) => cur.filter((x) => x.id !== n.id)); }}
+                        onClick={(e) => handleNotificationClick(e, n)}
                         style={{
                           display: 'block', padding: '12px 14px', borderBottom: '1px solid var(--line)', fontSize: 12.5,
                           background: !n.read ? 'rgba(184,69,47,0.08)' : 'transparent',

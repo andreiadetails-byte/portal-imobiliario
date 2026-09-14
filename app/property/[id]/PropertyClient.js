@@ -81,7 +81,7 @@ export default function PropertyClient() {
         // Tenta primeiro imóveis bem parecidos (mesmo distrito e tipo); se não
         // houver 6, vai alargando os critérios até chegar a 6 (ou esgotar).
         let foundSimilar = [];
-        const baseSelect = 'id, price, address, district, typology, business_type, property_type, bedrooms, bathrooms, area_util, area, property_photos(url, position)';
+        const baseSelect = 'id, price, address, district, municipality, typology, business_type, property_type, bedrooms, bathrooms, area_util, area, created_at, property_photos(url, position)';
 
         const { data: sameDistrictType } = await supabase
           .from('properties').select(baseSelect)
@@ -756,11 +756,18 @@ export default function PropertyClient() {
                       {Number(s.price).toLocaleString('pt-PT')} {s.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
                     <div className="addr">{s.typology} · {s.address}</div>
-                    <div className="meta">{s.district}</div>
-                    <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 12.5, color: 'var(--text-soft)', flexWrap: 'wrap' }}>
-                      {(s.area_util || s.area) && <span>📐 {s.area_util || s.area} m²</span>}
-                      {s.bedrooms != null && <span>🛏 {s.bedrooms}</span>}
-                      {s.bathrooms != null && <span>🚿 {s.bathrooms}</span>}
+                    <div className="meta">
+                      {s.property_type ? `${s.property_type} · ` : ''}
+                      {(s.area_util || s.area) ? `${s.area_util || s.area} m² · ` : ''}
+                      {s.bedrooms} quartos{s.bathrooms != null ? ` · ${s.bathrooms} wc` : ''}
+                    </div>
+                    {s.created_at && (
+                      <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 2 }}>
+                        {t('meta_published_on')} {new Date(s.created_at).toLocaleDateString('pt-PT')}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 2 }}>
+                      {s.district}{s.municipality ? ` · ${s.municipality}` : ''}
                     </div>
                   </div>
                 </Link>

@@ -124,6 +124,8 @@ function AdminInner() {
   const [euriborSaved, setEuriborSaved] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [allLeads, setAllLeads] = useState([]);
+  const [leadsTypeFilter, setLeadsTypeFilter] = useState('todos');
+  const [leadsOwnerFilter, setLeadsOwnerFilter] = useState(null);
   const [valuationRequests, setValuationRequests] = useState([]);
   const [leadsRevealed, setLeadsRevealed] = useState(false);
   const [leadsPinInput, setLeadsPinInput] = useState('');
@@ -138,6 +140,9 @@ function AdminInner() {
   const [campaignAudience, setCampaignAudience] = useState('todos');
   const [sendingCampaign, setSendingCampaign] = useState(false);
   const [campaignResult, setCampaignResult] = useState(null);
+  const [campaignDrafts, setCampaignDrafts] = useState([]);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [allFeedback, setAllFeedback] = useState([]);
   const [userSearch, setUserSearch] = useState('');
   const [userTypeFilter, setUserTypeFilter] = useState('todos');
   const [supportReplyText, setSupportReplyText] = useState({});
@@ -167,6 +172,8 @@ function AdminInner() {
       loadMortgageRate();
       loadAllUsers();
       loadAllLeads();
+      loadCampaignDrafts();
+      loadAllFeedback();
       loadValuationRequests();
       loadAds();
     }
@@ -254,6 +261,42 @@ function AdminInner() {
       .select('*, properties(id, typology, address, district, owner_id, profiles!owner_id(id, full_name, agency_name))')
       .order('created_at', { ascending: false });
     setAllLeads(data || []);
+  }
+
+  async function loadCampaignDrafts() {
+    const { data } = await supabase.from('campaign_drafts').select('*').order('created_at', { ascending: false });
+    setCampaignDrafts(data || []);
+  }
+
+  async function saveCampaignDraft() {
+    if (!campaignSubject.trim() || !campaignMessage.trim()) return;
+    setSavingDraft(true);
+    await supabase.from('campaign_drafts').insert({
+      subject: campaignSubject.trim(),
+      message: campaignMessage.trim(),
+      audience: campaignAudience,
+    });
+    setSavingDraft(false);
+    loadCampaignDrafts();
+  }
+
+  function loadDraftIntoForm(draft) {
+    setCampaignSubject(draft.subject);
+    setCampaignMessage(draft.message);
+    setCampaignAudience(draft.audience);
+  }
+
+  async function deleteCampaignDraft(id) {
+    await supabase.from('campaign_drafts').delete().eq('id', id);
+    setCampaignDrafts((cur) => cur.filter((d) => d.id !== id));
+  }
+
+  async function loadAllFeedback() {
+    const { data } = await supabase
+      .from('feedback')
+      .select('*, profiles!user_id(full_name, agency_name, email, phone_real)')
+      .order('created_at', { ascending: false });
+    setAllFeedback(data || []);
   }
 
   async function loadValuationRequests() {
@@ -1330,6 +1373,11 @@ function AdminInner() {
                         <> · <PhoneDisplay phone={u.phone_real} style={{ color: 'inherit', cursor: 'pointer' }}>📞 {u.phone_real}</PhoneDisplay></>
                       ) : ''}
                     </div>
+                    {u.created_at && (
+                      <div className="meta" style={{ fontSize: 11.5 }}>
+                        Conta criada em {new Date(u.created_at).toLocaleDateString('pt-PT')} às {new Date(u.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    )}
                     <div className="meta" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <select
                         value={u.account_type}
@@ -1383,6 +1431,13 @@ function AdminInner() {
                   <a href={`/admin/utilizador/${u.id}`} className="btn" style={{ fontSize: 13 }}>
                     👤 Ver imóveis
                   </a>
+                  <button
+                    onClick={() => { setLeadsOwnerFilter(u.id); setSection('leads'); }}
+                    className="btn"
+                    style={{ fontSize: 13 }}
+                  >
+                    📩 Leads
+                  </button>
                   {!u.is_admin && (
                     <>
                       <button
@@ -1433,8 +1488,42 @@ function AdminInner() {
           ) : allLeads.length === 0 ? (
             <p className="empty-state">{t('admin_no_leads_yet')}</p>
           ) : (
+            <>
+              {leadsOwnerFilter && (
+                <div style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-soft)' }}>
+                  A mostrar apenas leads deste utilizador.{' '}
+                  <button onClick={() => setLeadsOwnerFilter(null)} style={{ color: 'var(--telha)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: 13 }}>
+                    Ver todos
+                  </button>
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                {[
+                  ['todos', 'Todos', allLeads.length],
+                  ['mensagem', 'Mensagens', allLeads.filter((l) => l.name !== 'Alguém, por telefone').length],
+                  ['chamada', 'Chamadas', allLeads.filter((l) => l.name === 'Alguém, por telefone').length],
+                ].map(([key, label, count]) => (
+                  <button
+                    key={key}
+                    onClick={() => setLeadsTypeFilter(key)}
+                    className="btn"
+                    style={{
+                      fontSize: 12.5, fontWeight: 600,
+                      background: leadsTypeFilter === key ? 'var(--telha)' : 'var(--paper)',
+                      color: leadsTypeFilter === key ? '#fff' : 'var(--ink)',
+                    }}
+                  >
+                    {label} ({count})
+                  </button>
+                ))}
+              </div>
             <GroupedByOwner
-              items={allLeads}
+              items={allLeads.filter((l) => {
+                if (leadsTypeFilter === 'mensagem' && l.name === 'Alguém, por telefone') return false;
+                if (leadsTypeFilter === 'chamada' && l.name !== 'Alguém, por telefone') return false;
+                if (leadsOwnerFilter && l.properties?.owner_id !== leadsOwnerFilter) return false;
+                return true;
+              })}
               getOwnerKey={(l) => l.properties?.owner_id}
               getOwnerLabel={(l) => l.properties?.profiles?.agency_name || l.properties?.profiles?.full_name || 'Utilizador'}
               noOwnerLabel="Sem anúncio associado"
@@ -1478,6 +1567,7 @@ function AdminInner() {
                 </div>
               )}
             />
+            </>
           )}
         </>
       )}
@@ -1586,12 +1676,12 @@ function AdminInner() {
           </div>
 
           <div className="field">
-            <label>Mensagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('admin_html_hint')}</span></label>
+            <label>Mensagem <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(escreve normalmente — deixa uma linha em branco para separar parágrafos)</span></label>
             <textarea
               value={campaignMessage}
               onChange={(e) => setCampaignMessage(e.target.value)}
               rows={10}
-              style={{ fontFamily: 'monospace', fontSize: 12.5 }}
+              style={{ fontSize: 14 }}
             />
           </div>
 
@@ -1604,9 +1694,14 @@ function AdminInner() {
             </select>
           </div>
 
-          <button onClick={sendCampaign} className="btn btn-primary" disabled={sendingCampaign}>
-            {sendingCampaign ? 'A enviar...' : 'Enviar campanha'}
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={sendCampaign} className="btn btn-primary" disabled={sendingCampaign}>
+              {sendingCampaign ? 'A enviar...' : 'Enviar campanha'}
+            </button>
+            <button onClick={saveCampaignDraft} className="btn" disabled={savingDraft}>
+              {savingDraft ? 'A guardar...' : '💾 Guardar rascunho'}
+            </button>
+          </div>
 
           {sendingCampaign && (
             <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginTop: 10 }}>
@@ -1623,6 +1718,56 @@ function AdminInner() {
           {campaignResult?.error && (
             <p className="error-text" style={{ marginTop: 14 }}>{campaignResult.error}</p>
           )}
+
+          {campaignDrafts.length > 0 && (
+            <div style={{ marginTop: 32 }}>
+              <h3 className="display" style={{ fontSize: 16, marginBottom: 12 }}>Emails já criados</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {campaignDrafts.map((d) => (
+                  <div key={d.id} className="card" style={{ padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                    <div>
+                      <b style={{ fontSize: 13.5 }}>{d.subject}</b>
+                      <div className="meta">{new Date(d.created_at).toLocaleDateString('pt-PT')}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => loadDraftIntoForm(d)} className="btn" style={{ fontSize: 12.5 }}>Usar</button>
+                      <button onClick={() => deleteCampaignDraft(d.id)} className="btn" style={{ fontSize: 12.5, color: '#8a3b2a' }}>Apagar</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ marginTop: 40 }}>
+            <h3 className="display" style={{ fontSize: 16, marginBottom: 4 }}>Respostas recebidas (opinião dos utilizadores)</h3>
+            <p style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+              Sempre que alguém responde através do botão "Deixar a minha opinião" num email, aparece aqui.
+            </p>
+            {allFeedback.length === 0 ? (
+              <p className="empty-state">Ainda não há respostas.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {allFeedback.map((f) => (
+                  <div key={f.id} className="card" style={{ padding: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+                      <div>
+                        <b style={{ fontSize: 13.5 }}>
+                          {f.profiles?.agency_name || f.profiles?.full_name || 'Anónimo'}
+                        </b>
+                        <div className="meta">
+                          {f.profiles?.email}{f.profiles?.phone_real ? ` · ${f.profiles.phone_real}` : ''}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 16 }}>{'⭐'.repeat(f.rating)}</span>
+                    </div>
+                    {f.comment && <p style={{ fontSize: 13.5 }}>{f.comment}</p>}
+                    <span className="meta">{new Date(f.created_at).toLocaleDateString('pt-PT')}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </>
       )}
 
@@ -1953,6 +2098,28 @@ function AdminInner() {
           </div>
         </>
       )}
+
+      {section === 'definicoes' && (() => {
+        const activeProps = properties.filter((p) => p.status !== 'eliminado');
+        const missingTranslation = activeProps.filter((p) => !p.title_translations || Object.keys(p.title_translations || {}).length === 0);
+        const missingLocation = activeProps.filter((p) => !p.latitude || !p.longitude);
+        if (missingTranslation.length === 0 && missingLocation.length === 0) return null;
+        return (
+          <div className="card" style={{ padding: 18, maxWidth: 500, marginBottom: 16, background: 'rgba(138,106,31,0.1)', borderColor: '#8a6a1f' }}>
+            <h3 style={{ fontSize: 15, marginBottom: 8, color: '#8a6a1f' }}>⚠️ Atualizações pendentes</h3>
+            {missingTranslation.length > 0 && (
+              <p style={{ fontSize: 13, marginBottom: 4 }}>
+                {missingTranslation.length} imóveis por traduzir — usa "Traduzir imóveis em falta" nesta página.
+              </p>
+            )}
+            {missingLocation.length > 0 && (
+              <p style={{ fontSize: 13 }}>
+                {missingLocation.length} imóveis sem coordenadas de localização — usa "Atribuir coordenadas em falta" nesta página.
+              </p>
+            )}
+          </div>
+        );
+      })()}
 
       {section === 'definicoes' && (
         <div className="card" style={{ padding: 20, maxWidth: 400 }}>

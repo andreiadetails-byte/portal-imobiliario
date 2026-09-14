@@ -13,6 +13,7 @@ import dynamic from 'next/dynamic';
 
 const MapDrawSearch = dynamic(() => import('../../components/MapDrawSearch'), { ssr: false });
 import { displayAddress } from '../../lib/displayAddress';
+import { normalizeSearchText } from '../../lib/normalizeSearch';
 import AdBanner from '../../components/AdBanner';
 import ResultCardPhotos from '../../components/ResultCardPhotos';
 import PhoneDisplay from '../../components/PhoneDisplay';
@@ -270,9 +271,13 @@ function ResultsInner() {
 
     if (district) {
       // Junta as palavras com "%" no meio, para "vila nova gaia" encontrar
-      // "Vila Nova de Gaia" sem ser preciso escrever o "de".
-      const pattern = `%${district.trim().split(/\s+/).filter(Boolean).join('%')}%`;
-      query = query.or(`district.ilike.${pattern},address.ilike.${pattern},municipality.ilike.${pattern},parish.ilike.${pattern}`);
+      // "Vila Nova de Gaia" sem ser preciso escrever o "de". Pesquisa contra
+      // a coluna search_text (sem acentos, minúsculas), depois de também
+      // remover os acentos do que a pessoa escreveu — assim "fabricas"
+      // encontra "Fábricas" sem problema.
+      const normalizedDistrict = normalizeSearchText(district.trim());
+      const pattern = `%${normalizedDistrict.split(/\s+/).filter(Boolean).join('%')}%`;
+      query = query.ilike('search_text', pattern);
     }
     if (selectedTypes.length > 0) query = query.in('property_type', selectedTypes);
     if (selectedStates.length > 0) query = query.in('state', selectedStates);

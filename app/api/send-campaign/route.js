@@ -38,6 +38,15 @@ export async function POST(request) {
 
     const { subject, message, audience } = await request.json();
 
+    // A pessoa escreve texto normal (sem HTML) — aqui convertemos
+    // automaticamente: cada linha em branco separa um parágrafo novo, e
+    // uma quebra de linha simples vira um <br>. Assim não é preciso saber
+    // escrever HTML para mandar uma campanha com boa aparência.
+    const messageHtml = message
+      .split(/\n{2,}/)
+      .map((paragraph) => `<p style="margin:0 0 14px; font-size:15px;">${paragraph.replace(/\n/g, '<br>')}</p>`)
+      .join('');
+
     if (!subject || !message) {
       return Response.json({ error: 'Faltam dados.' }, { status: 400 });
     }
@@ -60,7 +69,7 @@ export async function POST(request) {
 
       const bodyHtml = `
         <p style="margin:0 0 14px; font-size:15px;">Olá${firstName ? ` ${firstName}` : ''},</p>
-        ${message}
+        ${messageHtml}
       `;
 
       const result = await sendEmail({

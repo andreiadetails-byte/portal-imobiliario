@@ -11,6 +11,7 @@ import { X, Gift } from 'lucide-react';
 import ViewsChart from '../../components/ViewsChart';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount } from '../../lib/accountTypes';
+import { normalizeSearchText } from '../../lib/normalizeSearch';
 
 const STATUS_LABELS = {
   ativo: { labelKey: 'dash_status_active', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
@@ -36,6 +37,7 @@ function DashboardInner() {
   const [appliedListingFilters, setAppliedListingFilters] = useState({ address: '', minPrice: '', maxPrice: '', parish: '', municipality: '' });
   const [listingPages, setListingPages] = useState({});
   const LISTINGS_PER_PAGE = 15;
+  const [activeListingTab, setActiveListingTab] = useState('ativo');
 
   function updateListingFilter(key, value) {
     setListingFilters((cur) => ({ ...cur, [key]: value }));
@@ -287,12 +289,12 @@ function DashboardInner() {
               </div>
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
-              <label style={{ fontSize: 12 }}>{t('dash_parish')}</label>
-              <input type="text" value={listingFilters.parish} onChange={(e) => updateListingFilter('parish', e.target.value)} placeholder={t('attr_parish')} />
-            </div>
-            <div className="field" style={{ marginBottom: 0 }}>
               <label style={{ fontSize: 12 }}>{t('dash_municipality')}</label>
               <input type="text" value={listingFilters.municipality} onChange={(e) => updateListingFilter('municipality', e.target.value)} placeholder={t('attr_municipality')} />
+            </div>
+            <div className="field" style={{ marginBottom: 0 }}>
+              <label style={{ fontSize: 12 }}>{t('dash_parish')}</label>
+              <input type="text" value={listingFilters.parish} onChange={(e) => updateListingFilter('parish', e.target.value)} placeholder={t('attr_parish')} />
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -304,148 +306,163 @@ function DashboardInner() {
       {properties.length === 0 ? (
         <p className="empty-state">{t('dashboard_none_listings')}</p>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 40, alignItems: 'start' }}>
-          {[
-            { key: 'pendente', title: t('dash_pending_review'), match: (p) => p.status === 'em_revisao' },
-            { key: 'ativo', title: t('dash_published'), match: (p) => ['ativo', 'desativado', 'vendido', 'arrendado', 'expirado'].includes(p.status) },
-            { key: 'eliminado', title: t('dash_deleted'), match: (p) => p.status === 'eliminado' },
-            { key: 'outros', title: t('dash_rejected_cancelled'), match: (p) => ['rejeitado', 'anulado_suporte'].includes(p.status) },
-          ].map(({ key, title, match }) => {
+        <div style={{ marginBottom: 40 }}>
+          {(() => {
+            const groups = [
+              { key: 'ativo', title: t('dash_published'), match: (p) => ['ativo', 'desativado', 'vendido', 'arrendado', 'expirado'].includes(p.status) },
+              { key: 'pendente', title: t('dash_pending_review'), match: (p) => p.status === 'em_revisao' },
+              { key: 'eliminado', title: t('dash_deleted'), match: (p) => p.status === 'eliminado' },
+              { key: 'outros', title: t('dash_rejected_cancelled'), match: (p) => ['rejeitado', 'anulado_suporte'].includes(p.status) },
+            ];
             const matchesSearch = (p) => {
               const { address, minPrice, maxPrice, parish, municipality } = appliedListingFilters;
-              if (address && !(p.address || '').toLowerCase().includes(address.trim().toLowerCase())) return false;
+              if (address && !normalizeSearchText(p.address).includes(normalizeSearchText(address))) return false;
               if (minPrice && Number(p.price || 0) < Number(minPrice)) return false;
               if (maxPrice && Number(p.price || 0) > Number(maxPrice)) return false;
-              if (parish && !(p.parish || '').toLowerCase().includes(parish.trim().toLowerCase())) return false;
-              if (municipality && !(p.municipality || '').toLowerCase().includes(municipality.trim().toLowerCase())) return false;
+              if (parish && !normalizeSearchText(p.parish).includes(normalizeSearchText(parish))) return false;
+              if (municipality && !normalizeSearchText(p.municipality).includes(normalizeSearchText(municipality))) return false;
               return true;
             };
-            const group = properties.filter((p) => match(p) && matchesSearch(p));
-            if (group.length === 0) return null;
-            const currentPage = listingPages[key] || 1;
+            const groupCounts = Object.fromEntries(groups.map((g) => [g.key, properties.filter((p) => g.match(p) && matchesSearch(p)).length]));
+            const activeGroup = groups.find((g) => g.key === activeListingTab) || groups[0];
+            const group = properties.filter((p) => activeGroup.match(p) && matchesSearch(p));
+            const currentPage = listingPages[activeGroup.key] || 1;
             const totalPages = Math.ceil(group.length / LISTINGS_PER_PAGE);
             const pageItems = group.slice((currentPage - 1) * LISTINGS_PER_PAGE, currentPage * LISTINGS_PER_PAGE);
+
             return (
-              <div key={key}>
-                <h2 className="display" style={{ fontSize: 15, marginBottom: 10, color: 'var(--text-soft)' }}>
-                  {title} <span style={{ fontWeight: 400 }}>({group.length})</span>
-                </h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {pageItems.map((p) => {
-                    const st = STATUS_LABELS[p.status] || { labelKey: null, color: 'var(--text-soft)', bg: 'var(--line)' };
-                    const stLabel = st.labelKey ? t(st.labelKey) : p.status;
-                    const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
-                    const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
-                    const isLocked = p.status === 'anulado_suporte' || p.status === 'eliminado';
-                    return (
-                      <div key={p.id} className="card" style={{ padding: 12, display: 'flex', gap: 10 }}>
-                        <Link href={`/property/${p.id}`} style={{ flexShrink: 0 }}>
-                          {firstPhoto ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={firstPhoto} alt={`Foto do anúncio ${p.title || p.typology}`} loading="lazy" style={{ width: 64, height: 50, objectFit: 'cover', borderRadius: 5, display: 'block' }} />
-                          ) : (
-                            <div style={{ width: 64, height: 50, borderRadius: 5, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)' }} />
-                          )}
-                        </Link>
+              <>
+                {/* Separadores (tabs) no topo, para escolher que grupo de anúncios ver */}
+                <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', borderBottom: '1px solid var(--line)', paddingBottom: 12 }}>
+                  {groups.map((g) => (
+                    <button
+                      key={g.key}
+                      type="button"
+                      onClick={() => setActiveListingTab(g.key)}
+                      className="btn"
+                      style={{
+                        fontSize: 13.5, fontWeight: 600,
+                        background: activeListingTab === g.key ? 'var(--telha)' : 'var(--paper)',
+                        color: activeListingTab === g.key ? '#fff' : 'var(--ink)',
+                        borderColor: activeListingTab === g.key ? 'var(--telha)' : 'var(--line)',
+                      }}
+                    >
+                      {g.title} ({groupCounts[g.key]})
+                    </button>
+                  ))}
+                </div>
 
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 2 }}>
-                            <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 6px', borderRadius: 8, background: st.bg, color: st.color }}>
-                              {stLabel.toUpperCase()}
-                            </span>
-                            {p.featured_status === 'active' && <span style={{ fontSize: 11 }}>★</span>}
-                          </div>
-                          <b style={{ fontSize: 12.5, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{p.typology} · {p.address}</b>
-                          <div className="meta" style={{ marginTop: 1, marginBottom: 0, fontSize: 11 }}>
-                            {Number(p.price).toLocaleString('pt-PT')} €
-                          </div>
-                          {p.status === 'anulado_suporte' && p.cancellation_reason && (
-                            <p style={{ fontSize: 10.5, color: '#8a3b2a', marginTop: 2, marginBottom: 0 }}>{t('dash_reason')} {p.cancellation_reason}</p>
-                          )}
-
-                          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', marginTop: 8 }}>
-                            {!isLocked && p.featured_status === 'none' && p.status === 'ativo' && (
-                              <button onClick={() => toggleFeaturedButtonClick(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
-                                Destacar
-                              </button>
+                {group.length === 0 ? (
+                  <p className="empty-state">{t('dashboard_none_listings')}</p>
+                ) : (
+                  <div className="grid-listings">
+                    {pageItems.map((p) => {
+                      const st = STATUS_LABELS[p.status] || { labelKey: null, color: 'var(--text-soft)', bg: 'var(--line)' };
+                      const stLabel = st.labelKey ? t(st.labelKey) : p.status;
+                      const firstSorted = p.property_photos?.sort((a, b) => a.position - b.position)[0];
+                      const firstPhoto = firstSorted?.thumbnail_url || firstSorted?.url;
+                      const isLocked = p.status === 'anulado_suporte' || p.status === 'eliminado';
+                      return (
+                        <div key={p.id} className="card" style={{ position: 'relative' }}>
+                          <span style={{
+                            position: 'absolute', top: 10, left: 10, zIndex: 1, fontSize: 11, fontWeight: 700,
+                            padding: '4px 10px', borderRadius: 20, background: st.bg, color: st.color,
+                          }}>
+                            {stLabel}
+                          </span>
+                          <Link href={`/property/${p.id}`}>
+                            {firstPhoto ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={firstPhoto} alt={`Foto do imóvel ${p.typology}`} loading="lazy" className="card-photo" style={{ objectFit: 'cover', width: '100%' }} />
+                            ) : (
+                              <div className="card-photo" />
                             )}
-                            {(p.featured_status === 'active' || p.featured_status === 'pending') && (
-                              <button onClick={() => cancelFeatured(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
-                                Anular destaque
-                              </button>
+                          </Link>
+                          <div className="card-body">
+                            <div className="price">
+                              {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
+                            </div>
+                            <Link href={`/property/${p.id}`}>
+                              <div className="addr">{p.typology} · {displayAddress ? displayAddress(p) : p.address}</div>
+                              <div className="meta">
+                                {p.property_type ? `${p.property_type} · ` : ''}
+                                {p.area_util ? `${p.area_util} m² · ` : ''}
+                                {p.bedrooms} quartos{p.bathrooms != null ? ` · ${p.bathrooms} wc` : ''}
+                              </div>
+                              {p.created_at && (
+                                <div style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 2 }}>
+                                  {t('meta_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}
+                                </div>
+                              )}
+                              <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginTop: 2 }}>
+                                {p.district}{p.municipality ? ` · ${p.municipality}` : ''}
+                              </div>
+                            </Link>
+                            {p.status === 'anulado_suporte' && p.cancellation_reason && (
+                              <p style={{ fontSize: 12, color: '#8a3b2a', marginTop: 6 }}>{t('dash_reason')} {p.cancellation_reason}</p>
                             )}
-                            {!isLocked && p.status === 'ativo' && (
-                              <button onClick={() => deactivateProperty(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
-                                Desativar
-                              </button>
-                            )}
-                            {!isLocked && p.status === 'desativado' && (
-                              <button onClick={() => reactivateProperty(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
-                                Reativar
-                              </button>
-                            )}
-                            {p.status === 'eliminado' && (
-                              <button onClick={() => republishProperty(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
-                                {t('dash_republish')}
-                              </button>
-                            )}
-                            {p.status === 'eliminado' && (
-                              <button onClick={() => deletePropertyPermanently(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px', color: '#8a3b2a' }}>
-                                {t('dash_delete_permanently')}
-                              </button>
-                            )}
-                            {p.status !== 'anulado_suporte' && (
-                              <Link href={`/publish?edit=${p.id}`} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>{t('dash_edit')}</Link>
-                            )}
-                            {p.status !== 'eliminado' && (
-                              <Link href={`/property/${p.id}`} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>{t('dash_view_listing')}</Link>
-                            )}
-                            {p.status !== 'eliminado' && p.status !== 'anulado_suporte' && (
-                              <button onClick={() => deleteProperty(p.id)} className="btn" style={{ fontSize: 10.5, padding: '4px 9px' }}>
-                                Apagar
-                              </button>
-                            )}
+                            <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                              {!isLocked && p.featured_status === 'none' && p.status === 'ativo' && (
+                                <button onClick={() => toggleFeaturedButtonClick(p.id)} className="btn" style={{ fontSize: 12.5 }}>⭐ {t('dash_feature')}</button>
+                              )}
+                              {(p.featured_status === 'active' || p.featured_status === 'pending') && (
+                                <button onClick={() => cancelFeatured(p.id)} className="btn" style={{ fontSize: 12.5 }}>Anular destaque</button>
+                              )}
+                              {!isLocked && p.status === 'ativo' && (
+                                <button onClick={() => deactivateProperty(p.id)} className="btn" style={{ fontSize: 12.5 }}>Desativar</button>
+                              )}
+                              {!isLocked && p.status === 'desativado' && (
+                                <button onClick={() => reactivateProperty(p.id)} className="btn" style={{ fontSize: 12.5 }}>Reativar</button>
+                              )}
+                              {p.status !== 'anulado_suporte' && (
+                                <Link href={`/publish?edit=${p.id}`} className="btn" style={{ fontSize: 12.5 }}>{t('dash_edit')}</Link>
+                              )}
+                              {p.status !== 'eliminado' && (
+                                <Link href={`/property/${p.id}`} className="btn" style={{ fontSize: 12.5 }}>{t('dash_view_listing')}</Link>
+                              )}
+                              {p.status === 'eliminado' && (
+                                <button onClick={() => republishProperty(p.id)} className="btn" style={{ fontSize: 12.5 }}>{t('dash_republish')}</button>
+                              )}
+                              {p.status === 'eliminado' && (
+                                <button onClick={() => deletePropertyPermanently(p.id)} className="btn" style={{ fontSize: 12.5, color: '#8a3b2a' }}>{t('dash_delete_permanently')}</button>
+                              )}
+                              {p.status !== 'eliminado' && (
+                                <button onClick={() => deleteProperty(p.id)} className="btn" style={{ fontSize: 12.5, color: '#8a3b2a' }}>Apagar</button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                {totalPages > 1 && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, marginBottom: 4 }}>
-                    <button
-                      onClick={() => setListingPages((cur) => ({ ...cur, [key]: currentPage - 1 }))}
-                      disabled={currentPage <= 1}
-                      className="btn"
-                      style={{ fontSize: 12.5, opacity: currentPage <= 1 ? 0.4 : 1 }}
-                    >
-                      {t('dash_previous')}
-                    </button>
-                    <span style={{ fontSize: 12.5, color: 'var(--text-soft)' }}>
-                      {t('dash_page_of').replace('{n}', currentPage).replace('{total}', totalPages)}
-                    </span>
-                    <button
-                      onClick={() => setListingPages((cur) => ({ ...cur, [key]: currentPage + 1 }))}
-                      disabled={currentPage >= totalPages}
-                      className="btn"
-                      style={{ fontSize: 12.5, opacity: currentPage >= totalPages ? 0.4 : 1 }}
-                    >
-                      {t('dash_next')}
-                    </button>
+                      );
+                    })}
                   </div>
                 )}
-              </div>
+
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => setListingPages((cur) => ({ ...cur, [activeGroup.key]: pageNum }))}
+                        className="btn"
+                        style={{ fontSize: 13, background: currentPage === pageNum ? 'var(--telha)' : 'var(--paper)', color: currentPage === pageNum ? '#fff' : 'var(--ink)' }}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
             );
-          })}
+          })()}
         </div>
       )}
       {properties.length > 0 && Object.values(appliedListingFilters).some(Boolean) && properties.filter((p) => {
         const { address, minPrice, maxPrice, parish, municipality } = appliedListingFilters;
-        if (address && !(p.address || '').toLowerCase().includes(address.trim().toLowerCase())) return false;
+        if (address && !normalizeSearchText(p.address).includes(normalizeSearchText(address))) return false;
         if (minPrice && Number(p.price || 0) < Number(minPrice)) return false;
         if (maxPrice && Number(p.price || 0) > Number(maxPrice)) return false;
-        if (parish && !(p.parish || '').toLowerCase().includes(parish.trim().toLowerCase())) return false;
-        if (municipality && !(p.municipality || '').toLowerCase().includes(municipality.trim().toLowerCase())) return false;
+        if (parish && !normalizeSearchText(p.parish).includes(normalizeSearchText(parish))) return false;
+        if (municipality && !normalizeSearchText(p.municipality).includes(normalizeSearchText(municipality))) return false;
         return true;
       }).length === 0 && (
         <p className="empty-state">{t('dash_no_match')}</p>
