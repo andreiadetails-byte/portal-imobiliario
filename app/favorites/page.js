@@ -451,7 +451,20 @@ export default function FavoritesPage() {
                             {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                           </div>
                           <div className="addr">{p.typology} · {displayAddress(p)}</div>
-                          <div className="meta">{p.district} · {p.area} m² · {p.bedrooms} {t('property_rooms').toLowerCase()}</div>
+                          <div className="meta">
+                            {p.property_type ? `${p.property_type} · ` : ''}
+                            {(p.area_util || p.area) ? `${p.area_util || p.area} m² · ` : ''}
+                            {p.bedrooms} {t('property_rooms').toLowerCase()}
+                            {p.bathrooms != null ? ` · ${p.bathrooms} wc` : ''}
+                          </div>
+                          {p.created_at && (
+                            <div style={{ fontSize: 12, color: 'var(--text-soft)', marginTop: 2 }}>
+                              {t('meta_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}
+                            </div>
+                          )}
+                          <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginTop: 2 }}>
+                            {p.district}{p.municipality ? ` · ${p.municipality}` : ''}
+                          </div>
                         </div>
                       </Link>
                     );

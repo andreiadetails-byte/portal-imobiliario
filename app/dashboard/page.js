@@ -12,6 +12,7 @@ import ViewsChart from '../../components/ViewsChart';
 import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount } from '../../lib/accountTypes';
 import { normalizeSearchText } from '../../lib/normalizeSearch';
+import { displayAddress } from '../../lib/displayAddress';
 
 const STATUS_LABELS = {
   ativo: { labelKey: 'dash_status_active', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
@@ -383,7 +384,7 @@ function DashboardInner() {
                               {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                             </div>
                             <Link href={`/property/${p.id}`}>
-                              <div className="addr">{p.typology} · {displayAddress ? displayAddress(p) : p.address}</div>
+                              <div className="addr">{p.typology} · {displayAddress(p)}</div>
                               <div className="meta">
                                 {p.property_type ? `${p.property_type} · ` : ''}
                                 {p.area_util ? `${p.area_util} m² · ` : ''}
