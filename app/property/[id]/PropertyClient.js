@@ -680,7 +680,7 @@ export default function PropertyClient() {
                   onChange={(e) => setAcceptedPolicy(e.target.checked)}
                   style={{ marginTop: 2, flexShrink: 0 }}
                 />
-                <span>
+                <span style={{ minWidth: 0, wordBreak: 'break-word' }}>
                   {t('sw_read_accept')}{' '}
                   <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
                     {t('sw_privacy_policy')}
@@ -980,7 +980,7 @@ export default function PropertyClient() {
         onClick={() => setShowContactModal(false)}
         style={{ position: 'fixed', inset: 0, background: 'rgba(51,46,34,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 120, padding: 20 }}
       >
-        <div onClick={(e) => e.stopPropagation()} className="card" style={{ padding: 24, maxWidth: 420, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
+        <div onClick={(e) => e.stopPropagation()} className="card" style={{ padding: 24, maxWidth: 420, width: '100%', maxHeight: '85vh', overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <span style={{ fontSize: 16, fontWeight: 700 }}>{t('prop_send_message')}</span>
             <button onClick={() => setShowContactModal(false)} aria-label={t('prop_close')} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-soft)' }}>✕</button>
@@ -1030,7 +1030,7 @@ export default function PropertyClient() {
                   onChange={(e) => setAcceptedPolicy(e.target.checked)}
                   style={{ marginTop: 2, flexShrink: 0 }}
                 />
-                <span>
+                <span style={{ minWidth: 0, wordBreak: 'break-word' }}>
                   {t('sw_read_accept')}{' '}
                   <a href="/privacidade" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--telha)', textDecoration: 'underline' }}>
                     {t('sw_privacy_policy')}
