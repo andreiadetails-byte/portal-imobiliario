@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/Header';
 import BackButton from '../../components/BackButton';
@@ -9,8 +9,22 @@ export default function FeedbackPage() {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    // Se a pessoa já tiver sessão iniciada, pré-preenche o nome e email —
+    // mas mesmo assim ficam editáveis, e guardados diretamente na
+    // resposta (não só ligados à conta), para nunca aparecer como "Anónimo".
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return;
+      setEmail(user.email || '');
+      const { data: profile } = await supabase.from('profiles').select('full_name, agency_name').eq('id', user.id).single();
+      setName(profile?.agency_name || profile?.full_name || '');
+    });
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -21,6 +35,8 @@ export default function FeedbackPage() {
 
     await supabase.from('feedback').insert({
       user_id: user?.id || null,
+      name: name.trim() || null,
+      email: email.trim() || null,
       rating,
       comment: comment.trim() || null,
     });
@@ -51,6 +67,16 @@ export default function FeedbackPage() {
             </p>
 
             <form onSubmit={handleSubmit} className="card" style={{ padding: 24 }}>
+              <div className="field">
+                <label>O seu nome <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
+                <input value={name} onChange={(e) => setName(e.target.value)} required />
+              </div>
+
+              <div className="field">
+                <label>O seu email <span style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
+
               <div className="field">
                 <label>A sua avaliação</label>
                 <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>

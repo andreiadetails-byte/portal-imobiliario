@@ -321,6 +321,12 @@ function AdminInner() {
     setAllFeedback((feedbackData || []).map((f) => ({ ...f, profiles: profilesById[f.user_id] || null })));
   }
 
+  async function deleteFeedback(id) {
+    if (!confirm('Apagar esta resposta? Esta ação não pode ser desfeita.')) return;
+    await supabase.from('feedback').delete().eq('id', id);
+    setAllFeedback((cur) => cur.filter((f) => f.id !== id));
+  }
+
   async function loadValuationRequests() {
     const { data } = await supabase.from('valuation_requests').select('*').order('created_at', { ascending: false });
     setValuationRequests(data || []);
@@ -1441,20 +1447,25 @@ function AdminInner() {
                       )}
                       {u.is_admin && ' · Administrador'}
                       {u.is_blocked && <span style={{ color: '#8a3b2a', fontWeight: 700 }}> · Bloqueado</span>}
-                      {isProfessionalAccount(u.account_type) && (
-                        <>
-                          {' · '}
-                          <span style={{
-                            fontWeight: 700,
-                            color: u.subscription_status === 'active' ? 'var(--telha)' : u.subscription_status === 'pending' ? '#8a6a1f' : '#8a3b2a',
-                          }}>
-                            {u.subscription_status === 'active' ? `Ativa até ${u.subscription_paid_until ? new Date(u.subscription_paid_until).toLocaleDateString('pt-PT') : '—'}`
-                              : u.subscription_status === 'pending' ? 'Pagamento pendente'
-                              : u.subscription_status === 'expired' ? 'Expirada'
-                              : 'Sem subscrição'}
-                          </span>
-                        </>
-                      )}
+                      {isProfessionalAccount(u.account_type) && (() => {
+                        const daysLeft = u.subscription_paid_until
+                          ? Math.ceil((new Date(u.subscription_paid_until) - new Date()) / (1000 * 60 * 60 * 24))
+                          : null;
+                        return (
+                          <>
+                            {' · '}
+                            <span style={{
+                              fontWeight: 700,
+                              color: u.subscription_status === 'active' ? 'var(--telha)' : u.subscription_status === 'pending' ? '#8a6a1f' : '#8a3b2a',
+                            }}>
+                              {u.subscription_status === 'active' ? `Ativa · renova/termina a ${u.subscription_paid_until ? new Date(u.subscription_paid_until).toLocaleDateString('pt-PT') : '—'}${daysLeft != null ? ` (${daysLeft >= 0 ? `${daysLeft} dias` : 'expirou'})` : ''}`
+                                : u.subscription_status === 'pending' ? 'Pagamento pendente'
+                                : u.subscription_status === 'expired' ? 'Expirada'
+                                : 'Sem subscrição'}
+                            </span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -1818,16 +1829,25 @@ function AdminInner() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
                       <div>
                         <b style={{ fontSize: 13.5 }}>
-                          {f.profiles?.agency_name || f.profiles?.full_name || 'Anónimo'}
+                          {f.name || f.profiles?.agency_name || f.profiles?.full_name || 'Anónimo'}
                         </b>
                         <div className="meta">
-                          {f.profiles?.email}{f.profiles?.phone_real ? ` · ${f.profiles.phone_real}` : ''}
+                          {f.email || f.profiles?.email}{f.profiles?.phone_real ? ` · ${f.profiles.phone_real}` : ''}
                         </div>
                       </div>
                       <span style={{ fontSize: 16 }}>{'⭐'.repeat(f.rating)}</span>
                     </div>
-                    {f.comment && <p style={{ fontSize: 13.5 }}>{f.comment}</p>}
-                    <span className="meta">{new Date(f.created_at).toLocaleDateString('pt-PT')}</span>
+                    {f.comment && <p style={{ fontSize: 13.5, marginBottom: 8 }}>{f.comment}</p>}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="meta">{new Date(f.created_at).toLocaleDateString('pt-PT')}</span>
+                      <button
+                        onClick={() => deleteFeedback(f.id)}
+                        className="btn"
+                        style={{ fontSize: 11.5, color: '#8a3b2a', padding: '4px 10px' }}
+                      >
+                        Apagar
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -2038,12 +2058,12 @@ function AdminInner() {
                   </button>
                   <button
                     onClick={() => notifyNews(n.id)}
-                    disabled={notifyingNewsId === n.id || notifiedNewsIds.includes(n.id)}
+                    disabled={notifyingNewsId === n.id}
                     className="btn"
                     style={{ fontSize: 12, color: notifiedNewsIds.includes(n.id) ? 'var(--telha)' : 'var(--text-soft)' }}
                     title="Enviar esta notícia por email a todos os utilizadores registados"
                   >
-                    {notifyingNewsId === n.id ? '📤 A enviar...' : notifiedNewsIds.includes(n.id) ? '✓ Notificado' : '📤 Notificar utilizadores'}
+                    {notifyingNewsId === n.id ? '📤 A enviar...' : notifiedNewsIds.includes(n.id) ? '📤 Notificar de novo' : '📤 Notificar utilizadores'}
                   </button>
                   <button onClick={() => startEditNews(n)} className="btn" style={{ fontSize: 12 }}>{t('admin_edit')}</button>
                   <button onClick={() => deleteNews(n.id)} className="btn" style={{ fontSize: 12 }}>{t('admin_delete')}</button>
