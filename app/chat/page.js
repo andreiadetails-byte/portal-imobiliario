@@ -62,7 +62,7 @@ function ChatInner() {
       let profilesById = {};
       if (otherPartyIds.length > 0) {
         const { data: profilesData } = await supabase
-          .from('profiles').select('id, full_name, agency_name').in('id', otherPartyIds);
+          .from('profiles').select('id, full_name, agency_name, email, phone_real').in('id', otherPartyIds);
         profilesById = Object.fromEntries((profilesData || []).map((p) => [p.id, p]));
       }
       const dataWithProfiles = (data || []).map((c) => ({
@@ -273,7 +273,11 @@ function ChatInner() {
 
   function otherPersonOf(c) {
     const person = c.buyer_id === user.id ? c.seller : c.buyer;
-    return { name: person?.agency_name || person?.full_name || t('chat_default_user') };
+    return {
+      name: person?.agency_name || person?.full_name || t('chat_default_user'),
+      email: person?.email || '',
+      phone: person?.phone_real || '',
+    };
   }
 
   const activeConversation = conversations.find((c) => c.id === activeId);
@@ -339,10 +343,10 @@ function ChatInner() {
                 <p style={{ padding: 16, fontSize: 12.5, color: 'var(--text-soft)' }}>{t('chat_no_conversations')}</p>
               )}
               {filteredConversations.map((c) => {
-                const { name } = otherPersonOf(c);
+                const { name, email, phone } = otherPersonOf(c);
                 const photo = c.properties?.property_photos?.sort((a, b) => a.position - b.position)[0]?.url;
                 const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-                const contact = [c.lastMessage?.sender_email, c.lastMessage?.sender_phone].filter(Boolean).join(' · ') || c.lastMessage?.sender_name;
+                const contact = [email, phone].filter(Boolean).join(' · ');
                 const isUnread = c.unreadCount > 0;
                 return (
                   <div
@@ -365,8 +369,14 @@ function ChatInner() {
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
                         <b style={{ fontSize: 15.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{name}</b>
-                        <span style={{ fontSize: 12, color: 'var(--text-soft)', flexShrink: 0 }}>
-                          {c.lastMessage ? new Date(c.lastMessage.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' }) : ''}
+                        <span style={{ fontSize: 11.5, color: 'var(--text-soft)', flexShrink: 0, textAlign: 'right' }}>
+                          {c.lastMessage ? (
+                            <>
+                              {new Date(c.lastMessage.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
+                              <br />
+                              {new Date(c.lastMessage.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                            </>
+                          ) : ''}
                         </span>
                       </div>
                       {contact && (
@@ -544,11 +554,16 @@ function ChatInner() {
                         {m.content}
                       </div>
                     </div>
-                    {isLastMine && m.read && m.read_at && (
-                      <div style={{ fontSize: 10, color: 'var(--text-soft)', marginTop: 3, textAlign: 'right', paddingRight: 2 }}>
-                        Visto às {new Date(m.read_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3, justifyContent: isMine ? 'flex-end' : 'flex-start', paddingLeft: isMine ? 0 : 2, paddingRight: isMine ? 2 : 0 }}>
+                      <span style={{ fontSize: 10, color: 'var(--text-soft)' }}>
+                        {new Date(m.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {isMine && (
+                        <span style={{ fontSize: 10, color: m.read ? 'var(--telha)' : 'var(--text-soft)' }} title={m.read ? 'Lida' : 'Enviada'}>
+                          {m.read ? '✓✓' : '✓'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
