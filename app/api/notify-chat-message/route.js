@@ -1,15 +1,16 @@
+import { createClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { sendEmail } from '../../../lib/sendEmail';
 import { renderEmail, propertyCardHtml, escapeHtml, SITE_URL } from '../../../lib/emailTemplate';
 import { isValidWebhookRequest } from '../../../lib/verifyWebhook';
 
-// Chamada pelo Supabase (Database Webhook) sempre que uma nova mensagem de chat é inserida.
+// Chamada tanto pelo Supabase (Database Webhook) como diretamente pelo
+// próprio site, logo após enviar uma mensagem — isto porque, em alguns
+// casos, o pedido do Supabase para o Netlify não chega corretamente
+// (problema de infraestrutura fora do nosso controlo), por isso o site
+// chama esta rota diretamente como garantia extra.
 export async function POST(request) {
   try {
-    if (!isValidWebhookRequest(request)) {
-      return Response.json({ error: 'Não autorizado.' }, { status: 401 });
-    }
-
     // Lê o corpo como texto simples e interpreta manualmente como JSON —
     // mais tolerante do que request.json(), que às vezes falha consoante o
     // cabeçalho Content-Type exato que o Supabase envia.
@@ -20,7 +21,29 @@ export async function POST(request) {
     } catch {
       return Response.json({ error: 'Corpo do pedido inválido (não é JSON válido).' }, { status: 400 });
     }
-    const message = payload.record;
+
+    let message = payload.record;
+
+    if (!message && payload.messageId) {
+      // Chamada direta do site: confirma que quem pede é mesmo o autor da
+      // mensagem, antes de continuar.
+      const authHeader = request.headers.get('authorization') || '';
+      const token = authHeader.replace('Bearer ', '');
+      if (!token) return Response.json({ error: 'Não autenticado.' }, { status: 401 });
+      const supabaseAuth = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+      const { data: { user } } = await supabaseAuth.auth.getUser(token);
+      if (!user) return Response.json({ error: 'Não autorizado.' }, { status: 401 });
+
+      const { data: fetchedMessage } = await supabaseAdmin
+        .from('messages').select('*').eq('id', payload.messageId).single();
+      if (!fetchedMessage || fetchedMessage.sender_id !== user.id) {
+        return Response.json({ error: 'Não autorizado.' }, { status: 403 });
+      }
+      message = fetchedMessage;
+    } else if (!isValidWebhookRequest(request)) {
+      return Response.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
     if (!message) return Response.json({ error: 'Sem dados' }, { status: 400 });
 
     const { data: conversation } = await supabaseAdmin

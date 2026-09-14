@@ -229,14 +229,25 @@ export default function PropertyClient() {
       // Com sessão iniciada: um sistema só — vai diretamente para o chat, com o nome e email visíveis na conversa.
       const conversationId = await getOrCreateConversation();
       if (conversationId) {
-        await supabase.from('messages').insert({
+        const { data: newMessage } = await supabase.from('messages').insert({
           conversation_id: conversationId,
           sender_id: user.id,
           content: lead.message,
           sender_name: lead.name,
           sender_email: lead.email,
           sender_phone: lead.phone || null,
-        });
+        }).select().single();
+
+        // Chama a notificação diretamente (em vez de confiar só no webhook
+        // do Supabase, que por vezes falha por um problema de infraestrutura).
+        if (newMessage) {
+          const { data: sessionData } = await supabase.auth.getSession();
+          fetch('/api/notify-chat-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionData?.session?.access_token}` },
+            body: JSON.stringify({ messageId: newMessage.id }),
+          }).catch(() => {});
+        }
       }
     } else {
       // Sem sessão iniciada, não há forma de chat — fica como lead (com nome, email e contacto).

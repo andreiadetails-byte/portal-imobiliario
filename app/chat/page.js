@@ -228,6 +228,16 @@ function ChatInner() {
       // sempre a ver a tua própria mensagem assim que a envias. Evita
       // duplicar, caso o aviso de tempo real também chegue a seguir.
       setMessages((cur) => (cur.some((m) => m.id === data.id) ? cur : [...cur, data]));
+
+      // Chama a notificação diretamente (em vez de confiar só no webhook
+      // do Supabase, que por vezes falha por um problema de infraestrutura).
+      supabase.auth.getSession().then(({ data: sessionData }) => {
+        fetch('/api/notify-chat-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionData?.session?.access_token}` },
+          body: JSON.stringify({ messageId: data.id }),
+        }).catch(() => {});
+      });
     }
   }
 
