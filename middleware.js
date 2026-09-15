@@ -54,7 +54,7 @@ function gatePage(error) {
 <body>
   <div class="card">
     <p class="logo">More<span>·</span>ada</p>
-    <div class="badge">🚀 Disponível a partir de 15 de setembro, 00h00</div>
+    <div class="badge">🚀 Vamos todos começar ao mesmo tempo, 14h00</div>
     <h1>Estamos quase prontos.</h1>
     <p>O novo portal imobiliário português está em preparação final. Se já tens acesso antecipado, escreve a password abaixo.</p>
     <form method="POST">
