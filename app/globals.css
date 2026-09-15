@@ -355,6 +355,26 @@ textarea:focus-visible, [tabindex]:focus-visible{
 /* Regras de impressão — usadas quando a pessoa descarrega a comparação de
    imóveis em PDF (o browser "imprime para PDF"). Esconde tudo o que não
    interessa no papel (cabeçalho do site, botões), e ajusta a tabela. */
+
+@media (max-width: 640px){
+  /* Avaliação da homepage: no telemóvel passa para uma coluna para nunca ficar cortada. */
+  .valuation-home-card{
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  .valuation-home-card > div:first-child{
+    min-height: 190px !important;
+    height: 190px !important;
+  }
+  .valuation-home-card > div:last-child{
+    padding: 22px 20px 24px !important;
+  }
+  .valuation-home-card .btn{
+    width: 100% !important;
+  }
+}
+
 @media print{
   .site-header, .support-widget, .no-print{ display:none !important; }
   body{ background:#fff !important; }
