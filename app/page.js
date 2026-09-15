@@ -591,7 +591,7 @@ export default function HomePage() {
 
       <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.48)' }} />
         <div className="wrap" style={{ maxWidth: 420, position: 'relative' }}>
           <div style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
@@ -614,7 +614,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.48)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <div className="card" style={{ padding: '26px 28px', background: 'var(--plaster)' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
@@ -649,13 +649,13 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#536044' }}>
         <img
           src="/mood/escritorio.jpg"
           alt=""
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(36,41,26,0.55) 0%, rgba(36,41,26,0.88) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(45,52,36,0.42) 0%, rgba(45,52,36,0.68) 100%)' }} />
         <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
           <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
             {t('home_mood_title')}
@@ -676,7 +676,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.75)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.52)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 8, color: '#fff' }}>{t('home_districts_title')}</h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
@@ -697,7 +697,7 @@ export default function HomePage() {
 
       <section style={{ padding: '56px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.5)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.46)' }} />
         <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative' }}>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14, color: '#fff' }}>{t('home_testimonials_title')}</h2>
@@ -714,7 +714,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.72)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.50)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
             <h2 className="display" style={{ fontSize: 28, margin: 0, color: '#fff' }}>{t('home_news_title')}</h2>
