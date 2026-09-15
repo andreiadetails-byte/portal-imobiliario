@@ -416,75 +416,109 @@ function PublishForm() {
     });
   }
 
-  async function uploadPhotos(propertyId, startPosition = 0) {
-    const uploadedUrls = [];
-    const { data: { session } } = await supabase.auth.getSession();
+async function uploadPhotos(propertyId, startPosition = 0) {
+  const uploadedUrls = [];
+  const { data: { session } } = await supabase.auth.getSession();
 
-    async function uploadOne(file, type) {
-      const body = new FormData();
-      body.append('file', file);
-      body.append('propertyId', propertyId);
-      body.append('type', type);
+  setUploadProgress({
+    current: 0,
+    total: photos.length,
+  });
 
-      let res;
-      try {
-        res = await fetch('/api/upload-photo-r2', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-          body,
-        });
-      } catch (networkErr) {
-        console.error(`Erro de rede ao enviar ${type}:`, networkErr);
-        return null;
-      }
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        console.error(`Falha ao enviar ${type} para o R2:`, res.status, errBody);
-        return null;
-      }
-      const { url } = await res.json();
-      return url;
+  async function uploadOne(file, type) {
+    const body = new FormData();
+    body.append('file', file);
+    body.append('propertyId', propertyId);
+    body.append('type', type);
+
+    let res;
+
+    try {
+      res = await fetch('/api/upload-photo-r2', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body,
+      });
+    } catch (networkErr) {
+      console.error(`Erro de rede ao enviar ${type}:`, networkErr);
+      return null;
     }
 
-    for (let i = 0; i < photos.length; i++) {
-      const { file } = photos[i];
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      console.error(
+        `Falha ao enviar ${type} para o R2:`,
+        res.status,
+        errBody
+      );
+      return null;
+    }
 
-      const url = await uploadOne(file, 'photo');
-      if (!url) {
-        alert('Não foi possível enviar uma das fotos. As outras continuam a ser enviadas.');
-        continue; // se uma foto falhar, continua com as outras
-      }
-      uploadedUrls.push(url);
+    const { url } = await res.json();
+    return url;
+  }
 
-      // A miniatura é só um "extra" — se por algum motivo falhar, a foto
-      // grande já foi enviada com sucesso, e o site usa-a como reserva.
-      let thumbnailUrl = null;
-      try {
-        const thumbFile = await makeThumbnail(file);
-        if (thumbFile) {
-          thumbnailUrl = await uploadOne(thumbFile, 'thumbnail');
-          if (!thumbnailUrl) {
-            console.error('Miniatura não foi enviada — uploadOne devolveu vazio.');
-            alert('Aviso: não foi possível criar a miniatura desta foto (a foto grande foi enviada bem na mesma).');
-          }
-        } else {
-          console.error('makeThumbnail devolveu null — o navegador não conseguiu gerar a miniatura.');
-          alert('Aviso: o navegador não conseguiu gerar a miniatura desta foto (a foto grande foi enviada bem na mesma).');
+  for (let i = 0; i < photos.length; i++) {
+    const { file } = photos[i];
+
+    const url = await uploadOne(file, 'photo');
+
+    if (!url) {
+      throw new Error(
+        `Não foi possível enviar a foto ${i + 1}. A publicação não foi concluída.`
+      );
+    }
+
+    uploadedUrls.push(url);
+
+    let thumbnailUrl = null;
+
+    try {
+      const thumbFile = await makeThumbnail(file);
+
+      if (thumbFile) {
+        thumbnailUrl = await uploadOne(thumbFile, 'thumbnail');
+
+        if (!thumbnailUrl) {
+          console.error(
+            'Miniatura não foi enviada — a foto principal foi enviada corretamente.'
+          );
         }
-      } catch (thumbErr) {
-        console.error('Erro ao gerar/enviar miniatura:', thumbErr);
-        alert(`Aviso: erro ao criar a miniatura (${thumbErr.message}). A foto grande foi enviada bem na mesma.`);
       }
+    } catch (thumbErr) {
+      console.error('Erro ao gerar/enviar miniatura:', thumbErr);
+    }
 
-      await supabase.from('property_photos').insert({
+    const { error: photoInsertError } = await supabase
+      .from('property_photos')
+      .insert({
         property_id: propertyId,
         url,
         thumbnail_url: thumbnailUrl,
         position: startPosition + i,
       });
+
+    if (photoInsertError) {
+      console.error(
+        'Erro ao guardar foto na base de dados:',
+        photoInsertError
+      );
+
+      throw new Error(
+        `A foto ${i + 1} foi enviada, mas não foi possível guardá-la no anúncio.`
+      );
     }
-    return uploadedUrls;
+
+    setUploadProgress({
+      current: i + 1,
+      total: photos.length,
+    });
   }
+
+  return uploadedUrls;
+}
 
   // Quando falta preencher algo, salta diretamente para esse campo (com um
   // deslize suave) e destaca-o a vermelho por um instante — assim a pessoa
