@@ -557,7 +557,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
+      <section className="hide-on-mobile" style={{ padding: '80px 0', background: 'var(--plaster)' }}>
         <div className="wrap" style={{ textAlign: 'center' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
             {t('home_find_title')}
@@ -691,7 +691,7 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
+      <section className="hide-on-mobile" style={{ padding: '80px 0', background: 'var(--plaster)' }}>
         <div className="wrap" style={{ textAlign: 'center' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
             {t('home_inspiration_title')}
