@@ -249,7 +249,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ background: 'rgba(126,143,106,0.14)', padding: '80px 0' }}>
+      <section style={{ background: 'rgba(122,128,104,0.10)', padding: '80px 0' }}>
         <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <span style={{
@@ -298,7 +298,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(92,103,76,0.22)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -406,7 +406,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(92,103,76,0.22)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -519,7 +519,7 @@ export default function HomePage() {
                 className="card-hover-lift decision-card"
                 style={{
                   display: 'block', textDecoration: 'none', background: 'var(--plaster)',
-                  border: '1px solid rgba(126,143,106,0.25)', borderRadius: 14, overflow: 'hidden',
+                  border: '1px solid rgba(122,128,104,0.22)', borderRadius: 14, overflow: 'hidden',
                 }}
               >
                 <div style={{ height: 100, overflow: 'hidden' }}>
@@ -543,7 +543,7 @@ export default function HomePage() {
           <div style={{
             display: 'grid', gridTemplateColumns: 'minmax(280px, 0.9fr) minmax(0, 1.1fr)',
             borderRadius: 14, overflow: 'hidden', marginTop: 44,
-            background: 'var(--plaster)', border: '1px solid rgba(126,143,106,0.25)',
+            background: 'var(--plaster)', border: '1px solid rgba(122,128,104,0.22)',
             minHeight: 180,
           }}>
             <div style={{ minHeight: 180, overflow: 'hidden' }}>
@@ -591,7 +591,7 @@ export default function HomePage() {
 
       <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.48)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
         <div className="wrap" style={{ maxWidth: 420, position: 'relative' }}>
           <div style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
@@ -614,7 +614,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.48)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <div className="card" style={{ padding: '26px 28px', background: 'var(--plaster)' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
@@ -649,13 +649,13 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#536044' }}>
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#667055' }}>
         <img
           src="/mood/escritorio.jpg"
           alt=""
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(45,52,36,0.42) 0%, rgba(45,52,36,0.68) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(58,64,49,0.30) 0%, rgba(58,64,49,0.52) 100%)' }} />
         <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
           <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
             {t('home_mood_title')}
@@ -676,7 +676,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.52)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.36)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 8, color: '#fff' }}>{t('home_districts_title')}</h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
@@ -697,7 +697,7 @@ export default function HomePage() {
 
       <section style={{ padding: '56px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.46)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.32)' }} />
         <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative' }}>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14, color: '#fff' }}>{t('home_testimonials_title')}</h2>
@@ -714,7 +714,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(67,79,53,0.50)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
             <h2 className="display" style={{ fontSize: 28, margin: 0, color: '#fff' }}>{t('home_news_title')}</h2>
