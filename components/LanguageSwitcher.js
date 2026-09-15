@@ -18,7 +18,7 @@ const LANGUAGES = [
   { code: 'zh', label: '中文', flag: '🇨🇳' },
   { code: 'ar', label: 'AR', flag: '🇸🇦' },
 ];
-
+const emojiFont = '"Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif';
 export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -48,7 +48,7 @@ export default function LanguageSwitcher() {
           background: 'var(--paper)', color: 'var(--text-soft)', cursor: 'pointer', whiteSpace: 'nowrap',
         }}
       >
-        <span aria-hidden="true" style={{ fontSize: 17, lineHeight: 1, display: 'inline-block', flexShrink: 0 }}>{current.flag}</span>
+        <span aria-hidden="true" style={{ fontFamily: emojiFont, fontSize: 17, lineHeight: 1, display: 'inline-block', flexShrink: 0, fontVariantEmoji: 'emoji' }}>{current.flag}</span>
         <span className="lang-switcher-label">{current.label}</span>
         <span style={{ fontSize: 9 }}>▾</span>
       </button>
@@ -70,7 +70,7 @@ export default function LanguageSwitcher() {
                 fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: 'var(--ink)',
               }}
             >
-              <span aria-hidden="true" style={{ fontSize: 17, lineHeight: 1, display: 'inline-block', flexShrink: 0 }}>{l.flag}</span>
+              <span aria-hidden="true" style={{ fontFamily: emojiFont, fontSize: 17, lineHeight: 1, display: 'inline-block', flexShrink: 0, fontVariantEmoji: 'emoji' }}>{l.flag}</span>
               {l.label}
             </button>
           ))}
