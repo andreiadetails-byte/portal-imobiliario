@@ -274,103 +274,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
-        <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
-        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
-          <div className="install-qr-section" style={{
-            background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap',
-          }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fwww.moreada.pt"
-              alt="Código QR para abrir o More·ada no telemóvel"
-              width={104}
-              height={104}
-              style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
-              className="install-qr-image"
-            />
-            <div>
-              <div className="display" style={{ fontSize: 21, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{t('home_install_title')}</div>
-              <div style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 10 }}>
-                {t('home_install_subtitle')}
-              </div>
-              {installPrompt ? (
-                // No telemóvel, se o navegador conseguir instalar automaticamente
-                // (normalmente Android/Chrome), mostra só um botão direto — é mais
-                // rápido do que pedir para a pessoa ler instruções.
-                <button onClick={handleInstallClick} className="btn btn-primary install-app-btn" style={{ fontSize: 16, padding: '12px 20px' }}>
-                  📲 {t('home_install_button')}
-                </button>
-              ) : (
-                // No computador, a pessoa vai digitalizar o código no telemóvel —
-                // os passos detalhados (Android/iPhone) fazem mais sentido só
-                // depois, quando já estiver lá, por isso aqui fica só o essencial.
-                <div className="install-text-instructions" style={{ fontSize: 14, color: 'var(--text-soft)' }}>
-                  {t('home_install_simple_hint')}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
-        <img
-          src="/mood/escritorio.jpg"
-          alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(36,41,26,0.55) 0%, rgba(36,41,26,0.88) 100%)' }} />
-        <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
-          <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
-            {t('home_mood_title')}
-          </div>
-          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: 460, margin: '0 auto' }}>
-            {t('home_mood_text')}
-          </p>
-        </div>
-      </section>
-
-      <div style={{ height: 24, background: 'var(--paper)' }} />
-
-      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
-        <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
-        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
-          <div className="card" style={{ padding: '26px 28px', background: 'var(--plaster)' }}>
-            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
-            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16 }}>
-              {t('home_doubts_text')}
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
-              {[t('home_doubts_tag_buy'), t('home_doubts_tag_sell'), t('home_doubts_tag_rent'), t('home_doubts_tag_credit'), t('home_doubts_tag_docs'), t('home_doubts_tag_deed'), t('home_doubts_tag_taxes'), t('home_doubts_tag_publish'), t('home_doubts_tag_other')].map((tema) => (
-                <button
-                  key={tema}
-                  type="button"
-                  onClick={() => window.dispatchEvent(new CustomEvent('morada-open-support', { detail: tema === t('home_doubts_tag_other') ? null : tema }))}
-                  style={{
-                    fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 14, cursor: 'pointer',
-                    background: 'var(--plaster)', color: 'var(--text-soft)', border: '1px solid var(--line)',
-                  }}
-                >
-                  {tema}
-                </button>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new Event('morada-open-support'))}
-              className="btn btn-primary"
-              style={{ fontSize: 13.5 }}
-            >
-              {t('home_doubts_cta')}
-            </button>
-          </div>
-        </div>
-      </section>
-
       <section style={{ padding: '72px 0 88px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 32, marginBottom: 32, color: 'var(--ink)' }}>{t('home_featured')}</h2>
@@ -596,6 +499,104 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
+          <div className="install-qr-section" style={{
+            background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap',
+          }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fwww.moreada.pt"
+              alt="Código QR para abrir o More·ada no telemóvel"
+              width={104}
+              height={104}
+              style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
+              className="install-qr-image"
+            />
+            <div>
+              <div className="display" style={{ fontSize: 21, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{t('home_install_title')}</div>
+              <div style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 10 }}>
+                {t('home_install_subtitle')}
+              </div>
+              {installPrompt ? (
+                // No telemóvel, se o navegador conseguir instalar automaticamente
+                // (normalmente Android/Chrome), mostra só um botão direto — é mais
+                // rápido do que pedir para a pessoa ler instruções.
+                <button onClick={handleInstallClick} className="btn btn-primary install-app-btn" style={{ fontSize: 16, padding: '12px 20px' }}>
+                  📲 {t('home_install_button')}
+                </button>
+              ) : (
+                // No computador, a pessoa vai digitalizar o código no telemóvel —
+                // os passos detalhados (Android/iPhone) fazem mais sentido só
+                // depois, quando já estiver lá, por isso aqui fica só o essencial.
+                <div className="install-text-instructions" style={{ fontSize: 14, color: 'var(--text-soft)' }}>
+                  {t('home_install_simple_hint')}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
+        <img
+          src="/mood/escritorio.jpg"
+          alt=""
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(36,41,26,0.55) 0%, rgba(36,41,26,0.88) 100%)' }} />
+        <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
+          <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+            {t('home_mood_title')}
+          </div>
+          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: 460, margin: '0 auto' }}>
+            {t('home_mood_text')}
+          </p>
+        </div>
+      </section>
+
+      <div style={{ height: 24, background: 'var(--paper)' }} />
+
+      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
+          <div className="card" style={{ padding: '26px 28px', background: 'var(--plaster)' }}>
+            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
+            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16 }}>
+              {t('home_doubts_text')}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
+              {[t('home_doubts_tag_buy'), t('home_doubts_tag_sell'), t('home_doubts_tag_rent'), t('home_doubts_tag_credit'), t('home_doubts_tag_docs'), t('home_doubts_tag_deed'), t('home_doubts_tag_taxes'), t('home_doubts_tag_publish'), t('home_doubts_tag_other')].map((tema) => (
+                <button
+                  key={tema}
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('morada-open-support', { detail: tema === t('home_doubts_tag_other') ? null : tema }))}
+                  style={{
+                    fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 14, cursor: 'pointer',
+                    background: 'var(--plaster)', color: 'var(--text-soft)', border: '1px solid var(--line)',
+                  }}
+                >
+                  {tema}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('morada-open-support'))}
+              className="btn btn-primary"
+              style={{ fontSize: 13.5 }}
+            >
+              {t('home_doubts_cta')}
+            </button>
+          </div>
+        </div>
+      </section>
+
 
       <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
         <div className="wrap" style={{ textAlign: 'center' }}>
