@@ -513,6 +513,8 @@ function PublishForm() {
     if (!isEditMode && !isAdmin) {
       const { count: existingCount } = await supabase
         .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', user.id).neq('status', 'eliminado');
+      console.log('LIMITE FINAL:', accountLimit);
+console.log('ANÚNCIOS EXISTENTES:', existingCount);
       if ((existingCount || 0) >= accountLimit) {
         setError(`Já tem ${accountLimit} anúncios publicados, que é o limite da sua conta. Apague um anúncio antigo no seu painel para poder publicar um novo.`);
         return;
