@@ -789,19 +789,16 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
       setPublished(true);
       setTimeout(() => router.push('/dashboard'), 2500);
 
-    } catch (uploadError) {
-      console.error('Erro ao concluir publicação:', uploadError);
-      setError(
-        uploadError?.message ||
-        'Não foi possível concluir o envio das fotografias.'
-      );
-      setSaving(false);
-      setPublished(false);
-    }
+     } catch (uploadError) {
+    console.error('Erro ao concluir publicação:', uploadError);
+    setError(
+      uploadError?.message ||
+      'Não foi possível concluir o envio das fotografias.'
+    );
+    setSaving(false);
+    setPublished(false);
   }
-  }
-  }
-
+}
 
   if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('pub_checking_session')}</div></>);
 
