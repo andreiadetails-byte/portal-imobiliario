@@ -219,23 +219,23 @@ if (profileError) {
   return;
 }
 
+}
+
 setLoading(false);
 
-
-    // Se o Supabase exigir confirmação por email, ainda não há sessão iniciada —
-    // é preciso avisar claramente, ou a pessoa acha que o botão não fez nada.
-    if (!data.session) {
-      setSignupEmailSent(true);
-      return;
-    }
+if (!data.session) {
+  setSignupEmailSent(true);
+  return;
+}
 
     await migrateLocalFavoritesToAccount(supabase, data.user.id);
 
-    const isNewFreeAgency = PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType);
-    router.push(isNewFreeAgency ? '/dashboard?welcome=agencia' : '/dashboard');
+  const isNewFreeAgency = PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType);
+router.push(isNewFreeAgency ? '/dashboard?welcome=agencia' : '/dashboard');
   }
-
-  return (
+}
+ 
+return (
     <main id="main-content" style={{ maxWidth: 400, margin: '0 auto', padding: '60px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
         <LanguageSwitcher />
