@@ -500,6 +500,28 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
+        <div className="wrap" style={{ textAlign: 'center' }}>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
+            Encontra a tua casa.
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {[
+              { href: '/results?business=Venda', img: '/mood/sala-verde-premium.jpg', label: 'Comprar' },
+              { href: '/results?business=Arrendamento', img: '/mood/nicho-arco-ceramica.jpg', label: 'Arrendar' },
+              { href: '/simulador-investimento', img: '/mood/estante-livros-v2.jpg', label: 'Investir' },
+            ].map((item) => (
+              <Link key={item.label} href={item.href} className="card-hover-lift" style={{ display: 'block', textDecoration: 'none' }}>
+                <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 14, boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
+                  <img src={item.img} alt={item.label} style={{ width: '100%', height: 220, objectFit: 'cover' }} />
+                </div>
+                <span className="display" style={{ fontSize: 18, color: 'var(--ink)' }}>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
