@@ -12,7 +12,6 @@ import BigPromoBanner from '../components/BigPromoBanner';
 import PricePerM2Lookup from '../components/PricePerM2Lookup';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import { distritos } from '../lib/locations';
-import NaturalSearchBox from '../components/NaturalSearchBox';
 import NewsletterSignup from '../components/NewsletterSignup';
 import LazyMount from '../components/LazyMount';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../lib/localFavorites';
@@ -253,20 +252,6 @@ export default function HomePage() {
       </section>
 
       <div style={{ height: 24, background: 'var(--paper)' }} />
-
-      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
-        <img src="/mood/parede-pedra.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.55)' }} />
-        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
-          <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
-            <div className="tile-strip" />
-            <div style={{ padding: 18 }}>
-              <NaturalSearchBox />
-            </div>
-            <div className="tile-strip" />
-          </div>
-        </div>
-      </section>
 
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
