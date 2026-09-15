@@ -322,8 +322,6 @@ function ChatInner() {
       ) : (
         <div className="card chat-grid" style={{ display: 'grid', gridTemplateColumns: '460px 1fr', height: 'calc(100vh - 200px)', minHeight: 420, maxHeight: 700, overflow: 'hidden' }}>
           <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, position: 'relative' }}>
-            <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(126,143,106,0.78)', zIndex: 0 }} />
             <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             <div style={{ padding: 14, borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
               <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -334,9 +332,9 @@ function ChatInner() {
                     className="btn"
                     style={{
                       fontSize: 11.5, padding: '5px 10px',
-                      background: filter === value ? 'var(--telha)' : 'transparent',
+                      background: filter === value ? 'var(--messages-green)' : 'var(--plaster)',
                       color: filter === value ? '#fff' : 'var(--ink)',
-                      borderColor: filter === value ? 'var(--telha)' : 'var(--ink)',
+                      borderColor: filter === value ? 'var(--messages-green)' : 'var(--line)',
                     }}
                   >
                     {label}
@@ -367,13 +365,13 @@ function ChatInner() {
                     onClick={() => setActiveId(c.id)}
                     style={{
                       display: 'flex', gap: 12, padding: '16px 16px', margin: '0 10px 12px',
-                      border: c.id === activeId ? '1.5px solid var(--telha)' : '1px solid var(--line)',
+                      border: c.id === activeId ? '1.5px solid var(--messages-green)' : '1px solid var(--line)',
                       borderRadius: 8, cursor: 'pointer',
-                      background: c.id === activeId ? 'var(--plaster)' : 'rgba(255,255,255,0.8)', alignItems: 'flex-start',
+                      background: c.id === activeId ? 'var(--plaster)' : 'var(--paper)', alignItems: 'flex-start',
                     }}
                   >
                     <div style={{
-                      width: 42, height: 42, borderRadius: '50%', background: 'var(--telha)', color: '#fff',
+                      width: 42, height: 42, borderRadius: '50%', background: 'var(--messages-green)', color: '#fff',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, flexShrink: 0,
                     }}>
                       {initials || '?'}
@@ -410,7 +408,7 @@ function ChatInner() {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={photo} alt={t('attr_photo_conversation')} loading="lazy" style={{ width: 32, height: 26, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
                         ) : (
-                          <div style={{ width: 32, height: 26, borderRadius: 3, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
+                          <div style={{ width: 32, height: 26, borderRadius: 3, background: 'var(--messages-green-soft)', flexShrink: 0 }} />
                         )}
                         <div style={{ minWidth: 0, flex: 1 }}>
                           <div style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textDecoration: c.properties?.id ? 'underline' : 'none', textDecorationColor: 'var(--line)' }}>
@@ -508,7 +506,7 @@ function ChatInner() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={photo} alt={t('attr_photo_conversation')} loading="lazy" style={{ width: 44, height: 34, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
                     ) : (
-                      <div style={{ width: 44, height: 34, borderRadius: 4, background: 'linear-gradient(135deg, var(--azulejo), #4A5A3C)', flexShrink: 0 }} />
+                      <div style={{ width: 44, height: 34, borderRadius: 4, background: 'var(--messages-green-soft)', flexShrink: 0 }} />
                     );
                   })()}
                   <div style={{ fontSize: 12, lineHeight: 1.3 }}>
@@ -561,7 +559,7 @@ function ChatInner() {
                         style={{
                           padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                           minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
-                          background: isMine ? 'var(--green-vivid)' : 'var(--green-aqua)',
+                          background: isMine ? 'var(--messages-green)' : 'var(--messages-green-soft)',
                           color: '#fff',
                         }}
                       >
@@ -579,7 +577,7 @@ function ChatInner() {
                         })()}
                       </span>
                       {isMine && (
-                        <span style={{ fontSize: 10, color: m.read ? 'var(--telha)' : 'var(--text-soft)' }} title={m.read ? 'Lida' : 'Enviada'}>
+                        <span style={{ fontSize: 10, color: m.read ? 'var(--messages-green)' : 'var(--text-soft)' }} title={m.read ? 'Lida' : 'Enviada'}>
                           {m.read ? '✓✓' : '✓'}
                         </span>
                       )}

@@ -1,16 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root{
-  --ink:#332E22;
-  --azulejo:#6B7A52;
-  --plaster:#F1E8D6;
-  --paper:#FFFFFF;
-  --telha:#3D4530;
+  --ink:#34382B;
+  --azulejo:#71805C;
+  --plaster:#E8E4D8;
+  --paper:#F7F5EF;
+  --telha:#536044;
   --terracota:#8B5A3C;
   --brass:#D8C9A3;
   --gold-strong:#C9A227;
   --green-vivid:#4F8B4A;
   --green-aqua:#3E9E8C;
+  --messages-green:#71805B;
+  --messages-green-soft:#E6EBDD;
   --line: rgba(51,46,34,0.14);
   --text-soft: rgba(51,46,34,0.72);
 }
