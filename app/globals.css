@@ -1,19 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root{
-  --ink:#34382B;
-  --azulejo:#71805C;
-  --plaster:#E8E4D8;
-  --paper:#F7F5EF;
-  --telha:#536044;
-  --terracota:#8B5A3C;
+  --ink:#3D4035;
+  --azulejo:#788267;
+  --plaster:#E1E5D9;
+  --paper:#F4F3EC;
+  --telha:#68755A;
+  --terracota:#9A6A50;
   --brass:#D8C9A3;
   --gold-strong:#C9A227;
-  --green-vivid:#4F8B4A;
-  --green-aqua:#3E9E8C;
-  --messages-green:#667055;
-  --messages-green-soft:#DDE3D2;
-  --messages-bg:#667055;
+  --green-vivid:#68755A;
+  --green-aqua:#7B866B;
   --line: rgba(51,46,34,0.14);
   --text-soft: rgba(51,46,34,0.72);
 }
@@ -33,7 +30,7 @@ img, video, iframe{ max-width: 100%; height: auto; }
 input, select, textarea, button{ min-width: 0; }
 img{ -webkit-user-drag:none; user-drag:none; }
 body{
-  background: #F5F1E8;
+  background: #EEF0E8;
   color:var(--ink);
   font-family:'Inter',sans-serif;
   line-height:1.55;
@@ -82,7 +79,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 }
 
 .card{ background:var(--paper); border:1px solid rgba(51,46,34,0.08); border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(51,46,34,0.04); }
-.card-photo{ height:200px; background:linear-gradient(135deg, var(--azulejo) 0%, #4A5A3C 100%); }
+.card-photo{ height:200px; background:linear-gradient(135deg, var(--azulejo) 0%, #626B52 100%); }
 .card-body{ padding:16px; }
 .price{ font-family:'Inter',sans-serif; font-size:24px; font-weight:700; margin-bottom:4px; }
 .addr{ font-family:'Fraunces',serif; font-size:19px; font-weight:600; margin-bottom:2px; overflow-wrap:break-word; word-break:break-word; }
@@ -110,7 +107,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 @media (max-width: 900px){
   .bottom-nav{
     display:flex; position:fixed; bottom:0; left:0; right:0; z-index:40;
-    background:linear-gradient(135deg, var(--telha) 0%, #3E4A32 100%);
+    background:linear-gradient(135deg, var(--telha) 0%, #596149 100%);
     padding:10px 0 max(10px, env(safe-area-inset-bottom));
     box-shadow: 0 -4px 16px rgba(0,0,0,0.18);
   }
@@ -364,6 +361,3 @@ textarea:focus-visible, [tabindex]:focus-visible{
   table{ width:100% !important; }
   a{ text-decoration:none !important; color:inherit !important; }
 }
-
-/* Messages / support: olive background inspired by the homepage hero */
-.messages-page-bg{ background:var(--messages-bg); }
