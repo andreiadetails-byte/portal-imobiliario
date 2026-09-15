@@ -253,14 +253,14 @@ export default function HomePage() {
 
       <div style={{ height: 24, background: 'var(--paper)' }} />
 
-      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '72px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.2)' }} />
-        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(48,57,39,0.62), rgba(48,57,39,0.18))' }} />
+        <div className="wrap" style={{ maxWidth: 900, position: 'relative' }}>
           <Link
             href="/simulador-investimento"
             style={{
-              borderRadius: 12, padding: '22px 26px', background: 'linear-gradient(135deg, var(--azulejo) 0%, var(--telha) 100%)',
+              borderRadius: 16, padding: '24px 28px', background: 'linear-gradient(135deg, rgba(73,86,56,0.98) 0%, rgba(112,91,58,0.96) 100%)', boxShadow: '0 18px 45px rgba(39,45,31,0.20)',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', textDecoration: 'none',
             }}
           >
@@ -283,11 +283,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden', background: 'var(--paper)' }}>
         <img src="/images/simulador-imt.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(51,46,34,0.55)' }} />
-        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
-          <div style={{ borderRadius: 12, padding: '22px 26px', background: 'rgba(255,255,255,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(45,51,35,0.72), rgba(45,51,35,0.34))' }} />
+        <div className="wrap" style={{ maxWidth: 900, position: 'relative' }}>
+          <div style={{ borderRadius: 16, padding: '24px 28px', background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 18px 45px rgba(39,45,31,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
             <div>
               <div className="display" style={{ fontSize: 21, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{t('home_imt_title')}</div>
               <div style={{ fontSize: 14.5, color: 'var(--text-soft)' }}>{t('home_imt_sub')}</div>
@@ -620,10 +620,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 88px' }}>
+      <section style={{ padding: '8px 0 88px' }}>
         <div className="wrap">
+          <div style={{ textAlign: 'center', marginBottom: 22 }}>
+            <div style={{ fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--telha)', fontWeight: 700, marginBottom: 6 }}>Simuladores</div>
+            <h2 className="display" style={{ fontSize: 28, color: 'var(--ink)', margin: 0 }}>Decida com mais confiança</h2>
+          </div>
           <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 380px))', justifyContent: 'center', gap: 20 }}>
-            <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div className="card-hover-lift simulator-card" style={{ background: 'rgba(255,253,247,0.96)', border: '1px solid rgba(117,106,82,0.18)', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: 150, backgroundImage: 'url(/images/simulador-arrendar.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
               <div style={{ padding: '30px 30px 36px' }}>
                 <h3 className="display" style={{ fontSize: 22, marginBottom: 10 }}>{t('home_rentbuy_title')}</h3>
@@ -633,7 +637,7 @@ export default function HomePage() {
                 <Link href="/simulador-arrendar-comprar" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>{t('home_rentbuy_cta')}</Link>
               </div>
             </div>
-            <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div className="card-hover-lift simulator-card" style={{ background: 'rgba(255,253,247,0.96)', border: '1px solid rgba(117,106,82,0.18)', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: 150, backgroundImage: 'url(/images/simulador-credito.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
               <div style={{ padding: '30px 30px 36px' }}>
                 <h3 className="display" style={{ fontSize: 22, marginBottom: 10 }}>{t('home_credit_title')}</h3>
