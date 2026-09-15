@@ -249,7 +249,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ background: 'linear-gradient(180deg, #E1E5D9 0%, #E8E9DE 100%)', padding: '80px 0' }}>
+      <section style={{ background: 'linear-gradient(180deg, #E5E7DA 0%, #DDE2D2 100%)', padding: '80px 0' }}>
         <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <span style={{
@@ -274,7 +274,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '32px 0 88px', background: '#F0F1E9' }}>
+      <section style={{ padding: '32px 0 88px', background: '#F1EFE6' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 32, marginBottom: 32, color: 'var(--ink)' }}>{t('home_featured')}</h2>
 
@@ -498,7 +498,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 56px', background: '#E6E9DF' }}>
+      <section style={{ padding: '0 0 56px', background: '#E8ECE0' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
             <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Calcula antes de decidir</h2>
@@ -558,7 +558,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '20px 0 88px', background: '#F0F1E9' }}>
+      <section style={{ padding: '20px 0 88px', background: '#F3F0E7' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
             <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>Quanto vale o m² na sua zona?</h2>
@@ -571,7 +571,7 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '56px 0', background: '#DDE3D5' }}>
+      <section style={{ padding: '56px 0', background: '#DDE3D4' }}>
         <div className="wrap">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
             {[
@@ -589,9 +589,9 @@ export default function HomePage() {
 
 
 
-      <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden', background: '#788267' }}>
+      <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden', background: '#D6DED0' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(64,72,54,0.24)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
         <div className="wrap" style={{ maxWidth: 420, position: 'relative' }}>
           <div style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
@@ -614,7 +614,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(64,72,54,0.24)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <div className="card" style={{ padding: '26px 28px', background: 'var(--plaster)' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
@@ -649,13 +649,13 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#71805F' }}>
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#667055' }}>
         <img
           src="/mood/escritorio.jpg"
           alt=""
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(55,63,46,0.16) 0%, rgba(55,63,46,0.34) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(58,64,49,0.30) 0%, rgba(58,64,49,0.52) 100%)' }} />
         <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
           <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
             {t('home_mood_title')}
@@ -666,7 +666,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div style={{ height: 24, background: '#E6E9DF' }} />
+      <div style={{ height: 24, background: '#E4E7DA' }} />
 
       
 
@@ -674,9 +674,9 @@ export default function HomePage() {
 
       
 
-      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden', background: '#DCE3D5' }}>
         <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(64,72,54,0.24)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.36)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 8, color: '#fff' }}>{t('home_districts_title')}</h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
@@ -697,7 +697,7 @@ export default function HomePage() {
 
       <section style={{ padding: '56px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(64,72,54,0.22)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.32)' }} />
         <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative' }}>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14, color: '#fff' }}>{t('home_testimonials_title')}</h2>
@@ -714,7 +714,7 @@ export default function HomePage() {
 
       <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(64,72,54,0.24)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
             <h2 className="display" style={{ fontSize: 28, margin: 0, color: '#fff' }}>{t('home_news_title')}</h2>
