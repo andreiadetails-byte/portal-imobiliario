@@ -2,21 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../lib/i18n';
+import { FLAG_COMPONENTS } from './FlagIcons';
 
 const LANGUAGES = [
-  { code: 'pt', label: 'PT', flag: '🇵🇹' },
-  { code: 'en', label: 'EN', flag: '🇬🇧' },
-  { code: 'es', label: 'ES', flag: '🇪🇸' },
-  { code: 'fr', label: 'FR', flag: '🇫🇷' },
-  { code: 'de', label: 'DE', flag: '🇩🇪' },
-  { code: 'nl', label: 'NL', flag: '🇳🇱' },
-  { code: 'ru', label: 'RU', flag: '🇷🇺' },
-  { code: 'it', label: 'IT', flag: '🇮🇹' },
-  { code: 'pl', label: 'PL', flag: '🇵🇱' },
-  { code: 'sv', label: 'SV', flag: '🇸🇪' },
-  { code: 'uk', label: 'UA', flag: '🇺🇦' },
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
-  { code: 'ar', label: 'AR', flag: '🇸🇦' },
+  { code: 'pt', label: 'PT', flag: 'pt' },
+  { code: 'en', label: 'EN', flag: 'gb' },
+  { code: 'es', label: 'ES', flag: 'es' },
+  { code: 'fr', label: 'FR', flag: 'fr' },
+  { code: 'de', label: 'DE', flag: 'de' },
+  { code: 'nl', label: 'NL', flag: 'nl' },
+  { code: 'ru', label: 'RU', flag: 'ru' },
+  { code: 'it', label: 'IT', flag: 'it' },
+  { code: 'pl', label: 'PL', flag: 'pl' },
+  { code: 'sv', label: 'SV', flag: 'se' },
+  { code: 'uk', label: 'UA', flag: 'ua' },
+  { code: 'zh', label: '中文', flag: 'cn' },
+  { code: 'ar', label: 'AR', flag: 'sa' },
 ];
 
 export default function LanguageSwitcher() {
@@ -33,6 +34,7 @@ export default function LanguageSwitcher() {
   }, []);
 
   const current = LANGUAGES.find((l) => l.code === lang) || LANGUAGES[0];
+  const CurrentFlag = FLAG_COMPONENTS[current.flag];
 
   return (
     <div ref={wrapRef} style={{ position: 'relative', marginRight: 12, flexShrink: 0 }}>
@@ -48,8 +50,7 @@ export default function LanguageSwitcher() {
           background: 'var(--paper)', color: 'var(--text-soft)', cursor: 'pointer', whiteSpace: 'nowrap',
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{current.flag}</span>
+        {CurrentFlag && <CurrentFlag size={18} />}
         <span className="lang-switcher-label">{current.label}</span>
         <span style={{ fontSize: 9 }}>▾</span>
       </button>
@@ -60,23 +61,25 @@ export default function LanguageSwitcher() {
           background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6,
           boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130, overflow: 'hidden',
         }}>
-          {LANGUAGES.map((l) => (
-            <button
-              key={l.code}
-              type="button"
-              onClick={() => { setLang(l.code); setOpen(false); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                padding: '9px 12px', border: 'none', cursor: 'pointer', textAlign: 'left',
-                background: l.code === lang ? 'var(--plaster)' : 'transparent',
-                fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: 'var(--ink)',
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{l.flag}</span>
-              {l.label}
-            </button>
-          ))}
+          {LANGUAGES.map((l) => {
+            const Flag = FLAG_COMPONENTS[l.flag];
+            return (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => { setLang(l.code); setOpen(false); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+                  padding: '9px 12px', border: 'none', cursor: 'pointer', textAlign: 'left',
+                  background: l.code === lang ? 'var(--plaster)' : 'transparent',
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: 'var(--ink)',
+                }}
+              >
+                {Flag && <Flag size={18} />}
+                {l.label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
