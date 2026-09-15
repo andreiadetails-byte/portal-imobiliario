@@ -799,6 +799,19 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <section style={{ padding: '90px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(245,241,232,0.88)' }} />
+        <div className="wrap" style={{ maxWidth: 560, textAlign: 'center', position: 'relative' }}>
+          <h2 className="display" style={{ fontSize: 30, marginBottom: 22, color: 'var(--ink)' }}>
+            A tua próxima morada pode estar aqui.
+          </h2>
+          <Link href="/results" className="btn btn-primary" style={{ fontSize: 16, padding: '13px 30px' }}>
+            Encontrar uma casa
+          </Link>
+        </div>
+      </section>
       </main>
 
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
