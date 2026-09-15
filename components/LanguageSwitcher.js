@@ -24,6 +24,7 @@ export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -32,6 +33,21 @@ export default function LanguageSwitcher() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Alguns navegadores móveis não desenham logo o conteúdo de elementos
+  // que aparecem através de uma mudança de estado do React — ficam em
+  // branco até haver outro toque no ecrã, que força esse desenho. Isto
+  // contorna o problema, forçando esse mesmo "redesenhar" por código,
+  // assim que o menu abre, sem precisar de esperar por um toque.
+  useEffect(() => {
+    if (open && dropdownRef.current) {
+      const el = dropdownRef.current;
+      el.style.display = 'none';
+      // eslint-disable-next-line no-unused-expressions
+      el.offsetHeight; // força o navegador a recalcular, antes de mostrar
+      el.style.display = '';
+    }
+  }, [open]);
 
   const current = LANGUAGES.find((l) => l.code === lang) || LANGUAGES[0];
   const CurrentFlag = FLAG_COMPONENTS[current.flag];
@@ -56,13 +72,15 @@ export default function LanguageSwitcher() {
       </button>
 
       {open && (
-        <div style={{
+        <div ref={dropdownRef} style={{
           position: 'absolute', top: '100%', right: 0, marginTop: 4, zIndex: 200,
           background: '#fff', border: '1px solid var(--line)', borderRadius: 6,
           boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130,
           maxHeight: '70vh', overflowY: 'auto',
         }}>
-          {LANGUAGES.map((l) => (
+          {LANGUAGES.map((l) => {
+            const Flag = FLAG_COMPONENTS[l.flag];
+            return (
               <button
                 key={l.code}
                 type="button"
@@ -74,9 +92,11 @@ export default function LanguageSwitcher() {
                   fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: '#332E22',
                 }}
               >
+                {Flag && <Flag size={18} />}
                 {l.label}
               </button>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
