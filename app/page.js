@@ -522,6 +522,71 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section style={{ padding: '88px 0' }}>
+        <div className="wrap">
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
+            <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Calcula antes de decidir</h2>
+            <p style={{ fontSize: 15.5, color: 'var(--text-soft)' }}>
+              Ferramentas simples para tomar melhores decisões imobiliárias.
+            </p>
+          </div>
+
+          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
+            {[
+              { href: '/simulador-imt', icon: '🏠', title: 'CALCULAR IMT', text: 'Saiba quanto poderá pagar na compra.' },
+              { href: '/simulador-arrendar-comprar', icon: '⚖️', title: 'ARRENDAR OU COMPRAR', text: 'Compare as duas opções.' },
+              { href: '/simulador-credito', icon: '€', title: 'SIMULADOR DE CRÉDITO', text: 'Estime a sua prestação.' },
+            ].map((card) => (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="card-hover-lift decision-card"
+                style={{
+                  display: 'block', textDecoration: 'none', background: 'var(--plaster)',
+                  border: '1px solid rgba(126,143,106,0.25)', borderRadius: 14, padding: '30px 24px',
+                  position: 'relative', overflow: 'hidden',
+                }}
+              >
+                <div style={{
+                  position: 'absolute', top: -18, right: -18, width: 70, height: 70, borderRadius: '50%',
+                  background: 'rgba(126,143,106,0.18)',
+                }} />
+                <div style={{
+                  width: 48, height: 48, borderRadius: 10, background: 'var(--azulejo)', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 18, position: 'relative',
+                }}>
+                  {card.icon}
+                </div>
+                <div style={{
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, letterSpacing: '0.06em',
+                  color: 'var(--telha)', fontWeight: 600, marginBottom: 8,
+                }}>
+                  {card.title}
+                </div>
+                <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5, marginBottom: 0 }}>
+                  {card.text}
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          <div style={{
+            position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220, marginTop: 40,
+            backgroundImage: 'url(/images/avaliacao-foto.jpg)', backgroundSize: 'cover', backgroundPosition: 'center center',
+          }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
+            }} />
+            <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
+              <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
+              <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
@@ -647,70 +712,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '88px 0' }}>
-        <div className="wrap">
-          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
-            <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Antes de escolher, faça as contas.</h2>
-            <p style={{ fontSize: 15.5, color: 'var(--text-soft)' }}>
-              Ferramentas simples para tomar melhores decisões imobiliárias.
-            </p>
-          </div>
-
-          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
-            {[
-              { href: '/simulador-imt', icon: '🏠', title: 'CALCULAR IMT', text: 'Saiba quanto poderá pagar na compra.' },
-              { href: '/simulador-arrendar-comprar', icon: '⚖️', title: 'ARRENDAR OU COMPRAR', text: 'Compare as duas opções.' },
-              { href: '/simulador-credito', icon: '€', title: 'SIMULADOR DE CRÉDITO', text: 'Estime a sua prestação.' },
-            ].map((card) => (
-              <Link
-                key={card.href}
-                href={card.href}
-                className="card-hover-lift decision-card"
-                style={{
-                  display: 'block', textDecoration: 'none', background: 'var(--plaster)',
-                  border: '1px solid rgba(126,143,106,0.25)', borderRadius: 14, padding: '30px 24px',
-                  position: 'relative', overflow: 'hidden',
-                }}
-              >
-                <div style={{
-                  position: 'absolute', top: -18, right: -18, width: 70, height: 70, borderRadius: '50%',
-                  background: 'rgba(126,143,106,0.18)',
-                }} />
-                <div style={{
-                  width: 48, height: 48, borderRadius: 10, background: 'var(--azulejo)', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 18, position: 'relative',
-                }}>
-                  {card.icon}
-                </div>
-                <div style={{
-                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, letterSpacing: '0.06em',
-                  color: 'var(--telha)', fontWeight: 600, marginBottom: 8,
-                }}>
-                  {card.title}
-                </div>
-                <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5, marginBottom: 0 }}>
-                  {card.text}
-                </p>
-              </Link>
-            ))}
-          </div>
-
-          <div style={{
-            position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220, marginTop: 40,
-            backgroundImage: 'url(/images/avaliacao-foto.jpg)', backgroundSize: 'cover', backgroundPosition: 'center center',
-          }}>
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
-            }} />
-            <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
-              <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
-              <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section style={{ padding: '20px 0 88px' }}>
         <div className="wrap">
