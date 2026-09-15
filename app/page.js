@@ -498,7 +498,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '40px 0 88px' }}>
+      <section style={{ padding: '8px 0 56px' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
             <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Calcula antes de decidir</h2>
@@ -542,14 +542,14 @@ export default function HomePage() {
 
           <div style={{
             display: 'grid', gridTemplateColumns: 'minmax(280px, 0.9fr) minmax(0, 1.1fr)',
-            borderRadius: 14, overflow: 'hidden', marginTop: 40,
+            borderRadius: 14, overflow: 'hidden', marginTop: 28,
             background: 'var(--plaster)', border: '1px solid rgba(126,143,106,0.25)',
-            minHeight: 220,
+            minHeight: 180,
           }}>
-            <div style={{ minHeight: 220, overflow: 'hidden' }}>
+            <div style={{ minHeight: 180, overflow: 'hidden' }}>
               <img src="/images/avaliacao-foto.jpg" alt="Avaliação de imóvel" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
-            <div style={{ padding: '34px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ padding: '28px 34px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: 'var(--ink)' }}>{t('home_valuation_title')}</h2>
               <p style={{ fontSize: 14.5, color: 'var(--text-soft)', marginBottom: 20, lineHeight: 1.55 }}>{t('home_valuation_sub')}</p>
               <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
