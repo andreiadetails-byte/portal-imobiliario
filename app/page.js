@@ -498,7 +498,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '8px 0 56px' }}>
+      <section style={{ padding: '0 0 56px' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
             <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Calcula antes de decidir</h2>
@@ -542,7 +542,7 @@ export default function HomePage() {
 
           <div style={{
             display: 'grid', gridTemplateColumns: 'minmax(280px, 0.9fr) minmax(0, 1.1fr)',
-            borderRadius: 14, overflow: 'hidden', marginTop: 28,
+            borderRadius: 14, overflow: 'hidden', marginTop: 44,
             background: 'var(--plaster)', border: '1px solid rgba(126,143,106,0.25)',
             minHeight: 180,
           }}>
@@ -591,23 +591,17 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
-        <div className="wrap" style={{ textAlign: 'center' }}>
-          <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
-            Encontra a tua casa.
-          </h2>
+      <section style={{ padding: '56px 0', background: 'var(--plaster)' }}>
+        <div className="wrap">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
             {[
-              { href: '/results?business=Venda', img: '/mood/sala-verde-premium.jpg', label: 'Comprar' },
-              { href: '/results?business=Arrendamento', img: '/mood/nicho-arco-ceramica.jpg', label: 'Arrendar' },
-              { href: '/simulador-investimento', img: '/mood/estante-livros-v2.jpg', label: 'Investir' },
+              { img: '/mood/sala-verde-premium.jpg', label: 'Sala' },
+              { img: '/mood/nicho-arco-ceramica.jpg', label: 'Cozinha' },
+              { img: '/mood/estante-livros-v2.jpg', label: 'Investimento' },
             ].map((item) => (
-              <Link key={item.label} href={item.href} className="card-hover-lift" style={{ display: 'block', textDecoration: 'none' }}>
-                <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 14, boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
-                  <img src={item.img} alt={item.label} style={{ width: '100%', height: 220, objectFit: 'cover' }} />
-                </div>
-                <span className="display" style={{ fontSize: 18, color: 'var(--ink)' }}>{item.label}</span>
-              </Link>
+              <div key={item.img} style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
+                <img src={item.img} alt="" style={{ width: '100%', height: 220, objectFit: 'cover', display: 'block' }} />
+              </div>
             ))}
           </div>
         </div>
