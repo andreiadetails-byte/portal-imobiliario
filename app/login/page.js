@@ -269,7 +269,7 @@ if (profileError) {
                   <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
                     <option value="particular">{t('login_particular_opt')}</option>
                     <option value="agencia">{t('login_agency_opt')}</option>
-                    <option value="consultor">{t('login_consultant_opt')}</option>
+  
                     <option value="promotor">{t('login_developer_opt')}</option>
                   </select>
                 </div>
@@ -428,7 +428,7 @@ if (profileError) {
               <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
                 <option value="particular">{t('login_particular_opt')}</option>
                 <option value="agencia">{t('login_agency_opt')}</option>
-                <option value="consultor">{t('login_consultant_opt')}</option>
+                
                 <option value="promotor">{t('login_developer_opt')}</option>
               </select>
             </div>
