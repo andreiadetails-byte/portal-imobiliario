@@ -12,11 +12,13 @@ import BigPromoBanner from '../components/BigPromoBanner';
 import PricePerM2Lookup from '../components/PricePerM2Lookup';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import { distritos } from '../lib/locations';
+import NaturalSearchBox from '../components/NaturalSearchBox';
 import NewsletterSignup from '../components/NewsletterSignup';
 import LazyMount from '../components/LazyMount';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../lib/localFavorites';
 import PhoneDisplay from '../components/PhoneDisplay';
 import dynamic from 'next/dynamic';
+import { Heart } from 'lucide-react';
 
 const MiniMapPreview = dynamic(() => import('../components/MiniMapPreview'), { ssr: false });
 import { displayAddress } from '../lib/displayAddress';
@@ -186,30 +188,27 @@ export default function HomePage() {
       <main id="main-content">
       <section
         style={{
-          padding: '100px 0 64px',
-          backgroundImage: 'linear-gradient(rgba(30,26,18,0.62), rgba(30,26,18,0.42)), url(/hero.jpg)',
+          padding: '120px 0 70px',
+          backgroundImage: 'linear-gradient(rgba(51,46,34,0.32), rgba(51,46,34,0.42)), url(/mood/sala-verde-premium.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
         }}
       >
-        <div className="wrap" style={{ maxWidth: 760 }}>
-          <span style={{
-            fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.08em',
-            textTransform: 'uppercase', color: 'var(--brass)', marginBottom: 18, display: 'block',
-          }}>
-            {t('home_eyebrow')}
-          </span>
-          <h1 className="display hero-title" style={{ fontSize: 48, lineHeight: 1.08, letterSpacing: '-0.01em', marginBottom: 14, color: '#fff' }}>
+        <div className="wrap" style={{ maxWidth: 720, textAlign: 'center' }}>
+          <h1 className="display hero-title" style={{ fontSize: 46, lineHeight: 1.15, letterSpacing: '-0.01em', marginBottom: 14, color: '#fff' }}>
             {t('home_title')}
           </h1>
-          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', maxWidth: 480, marginBottom: 24 }}>
+          <p style={{
+            fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, letterSpacing: '0.06em',
+            color: 'rgba(255,255,255,0.9)', marginBottom: 30,
+          }}>
             {t('home_lede')}
           </p>
         </div>
 
         <div className="wrap">
-          <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760, margin: '0 auto', boxShadow: '0 8px 30px rgba(0,0,0,0.25)', overflow: 'visible' }}>
+          <form onSubmit={handleSearch} className="card" style={{ padding: 22, maxWidth: 760, margin: '0 auto', background: 'var(--paper)', boxShadow: '0 16px 44px rgba(30,26,18,0.22)', overflow: 'visible' }}>
             <div className="home-tabs-search-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
               <div style={{ display: 'flex', gap: 4 }}>
                 {['Venda', 'Arrendamento', 'Trespasse'].map((bt) => (
@@ -253,46 +252,16 @@ export default function HomePage() {
 
       <div style={{ height: 24, background: 'var(--paper)' }} />
 
-      <section style={{ padding: '72px 0', position: 'relative', overflow: 'hidden' }}>
-        <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(48,57,39,0.62), rgba(48,57,39,0.18))' }} />
-        <div className="wrap" style={{ maxWidth: 900, position: 'relative' }}>
-          <Link
-            href="/simulador-investimento"
-            style={{
-              borderRadius: 16, padding: '24px 28px', background: 'linear-gradient(135deg, rgba(73,86,56,0.98) 0%, rgba(112,91,58,0.96) 100%)', boxShadow: '0 18px 45px rgba(39,45,31,0.20)',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', textDecoration: 'none',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontSize: 34, flexShrink: 0 }}>📈</span>
-              <div>
-                <div className="display" style={{ fontSize: 19, fontWeight: 600, color: '#fff', marginBottom: 3 }}>{t('home_investor_title')}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)' }}>
-                  {t('home_investor_text')}
-                </div>
-              </div>
+      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/parede-pedra.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.55)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
+          <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
+            <div className="tile-strip" />
+            <div style={{ padding: 18 }}>
+              <NaturalSearchBox />
             </div>
-            <span style={{
-              background: '#fff', color: 'var(--ink)', fontSize: 13.5, fontWeight: 600,
-              padding: '11px 22px', borderRadius: 6, whiteSpace: 'nowrap',
-            }}>
-              {t('home_investor_cta')}
-            </span>
-          </Link>
-        </div>
-      </section>
-
-      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden', background: 'var(--paper)' }}>
-        <img src="/images/simulador-imt.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(45,51,35,0.72), rgba(45,51,35,0.34))' }} />
-        <div className="wrap" style={{ maxWidth: 900, position: 'relative' }}>
-          <div style={{ borderRadius: 16, padding: '24px 28px', background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 18px 45px rgba(39,45,31,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
-            <div>
-              <div className="display" style={{ fontSize: 21, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{t('home_imt_title')}</div>
-              <div style={{ fontSize: 14.5, color: 'var(--text-soft)' }}>{t('home_imt_sub')}</div>
-            </div>
-            <Link href="/simulador-imt" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px', whiteSpace: 'nowrap' }}>{t('home_imt_btn')}</Link>
+            <div className="tile-strip" />
           </div>
         </div>
       </section>
@@ -417,7 +386,7 @@ export default function HomePage() {
                     role="link"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
-                    className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
+                    className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                     style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
@@ -432,30 +401,30 @@ export default function HomePage() {
                       color: favoriteIds.includes(p.id) ? '#b8452f' : 'var(--ink)',
                     }}
                   >
-                    {favoriteIds.includes(p.id) ? '♥' : '♡'}
+                    {favoriteIds.includes(p.id) ? <Heart size={15} fill="#b8452f" strokeWidth={1.5} /> : <Heart size={15} strokeWidth={1.5} />}
                   </button>
                   {firstPhoto ? (
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative', overflow: 'hidden' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} className="card-photo-zoom" style={{ width: '100%', height: 220, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
                       <div className="photo-watermark" style={{ fontSize: 11 }}>More·ada</div>
                     </div>
                   ) : (
-                    <div className="card-photo" />
+                    <div className="card-photo" style={{ height: 220 }} />
                   )}
-                  <div className="card-body">
-                    <div className="price">
+                  <div className="card-body" style={{ padding: '22px 20px 20px' }}>
+                    <div className="addr" style={{ fontSize: 17, marginBottom: 4 }}>{p.typology} · {p.district}</div>
+                    <div className="meta" style={{ marginBottom: 10, fontSize: 13 }}>{displayAddress(p)}</div>
+                    <div className="price" style={{ fontSize: 20, marginBottom: 6 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="addr">{p.typology} · {displayAddress(p)}</div>
-                    <div className="meta" style={{ marginBottom: 4 }}>
-                      {p.property_type}{p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
-                      {p.bedrooms ? ` · ${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
+                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                      {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
+                      {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                     </div>
-                    <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>{t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-                      <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+                      <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}></div>
                       {p.profiles && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
@@ -526,7 +495,7 @@ export default function HomePage() {
                     role="link"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
-                    className={`card${p.featured_status === 'active' ? ' card-destaque' : ''}`}
+                    className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
                     style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
@@ -541,7 +510,7 @@ export default function HomePage() {
                       color: favoriteIds.includes(p.id) ? '#b8452f' : 'var(--ink)',
                     }}
                   >
-                    {favoriteIds.includes(p.id) ? '♥' : '♡'}
+                    {favoriteIds.includes(p.id) ? <Heart size={15} fill="#b8452f" strokeWidth={1.5} /> : <Heart size={15} strokeWidth={1.5} />}
                   </button>
                   {firstPhoto ? (
                     <div style={{ position: 'relative' }}>
@@ -620,33 +589,53 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '8px 0 88px' }}>
+      <section style={{ padding: '20px 0 88px' }}>
         <div className="wrap">
-          <div style={{ textAlign: 'center', marginBottom: 22 }}>
-            <div style={{ fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--telha)', fontWeight: 700, marginBottom: 6 }}>Simuladores</div>
-            <h2 className="display" style={{ fontSize: 28, color: 'var(--ink)', margin: 0 }}>Decida com mais confiança</h2>
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
+            <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Antes de escolher, faça as contas.</h2>
+            <p style={{ fontSize: 15.5, color: 'var(--text-soft)' }}>
+              Ferramentas simples para tomar melhores decisões imobiliárias.
+            </p>
           </div>
-          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 380px))', justifyContent: 'center', gap: 20 }}>
-            <div className="card-hover-lift simulator-card" style={{ background: 'rgba(255,253,247,0.96)', border: '1px solid rgba(117,106,82,0.18)', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ height: 150, backgroundImage: 'url(/images/simulador-arrendar.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              <div style={{ padding: '30px 30px 36px' }}>
-                <h3 className="display" style={{ fontSize: 22, marginBottom: 10 }}>{t('home_rentbuy_title')}</h3>
-                <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 20, lineHeight: 1.55 }}>
-                  Compare o custo real das duas opções, ao longo do tempo.
+
+          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18 }}>
+            {[
+              { href: '/simulador-investimento', icon: '📈', title: 'CALCULADORA INVESTIDOR', text: 'Descubra a rentabilidade do seu investimento.' },
+              { href: '/simulador-imt', icon: '🏠', title: 'CALCULAR IMT', text: 'Saiba quanto poderá pagar na compra.' },
+              { href: '/simulador-arrendar-comprar', icon: '⚖️', title: 'ARRENDAR OU COMPRAR', text: 'Compare as duas opções.' },
+              { href: '/simulador-credito', icon: '€', title: 'SIMULADOR DE CRÉDITO', text: 'Estime a sua prestação.' },
+            ].map((card) => (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="card-hover-lift decision-card"
+                style={{
+                  display: 'block', textDecoration: 'none', background: 'var(--plaster)',
+                  border: '1px solid rgba(126,143,106,0.25)', borderRadius: 14, padding: '30px 24px',
+                  position: 'relative', overflow: 'hidden',
+                }}
+              >
+                <div style={{
+                  position: 'absolute', top: -18, right: -18, width: 70, height: 70, borderRadius: '50%',
+                  background: 'rgba(126,143,106,0.18)',
+                }} />
+                <div style={{
+                  width: 48, height: 48, borderRadius: 10, background: 'var(--azulejo)', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 18, position: 'relative',
+                }}>
+                  {card.icon}
+                </div>
+                <div style={{
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, letterSpacing: '0.06em',
+                  color: 'var(--telha)', fontWeight: 600, marginBottom: 8,
+                }}>
+                  {card.title}
+                </div>
+                <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5, marginBottom: 0 }}>
+                  {card.text}
                 </p>
-                <Link href="/simulador-arrendar-comprar" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>{t('home_rentbuy_cta')}</Link>
-              </div>
-            </div>
-            <div className="card-hover-lift simulator-card" style={{ background: 'rgba(255,253,247,0.96)', border: '1px solid rgba(117,106,82,0.18)', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ height: 150, backgroundImage: 'url(/images/simulador-credito.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              <div style={{ padding: '30px 30px 36px' }}>
-                <h3 className="display" style={{ fontSize: 22, marginBottom: 10 }}>{t('home_credit_title')}</h3>
-                <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 20, lineHeight: 1.55 }}>
-                  {t('home_credit_sub')}
-                </p>
-                <Link href="/simulador-credito" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>{t('home_credit_btn')}</Link>
-              </div>
-            </div>
+              </Link>
+            ))}
           </div>
 
           <div style={{
@@ -764,17 +753,72 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      <section style={{ background: 'var(--telha)', padding: '90px 0', position: 'relative', overflow: 'hidden' }}>
+        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 40, alignItems: 'center' }}>
+          <div>
+            <h2 className="display" style={{ fontSize: 32, color: '#fff', marginBottom: 44 }}>Uma nova forma de procurar casa.</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+              {[
+                { n: '01', title: 'Tudo num só lugar', text: 'Imóveis, ferramentas e informação.' },
+                { n: '02', title: 'Mais simples', text: 'Sem complicações desnecessárias.' },
+                { n: '03', title: 'Feito para Portugal', text: 'Pensado para quem compra, vende, arrenda ou investe.' },
+              ].map((item) => (
+                <div key={item.n} style={{ display: 'flex', gap: 18, alignItems: 'baseline' }}>
+                  <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, color: 'rgba(255,255,255,0.55)', flexShrink: 0 }}>
+                    {item.n} —
+                  </span>
+                  <div>
+                    <div className="display" style={{ fontSize: 19, color: '#fff', marginBottom: 3 }}>{item.title}</div>
+                    <div style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.78)' }}>{item.text}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', opacity: 0.9 }}>
+            <svg width="220" height="320" viewBox="0 0 220 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M110 300 C 108 220, 112 140, 108 30" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" strokeLinecap="round" />
+              {[
+                { y: 60, side: 1 }, { y: 90, side: -1 }, { y: 120, side: 1 }, { y: 150, side: -1 },
+                { y: 180, side: 1 }, { y: 210, side: -1 }, { y: 240, side: 1 }, { y: 270, side: -1 },
+              ].map((leaf, idx) => (
+                <ellipse
+                  key={idx}
+                  cx={110 + leaf.side * 32}
+                  cy={leaf.y}
+                  rx="26"
+                  ry="10"
+                  fill="rgba(216,201,163,0.5)"
+                  stroke="rgba(255,255,255,0.4)"
+                  strokeWidth="1"
+                  transform={`rotate(${leaf.side * 28} ${110 + leaf.side * 32} ${leaf.y})`}
+                />
+              ))}
+            </svg>
+          </div>
+        </div>
+      </section>
       </main>
 
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>
         <div className="wrap" style={{ padding: '48px 32px 32px' }}>
-          <div style={{ background: 'var(--plaster)', borderRadius: 12, padding: '28px 32px', marginBottom: 40, textAlign: 'center' }}>
-            <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('newsletter_title')}</h3>
-            <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto' }}>
-              {t('newsletter_subtitle')}
-            </p>
-            <div style={{ maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
-              <NewsletterSignup />
+          <div className="newsletter-box" style={{
+            display: 'grid', gridTemplateColumns: '260px 1fr', gap: 0, borderRadius: 16, overflow: 'hidden',
+            marginBottom: 40, background: 'var(--plaster)', border: '1px solid rgba(126,143,106,0.2)',
+          }}>
+            <div style={{
+              backgroundImage: 'url(/mood/nicho-arco-ceramica.jpg)', backgroundSize: 'cover', backgroundPosition: 'center',
+              minHeight: 220,
+            }} />
+            <div style={{ padding: '32px 36px', textAlign: 'left' }}>
+              <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('newsletter_title')}</h3>
+              <p style={{ fontSize: 13.5, color: 'var(--text-soft)', marginBottom: 16, maxWidth: 480 }}>
+                {t('newsletter_subtitle')}
+              </p>
+              <div style={{ maxWidth: 420 }}>
+                <NewsletterSignup />
+              </div>
             </div>
           </div>
           <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 32 }}>

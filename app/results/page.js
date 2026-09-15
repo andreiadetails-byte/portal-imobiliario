@@ -229,41 +229,14 @@ function ResultsInner() {
         conversationId = created?.id;
       }
       if (conversationId) {
-        const { data: newMessage, error: messageError } = await supabase
-          .from('messages')
-          .insert({
-            conversation_id: conversationId,
-            sender_id: user.id,
-            content: messageForm.message,
-            sender_name: messageForm.name,
-            sender_email: messageForm.email,
-            sender_phone: messageForm.phone || null,
-          })
-          .select()
-          .single();
-
-        if (messageError) {
-          console.error('[CHAT] Erro ao inserir mensagem:', messageError);
-          alert(`Erro ao enviar mensagem: ${messageError.message}`);
-        } else if (!newMessage) {
-          console.error('[CHAT] Mensagem inserida mas sem dados devolvidos.');
-          alert('A mensagem foi enviada, mas não foi possível obter os dados da mensagem.');
-        } else {
-          const { data: sessionData } = await supabase.auth.getSession();
-          fetch('/api/notify-chat-message', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${sessionData?.session?.access_token}`,
-            },
-            body: JSON.stringify({ messageId: newMessage.id }),
-          }).catch((err) => {
-            console.error('[notify-chat-message] falhou:', err);
-          });
-        }
-      } else {
-        console.error('[CHAT] Não foi possível criar/encontrar a conversa.');
-        alert('Não foi possível abrir a conversa para enviar a mensagem.');
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: messageForm.message,
+          sender_name: messageForm.name,
+          sender_email: messageForm.email,
+          sender_phone: messageForm.phone || null,
+        });
       }
     } else {
       // Sem sessão iniciada — fica como lead, tal como na ficha do imóvel.

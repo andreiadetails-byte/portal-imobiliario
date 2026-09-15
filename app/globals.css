@@ -89,6 +89,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 .grid-listings-owner{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:18px; }
 @media (max-width: 900px){ .grid-listings{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 640px){
+  .newsletter-box{ grid-template-columns: 1fr !important; }
+  .newsletter-box > div:first-child{ min-height: 140px !important; }
   .grid-listings{ grid-template-columns:1fr; }
   img, video, iframe { max-width: 100%; height: auto; }
   /* No telemóvel já existe um aviso próprio, mais simples e automático
@@ -166,6 +168,7 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
 
 .card-hover-lift{ transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .card-hover-lift:hover{ transform: translateY(-4px); box-shadow: 0 10px 24px rgba(51,46,34,0.12); }
+.card-photo-zoom:hover{ transform: scale(1.04); }
 
 @keyframes character-float {
   0%, 100% { transform: translateY(0); }
@@ -234,6 +237,8 @@ header.site-header{ background:var(--paper); border-bottom:1px solid var(--line)
     scroll-snap-type: x mandatory;
   }
   .simulator-card{ flex: 0 0 82% !important; scroll-snap-align: start; }
+  .decision-card{ flex: 0 0 78% !important; scroll-snap-align: start; }
+  .simulators-row .decision-card{ display: block; }
   .chat-grid{ grid-template-columns: 1fr !important; height: calc(100vh - 220px) !important; min-height: 420px; }
   .chat-grid > *{ min-width: 0 !important; max-width: 100% !important; }
   .chat-list-col{ border-right: none !important; }

@@ -229,49 +229,25 @@ export default function PropertyClient() {
       // Com sessão iniciada: um sistema só — vai diretamente para o chat, com o nome e email visíveis na conversa.
       const conversationId = await getOrCreateConversation();
       if (conversationId) {
-        const { data: newMessage, error: messageError } = await supabase
-          .from('messages')
-          .insert({
-            conversation_id: conversationId,
-            sender_id: user.id,
-            content: lead.message,
-            sender_name: lead.name,
-            sender_email: lead.email,
-            sender_phone: lead.phone || null,
-          })
-          .select()
-          .single();
+        const { data: newMessage } = await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: lead.message,
+          sender_name: lead.name,
+          sender_email: lead.email,
+          sender_phone: lead.phone || null,
+        }).select().single();
 
-        if (messageError) {
-          console.error('[CHAT] Erro ao inserir mensagem:', messageError);
-          alert(`Erro ao enviar mensagem: ${messageError.message}`);
-        } else if (!newMessage) {
-          console.error('[CHAT] Mensagem inserida mas sem dados devolvidos.');
-          alert('A mensagem foi enviada, mas não foi possível obter os dados da mensagem.');
-        } else {
+        // Chama a notificação diretamente (em vez de confiar só no webhook
+        // do Supabase, que por vezes falha por um problema de infraestrutura).
+        if (newMessage) {
           const { data: sessionData } = await supabase.auth.getSession();
           fetch('/api/notify-chat-message', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${sessionData?.session?.access_token}`,
-            },
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionData?.session?.access_token}` },
             body: JSON.stringify({ messageId: newMessage.id }),
-          })
-            .then(async (res) => {
-              const result = await res.json();
-              return { status: res.status, result };
-            })
-            .then(({ status, result }) => {
-              console.log('[notify-chat-message]', status, result);
-              alert(`Diagnóstico notificação: estado ${status} — ${JSON.stringify(result)}`);
-            })
-            .catch((err) => {
-              console.error('[notify-chat-message] falhou:', err);
-              alert(`Diagnóstico: erro de rede ao chamar a notificação — ${err.message}`);
-            });
+          }).catch(() => {});
         }
-
       }
     } else {
       // Sem sessão iniciada, não há forma de chat — fica como lead (com nome, email e contacto).
