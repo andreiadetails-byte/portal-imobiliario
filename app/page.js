@@ -274,7 +274,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '32px 0 88px' }}>
+      <section style={{ padding: '32px 0 32px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 32, marginBottom: 32, color: 'var(--ink)' }}>{t('home_featured')}</h2>
 
@@ -498,7 +498,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '40px 0 88px' }}>
+      <section style={{ padding: '12px 0 64px' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
             <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Calcula antes de decidir</h2>
