@@ -799,7 +799,11 @@ function PublishForm() {
   return (
     <>
       <Header />
-    <main id="main-content" className="wrap publish-page-bg" style={{ maxWidth: 900, padding: '32px 32px 56px', backgroundImage: "linear-gradient(rgba(247,245,239,0.90), rgba(232,228,216,0.92)), url('/mood/sala-verde-premium.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', borderRadius: 18, marginTop: 24, boxShadow: '0 18px 50px rgba(51,46,34,0.10)', border: '1px solid rgba(113,128,92,0.18)' }}>
+      <div style={{ position: 'relative', overflow: 'hidden', height: 64 }}>
+        <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.78)' }} />
+      </div>
+    <main id="main-content" className="wrap" style={{ maxWidth: 720, padding: '32px 32px 48px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
       <BackButton fallback="/dashboard" />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 className="display" style={{ fontSize: 28 }}>{isEditMode ? 'Editar anúncio' : t('publish_title')}</h1>
@@ -820,7 +824,7 @@ function PublishForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="card publish-form-card" style={{ padding: 32, overflow: 'visible', maxWidth: 720, margin: '0 auto' }}>
+      <form onSubmit={handleSubmit} className="card" style={{ padding: 32, overflow: 'visible' }}>
         <div className="field">
           <label>{t('pub_title_optional')}</label>
           <input value={form.title} onChange={(e) => updateField('title', e.target.value)} placeholder="ex: T3 remodelado em Campo de Ourique" />

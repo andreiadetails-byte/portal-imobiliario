@@ -198,7 +198,7 @@ export default function PricePerM2Lookup() {
             result.ine ? (
               <>
                 <div style={{ fontSize: 12.5, color: 'var(--text-soft)', marginBottom: 4 }}>
-                  {t('pricem2_not_enough_ine')} {areaLabel} {t('pricem2_ine_official_value')}
+                  {t('pricem2_ine_official_value_for')} {areaLabel}
                   {result.ineWidenedLabel && ` ${t('pricem2_ine_for')} ${result.ineWidenedLabel} ${t('pricem2_ine_no_data_for')} ${areaLabel})`}
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--telha)', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>

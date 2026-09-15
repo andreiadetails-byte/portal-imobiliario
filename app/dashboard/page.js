@@ -256,6 +256,10 @@ function DashboardInner() {
   return (
     <>
       <Header />
+      <div style={{ position: 'relative', overflow: 'hidden', height: 64 }}>
+        <img src="/mood/sala-verde-premium.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.78)' }} />
+      </div>
     <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
       <BackButton fallback="/" />
       {isWelcomeAgency && !welcomeDismissed && (() => {

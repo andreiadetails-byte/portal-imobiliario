@@ -20,20 +20,29 @@ export async function POST(request) {
       return Response.json({ success: true, applied: false });
     }
 
+    // Até 15 de dezembro de 2026, contas eliminadas podem voltar a ter o
+    // período grátis (promoção temporária). Depois dessa data, uma conta
+    // que já foi eliminada tem de pagar logo, como seria o normal.
+    const promoDeadline = new Date('2026-12-15T23:59:59');
+    const isPastPromoDeadline = new Date() > promoDeadline;
+
     // Se este email já teve uma conta eliminada antes, não volta a ter
-    // direito ao período grátis inicial — evita que alguém elimine e crie
-    // conta de novo só para repetir o desconto.
-    const { data: { user: authUser } } = await supabaseAdmin.auth.admin.getUserById(userId);
-    const email = authUser?.email;
-    if (email) {
-      const { data: priorDeletion } = await supabaseAdmin
-        .from('account_deletions').select('id').eq('email', email).limit(1).maybeSingle();
-      if (priorDeletion) {
-        // Marca a conta como precisando de pagar já, sem período grátis.
-        await supabaseAdmin.from('profiles').update({
-          subscription_status: 'pending',
-        }).eq('id', userId);
-        return Response.json({ success: true, applied: false, reason: 'previously_deleted' });
+    // direito ao período grátis inicial (só depois da promoção acima
+    // terminar) — evita que alguém elimine e crie conta de novo só para
+    // repetir o desconto indefinidamente.
+    if (isPastPromoDeadline) {
+      const { data: { user: authUser } } = await supabaseAdmin.auth.admin.getUserById(userId);
+      const email = authUser?.email;
+      if (email) {
+        const { data: priorDeletion } = await supabaseAdmin
+          .from('account_deletions').select('id').eq('email', email).limit(1).maybeSingle();
+        if (priorDeletion) {
+          // Marca a conta como precisando de pagar já, sem período grátis.
+          await supabaseAdmin.from('profiles').update({
+            subscription_status: 'pending',
+          }).eq('id', userId);
+          return Response.json({ success: true, applied: false, reason: 'previously_deleted' });
+        }
       }
     }
 

@@ -120,12 +120,12 @@ function MensagensSuporteInner() {
 
   const activeThread = supportThreads.find((r) => r.id === activeId);
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--messages-bg)', borderRadius: 16, marginTop: 24 }}>...</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>);
 
   return (
     <>
       <Header />
-      <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--messages-bg)', borderRadius: 16, marginTop: 24 }}>
+      <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
         <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('support_title')}</h1>
 
@@ -135,6 +135,8 @@ function MensagensSuporteInner() {
           <div className="card chat-grid" style={{ display: 'grid', gridTemplateColumns: '460px 1fr', height: 'calc(100vh - 200px)', minHeight: 420, maxHeight: 700, overflow: 'hidden' }}>
             {/* Coluna da lista de conversas, com a foto da estante como fundo */}
             <div className={`chat-list-col${activeId ? ' chat-hide-mobile' : ''}`} style={{ borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, position: 'relative' }}>
+              <img src="/mood/estante-livros-v2.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(126,143,106,0.78)', zIndex: 0 }} />
               <div style={{ position: 'relative', zIndex: 1, overflowY: 'auto', flex: 1, minHeight: 0, padding: '14px 0' }}>
                 {supportThreads.map((r) => {
                   const lastMsg = r.replies.length > 0 ? r.replies[r.replies.length - 1] : { message: r.message, created_at: r.created_at };
@@ -146,15 +148,15 @@ function MensagensSuporteInner() {
                       onClick={() => setActiveId(r.id)}
                       style={{
                         display: 'flex', flexDirection: 'column', gap: 4, padding: '14px 16px', margin: '0 10px 12px',
-                        border: (highlightedId === r.id || r.id === activeId) ? '1.5px solid var(--messages-green)' : '1px solid var(--line)',
+                        border: (highlightedId === r.id || r.id === activeId) ? '1.5px solid var(--telha)' : '1px solid var(--line)',
                         borderRadius: 8, cursor: 'pointer',
-                        background: r.id === activeId ? 'var(--plaster)' : 'var(--paper)',
+                        background: r.id === activeId ? 'var(--plaster)' : 'rgba(255,255,255,0.8)',
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
                         <b style={{ fontSize: 14.5 }}>Conversa com {agentLabel(r.agent_name)}</b>
                         {unreadCount > 0 && (
-                          <span style={{ background: 'var(--messages-green-soft)', color: 'var(--ink)', fontSize: 10.5, fontWeight: 700, borderRadius: 10, padding: '1px 7px' }}>
+                          <span style={{ background: 'var(--telha)', color: '#fff', fontSize: 10.5, fontWeight: 700, borderRadius: 10, padding: '1px 7px' }}>
                             {unreadCount}
                           </span>
                         )}
@@ -196,7 +198,7 @@ function MensagensSuporteInner() {
 
                   <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <div style={{ alignSelf: 'flex-end', maxWidth: '80%', minWidth: 0 }}>
-                      <div style={{ background: 'var(--messages-green-soft)', color: 'var(--ink)', padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4, minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+                      <div style={{ background: 'var(--green-vivid)', color: '#fff', padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4, minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                         {activeThread.message}
                       </div>
                       <div style={{ fontSize: 11.5, color: 'var(--text-soft)', marginTop: 3, textAlign: 'right', paddingRight: 2 }}>
@@ -212,8 +214,8 @@ function MensagensSuporteInner() {
                             style={{
                               padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                               minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
-                              background: rep.sender_role === 'admin' ? 'var(--paper)' : 'var(--messages-green-soft)',
-                              color: rep.sender_role === 'admin' ? 'var(--ink)' : '#fff',
+                              background: rep.sender_role === 'admin' ? 'var(--green-aqua)' : 'var(--green-vivid)',
+                              color: '#fff',
                             }}
                           >
                             {rep.message}
@@ -269,7 +271,7 @@ function MensagensSuporteInner() {
 
 export default function MensagensSuportePage() {
   return (
-    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--messages-bg)', borderRadius: 16, marginTop: 24 }}>...</div>}>
+    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div>}>
       <MensagensSuporteInner />
     </Suspense>
   );

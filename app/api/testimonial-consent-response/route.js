@@ -9,7 +9,7 @@ export async function GET(request) {
   const token = searchParams.get('token');
   const resposta = searchParams.get('resposta');
 
-  const redirectBase = 'https://portalimobiliario.netlify.app/testemunho-resposta';
+  const redirectBase = 'https://www.moreada.pt/testemunho-resposta';
 
   if (!token || !['sim', 'nao'].includes(resposta)) {
     return Response.redirect(`${redirectBase}?estado=erro`, 302);

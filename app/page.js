@@ -184,11 +184,10 @@ export default function HomePage() {
     <>
       <Header minimal />
 
-      <main id="main-content" className="homepage-shell">
+      <main id="main-content">
       <section
         style={{
           padding: '120px 0 70px',
-          backgroundColor: '#7A8568',
           backgroundImage: 'linear-gradient(rgba(51,46,34,0.32), rgba(51,46,34,0.42)), url(/mood/sala-verde-premium.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -250,23 +249,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ background: 'linear-gradient(180deg, #D3DBC5 0%, #C4D0B5 100%)', borderTop: '1px solid rgba(76,91,60,0.10)', borderBottom: '1px solid rgba(76,91,60,0.10)', padding: '80px 0' }}>
+      <section style={{ background: 'rgba(126,143,106,0.14)', padding: '80px 0' }}>
         <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <span style={{
               fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase',
               color: 'var(--telha)', fontWeight: 600, marginBottom: 12, display: 'block',
             }}>
-              Para investidores
+              {t('home_investor_eyebrow2')}
             </span>
             <h2 className="display" style={{ fontSize: 30, marginBottom: 16, color: 'var(--ink)' }}>
-              Investe com mais informação.
+              {t('home_investor_title2')}
             </h2>
             <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 26, lineHeight: 1.6, maxWidth: 400 }}>
-              Descubra a rentabilidade real de um investimento imobiliário, com base em dados atuais de mercado.
+              {t('home_investor_desc2')}
             </p>
             <Link href="/simulador-investimento" className="btn btn-primary" style={{ fontSize: 15, padding: '12px 26px' }}>
-              Calcular rentabilidade
+              {t('home_investor_cta2')}
             </Link>
           </div>
           <div style={{ borderRadius: 14, overflow: 'hidden', boxShadow: '0 20px 50px rgba(51,46,34,0.14)' }}>
@@ -275,7 +274,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '32px 0 88px', background: '#EFE6D5' }}>
+      <section style={{ padding: '32px 0 32px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 32, marginBottom: 32, color: 'var(--ink)' }}>{t('home_featured')}</h2>
 
@@ -299,7 +298,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(92,103,76,0.22)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -407,7 +406,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(92,103,76,0.22)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -499,20 +498,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '0 0 56px', background: '#D9E1D0' }}>
+      <section style={{ padding: '16px 0 88px' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
-            <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Calcula antes de decidir</h2>
+            <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>{t('home_calc_title')}</h2>
             <p style={{ fontSize: 15.5, color: 'var(--text-soft)' }}>
-              Ferramentas simples para tomar melhores decisões imobiliárias.
+              {t('home_calc_subtitle')}
             </p>
           </div>
 
-          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
+          <div className="decision-cards-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
             {[
-              { href: '/simulador-imt', img: '/mood/parede-bege.jpg', title: 'CALCULAR IMT', text: 'Saiba quanto poderá pagar na compra.' },
-              { href: '/simulador-arrendar-comprar', img: '/mood/luz-janela.jpg', title: 'ARRENDAR OU COMPRAR', text: 'Compare as duas opções.' },
-              { href: '/simulador-credito', img: '/mood/folha-terracota.jpg', title: 'SIMULADOR DE CRÉDITO', text: 'Estime a sua prestação.' },
+              { href: '/simulador-imt', img: '/mood/parede-bege.jpg', title: t('home_calc_imt_title'), text: t('home_calc_imt_text') },
+              { href: '/simulador-arrendar-comprar', img: '/mood/luz-janela.jpg', title: t('home_calc_rentbuy_title'), text: t('home_calc_rentbuy_text') },
+              { href: '/simulador-credito', img: '/mood/folha-terracota.jpg', title: t('home_calc_credit_title2'), text: t('home_calc_credit_text2') },
             ].map((card) => (
               <Link
                 key={card.href}
@@ -520,11 +519,11 @@ export default function HomePage() {
                 className="card-hover-lift decision-card"
                 style={{
                   display: 'block', textDecoration: 'none', background: 'var(--plaster)',
-                  border: '1px solid rgba(122,128,104,0.22)', borderRadius: 14, overflow: 'hidden',
+                  border: '1px solid rgba(126,143,106,0.25)', borderRadius: 14, overflow: 'hidden',
                 }}
               >
                 <div style={{ height: 100, overflow: 'hidden' }}>
-                  <img src={card.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={card.img} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '22px 24px 26px' }}>
                 <div className="display" style={{
@@ -541,58 +540,80 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="valuation-home-card" style={{
-            display: 'grid', gridTemplateColumns: 'minmax(280px, 0.9fr) minmax(0, 1.1fr)',
-            borderRadius: 14, overflow: 'hidden', marginTop: 44,
-            background: 'var(--plaster)', border: '1px solid rgba(122,128,104,0.22)',
-            minHeight: 180,
+          <div style={{
+            position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220, marginTop: 40,
+            backgroundImage: 'url(/images/avaliacao-foto.jpg)', backgroundSize: 'cover', backgroundPosition: 'center center',
           }}>
-            <div style={{ minHeight: 180, overflow: 'hidden' }}>
-              <img src="/images/avaliacao-foto.jpg" alt="Avaliação de imóvel" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            </div>
-            <div style={{ padding: '28px 34px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: 'var(--ink)' }}>{t('home_valuation_title')}</h2>
-              <p style={{ fontSize: 14.5, color: 'var(--text-soft)', marginBottom: 20, lineHeight: 1.55 }}>{t('home_valuation_sub')}</p>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
+            }} />
+            <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
+              <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
               <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section style={{ padding: '20px 0 88px', background: '#EEE4D2' }}>
-        <div className="wrap">
-          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
-            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>Quanto vale o m² na sua zona?</h2>
-            <p style={{ fontSize: 15.5, color: 'var(--text-soft)', margin: 0 }}>Compare os preços praticados na sua área e perceba melhor o valor da sua casa.</p>
-          </div>
-          <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
-            <PricePerM2Lookup />
-          </div>
-        </div>
-      </section>
-
-
-      <section style={{ padding: '56px 0', background: '#CBD6C0' }}>
-        <div className="wrap">
+      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
+        <div className="wrap" style={{ textAlign: 'center' }}>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
+            {t('home_find_title')}
+          </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
             {[
-              { img: '/mood/sala-verde-premium.jpg', label: 'Sala' },
-              { img: '/mood/nicho-arco-ceramica.jpg', label: 'Cozinha' },
-              { img: '/mood/estante-livros-v2.jpg', label: 'Investimento' },
+              { href: '/results?business=Venda', img: '/mood/sala-verde-premium.jpg', label: t('home_find_buy') },
+              { href: '/results?business=Arrendamento', img: '/mood/nicho-arco-ceramica.jpg', label: t('home_find_rent') },
+              { href: '/simulador-investimento', img: '/mood/estante-livros-v2.jpg', label: t('home_find_invest') },
             ].map((item) => (
-              <div key={item.img} style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
-                <img src={item.img} alt="" style={{ width: '100%', height: 220, objectFit: 'cover', display: 'block' }} />
-              </div>
+              <Link key={item.label} href={item.href} className="card-hover-lift" style={{ display: 'block', textDecoration: 'none' }}>
+                <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 14, boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
+                  <img src={item.img} alt={item.label} loading="lazy" style={{ width: '100%', height: 220, objectFit: 'cover' }} />
+                </div>
+                <span className="display" style={{ fontSize: 18, color: 'var(--ink)' }}>{item.label}</span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
 
+      <section style={{ padding: '20px 0 88px' }}>
+        <div className="wrap">
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
+            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>{t('home_m2_title')}</h2>
+          </div>
+          <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
+            <PricePerM2Lookup />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, maxWidth: 900, margin: '0 auto' }}>
+            {[
+              { href: '/valuation', label: t('home_data_avaliacao') },
+              { href: '/simulador-credito', label: t('home_data_credito') },
+              { href: '/simulador-imt', label: t('home_data_imt') },
+              { href: '/results', label: t('home_data_evolucao') },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  padding: '16px 12px', borderRadius: 10, border: '1px solid rgba(126,143,106,0.25)',
+                  background: 'var(--paper)', textDecoration: 'none', fontSize: 13.5, fontWeight: 600, color: 'var(--telha)',
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden', background: '#BCC9AE' }}>
-        <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
+      <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
         <div className="wrap" style={{ maxWidth: 420, position: 'relative' }}>
           <div style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
@@ -607,15 +628,35 @@ export default function HomePage() {
               style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
             />
             <div className="display" style={{ fontSize: 17, fontWeight: 600, color: 'var(--ink)' }}>
-              Leva o More·ada no telemóvel
+              {t('home_qr_text')}
             </div>
           </div>
         </div>
       </section>
 
-      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden', background: '#D4DCC9' }}>
-        <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
+        <img
+          src="/mood/escritorio.jpg"
+          alt=""
+          loading="lazy"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(36,41,26,0.55) 0%, rgba(36,41,26,0.88) 100%)' }} />
+        <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
+          <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+            {t('home_mood_title')}
+          </div>
+          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: 460, margin: '0 auto' }}>
+            {t('home_mood_text')}
+          </p>
+        </div>
+      </section>
+
+      <div style={{ height: 24, background: 'var(--paper)' }} />
+
+      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
           <div className="card" style={{ padding: '26px 28px', background: 'var(--plaster)' }}>
             <h3 className="display" style={{ fontSize: 19, marginBottom: 6 }}>{t('home_doubts_title')}</h3>
@@ -650,34 +691,48 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#667456' }}>
-        <img
-          src="/mood/escritorio.jpg"
-          alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(58,64,49,0.30) 0%, rgba(58,64,49,0.52) 100%)' }} />
-        <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
-          <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
-            {t('home_mood_title')}
+      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
+        <div className="wrap" style={{ textAlign: 'center' }}>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
+            {t('home_inspiration_title')}
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {[
+              { img: '/mood/sala-verde-premium.jpg', label: t('home_inspiration_living') },
+              { img: '/mood/floresta.jpg', label: t('home_inspiration_kitchen') },
+              { img: '/mood/escritorio.jpg', label: t('home_inspiration_exterior') },
+            ].map((item) => (
+              <div key={item.label}>
+                <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 14, boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
+                  <img src={item.img} alt={item.label} loading="lazy" style={{ width: '100%', height: 260, objectFit: 'cover' }} />
+                </div>
+                <span style={{
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, letterSpacing: '0.05em',
+                  textTransform: 'uppercase', color: 'var(--telha)', fontWeight: 600,
+                }}>
+                  {item.label}
+                </span>
+              </div>
+            ))}
           </div>
-          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: 460, margin: '0 auto' }}>
-            {t('home_mood_text')}
+        </div>
+      </section>
+
+
+
+      <section style={{ padding: '72px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
+        <img src="/mood/cadeiras.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55 }} loading="lazy" />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(61,74,46,0.3) 0%, rgba(61,74,46,0.75) 100%)' }} />
+        <div className="wrap" style={{ position: 'relative', maxWidth: 560, textAlign: 'center' }}>
+          <p className="display" style={{ fontSize: 24, fontWeight: 600, color: '#fff', lineHeight: 1.35, marginBottom: 0 }}>
+            {t('home_bench_quote')}
           </p>
         </div>
       </section>
 
-      <div style={{ height: 24, background: '#E4E7DA' }} />
-
-      
-
-
-
-      
-
-      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden', background: '#C8D4BC' }}>
-        <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.36)' }} />
+      <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/folhas-chao.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.75)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <h2 className="display" style={{ fontSize: 28, marginBottom: 8, color: '#fff' }}>{t('home_districts_title')}</h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 20 }}>{t('home_districts_sub')}</p>
@@ -696,9 +751,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '56px 0 88px', position: 'relative', overflow: 'hidden', background: '#E6DDCE' }}>
-        <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.32)' }} />
+      <section style={{ padding: '56px 0 88px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.5)' }} />
         <div className="wrap two-col-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative' }}>
           <div>
             <h2 className="display" style={{ fontSize: 20, marginBottom: 14, color: '#fff' }}>{t('home_testimonials_title')}</h2>
@@ -713,9 +768,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden', background: '#D9D1C3' }}>
-        <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(82,92,70,0.34)' }} />
+      <section style={{ padding: '64px 0 104px', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/parede-bege.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.72)' }} />
         <div className="wrap" style={{ position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
             <h2 className="display" style={{ fontSize: 28, margin: 0, color: '#fff' }}>{t('home_news_title')}</h2>
@@ -758,9 +813,64 @@ export default function HomePage() {
         </div>
       </section>
 
-      
+      <section style={{ background: 'var(--telha)', padding: '90px 0', position: 'relative', overflow: 'hidden' }}>
+        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 40, alignItems: 'center' }}>
+          <div>
+            <h2 className="display" style={{ fontSize: 32, color: '#fff', marginBottom: 44 }}>{t('home_why_title')}</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+              {[
+                { n: '01', title: t('home_why_1_title'), text: t('home_why_1_text') },
+                { n: '02', title: t('home_why_2_title'), text: t('home_why_2_text') },
+                { n: '03', title: t('home_why_3_title'), text: t('home_why_3_text') },
+              ].map((item) => (
+                <div key={item.n} style={{ display: 'flex', gap: 18, alignItems: 'baseline' }}>
+                  <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 15, color: 'rgba(255,255,255,0.55)', flexShrink: 0 }}>
+                    {item.n} —
+                  </span>
+                  <div>
+                    <div className="display" style={{ fontSize: 19, color: '#fff', marginBottom: 3 }}>{item.title}</div>
+                    <div style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.78)' }}>{item.text}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', opacity: 0.9 }}>
+            <svg width="220" height="320" viewBox="0 0 220 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M110 300 C 108 220, 112 140, 108 30" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" strokeLinecap="round" />
+              {[
+                { y: 60, side: 1 }, { y: 90, side: -1 }, { y: 120, side: 1 }, { y: 150, side: -1 },
+                { y: 180, side: 1 }, { y: 210, side: -1 }, { y: 240, side: 1 }, { y: 270, side: -1 },
+              ].map((leaf, idx) => (
+                <ellipse
+                  key={idx}
+                  cx={110 + leaf.side * 32}
+                  cy={leaf.y}
+                  rx="26"
+                  ry="10"
+                  fill="rgba(216,201,163,0.5)"
+                  stroke="rgba(255,255,255,0.4)"
+                  strokeWidth="1"
+                  transform={`rotate(${leaf.side * 28} ${110 + leaf.side * 32} ${leaf.y})`}
+                />
+              ))}
+            </svg>
+          </div>
+        </div>
+      </section>
 
-      
+      <section style={{ padding: '90px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/mood/luz-janela.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(245,241,232,0.88)' }} />
+        <div className="wrap" style={{ maxWidth: 560, textAlign: 'center', position: 'relative' }}>
+          <h2 className="display" style={{ fontSize: 30, marginBottom: 22, color: 'var(--ink)' }}>
+            {t('home_final_cta_title')}
+          </h2>
+          <Link href="/results" className="btn btn-primary" style={{ fontSize: 16, padding: '13px 30px' }}>
+            {t('home_final_cta_button')}
+          </Link>
+        </div>
+      </section>
       </main>
 
       <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--paper)' }}>

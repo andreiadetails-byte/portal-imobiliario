@@ -217,6 +217,10 @@ export default function PerfilPage() {
   return (
     <>
       <Header />
+      <div style={{ position: 'relative', overflow: 'hidden', height: 64 }}>
+        <img src="/mood/nicho-arco-ceramica.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.78)' }} />
+      </div>
       <main id="main-content" className="wrap" style={{ maxWidth: 560, paddingTop: 24, paddingBottom: 56, background: 'var(--paper)', borderRadius: 16, marginTop: 24, paddingLeft: 32, paddingRight: 32 }}>
         <BackButton fallback="/" />
         <h1 className="display" style={{ fontSize: 26, marginBottom: 28 }}>{t('perfil_title')}</h1>

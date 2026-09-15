@@ -290,7 +290,7 @@ export default function PropertyClient() {
       >
         {t('back_to_previous_page')}
       </button>
-      <div className="property-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40 }}>
+      <div className="property-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 40, alignItems: 'start' }}>
         <div>
           {photos.length > 0 ? (
             <div style={{ marginBottom: 24 }}>
@@ -601,7 +601,7 @@ export default function PropertyClient() {
           )}
         </div>
 
-        <aside id="property-contact-box" className="card" style={{ padding: 22, height: 'fit-content' }}>
+        <aside id="property-contact-box" className="card" style={{ padding: 22, height: 'fit-content', overflow: 'visible' }}>
           {ownerProfile && (
             <Link
               href={`/agency/${ownerProfile.id}${property.display_name ? `?as=${encodeURIComponent(property.display_name)}` : ''}`}

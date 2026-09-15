@@ -76,7 +76,7 @@ export async function POST(request) {
         })}
       `;
 
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: email,
         subject: `Novo imóvel na sua pesquisa "${search.name}"`,
         html: renderEmail({
@@ -86,7 +86,13 @@ export async function POST(request) {
           ctaUrl: `${SITE_URL}/property/${property.id}`,
         }),
       });
-      sent++;
+      if (emailResult.error) {
+        // Regista o erro mas continua para as próximas pesquisas guardadas —
+        // uma falha isolada não deve impedir o envio às restantes pessoas.
+        console.error(`Falha ao enviar email de pesquisa guardada para ${email}:`, emailResult.error);
+      } else {
+        sent++;
+      }
     }
 
     return Response.json({ success: true, sent });

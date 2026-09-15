@@ -9,7 +9,7 @@ const SITE_URL = 'https://www.moreada.pt';
 
 export default async function sitemap() {
   const staticPages = [
-    '', 'results', 'favorites', 'login', 'publish', 'valuation',
+    '', 'results', 'login', 'publish', 'valuation',
     'simulador-credito', 'simulador-imt', 'sobre', 'faq', 'contacto',
     'privacidade', 'cookies', 'termos', 'seguranca', 'trabalha-connosco',
   ].map((path) => ({

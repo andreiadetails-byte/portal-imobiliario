@@ -226,7 +226,7 @@ export default function LoginPage() {
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
         <LanguageSwitcher />
       </div>
-      <Link href="/" className="logo" style={{ display: 'block', textAlign: 'center', marginBottom: 32, color: '#fff' }}>
+      <Link href="/" className="logo" style={{ display: 'block', textAlign: 'center', marginBottom: 32, color: 'var(--ink)' }}>
         More<span>&middot;</span>ada
       </Link>
 

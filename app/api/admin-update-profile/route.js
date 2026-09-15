@@ -80,7 +80,7 @@ export async function POST(request) {
                 <h2 style="color: #332E22; font-size: 18px;">A sua conta foi atualizada</h2>
                 ${messages.map((m) => `<p>${m}</p>`).join('')}
                 <p style="margin-top: 24px;">
-                  <a href="https://portalimobiliario.netlify.app/dashboard" style="color: #5A6B49;">Ver o meu painel</a>
+                  <a href="https://www.moreada.pt/dashboard" style="color: #5A6B49;">Ver o meu painel</a>
                 </p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0 16px;" />
                 <p style="font-size: 12px; color: #999;">
