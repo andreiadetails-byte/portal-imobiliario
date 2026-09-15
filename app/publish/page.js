@@ -105,7 +105,7 @@ function PublishForm() {
       }
 
       if (!editId && !myProfile?.is_admin) {
-        const accountTypeLimit = isProfessionalAccount(myProfile?.account_type) ? 50 : 3;
+       const accountTypeLimit = 50;
         setAccountLimit(accountTypeLimit);
         const { count } = await supabase
           .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', data.user.id).neq('status', 'eliminado');
