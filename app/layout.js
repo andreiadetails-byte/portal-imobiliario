@@ -43,7 +43,15 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-PT">
-      <body>
+  <head>
+    <link
+      rel="preload"
+      as="image"
+      href="/mood/sala-verde-premium.jpg"
+      fetchPriority="high"
+    />
+  </head>
+  <body>
         <a href="#main-content" className="skip-link">Saltar para o conteúdo</a>
         <LanguageProvider>
           <Suspense fallback={null}><ScrollToTop /></Suspense>

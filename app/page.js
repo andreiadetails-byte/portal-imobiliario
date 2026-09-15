@@ -188,6 +188,7 @@ export default function HomePage() {
       <section
         style={{
           padding: '120px 0 70px',
+          backgroundColor: '#7A8568',
           backgroundImage: 'linear-gradient(rgba(51,46,34,0.32), rgba(51,46,34,0.42)), url(/mood/sala-verde-premium.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
