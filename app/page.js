@@ -274,7 +274,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '32px 0 32px' }}>
+      <section style={{ padding: '32px 0 88px' }}>
         <div className="wrap">
           <h2 className="display" style={{ fontSize: 32, marginBottom: 32, color: 'var(--ink)' }}>{t('home_featured')}</h2>
 
@@ -498,7 +498,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '12px 0 64px' }}>
+      <section style={{ padding: '40px 0 88px' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
             <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Calcula antes de decidir</h2>
@@ -583,7 +583,8 @@ export default function HomePage() {
       <section style={{ padding: '20px 0 88px' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
-            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>Quanto vale o m² na tua zona?</h2>
+            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>Quanto vale hoje a sua casa?</h2>
+            <p style={{ fontSize: 15.5, color: 'var(--text-soft)', margin: 0 }}>Descubra em poucos passos uma estimativa do valor do seu imóvel.</p>
           </div>
           <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
             <PricePerM2Lookup />
