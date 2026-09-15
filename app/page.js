@@ -589,7 +589,59 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '20px 0 88px' }}>
+      <section style={{ background: 'rgba(126,143,106,0.14)', padding: '80px 0' }}>
+        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 48, alignItems: 'center' }}>
+          <div>
+            <span style={{
+              fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'var(--telha)', fontWeight: 600, marginBottom: 12, display: 'block',
+            }}>
+              Para investidores
+            </span>
+            <h2 className="display" style={{ fontSize: 30, marginBottom: 16, color: 'var(--ink)' }}>
+              Investe com mais informação.
+            </h2>
+            <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 26, lineHeight: 1.6, maxWidth: 400 }}>
+              Descubra a rentabilidade real de um investimento imobiliário, com base em dados atuais de mercado.
+            </p>
+            <Link href="/simulador-investimento" className="btn btn-primary" style={{ fontSize: 15, padding: '12px 26px' }}>
+              Calcular rentabilidade
+            </Link>
+          </div>
+          <div style={{ borderRadius: 14, overflow: 'hidden', boxShadow: '0 20px 50px rgba(51,46,34,0.14)' }}>
+            <img src="/mood/estante-livros-v2.jpg" alt="" style={{ width: '100%', height: 320, objectFit: 'cover' }} />
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
+        <div className="wrap" style={{ textAlign: 'center' }}>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
+            A casa começa antes da mudança.
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {[
+              { img: '/mood/sala-verde-premium.jpg', label: 'Sala' },
+              { img: '/mood/floresta.jpg', label: 'Cozinha' },
+              { img: '/mood/escritorio.jpg', label: 'Exterior' },
+            ].map((item) => (
+              <div key={item.label}>
+                <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 14, boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
+                  <img src={item.img} alt={item.label} style={{ width: '100%', height: 260, objectFit: 'cover' }} />
+                </div>
+                <span style={{
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, letterSpacing: '0.05em',
+                  textTransform: 'uppercase', color: 'var(--telha)', fontWeight: 600,
+                }}>
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '88px 0' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
             <h2 className="display" style={{ fontSize: 30, marginBottom: 10 }}>Antes de escolher, faça as contas.</h2>
@@ -598,9 +650,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18 }}>
+          <div className="simulators-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
             {[
-              { href: '/simulador-investimento', icon: '📈', title: 'CALCULADORA INVESTIDOR', text: 'Descubra a rentabilidade do seu investimento.' },
               { href: '/simulador-imt', icon: '🏠', title: 'CALCULAR IMT', text: 'Saiba quanto poderá pagar na compra.' },
               { href: '/simulador-arrendar-comprar', icon: '⚖️', title: 'ARRENDAR OU COMPRAR', text: 'Compare as duas opções.' },
               { href: '/simulador-credito', icon: '€', title: 'SIMULADOR DE CRÉDITO', text: 'Estime a sua prestação.' },
