@@ -93,8 +93,35 @@ function MensagensSuporteInner() {
 
   async function deleteThread(requestId) {
     if (!confirm('Apagar esta conversa inteira? Esta ação não pode ser desfeita.')) return;
-    await supabase.from('support_replies').delete().eq('support_request_id', requestId);
-    await supabase.from('support_requests').delete().eq('id', requestId);
+
+    // Apaga primeiro as respostas e só depois o pedido.
+    // É importante verificar os erros: antes a interface escondia a conversa
+    // mesmo quando o Supabase recusava o DELETE, fazendo-a reaparecer após
+    // atualizar a página.
+    const { error: repliesError } = await supabase
+      .from('support_replies')
+      .delete()
+      .eq('support_request_id', requestId);
+
+    if (repliesError) {
+      console.error('[SUPORTE] Erro ao apagar respostas:', repliesError);
+      alert('Não foi possível apagar esta conversa. O servidor recusou a eliminação das mensagens.');
+      return;
+    }
+
+    const { error: requestError } = await supabase
+      .from('support_requests')
+      .delete()
+      .eq('id', requestId)
+      .eq('user_id', userId);
+
+    if (requestError) {
+      console.error('[SUPORTE] Erro ao apagar pedido:', requestError);
+      alert('Não foi possível apagar esta conversa. O servidor recusou a eliminação do pedido de suporte.');
+      return;
+    }
+
+    // Só atualizar a interface depois de confirmar que os DELETE foram aceites.
     setSupportThreads((cur) => cur.filter((r) => r.id !== requestId));
     if (activeId === requestId) setActiveId(null);
   }
