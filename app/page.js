@@ -587,6 +587,37 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section style={{ padding: '20px 0 88px' }}>
+        <div className="wrap">
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
+            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>Quanto vale o m² na tua zona?</h2>
+          </div>
+          <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
+            <PricePerM2Lookup />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, maxWidth: 900, margin: '0 auto' }}>
+            {[
+              { href: '/valuation', label: 'Avaliação' },
+              { href: '/simulador-credito', label: 'Crédito' },
+              { href: '/simulador-imt', label: 'IMT' },
+              { href: '/results', label: 'Evolução do mercado' },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  padding: '16px 12px', borderRadius: 10, border: '1px solid rgba(126,143,106,0.25)',
+                  background: 'var(--paper)', textDecoration: 'none', fontSize: 13.5, fontWeight: 600, color: 'var(--telha)',
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
@@ -713,36 +744,6 @@ export default function HomePage() {
       </section>
 
 
-      <section style={{ padding: '20px 0 88px' }}>
-        <div className="wrap">
-          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
-            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>O mercado imobiliário, num só lugar.</h2>
-          </div>
-          <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
-            <PricePerM2Lookup />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, maxWidth: 900, margin: '0 auto' }}>
-            {[
-              { href: '/valuation', label: 'Avaliação' },
-              { href: '/simulador-credito', label: 'Crédito' },
-              { href: '/simulador-imt', label: 'IMT' },
-              { href: '/results', label: 'Evolução do mercado' },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  padding: '16px 12px', borderRadius: 10, border: '1px solid rgba(126,143,106,0.25)',
-                  background: 'var(--paper)', textDecoration: 'none', fontSize: 13.5, fontWeight: 600, color: 'var(--telha)',
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section style={{ padding: '72px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
         <img src="/mood/cadeiras.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55 }} />
