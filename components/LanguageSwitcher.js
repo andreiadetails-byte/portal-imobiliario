@@ -55,18 +55,14 @@ export default function LanguageSwitcher() {
         <span style={{ fontSize: 9 }}>▾</span>
       </button>
 
-      <div style={{
-        position: 'absolute', top: '100%', right: 0, marginTop: 4, zIndex: 200,
-        background: '#fff', border: '1px solid var(--line)', borderRadius: 6,
-        boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130,
-        maxHeight: '70vh', overflowY: 'auto',
-        visibility: open ? 'visible' : 'hidden',
-        opacity: open ? 1 : 0,
-        pointerEvents: open ? 'auto' : 'none',
-      }}>
-          {LANGUAGES.map((l) => {
-            const Flag = FLAG_COMPONENTS[l.flag];
-            return (
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', right: 0, marginTop: 4, zIndex: 200,
+          background: '#fff', border: '1px solid var(--line)', borderRadius: 6,
+          boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130,
+          maxHeight: '70vh', overflowY: 'auto',
+        }}>
+          {LANGUAGES.map((l) => (
               <button
                 key={l.code}
                 type="button"
@@ -78,12 +74,11 @@ export default function LanguageSwitcher() {
                   fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: '#332E22',
                 }}
               >
-                {Flag && <Flag size={18} />}
                 {l.label}
               </button>
-            );
-          })}
+          ))}
         </div>
+      )}
     </div>
   );
 }
