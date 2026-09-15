@@ -393,3 +393,29 @@ textarea:focus-visible, [tabindex]:focus-visible{
   }
 }
 
+
+/* Homepage — paleta principal aplicada de forma explícita */
+.homepage-shell{
+  background:#E2DED2;
+}
+.homepage-shell .card{
+  background:#F5F0E5;
+  border-color:rgba(76,91,60,0.16);
+  box-shadow:0 8px 24px rgba(76,91,60,0.08);
+}
+.homepage-shell .btn-primary{
+  background:#667456;
+  border-color:#667456;
+}
+.homepage-shell .btn-primary:hover{
+  background:#4C5B3C;
+  border-color:#4C5B3C;
+}
+.homepage-shell .grid-listings > *{
+  border-color:rgba(76,91,60,0.14);
+}
+@media (max-width:640px){
+  .homepage-shell section{
+    border-radius:0;
+  }
+}
