@@ -58,9 +58,9 @@ export default function LanguageSwitcher() {
       {open && (
         <div style={{
           position: 'absolute', top: '100%', right: 0, marginTop: 4, zIndex: 200,
-          background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6,
-          boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130, overflow: 'hidden',
-          transform: 'translateZ(0)', WebkitTransform: 'translateZ(0)',
+          background: '#fff', border: '1px solid var(--line)', borderRadius: 6,
+          boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130,
+          maxHeight: '70vh', overflowY: 'auto',
         }}>
           {LANGUAGES.map((l) => {
             const Flag = FLAG_COMPONENTS[l.flag];
@@ -72,8 +72,8 @@ export default function LanguageSwitcher() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8, width: '100%',
                   padding: '9px 12px', border: 'none', cursor: 'pointer', textAlign: 'left',
-                  background: l.code === lang ? 'var(--plaster)' : 'transparent',
-                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: 'var(--ink)',
+                  background: l.code === lang ? 'var(--plaster)' : '#fff',
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: '#332E22',
                 }}
               >
                 {Flag && <Flag size={18} />}
