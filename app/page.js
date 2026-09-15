@@ -284,6 +284,20 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+        <img src="/images/simulador-imt.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(51,46,34,0.55)' }} />
+        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
+          <div style={{ borderRadius: 12, padding: '22px 26px', background: 'rgba(255,255,255,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+            <div>
+              <div className="display" style={{ fontSize: 21, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{t('home_imt_title')}</div>
+              <div style={{ fontSize: 14.5, color: 'var(--text-soft)' }}>{t('home_imt_sub')}</div>
+            </div>
+            <Link href="/simulador-imt" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px', whiteSpace: 'nowrap' }}>{t('home_imt_btn')}</Link>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
         <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
@@ -617,16 +631,6 @@ export default function HomePage() {
                   Compare o custo real das duas opções, ao longo do tempo.
                 </p>
                 <Link href="/simulador-arrendar-comprar" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>{t('home_rentbuy_cta')}</Link>
-              </div>
-            </div>
-            <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ height: 150, backgroundImage: 'url(/images/simulador-imt.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              <div style={{ padding: '30px 30px 36px' }}>
-                <h3 className="display" style={{ fontSize: 22, marginBottom: 10 }}>{t('home_imt_title')}</h3>
-                <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 20, lineHeight: 1.55 }}>
-                  {t('home_imt_sub')}
-                </p>
-                <Link href="/simulador-imt" className="btn btn-primary" style={{ fontSize: 15.5, padding: '11px 22px' }}>{t('home_imt_btn')}</Link>
               </div>
             </div>
             <div className="card-hover-lift simulator-card" style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
