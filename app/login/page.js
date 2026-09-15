@@ -196,15 +196,25 @@ export default function LoginPage() {
         setSignupFreeMonths(signupFreeMonthsValue);
       }
 
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        account_type: accountType,
-        email: data.user.email,
-        phone_real: phone || null,
-        show_phone_public: showPhonePublic,
-        ...(isProfessionalAccount(accountType) && accountType !== 'promotor' && { agency_license: amiLicense.trim() }),
-        ...(avatar_url && { avatar_url }),
-      }, { onConflict: 'id' });
+     const { error: profileError } = await supabase.from('profiles').upsert({
+  id: data.user.id,
+  full_name: fullName,
+  account_type: accountType,
+  email: data.user.email,
+  phone_real: phone || null,
+  show_phone_public: showPhonePublic,
+  ...(isProfessionalAccount(accountType) && accountType !== 'promotor' && {
+    agency_license: amiLicense.trim()
+  }),
+  ...(avatar_url && { avatar_url }),
+}, { onConflict: 'id' });
+
+if (profileError) {
+  console.error('Erro ao criar perfil:', profileError);
+  setError('A conta foi criada, mas não foi possível criar o perfil. Tente novamente ou contacte o suporte.');
+  setLoading(false);
+  return;
+}
     }
     setLoading(false);
 
