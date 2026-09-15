@@ -308,12 +308,12 @@ function ChatInner() {
       return name.toLowerCase().includes(term) || contact.includes(term) || propText.includes(term);
     });
 
-  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div></>);
+  if (loading) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--messages-bg)', borderRadius: 16, marginTop: 24 }}>...</div></>);
 
   return (
     <>
       <Header />
-    <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>
+    <main id="main-content" className="wrap" style={{ padding: '24px 32px 80px', background: 'var(--messages-bg)', borderRadius: 16, marginTop: 24 }}>
       <BackButton fallback="/" />
       <h1 className="display" style={{ fontSize: 26, marginBottom: 20 }}>{t('chat_title')}</h1>
 
@@ -332,7 +332,7 @@ function ChatInner() {
                     className="btn"
                     style={{
                       fontSize: 11.5, padding: '5px 10px',
-                      background: filter === value ? 'var(--messages-green)' : 'var(--plaster)',
+                      background: filter === value ? 'var(--messages-green-soft)' : 'var(--plaster)',
                       color: filter === value ? '#fff' : 'var(--ink)',
                       borderColor: filter === value ? 'var(--messages-green)' : 'var(--line)',
                     }}
@@ -371,7 +371,7 @@ function ChatInner() {
                     }}
                   >
                     <div style={{
-                      width: 42, height: 42, borderRadius: '50%', background: 'var(--messages-green)', color: '#fff',
+                      width: 42, height: 42, borderRadius: '50%', background: 'var(--messages-green-soft)', color: 'var(--ink)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, flexShrink: 0,
                     }}>
                       {initials || '?'}
@@ -429,7 +429,7 @@ function ChatInner() {
 
                       <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
                         {isUnread && (
-                          <span style={{ fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: '#b8452f', color: '#fff' }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: '#b8452f', color: 'var(--ink)' }}>
                             {c.unreadCount} NOVA{c.unreadCount > 1 ? 'S' : ''}
                           </span>
                         )}
@@ -559,8 +559,8 @@ function ChatInner() {
                         style={{
                           padding: '10px 14px', borderRadius: 12, fontSize: 16, lineHeight: 1.4,
                           minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word',
-                          background: isMine ? 'var(--messages-green)' : 'var(--messages-green-soft)',
-                          color: '#fff',
+                          background: isMine ? 'var(--messages-green-soft)' : 'var(--paper)',
+                          color: 'var(--ink)',
                         }}
                       >
                         {m.content}
@@ -607,7 +607,7 @@ function ChatInner() {
 
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>...</div>}>
+    <Suspense fallback={<div className="wrap" style={{ padding: 60, background: 'var(--messages-bg)', borderRadius: 16, marginTop: 24 }}>...</div>}>
       <ChatInner />
     </Suspense>
   );
