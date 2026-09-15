@@ -71,8 +71,12 @@ function PublishForm() {
   const [municipalityManual, setMunicipalityManual] = useState(false);
   const [parishManual, setParishManual] = useState(false);
   const [error, setError] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [published, setPublished] = useState(false);
+const [saving, setSaving] = useState(false);
+const [uploadProgress, setUploadProgress] = useState({
+  current: 0,
+  total: 0,
+});
+const [published, setPublished] = useState(false);
   const [photos, setPhotos] = useState([]); // { file, preview }
   const [planFile, setPlanFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
@@ -713,13 +717,10 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
       });
     }
 
-    setSaving(false);
-    setPublished(true);
-    setTimeout(() => router.push('/dashboard'), 2500);
 
     // A planta e as fotos continuam a ser enviadas em segundo plano,
     // sem o utilizador ter de esperar a fazer scroll parado no ecrã.
-    (async () => {
+    try {
       const planUrl = await uploadPlan(propertyId);
       if (planUrl) {
         await supabase.from('properties').update({ floor_plan_url: planUrl }).eq('id', propertyId);
@@ -781,8 +782,26 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
         else if (hasOffensiveText) updates.moderation_flag_reason = 'Linguagem possivelmente ofensiva no título/descrição.';
         await supabase.from('properties').update(updates).eq('id', propertyId);
       }
-    })();
+      }
+      }
+
+      setSaving(false);
+      setPublished(true);
+      setTimeout(() => router.push('/dashboard'), 2500);
+
+    } catch (uploadError) {
+      console.error('Erro ao concluir publicação:', uploadError);
+      setError(
+        uploadError?.message ||
+        'Não foi possível concluir o envio das fotografias.'
+      );
+      setSaving(false);
+      setPublished(false);
+    }
   }
+  }
+  }
+
 
   if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('pub_checking_session')}</div></>);
 
