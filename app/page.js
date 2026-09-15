@@ -541,50 +541,28 @@ export default function HomePage() {
           </div>
 
           <div style={{
-            position: 'relative', borderRadius: 14, overflow: 'hidden', height: 220, marginTop: 40,
-            backgroundImage: 'url(/images/avaliacao-foto.jpg)', backgroundSize: 'cover', backgroundPosition: 'center center',
+            display: 'grid', gridTemplateColumns: 'minmax(280px, 0.9fr) minmax(0, 1.1fr)',
+            borderRadius: 14, overflow: 'hidden', marginTop: 40,
+            background: 'var(--plaster)', border: '1px solid rgba(126,143,106,0.25)',
+            minHeight: 220,
           }}>
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(90deg, rgba(51,46,34,0.82) 0%, rgba(51,46,34,0.78) 40%, rgba(51,46,34,0.15) 100%)',
-            }} />
-            <div style={{ position: 'relative', padding: '36px 40px', maxWidth: 440, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: '#fff' }}>{t('home_valuation_title')}</h2>
-              <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.88)', marginBottom: 20 }}>{t('home_valuation_sub')}</p>
+            <div style={{ minHeight: 220, overflow: 'hidden' }}>
+              <img src="/images/avaliacao-foto.jpg" alt="Avaliação de imóvel" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </div>
+            <div style={{ padding: '34px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h2 className="display" style={{ fontSize: 22, marginBottom: 8, color: 'var(--ink)' }}>{t('home_valuation_title')}</h2>
+              <p style={{ fontSize: 14.5, color: 'var(--text-soft)', marginBottom: 20, lineHeight: 1.55 }}>{t('home_valuation_sub')}</p>
               <Link href="/valuation" className="btn btn-primary" style={{ width: 'fit-content' }}>{t('home_valuation_btn')}</Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
-        <div className="wrap" style={{ textAlign: 'center' }}>
-          <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
-            Encontra a tua casa.
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-            {[
-              { href: '/results?business=Venda', img: '/mood/sala-verde-premium.jpg', label: 'Comprar' },
-              { href: '/results?business=Arrendamento', img: '/mood/nicho-arco-ceramica.jpg', label: 'Arrendar' },
-              { href: '/simulador-investimento', img: '/mood/estante-livros-v2.jpg', label: 'Investir' },
-            ].map((item) => (
-              <Link key={item.label} href={item.href} className="card-hover-lift" style={{ display: 'block', textDecoration: 'none' }}>
-                <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 14, boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
-                  <img src={item.img} alt={item.label} style={{ width: '100%', height: 220, objectFit: 'cover' }} />
-                </div>
-                <span className="display" style={{ fontSize: 18, color: 'var(--ink)' }}>{item.label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
       <section style={{ padding: '20px 0 88px' }}>
         <div className="wrap">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 40px' }}>
-            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>Quanto vale hoje a sua casa?</h2>
-            <p style={{ fontSize: 15.5, color: 'var(--text-soft)', margin: 0 }}>Descubra em poucos passos uma estimativa do valor do seu imóvel.</p>
+            <h2 className="display" style={{ fontSize: 28, marginBottom: 10 }}>Quanto vale o m² na sua zona?</h2>
+            <p style={{ fontSize: 15.5, color: 'var(--text-soft)', margin: 0 }}>Compare os preços praticados na sua área e perceba melhor o valor da sua casa.</p>
           </div>
           <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
             <PricePerM2Lookup />
@@ -611,6 +589,31 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+
+      <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
+        <div className="wrap" style={{ textAlign: 'center' }}>
+          <h2 className="display" style={{ fontSize: 28, marginBottom: 44, color: 'var(--ink)' }}>
+            Encontra a tua casa.
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {[
+              { href: '/results?business=Venda', img: '/mood/sala-verde-premium.jpg', label: 'Comprar' },
+              { href: '/results?business=Arrendamento', img: '/mood/nicho-arco-ceramica.jpg', label: 'Arrendar' },
+              { href: '/simulador-investimento', img: '/mood/estante-livros-v2.jpg', label: 'Investir' },
+            ].map((item) => (
+              <Link key={item.label} href={item.href} className="card-hover-lift" style={{ display: 'block', textDecoration: 'none' }}>
+                <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 14, boxShadow: '0 12px 30px rgba(51,46,34,0.1)' }}>
+                  <img src={item.img} alt={item.label} style={{ width: '100%', height: 220, objectFit: 'cover' }} />
+                </div>
+                <span className="display" style={{ fontSize: 18, color: 'var(--ink)' }}>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
 
       <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
