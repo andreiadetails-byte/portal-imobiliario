@@ -317,11 +317,11 @@ export default function HomePage() {
                   {firstPhoto ? (
                     <div style={{ position: 'relative', overflow: 'hidden' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} className="card-photo-zoom" style={{ width: '100%', height: 220, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
+                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} className="card-photo-zoom" style={{ width: '100%', height: 190, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
                       <div className="photo-watermark" style={{ fontSize: 11 }}>More·ada</div>
                     </div>
                   ) : (
-                    <div className="card-photo" style={{ height: 220 }} />
+                    <div className="card-photo" style={{ height: 190 }} />
                   )}
                   <div className="card-body" style={{ padding: '22px 20px 20px' }}>
                     <div className="addr" style={{ fontSize: 17, marginBottom: 4 }}>{p.typology} · {p.district}</div>
@@ -334,8 +334,7 @@ export default function HomePage() {
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-                      <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}></div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
                       {p.profiles && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
@@ -424,27 +423,26 @@ export default function HomePage() {
                     {favoriteIds.includes(p.id) ? <Heart size={15} fill="#b8452f" strokeWidth={1.5} /> : <Heart size={15} strokeWidth={1.5} />}
                   </button>
                   {firstPhoto ? (
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative', overflow: 'hidden' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" style={{ width: '100%', height: 170, objectFit: 'cover' }} />
+                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" className="card-photo-zoom" style={{ width: '100%', height: 190, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
                       <div className="photo-watermark" style={{ fontSize: 11 }}>More·ada</div>
                     </div>
                   ) : (
-                    <div className="card-photo" />
+                    <div className="card-photo" style={{ height: 190 }} />
                   )}
-                  <div className="card-body">
-                    <div className="price">
+                  <div className="card-body" style={{ padding: '22px 20px 20px' }}>
+                    <div className="addr" style={{ fontSize: 17, marginBottom: 4 }}>{p.typology} · {p.district}</div>
+                    <div className="meta" style={{ marginBottom: 10, fontSize: 13 }}>{displayAddress(p)}</div>
+                    <div className="price" style={{ fontSize: 20, marginBottom: 6 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="addr">{p.typology} · {displayAddress(p)}</div>
-                    <div className="meta" style={{ marginBottom: 4 }}>
-                      {p.property_type}{p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
-                      {p.bedrooms ? ` · ${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
+                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                      {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
+                      {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                     </div>
-                    <div className="meta" style={{ marginBottom: 10, fontSize: 11 }}>{t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-                      <div className="meta" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.district}{p.parish ? ` · ${p.parish}` : p.municipality ? ` · ${p.municipality}` : ''}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
                       {p.profiles && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
