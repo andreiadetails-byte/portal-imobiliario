@@ -638,25 +638,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
-        <img
-          src="/mood/escritorio.jpg"
-          alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(36,41,26,0.55) 0%, rgba(36,41,26,0.88) 100%)' }} />
-        <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
-          <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
-            {t('home_mood_title')}
-          </div>
-          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: 460, margin: '0 auto' }}>
-            {t('home_mood_text')}
-          </p>
-        </div>
-      </section>
-
-      <div style={{ height: 24, background: 'var(--paper)' }} />
-
       <section style={{ padding: '64px 0 88px', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/pintura-abstrata.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,69,48,0.55)' }} />
@@ -693,6 +674,25 @@ export default function HomePage() {
         </div>
       </section>
 
+
+      <section style={{ padding: '96px 0', position: 'relative', overflow: 'hidden', background: '#3D4A2E' }}>
+        <img
+          src="/mood/escritorio.jpg"
+          alt=""
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(36,41,26,0.55) 0%, rgba(36,41,26,0.88) 100%)' }} />
+        <div className="wrap" style={{ position: 'relative', maxWidth: 680, textAlign: 'center' }}>
+          <div className="display" style={{ fontSize: 38, fontWeight: 600, color: '#fff', marginBottom: 18, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+            {t('home_mood_title')}
+          </div>
+          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: 460, margin: '0 auto' }}>
+            {t('home_mood_text')}
+          </p>
+        </div>
+      </section>
+
+      <div style={{ height: 24, background: 'var(--paper)' }} />
 
       <section style={{ padding: '80px 0', background: 'var(--plaster)' }}>
         <div className="wrap" style={{ textAlign: 'center' }}>
