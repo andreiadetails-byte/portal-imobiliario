@@ -616,43 +616,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '48px 0', position: 'relative', overflow: 'hidden' }}>
         <img src="/mood/floresta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.6)' }} />
-        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
-          <div className="install-qr-section" style={{
+        <div className="wrap" style={{ maxWidth: 420, position: 'relative' }}>
+          <div style={{
             background: '#fff', border: '1.5px solid var(--brass)', borderRadius: 12, padding: '20px 26px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fwww.moreada.pt"
               alt="Código QR para abrir o More·ada no telemóvel"
-              width={104}
-              height={104}
+              width={88}
+              height={88}
               style={{ borderRadius: 6, border: '1px solid var(--line)', flexShrink: 0 }}
-              className="install-qr-image"
             />
-            <div>
-              <div className="display" style={{ fontSize: 21, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{t('home_install_title')}</div>
-              <div style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 10 }}>
-                {t('home_install_subtitle')}
-              </div>
-              {installPrompt ? (
-                // No telemóvel, se o navegador conseguir instalar automaticamente
-                // (normalmente Android/Chrome), mostra só um botão direto — é mais
-                // rápido do que pedir para a pessoa ler instruções.
-                <button onClick={handleInstallClick} className="btn btn-primary install-app-btn" style={{ fontSize: 16, padding: '12px 20px' }}>
-                  📲 {t('home_install_button')}
-                </button>
-              ) : (
-                // No computador, a pessoa vai digitalizar o código no telemóvel —
-                // os passos detalhados (Android/iPhone) fazem mais sentido só
-                // depois, quando já estiver lá, por isso aqui fica só o essencial.
-                <div className="install-text-instructions" style={{ fontSize: 14, color: 'var(--text-soft)' }}>
-                  {t('home_install_simple_hint')}
-                </div>
-              )}
+            <div className="display" style={{ fontSize: 17, fontWeight: 600, color: 'var(--ink)' }}>
+              Leva o More·ada no telemóvel
             </div>
           </div>
         </div>
