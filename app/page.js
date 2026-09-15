@@ -540,7 +540,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div style={{
+          <div className="valuation-home-card" style={{
             display: 'grid', gridTemplateColumns: 'minmax(280px, 0.9fr) minmax(0, 1.1fr)',
             borderRadius: 14, overflow: 'hidden', marginTop: 44,
             background: 'var(--plaster)', border: '1px solid rgba(122,128,104,0.22)',
