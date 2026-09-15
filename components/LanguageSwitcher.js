@@ -1,64 +1,57 @@
 'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../lib/i18n';
 
 const LANGUAGES = [
-  { code: 'pt', label: 'PT', flag: 'pt' },
-  { code: 'en', label: 'EN', flag: 'gb' },
-  { code: 'es', label: 'ES', flag: 'es' },
-  { code: 'fr', label: 'FR', flag: 'fr' },
-  { code: 'de', label: 'DE', flag: 'de' },
-  { code: 'nl', label: 'NL', flag: 'nl' },
-  { code: 'ru', label: 'RU', flag: 'ru' },
-  { code: 'it', label: 'IT', flag: 'it' },
-  { code: 'pl', label: 'PL', flag: 'pl' },
-  { code: 'sv', label: 'SV', flag: 'se' },
-  { code: 'uk', label: 'UA', flag: 'ua' },
-  { code: 'zh', label: '中文', flag: 'cn' },
-  { code: 'ar', label: 'AR', flag: 'sa' },
+  { code: 'pt', label: 'PT', flag: '🇵🇹' },
+  { code: 'en', label: 'EN', flag: '🇬🇧' },
+  { code: 'es', label: 'ES', flag: '🇪🇸' },
+  { code: 'fr', label: 'FR', flag: '🇫🇷' },
+  { code: 'de', label: 'DE', flag: '🇩🇪' },
+  { code: 'it', label: 'IT', flag: '🇮🇹' },
+  { code: 'nl', label: 'NL', flag: '🇳🇱' },
+  { code: 'pl', label: 'PL', flag: '🇵🇱' },
+  { code: 'ro', label: 'RO', flag: '🇷🇴' },
+  { code: 'uk', label: 'UK', flag: '🇺🇦' },
+  { code: 'ru', label: 'RU', flag: '🇷🇺' },
+  { code: 'zh', label: 'ZH', flag: '🇨🇳' },
+  { code: 'ja', label: 'JA', flag: '🇯🇵' },
 ];
 
 export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
   const [open, setOpen] = useState(false);
-  const wrapRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
+  const ref = useRef(null);
   const current = LANGUAGES.find((l) => l.code === lang) || LANGUAGES[0];
 
+  useEffect(() => {
+    function handleOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
+
   return (
-    <div ref={wrapRef} style={{ position: 'relative', marginRight: 12, flexShrink: 0 }}>
+    <div ref={ref} style={{ position: 'relative', flexShrink: 0 }}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        className="lang-switcher-btn btn"
+        onClick={() => setOpen((v) => !v)}
         aria-label="Escolher idioma"
-        className="lang-switcher-btn"
-        style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, fontWeight: 500,
-          padding: '6px 10px', border: '1px solid var(--line)', borderRadius: 5,
-          background: 'var(--paper)', color: 'var(--text-soft)', cursor: 'pointer', whiteSpace: 'nowrap',
-        }}
+        aria-expanded={open}
+        style={{ padding: '8px 10px', gap: 6, minWidth: 0, borderColor: 'var(--line)' }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://flagcdn.com/w20/${current.flag}.png`} alt="" width={18} height={13} style={{ display: 'block', borderRadius: 2, flexShrink: 0 }} />
-        <span className="lang-switcher-label">{current.label}</span>
-        <span style={{ fontSize: 9 }}>▾</span>
+        <span aria-hidden="true" style={{ fontSize: 18, lineHeight: 1 }}>{current.flag}</span>
+        <span className="lang-switcher-label" style={{ fontSize: 12, fontWeight: 600 }}>{current.label}</span>
+        <span aria-hidden="true" style={{ fontSize: 10 }}>▾</span>
       </button>
-
       {open && (
         <div style={{
-          position: 'absolute', top: '100%', right: 0, marginTop: 4, zIndex: 200,
-          background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6,
-          boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130, overflow: 'hidden',
+          position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 100,
+          minWidth: 170, maxHeight: 360, overflowY: 'auto', padding: 6,
+          background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 8,
+          boxShadow: '0 12px 30px rgba(51,46,34,0.18)',
         }}>
           {LANGUAGES.map((l) => (
             <button
@@ -66,15 +59,14 @@ export default function LanguageSwitcher() {
               type="button"
               onClick={() => { setLang(l.code); setOpen(false); }}
               style={{
-                display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                padding: '9px 12px', border: 'none', cursor: 'pointer', textAlign: 'left',
-                background: l.code === lang ? 'var(--plaster)' : 'transparent',
-                fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, color: 'var(--ink)',
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 10px', border: 0, borderRadius: 6, cursor: 'pointer',
+                background: l.code === lang ? 'rgba(102,116,86,0.12)' : 'transparent',
+                color: 'var(--ink)', textAlign: 'left', fontFamily: 'Inter, sans-serif',
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://flagcdn.com/w20/${l.flag}.png`} alt="" width={18} height={13} style={{ display: 'block', borderRadius: 2, flexShrink: 0 }} />
-              {l.label}
+              <span aria-hidden="true" style={{ fontSize: 18, lineHeight: 1 }}>{l.flag}</span>
+              <span style={{ fontSize: 13, fontWeight: l.code === lang ? 700 : 500 }}>{l.label}</span>
             </button>
           ))}
         </div>

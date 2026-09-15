@@ -355,29 +355,41 @@ textarea:focus-visible, [tabindex]:focus-visible{
 /* Regras de impressão — usadas quando a pessoa descarrega a comparação de
    imóveis em PDF (o browser "imprime para PDF"). Esconde tudo o que não
    interessa no papel (cabeçalho do site, botões), e ajusta a tabela. */
-
-@media (max-width: 640px){
-  /* Avaliação da homepage: no telemóvel passa para uma coluna para nunca ficar cortada. */
-  .valuation-home-card{
-    grid-template-columns: 1fr !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-  }
-  .valuation-home-card > div:first-child{
-    min-height: 190px !important;
-    height: 190px !important;
-  }
-  .valuation-home-card > div:last-child{
-    padding: 22px 20px 24px !important;
-  }
-  .valuation-home-card .btn{
-    width: 100% !important;
-  }
-}
-
 @media print{
   .site-header, .support-widget, .no-print{ display:none !important; }
   body{ background:#fff !important; }
   table{ width:100% !important; }
   a{ text-decoration:none !important; color:inherit !important; }
 }
+/* Homepage — correções móveis e identidade visual */
+@media (max-width: 640px){
+  .valuation-home-card{
+    display:flex !important;
+    flex-direction:column !important;
+    grid-template-columns:none !important;
+    min-height:0 !important;
+    height:auto !important;
+    overflow:hidden !important;
+    margin-top:28px !important;
+  }
+  .valuation-home-card > div:first-child{
+    width:100% !important;
+    min-height:0 !important;
+    height:190px !important;
+    flex:0 0 190px !important;
+  }
+  .valuation-home-card > div:first-child img{
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+  }
+  .valuation-home-card > div:last-child{
+    width:100% !important;
+    padding:22px 20px 24px !important;
+  }
+  .valuation-home-card .btn{
+    width:100% !important;
+    min-height:46px !important;
+  }
+}
+
