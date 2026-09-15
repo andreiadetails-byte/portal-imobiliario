@@ -782,8 +782,8 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
         else if (hasOffensiveText) updates.moderation_flag_reason = 'Linguagem possivelmente ofensiva no título/descrição.';
         await supabase.from('properties').update(updates).eq('id', propertyId);
       }
-      }
-      }
+    
+      
 
       setSaving(false);
       setPublished(true);
