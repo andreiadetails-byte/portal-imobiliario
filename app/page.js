@@ -298,7 +298,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -406,7 +406,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -526,9 +526,9 @@ export default function HomePage() {
                   <img src={card.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '22px 24px 26px' }}>
-                <div style={{
-                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, letterSpacing: '0.06em',
-                  color: 'var(--telha)', fontWeight: 600, marginBottom: 8,
+                <div className="display" style={{
+                  fontSize: 21, fontWeight: 700,
+                  color: 'var(--ink)', marginBottom: 8,
                 }}>
                   {card.title}
                 </div>
