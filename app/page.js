@@ -12,7 +12,6 @@ import BigPromoBanner from '../components/BigPromoBanner';
 import PricePerM2Lookup from '../components/PricePerM2Lookup';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import { distritos } from '../lib/locations';
-import NaturalSearchBox from '../components/NaturalSearchBox';
 import NewsletterSignup from '../components/NewsletterSignup';
 import LazyMount from '../components/LazyMount';
 import { getLocalFavoriteIds, toggleLocalFavorite } from '../lib/localFavorites';
@@ -250,18 +249,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div style={{ height: 24, background: 'var(--paper)' }} />
-
-      <section style={{ padding: '64px 0', position: 'relative', overflow: 'hidden' }}>
-        <img src="/mood/parede-pedra.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(61,74,46,0.55)' }} />
-        <div className="wrap" style={{ maxWidth: 760, position: 'relative' }}>
-          <div style={{ background: 'var(--plaster)', border: '1px solid var(--brass)', borderRadius: 12, overflow: 'hidden' }}>
-            <div className="tile-strip" />
-            <div style={{ padding: 18 }}>
-              <NaturalSearchBox />
-            </div>
-            <div className="tile-strip" />
+      <section style={{ background: 'rgba(126,143,106,0.14)', padding: '80px 0' }}>
+        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 48, alignItems: 'center' }}>
+          <div>
+            <span style={{
+              fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'var(--telha)', fontWeight: 600, marginBottom: 12, display: 'block',
+            }}>
+              Para investidores
+            </span>
+            <h2 className="display" style={{ fontSize: 30, marginBottom: 16, color: 'var(--ink)' }}>
+              Investe com mais informação.
+            </h2>
+            <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 26, lineHeight: 1.6, maxWidth: 400 }}>
+              Descubra a rentabilidade real de um investimento imobiliário, com base em dados atuais de mercado.
+            </p>
+            <Link href="/simulador-investimento" className="btn btn-primary" style={{ fontSize: 15, padding: '12px 26px' }}>
+              Calcular rentabilidade
+            </Link>
+          </div>
+          <div style={{ borderRadius: 14, overflow: 'hidden', boxShadow: '0 20px 50px rgba(51,46,34,0.14)' }}>
+            <img src="/mood/estante-livros-v2.jpg" alt="" style={{ width: '100%', height: 320, objectFit: 'cover' }} />
           </div>
         </div>
       </section>
@@ -585,31 +593,6 @@ export default function HomePage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      <section style={{ background: 'rgba(126,143,106,0.14)', padding: '80px 0' }}>
-        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 48, alignItems: 'center' }}>
-          <div>
-            <span style={{
-              fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase',
-              color: 'var(--telha)', fontWeight: 600, marginBottom: 12, display: 'block',
-            }}>
-              Para investidores
-            </span>
-            <h2 className="display" style={{ fontSize: 30, marginBottom: 16, color: 'var(--ink)' }}>
-              Investe com mais informação.
-            </h2>
-            <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 26, lineHeight: 1.6, maxWidth: 400 }}>
-              Descubra a rentabilidade real de um investimento imobiliário, com base em dados atuais de mercado.
-            </p>
-            <Link href="/simulador-investimento" className="btn btn-primary" style={{ fontSize: 15, padding: '12px 26px' }}>
-              Calcular rentabilidade
-            </Link>
-          </div>
-          <div style={{ borderRadius: 14, overflow: 'hidden', boxShadow: '0 20px 50px rgba(51,46,34,0.14)' }}>
-            <img src="/mood/estante-livros-v2.jpg" alt="" style={{ width: '100%', height: 320, objectFit: 'cover' }} />
           </div>
         </div>
       </section>
