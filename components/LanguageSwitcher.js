@@ -60,6 +60,7 @@ export default function LanguageSwitcher() {
           position: 'absolute', top: '100%', right: 0, marginTop: 4, zIndex: 200,
           background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6,
           boxShadow: '0 6px 18px rgba(51,46,34,0.15)', minWidth: 130, overflow: 'hidden',
+          transform: 'translateZ(0)', WebkitTransform: 'translateZ(0)',
         }}>
           {LANGUAGES.map((l) => {
             const Flag = FLAG_COMPONENTS[l.flag];

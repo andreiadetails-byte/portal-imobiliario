@@ -588,7 +588,7 @@ export default function HomePage() {
           <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
             <PricePerM2Lookup />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, maxWidth: 900, margin: '0 auto' }}>
+          <div className="hide-on-mobile" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, maxWidth: 900, margin: '0 auto' }}>
             {[
               { href: '/valuation', label: t('home_data_avaliacao') },
               { href: '/simulador-credito', label: t('home_data_credito') },
