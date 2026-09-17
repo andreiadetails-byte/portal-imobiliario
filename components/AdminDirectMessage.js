@@ -50,7 +50,7 @@ export default function AdminDirectMessage({ allUsers }) {
     const { error: replyErr } = await supabase.from('support_replies').insert({
       support_request_id: request.id,
       sender_role: 'admin',
-      content: message.trim(),
+      message: message.trim(),
     });
 
     setSending(false);

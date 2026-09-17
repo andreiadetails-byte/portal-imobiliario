@@ -158,6 +158,8 @@ function AdminInner() {
   const [editingAdId, setEditingAdId] = useState(null);
   const [editAdForm, setEditAdForm] = useState({ title: '', link_url: '' });
   const [editAdImage, setEditAdImage] = useState(null);
+  const [resettingPasswordFor, setResettingPasswordFor] = useState(null);
+  const [resetPasswordResult, setResetPasswordResult] = useState(null);
 
   useEffect(() => {
     async function checkAccess() {
@@ -494,7 +496,7 @@ function AdminInner() {
   }
 
   async function resetUserPassword(userId, userName) {
-    if (!confirm(`Definir uma nova password temporária para "${userName}"? A password atual dessa pessoa deixa de funcionar.`)) return;
+    setResettingPasswordFor(userId);
 
     const { data: { session } } = await supabase.auth.getSession();
     const res = await fetch('/api/admin-reset-user-password', {
@@ -504,15 +506,17 @@ function AdminInner() {
     });
 
     const data = await res.json();
+    setResettingPasswordFor(null);
+
     if (!res.ok) {
-      alert(`Não foi possível repor a password: ${data.error || 'erro desconhecido'}`);
+      setResetPasswordResult({ userName, error: data.error || 'erro desconhecido' });
       return;
     }
 
-    // Mostra a password diretamente, para a administradora a copiar e
-    // partilhar com a pessoa (por telefone, WhatsApp, etc.) — não fica
-    // guardada em lado nenhum depois disto, por isso é preciso apontá-la já.
-    prompt(`Nova password para ${userName} (copia agora — não vai voltar a aparecer):`, data.newPassword);
+    // Mostra a password num painel na própria página (em vez de um popup
+    // nativo do navegador, que por vezes fica bloqueado) — a administradora
+    // copia-a e partilha com a pessoa; não fica guardada em lado nenhum.
+    setResetPasswordResult({ userName, newPassword: data.newPassword });
   }
 
   async function loadMortgageRate() {
@@ -1396,6 +1400,49 @@ function AdminInner() {
       {section === 'utilizadores' && (
         <>
           <AdminDirectMessage allUsers={allUsers} />
+
+          {resetPasswordResult && (
+            <div
+              className="card"
+              style={{
+                padding: 16, marginBottom: 20,
+                borderColor: resetPasswordResult.error ? '#8a3b2a' : 'var(--telha)',
+              }}
+            >
+              {resetPasswordResult.error ? (
+                <p style={{ color: '#8a3b2a', fontSize: 13.5, margin: 0 }}>
+                  Não foi possível repor a password de {resetPasswordResult.userName}: {resetPasswordResult.error}
+                </p>
+              ) : (
+                <>
+                  <p style={{ fontSize: 13.5, marginBottom: 8 }}>
+                    Nova password para <b>{resetPasswordResult.userName}</b> — copia agora, não vai voltar a aparecer:
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                    <code style={{
+                      fontSize: 16, fontWeight: 700, padding: '8px 14px', background: 'var(--plaster)',
+                      borderRadius: 6, letterSpacing: '0.03em',
+                    }}>
+                      {resetPasswordResult.newPassword}
+                    </code>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(resetPasswordResult.newPassword)}
+                      className="btn"
+                      style={{ fontSize: 12.5 }}
+                    >
+                      📋 Copiar
+                    </button>
+                  </div>
+                </>
+              )}
+              <button
+                onClick={() => setResetPasswordResult(null)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-soft)', fontSize: 12, cursor: 'pointer', marginTop: 10, padding: 0, textDecoration: 'underline' }}
+              >
+                Fechar
+              </button>
+            </div>
+          )}
           <div style={{ marginBottom: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {[
               ['todos', 'Todos'],
@@ -1526,9 +1573,10 @@ function AdminInner() {
                       <button
                         onClick={() => resetUserPassword(u.id, u.agency_name || u.full_name)}
                         className="btn"
+                        disabled={resettingPasswordFor === u.id}
                         style={{ fontSize: 13 }}
                       >
-                        🔑 Repor password
+                        {resettingPasswordFor === u.id ? 'A repor...' : '🔑 Repor password'}
                       </button>
                       <button
                         onClick={() => toggleBlockUser(u.id, u.is_blocked)}
