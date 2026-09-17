@@ -5,7 +5,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-const SITE_URL = 'https://moreada.pt';
+const SITE_URL = 'https://www.moreada.pt';
 
 export default async function sitemap() {
   const staticPages = [

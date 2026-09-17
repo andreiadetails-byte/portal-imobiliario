@@ -472,7 +472,11 @@ export default function PropertyClient() {
             <div><b>{property.bathrooms}</b><div className="meta">{t('property_baths')}</div></div>
             <div><b>{property.energy_certificate || '—'}</b><div className="meta">{t('property_energy')}</div></div>
             {property.floor && (
-              <div><b>{property.floor}{property.is_top_floor ? ` ${t('prop_top_floor')}` : ''}</b><div className="meta">{t('prop_floor')}</div></div>
+              property.property_type === 'Moradia' ? (
+                <div><b>{property.floor}</b><div className="meta">Pisos</div></div>
+              ) : (
+                <div><b>{property.floor}{property.is_top_floor ? ` ${t('prop_top_floor')}` : ''}</b><div className="meta">{t('prop_floor')}</div></div>
+              )
             )}
             {property.state && <div><b>{property.state}</b><div className="meta">{t('prop_state_label')}</div></div>}
           </div>
@@ -523,7 +527,7 @@ export default function PropertyClient() {
           <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {[
               property.area_util && [t('prop_usable_area'), `${property.area_util} m²`],
-              property.floor && [t('prop_floor'), property.floor],
+              property.floor && [property.property_type === 'Moradia' ? 'Pisos' : t('prop_floor'), property.floor],
               property.solar_orientations?.length > 0 && [t('prop_orientation'), property.solar_orientations.join(', ')],
               property.energy_certificate && [t('prop_energy_class'), property.energy_certificate],
               property.construction_year && [t('prop_construction_year'), property.construction_year],

@@ -196,46 +196,32 @@ export default function LoginPage() {
         setSignupFreeMonths(signupFreeMonthsValue);
       }
 
-   const { data: currentSessionData } = await supabase.auth.getSession();
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        account_type: accountType,
+        email: data.user.email,
+        phone_real: phone || null,
+        show_phone_public: showPhonePublic,
+        ...(isProfessionalAccount(accountType) && accountType !== 'promotor' && { agency_license: amiLicense.trim() }),
+        ...(avatar_url && { avatar_url }),
+      }, { onConflict: 'id' });
+    }
+    setLoading(false);
 
-if (currentSessionData?.session) {
-  const { error: profileError } = await supabase.from('profiles').upsert({
-    id: data.user.id,
-    full_name: fullName,
-    account_type: accountType,
-    email: data.user.email,
-    phone_real: phone || null,
-    show_phone_public: showPhonePublic,
-    ...(isProfessionalAccount(accountType) && accountType !== 'promotor' && {
-      agency_license: amiLicense.trim()
-    }),
-    ...(avatar_url && { avatar_url }),
-  }, { onConflict: 'id' });
-
-if (profileError) {
-  console.error('Erro ao criar perfil:', profileError);
-  setError('A conta foi criada, mas não foi possível criar o perfil. Tente novamente ou contacte o suporte.');
-  setLoading(false);
-  return;
-}
-
-}
-
-setLoading(false);
-
-if (!data.session) {
-  setSignupEmailSent(true);
-  return;
-}
+    // Se o Supabase exigir confirmação por email, ainda não há sessão iniciada —
+    // é preciso avisar claramente, ou a pessoa acha que o botão não fez nada.
+    if (!data.session) {
+      setSignupEmailSent(true);
+      return;
+    }
 
     await migrateLocalFavoritesToAccount(supabase, data.user.id);
 
-  const isNewFreeAgency = PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType);
-router.push(isNewFreeAgency ? '/dashboard?welcome=agencia' : '/dashboard');
+    const isNewFreeAgency = PAYMENT_INFO.subscriptionEnforced && isProfessionalAccount(accountType);
+    router.push(isNewFreeAgency ? '/dashboard?welcome=agencia' : '/dashboard');
   }
-}
- 
-return (
+
+  return (
     <main id="main-content" style={{ maxWidth: 400, margin: '0 auto', padding: '60px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
         <LanguageSwitcher />
@@ -273,7 +259,7 @@ return (
                   <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
                     <option value="particular">{t('login_particular_opt')}</option>
                     <option value="agencia">{t('login_agency_opt')}</option>
-  
+                    <option value="consultor">{t('login_consultant_opt')}</option>
                     <option value="promotor">{t('login_developer_opt')}</option>
                   </select>
                 </div>
@@ -432,7 +418,7 @@ return (
               <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
                 <option value="particular">{t('login_particular_opt')}</option>
                 <option value="agencia">{t('login_agency_opt')}</option>
-                
+                <option value="consultor">{t('login_consultant_opt')}</option>
                 <option value="promotor">{t('login_developer_opt')}</option>
               </select>
             </div>

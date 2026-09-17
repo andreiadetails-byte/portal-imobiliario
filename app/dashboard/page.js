@@ -13,6 +13,7 @@ import { PAYMENT_INFO } from '../../lib/paymentInfo';
 import { isProfessionalAccount } from '../../lib/accountTypes';
 import { normalizeSearchText } from '../../lib/normalizeSearch';
 import { displayAddress } from '../../lib/displayAddress';
+import CrmFeedManager from '../../components/CrmFeedManager';
 
 const STATUS_LABELS = {
   ativo: { labelKey: 'dash_status_active', color: 'var(--telha)', bg: 'rgba(126,143,106,0.18)' },
@@ -298,6 +299,10 @@ function DashboardInner() {
       })()}
 
       <h1 className="display" style={{ fontSize: 28, marginBottom: 32 }}>{t('dashboard_hi')}, {profile?.full_name || ''}</h1>
+
+      {profile?.is_admin && (
+        <CrmFeedManager userId={userId} />
+      )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h2 className="display" style={{ fontSize: 18 }}>{t('dashboard_my_listings')}</h2>
