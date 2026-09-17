@@ -12,6 +12,7 @@ import { isProfessionalAccount, accountTypeLabel } from '../../lib/accountTypes'
 import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send, Calculator } from 'lucide-react';
 import { compressImageFile } from '../../lib/imageCompression';
+import AdminDirectMessage from '../../components/AdminDirectMessage';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -1372,6 +1373,7 @@ function AdminInner() {
 
       {section === 'utilizadores' && (
         <>
+          <AdminDirectMessage allUsers={allUsers} />
           <div style={{ marginBottom: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {[
               ['todos', 'Todos'],
