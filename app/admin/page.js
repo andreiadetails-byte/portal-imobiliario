@@ -493,6 +493,28 @@ function AdminInner() {
     }
   }
 
+  async function resetUserPassword(userId, userName) {
+    if (!confirm(`Definir uma nova password temporária para "${userName}"? A password atual dessa pessoa deixa de funcionar.`)) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/admin-reset-user-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ userId }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(`Não foi possível repor a password: ${data.error || 'erro desconhecido'}`);
+      return;
+    }
+
+    // Mostra a password diretamente, para a administradora a copiar e
+    // partilhar com a pessoa (por telefone, WhatsApp, etc.) — não fica
+    // guardada em lado nenhum depois disto, por isso é preciso apontá-la já.
+    prompt(`Nova password para ${userName} (copia agora — não vai voltar a aparecer):`, data.newPassword);
+  }
+
   async function loadMortgageRate() {
     const { data } = await supabase.from('settings').select('mortgage_rate, euribor_rate').eq('id', 1).single();
     if (data) {
@@ -1501,6 +1523,13 @@ function AdminInner() {
                   </button>
                   {!u.is_admin && (
                     <>
+                      <button
+                        onClick={() => resetUserPassword(u.id, u.agency_name || u.full_name)}
+                        className="btn"
+                        style={{ fontSize: 13 }}
+                      >
+                        🔑 Repor password
+                      </button>
                       <button
                         onClick={() => toggleBlockUser(u.id, u.is_blocked)}
                         className="btn"
