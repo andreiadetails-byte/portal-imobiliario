@@ -498,25 +498,31 @@ function AdminInner() {
   async function resetUserPassword(userId, userName) {
     setResettingPasswordFor(userId);
 
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch('/api/admin-reset-user-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
-      body: JSON.stringify({ userId }),
-    });
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/admin-reset-user-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ userId }),
+      });
 
-    const data = await res.json();
-    setResettingPasswordFor(null);
+      let data = null;
+      try { data = await res.json(); } catch (parseErr) { /* resposta não era JSON — provavelmente a rota não existe */ }
 
-    if (!res.ok) {
-      setResetPasswordResult({ userName, error: data.error || 'erro desconhecido' });
-      return;
+      if (!res.ok) {
+        setResetPasswordResult({ userName, error: data?.error || `Erro ${res.status} — a rota pode não existir ou não estar publicada.` });
+        return;
+      }
+
+      // Mostra a password num painel na própria página (em vez de um popup
+      // nativo do navegador, que por vezes fica bloqueado) — a administradora
+      // copia-a e partilha com a pessoa; não fica guardada em lado nenhum.
+      setResetPasswordResult({ userName, newPassword: data.newPassword });
+    } catch (err) {
+      setResetPasswordResult({ userName, error: err.message });
+    } finally {
+      setResettingPasswordFor(null);
     }
-
-    // Mostra a password num painel na própria página (em vez de um popup
-    // nativo do navegador, que por vezes fica bloqueado) — a administradora
-    // copia-a e partilha com a pessoa; não fica guardada em lado nenhum.
-    setResetPasswordResult({ userName, newPassword: data.newPassword });
   }
 
   async function loadMortgageRate() {
