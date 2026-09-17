@@ -59,6 +59,7 @@ function PublishForm() {
   const [loadingEdit, setLoadingEdit] = useState(isEditMode);
   const [existingPhotoCount, setExistingPhotoCount] = useState(0);
   const [existingPhotos, setExistingPhotos] = useState([]);
+  const [existingDragIndex, setExistingDragIndex] = useState(null);
   const [limitReached, setLimitReached] = useState(false);
   const [accountLimit, setAccountLimit] = useState(50);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -71,12 +72,8 @@ function PublishForm() {
   const [municipalityManual, setMunicipalityManual] = useState(false);
   const [parishManual, setParishManual] = useState(false);
   const [error, setError] = useState('');
-const [saving, setSaving] = useState(false);
-const [uploadProgress, setUploadProgress] = useState({
-  current: 0,
-  total: 0,
-});
-const [published, setPublished] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [published, setPublished] = useState(false);
   const [photos, setPhotos] = useState([]); // { file, preview }
   const [planFile, setPlanFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
@@ -109,7 +106,7 @@ const [published, setPublished] = useState(false);
       }
 
       if (!editId && !myProfile?.is_admin) {
-       const accountTypeLimit = 50;
+        const accountTypeLimit = isProfessionalAccount(myProfile?.account_type) ? 50 : 3;
         setAccountLimit(accountTypeLimit);
         const { count } = await supabase
           .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', data.user.id).neq('status', 'eliminado');
@@ -420,109 +417,75 @@ const [published, setPublished] = useState(false);
     });
   }
 
-async function uploadPhotos(propertyId, startPosition = 0) {
-  const uploadedUrls = [];
-  const { data: { session } } = await supabase.auth.getSession();
+  async function uploadPhotos(propertyId, startPosition = 0) {
+    const uploadedUrls = [];
+    const { data: { session } } = await supabase.auth.getSession();
 
-  setUploadProgress({
-    current: 0,
-    total: photos.length,
-  });
+    async function uploadOne(file, type) {
+      const body = new FormData();
+      body.append('file', file);
+      body.append('propertyId', propertyId);
+      body.append('type', type);
 
-  async function uploadOne(file, type) {
-    const body = new FormData();
-    body.append('file', file);
-    body.append('propertyId', propertyId);
-    body.append('type', type);
-
-    let res;
-
-    try {
-      res = await fetch('/api/upload-photo-r2', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-        body,
-      });
-    } catch (networkErr) {
-      console.error(`Erro de rede ao enviar ${type}:`, networkErr);
-      return null;
-    }
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      console.error(
-        `Falha ao enviar ${type} para o R2:`,
-        res.status,
-        errBody
-      );
-      return null;
-    }
-
-    const { url } = await res.json();
-    return url;
-  }
-
-  for (let i = 0; i < photos.length; i++) {
-    const { file } = photos[i];
-
-    const url = await uploadOne(file, 'photo');
-
-    if (!url) {
-      throw new Error(
-        `Não foi possível enviar a foto ${i + 1}. A publicação não foi concluída.`
-      );
-    }
-
-    uploadedUrls.push(url);
-
-    let thumbnailUrl = null;
-
-    try {
-      const thumbFile = await makeThumbnail(file);
-
-      if (thumbFile) {
-        thumbnailUrl = await uploadOne(thumbFile, 'thumbnail');
-
-        if (!thumbnailUrl) {
-          console.error(
-            'Miniatura não foi enviada — a foto principal foi enviada corretamente.'
-          );
-        }
+      let res;
+      try {
+        res = await fetch('/api/upload-photo-r2', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body,
+        });
+      } catch (networkErr) {
+        console.error(`Erro de rede ao enviar ${type}:`, networkErr);
+        return null;
       }
-    } catch (thumbErr) {
-      console.error('Erro ao gerar/enviar miniatura:', thumbErr);
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error(`Falha ao enviar ${type} para o R2:`, res.status, errBody);
+        return null;
+      }
+      const { url } = await res.json();
+      return url;
     }
 
-    const { error: photoInsertError } = await supabase
-      .from('property_photos')
-      .insert({
+    for (let i = 0; i < photos.length; i++) {
+      const { file } = photos[i];
+
+      const url = await uploadOne(file, 'photo');
+      if (!url) {
+        alert('Não foi possível enviar uma das fotos. As outras continuam a ser enviadas.');
+        continue; // se uma foto falhar, continua com as outras
+      }
+      uploadedUrls.push(url);
+
+      // A miniatura é só um "extra" — se por algum motivo falhar, a foto
+      // grande já foi enviada com sucesso, e o site usa-a como reserva.
+      let thumbnailUrl = null;
+      try {
+        const thumbFile = await makeThumbnail(file);
+        if (thumbFile) {
+          thumbnailUrl = await uploadOne(thumbFile, 'thumbnail');
+          if (!thumbnailUrl) {
+            console.error('Miniatura não foi enviada — uploadOne devolveu vazio.');
+            alert('Aviso: não foi possível criar a miniatura desta foto (a foto grande foi enviada bem na mesma).');
+          }
+        } else {
+          console.error('makeThumbnail devolveu null — o navegador não conseguiu gerar a miniatura.');
+          alert('Aviso: o navegador não conseguiu gerar a miniatura desta foto (a foto grande foi enviada bem na mesma).');
+        }
+      } catch (thumbErr) {
+        console.error('Erro ao gerar/enviar miniatura:', thumbErr);
+        alert(`Aviso: erro ao criar a miniatura (${thumbErr.message}). A foto grande foi enviada bem na mesma.`);
+      }
+
+      await supabase.from('property_photos').insert({
         property_id: propertyId,
         url,
         thumbnail_url: thumbnailUrl,
         position: startPosition + i,
       });
-
-    if (photoInsertError) {
-      console.error(
-        'Erro ao guardar foto na base de dados:',
-        photoInsertError
-      );
-
-      throw new Error(
-        `A foto ${i + 1} foi enviada, mas não foi possível guardá-la no anúncio.`
-      );
     }
-
-    setUploadProgress({
-      current: i + 1,
-      total: photos.length,
-    });
+    return uploadedUrls;
   }
-
-  return uploadedUrls;
-}
 
   // Quando falta preencher algo, salta diretamente para esse campo (com um
   // deslize suave) e destaca-o a vermelho por um instante — assim a pessoa
@@ -551,8 +514,6 @@ async function uploadPhotos(propertyId, startPosition = 0) {
     if (!isEditMode && !isAdmin) {
       const { count: existingCount } = await supabase
         .from('properties').select('id', { count: 'exact', head: true }).eq('owner_id', user.id).neq('status', 'eliminado');
-      console.log('LIMITE FINAL:', accountLimit);
-console.log('ANÚNCIOS EXISTENTES:', existingCount);
       if ((existingCount || 0) >= accountLimit) {
         setError(`Já tem ${accountLimit} anúncios publicados, que é o limite da sua conta. Apague um anúncio antigo no seu painel para poder publicar um novo.`);
         return;
@@ -717,10 +678,13 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
       });
     }
 
+    setSaving(false);
+    setPublished(true);
+    setTimeout(() => router.push('/dashboard'), 2500);
 
     // A planta e as fotos continuam a ser enviadas em segundo plano,
     // sem o utilizador ter de esperar a fazer scroll parado no ecrã.
-    try {
+    (async () => {
       const planUrl = await uploadPlan(propertyId);
       if (planUrl) {
         await supabase.from('properties').update({ floor_plan_url: planUrl }).eq('id', propertyId);
@@ -735,6 +699,17 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
       if (videoUrl) {
         await supabase.from('properties').update({ video_url: videoUrl }).eq('id', propertyId);
       }
+
+      // Grava a nova ordem das fotos já existentes (caso a pessoa as tenha
+      // arrastado ou usado "Tornar principal") — sem isto, mudar a ordem no
+      // ecrã não tinha qualquer efeito, e a primeira foto original
+      // continuava sempre a ser a principal do anúncio.
+      if (isEditMode && existingPhotos.length > 0) {
+        await Promise.all(
+          existingPhotos.map((p, i) => supabase.from('property_photos').update({ position: i }).eq('id', p.id))
+        );
+      }
+
       let uploadedPhotoUrls = [];
       if (photos.length > 0) {
         uploadedPhotoUrls = await uploadPhotos(propertyId, existingPhotoCount);
@@ -782,23 +757,8 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
         else if (hasOffensiveText) updates.moderation_flag_reason = 'Linguagem possivelmente ofensiva no título/descrição.';
         await supabase.from('properties').update(updates).eq('id', propertyId);
       }
-    
-      
-
-      setSaving(false);
-      setPublished(true);
-      setTimeout(() => router.push('/dashboard'), 2500);
-
-     } catch (uploadError) {
-    console.error('Erro ao concluir publicação:', uploadError);
-    setError(
-      uploadError?.message ||
-      'Não foi possível concluir o envio das fotografias.'
-    );
-    setSaving(false);
-    setPublished(false);
+    })();
   }
-}
 
   if (!user || loadingEdit) return (<><Header /><div className="wrap" style={{ padding: 60, background: 'var(--paper)', borderRadius: 16, marginTop: 24 }}>{t('pub_checking_session')}</div></>);
 
@@ -987,15 +947,29 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="field" id="field-floor">
-            <label>{t('pub_floor')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
-            <select required value={form.floor} onChange={(e) => updateField('floor', e.target.value)}>
-              <option value="">{t('pub_choose_option')}</option>
-              {PISOS.map((p) => <option key={p}>{p}</option>)}
-            </select>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, fontWeight: 400, fontSize: 13, cursor: 'pointer' }}>
-              <input type="checkbox" checked={form.is_top_floor} onChange={(e) => updateField('is_top_floor', e.target.checked)} />
-              {t('pub_top_floor')}
-            </label>
+            {form.property_type === 'Moradia' ? (
+              <>
+                <label>Número de pisos <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
+                <input
+                  type="number" required min="1" step="1"
+                  value={form.floor}
+                  onChange={(e) => updateField('floor', e.target.value)}
+                  placeholder="ex: 2"
+                />
+              </>
+            ) : (
+              <>
+                <label>{t('pub_floor')} <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: '#8a3b2a' }}>*obrigatório</span></label>
+                <select required value={form.floor} onChange={(e) => updateField('floor', e.target.value)}>
+                  <option value="">{t('pub_choose_option')}</option>
+                  {PISOS.map((p) => <option key={p}>{p}</option>)}
+                </select>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, fontWeight: 400, fontSize: 13, cursor: 'pointer' }}>
+                  <input type="checkbox" checked={form.is_top_floor} onChange={(e) => updateField('is_top_floor', e.target.checked)} />
+                  {t('pub_top_floor')}
+                </label>
+              </>
+            )}
           </div>
           <div className="field">
             <label>Área bruta (m²) <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>(opcional)</span></label>
@@ -1329,26 +1303,77 @@ console.log('ANÚNCIOS EXISTENTES:', existingCount);
         <div className="field" id="field-photos">
           <label>{t('pub_photos')} {isEditMode && <span className="hint" style={{ fontWeight: 400, fontSize: 12, color: 'var(--text-soft)' }}>{t('pub_already_has_photos').replace('{n}', existingPhotoCount)}</span>}</label>
           {isEditMode && existingPhotos.length > 0 && (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
-              {existingPhotos.map((p) => (
-                <div key={p.id} style={{ position: 'relative', width: 80, height: 64 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.thumbnail_url || p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 5 }} />
-                  <button
-                    type="button"
-                    onClick={() => deleteExistingPhoto(p.id)}
-                    aria-label="Apagar esta foto"
+            <>
+              {existingPhotos.length > 1 && (
+                <p style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 8 }}>
+                  Arraste as fotos para as reordenar. A primeira é a foto principal do anúncio.
+                </p>
+              )}
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+                {existingPhotos.map((p, i) => (
+                  <div
+                    key={p.id}
+                    draggable
+                    onDragStart={() => setExistingDragIndex(i)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => {
+                      if (existingDragIndex === null || existingDragIndex === i) return;
+                      setExistingPhotos((cur) => {
+                        const next = [...cur];
+                        const [moved] = next.splice(existingDragIndex, 1);
+                        next.splice(i, 0, moved);
+                        return next;
+                      });
+                      setExistingDragIndex(null);
+                    }}
                     style={{
-                      position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%',
-                      background: '#8a3b2a', color: '#fff', border: '2px solid #fff', cursor: 'pointer',
-                      fontSize: 11, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      position: 'relative', width: 80, height: 64, cursor: 'grab',
+                      border: i === 0 ? '2px solid var(--telha)' : '2px solid transparent', borderRadius: 5,
                     }}
                   >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.thumbnail_url || p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} />
+                    {i === 0 && (
+                      <span style={{
+                        position: 'absolute', bottom: 3, left: 3, fontSize: 8.5, fontWeight: 700, padding: '1px 5px',
+                        borderRadius: 6, background: 'var(--telha)', color: '#fff',
+                      }}>
+                        PRINCIPAL
+                      </span>
+                    )}
+                    {i !== 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setExistingPhotos((cur) => {
+                          const next = [...cur];
+                          const [moved] = next.splice(i, 1);
+                          next.unshift(moved);
+                          return next;
+                        })}
+                        style={{
+                          position: 'absolute', bottom: 3, left: 3, fontSize: 8.5, fontWeight: 600, padding: '1px 5px',
+                          borderRadius: 6, background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', color: 'var(--ink)',
+                        }}
+                      >
+                        Tornar principal
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => deleteExistingPhoto(p.id)}
+                      aria-label="Apagar esta foto"
+                      style={{
+                        position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%',
+                        background: '#8a3b2a', color: '#fff', border: '2px solid #fff', cursor: 'pointer',
+                        fontSize: 11, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
           <div style={{ display: 'flex', gap: 8 }}>
             <label
