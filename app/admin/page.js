@@ -1445,7 +1445,6 @@ function AdminInner() {
                       >
                         <option value="particular">{t('admin_particular_opt')}</option>
                         <option value="agencia">{t('admin_agency_opt')}</option>
-                        <option value="consultor">{t('admin_consultant_opt')}</option>
                         <option value="promotor">{t('admin_developer_opt')}</option>
                       </select>
                       {u.account_type === 'particular' && u.agency_name && (

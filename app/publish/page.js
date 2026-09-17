@@ -680,10 +680,13 @@ function PublishForm() {
 
     setSaving(false);
     setPublished(true);
-    setTimeout(() => router.push('/dashboard'), 2500);
 
-    // A planta e as fotos continuam a ser enviadas em segundo plano,
-    // sem o utilizador ter de esperar a fazer scroll parado no ecrã.
+    // A planta e as fotos continuam a ser enviadas em segundo plano, sem
+    // bloquear a pessoa com um ecrã de carregamento — mas só avançamos
+    // para o painel DEPOIS de tudo estar mesmo enviado. Antes, saía-se
+    // logo ao fim de 2,5 segundos, o que cortava o envio a meio sempre
+    // que havia várias fotos e demorava mais tempo do que isso — ficavam
+    // por enviar, e às vezes até a foto principal desaparecia.
     (async () => {
       const planUrl = await uploadPlan(propertyId);
       if (planUrl) {
@@ -757,6 +760,13 @@ function PublishForm() {
         else if (hasOffensiveText) updates.moderation_flag_reason = 'Linguagem possivelmente ofensiva no título/descrição.';
         await supabase.from('properties').update(updates).eq('id', propertyId);
       }
+
+      // Só sai desta página depois de tudo (fotos, planta, documento,
+      // vídeo) estar mesmo enviado — antes, um temporizador fixo de 2,5
+      // segundos podia mandar a pessoa para o painel a meio do envio das
+      // fotos, cortando o resto e perdendo algumas (às vezes até a
+      // principal).
+      setTimeout(() => router.push('/dashboard'), 800);
     })();
   }
 

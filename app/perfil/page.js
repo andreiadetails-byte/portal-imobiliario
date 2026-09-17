@@ -263,7 +263,6 @@ export default function PerfilPage() {
             <select id="account-type-select" value={accountType} onChange={(e) => handleAccountTypeChange(e.target.value)}>
               <option value="particular">{accountTypeLabel('particular')}</option>
               <option value="agencia">{accountTypeLabel('agencia')}</option>
-              <option value="consultor">{accountTypeLabel('consultor')}</option>
               <option value="promotor">{accountTypeLabel('promotor')}</option>
             </select>
           </div>
