@@ -59,6 +59,16 @@ export default function AdminDirectMessage({ allUsers }) {
       return;
     }
 
+    // Avisa o utilizador (sino de notificações) de que tem uma mensagem
+    // nova — sem isto, a mensagem fica guardada mas a pessoa nunca fica a
+    // saber que a recebeu.
+    await supabase.from('notifications').insert({
+      user_id: selectedUser.id,
+      message: '💬 Mensagem do suporte: recebeu uma nova mensagem da equipa.',
+      link: `/mensagens-suporte?id=${request.id}`,
+      read: false,
+    });
+
     setSent(true);
     setMessage('');
     setSelectedUser(null);
