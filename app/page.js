@@ -317,13 +317,13 @@ export default function HomePage() {
                   {firstPhoto ? (
                     <div style={{ position: 'relative', overflow: 'hidden' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} className="card-photo-zoom" style={{ width: '100%', height: 190, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
+                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : 'auto'} className="card-photo-zoom" style={{ width: '100%', height: 260, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
                       <div className="photo-watermark" style={{ fontSize: 11 }}>More·ada</div>
                     </div>
                   ) : (
-                    <div className="card-photo" style={{ height: 190 }} />
+                    <div className="card-photo" style={{ height: 260 }} />
                   )}
-                  <div className="card-body" style={{ padding: '22px 20px 20px' }}>
+                  <div className="card-body" style={{ padding: '16px 20px 16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
                       <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
                       {p.property_type && (
@@ -344,9 +344,6 @@ export default function HomePage() {
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                       {p.energy_class ? ` · Classe ${p.energy_class}` : ''}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-soft)', marginBottom: 4 }}>
-                      {t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                       {p.profiles && (
@@ -439,13 +436,13 @@ export default function HomePage() {
                   {firstPhoto ? (
                     <div style={{ position: 'relative', overflow: 'hidden' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" className="card-photo-zoom" style={{ width: '100%', height: 190, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
+                      <img src={firstPhoto} alt={`Foto do imóvel ${p.typology} em ${p.district}`} loading="lazy" className="card-photo-zoom" style={{ width: '100%', height: 260, objectFit: 'cover', transition: 'transform 0.5s ease' }} />
                       <div className="photo-watermark" style={{ fontSize: 11 }}>More·ada</div>
                     </div>
                   ) : (
-                    <div className="card-photo" style={{ height: 190 }} />
+                    <div className="card-photo" style={{ height: 260 }} />
                   )}
-                  <div className="card-body" style={{ padding: '22px 20px 20px' }}>
+                  <div className="card-body" style={{ padding: '16px 20px 16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
                       <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
                       {p.property_type && (
@@ -466,9 +463,6 @@ export default function HomePage() {
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                       {p.energy_class ? ` · Classe ${p.energy_class}` : ''}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-soft)', marginBottom: 4 }}>
-                      {t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                       {p.profiles && (
