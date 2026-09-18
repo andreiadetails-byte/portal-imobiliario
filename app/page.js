@@ -323,7 +323,7 @@ export default function HomePage() {
                   ) : (
                     <div className="card-photo" style={{ height: 260 }} />
                   )}
-                  <div className="card-body" style={{ padding: '16px 20px 16px' }}>
+                  <div className="card-body" style={{ padding: '14px 18px 14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
                       <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
                       {p.property_type && (
@@ -335,17 +335,17 @@ export default function HomePage() {
                         </span>
                       )}
                     </div>
-                    <div className="meta" style={{ marginBottom: 10, fontSize: 13 }}>{displayAddress(p)}</div>
-                    <div className="price" style={{ fontSize: 20, marginBottom: 6 }}>
+                    <div className="meta" style={{ marginBottom: 5, fontSize: 13 }}>{displayAddress(p)}</div>
+                    <div className="price" style={{ fontSize: 20, marginBottom: 4 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="meta" style={{ marginBottom: 8, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
                       {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                       {p.energy_class ? ` · Classe ${p.energy_class}` : ''}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>
                       {p.profiles && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
@@ -442,7 +442,7 @@ export default function HomePage() {
                   ) : (
                     <div className="card-photo" style={{ height: 260 }} />
                   )}
-                  <div className="card-body" style={{ padding: '16px 20px 16px' }}>
+                  <div className="card-body" style={{ padding: '14px 18px 14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
                       <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
                       {p.property_type && (
@@ -454,17 +454,17 @@ export default function HomePage() {
                         </span>
                       )}
                     </div>
-                    <div className="meta" style={{ marginBottom: 10, fontSize: 13 }}>{displayAddress(p)}</div>
-                    <div className="price" style={{ fontSize: 20, marginBottom: 6 }}>
+                    <div className="meta" style={{ marginBottom: 5, fontSize: 13 }}>{displayAddress(p)}</div>
+                    <div className="price" style={{ fontSize: 20, marginBottom: 4 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="meta" style={{ marginBottom: 8, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
                       {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
                       {p.energy_class ? ` · Classe ${p.energy_class}` : ''}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>
                       {p.profiles && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
