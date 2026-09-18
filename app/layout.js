@@ -41,8 +41,27 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateAgent',
+    name: 'More·ada',
+    url: 'https://www.moreada.pt',
+    logo: 'https://www.moreada.pt/icon-512.png',
+    description: 'Portal imobiliário em Portugal — compre, arrende ou publique o seu imóvel diretamente, sem intermediários obrigatórios.',
+    areaServed: { '@type': 'Country', name: 'Portugal' },
+  };
+
   return (
     <html lang="pt-PT">
+      <head>
+        <script
+          type="application/ld+json"
+          // Escapa "<" para impedir que alguém consiga fechar esta tag
+          // <script> à força, injetando código — mesma proteção já usada
+          // nos dados estruturados de cada imóvel.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c') }}
+        />
+      </head>
       <body>
         <a href="#main-content" className="skip-link">Saltar para o conteúdo</a>
         <LanguageProvider>
