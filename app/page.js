@@ -298,7 +298,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -324,17 +324,31 @@ export default function HomePage() {
                     <div className="card-photo" style={{ height: 190 }} />
                   )}
                   <div className="card-body" style={{ padding: '22px 20px 20px' }}>
-                    <div className="addr" style={{ fontSize: 17, marginBottom: 4 }}>{p.typology} · {p.district}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+                      <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
+                      {p.property_type && (
+                        <span style={{
+                          fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, letterSpacing: '0.03em',
+                          color: 'var(--text-soft)', flexShrink: 0, textTransform: 'uppercase',
+                        }}>
+                          {p.property_type}
+                        </span>
+                      )}
+                    </div>
                     <div className="meta" style={{ marginBottom: 10, fontSize: 13 }}>{displayAddress(p)}</div>
                     <div className="price" style={{ fontSize: 20, marginBottom: 6 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                    <div className="meta" style={{ marginBottom: 8, color: 'var(--azulejo)', fontSize: 12.5 }}>
                       {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
+                      {p.energy_class ? ` · Classe ${p.energy_class}` : ''}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-soft)', marginBottom: 4 }}>
+                      {t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                       {p.profiles && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
@@ -406,7 +420,7 @@ export default function HomePage() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/property/${p.id}`); }}
                     className={`card card-hover-lift${p.featured_status === 'active' ? ' card-destaque' : ''}`}
-                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--telha)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(61,74,46,0.28)' : undefined }}>
+                    style={{ position: 'relative', cursor: 'pointer', border: p.featured_status === 'active' ? '2.5px solid var(--gold-strong)' : undefined, boxShadow: p.featured_status === 'active' ? '0 6px 18px rgba(201,162,39,0.28)' : undefined }}>
                   {p.featured_status === 'active' && (
                     <span className="destaque-strip">★ DESTAQUE</span>
                   )}
@@ -432,17 +446,31 @@ export default function HomePage() {
                     <div className="card-photo" style={{ height: 190 }} />
                   )}
                   <div className="card-body" style={{ padding: '22px 20px 20px' }}>
-                    <div className="addr" style={{ fontSize: 17, marginBottom: 4 }}>{p.typology} · {p.district}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+                      <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
+                      {p.property_type && (
+                        <span style={{
+                          fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, letterSpacing: '0.03em',
+                          color: 'var(--text-soft)', flexShrink: 0, textTransform: 'uppercase',
+                        }}>
+                          {p.property_type}
+                        </span>
+                      )}
+                    </div>
                     <div className="meta" style={{ marginBottom: 10, fontSize: 13 }}>{displayAddress(p)}</div>
                     <div className="price" style={{ fontSize: 20, marginBottom: 6 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                    <div className="meta" style={{ marginBottom: 8, color: 'var(--azulejo)', fontSize: 12.5 }}>
                       {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
+                      {p.energy_class ? ` · Classe ${p.energy_class}` : ''}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-soft)', marginBottom: 4 }}>
+                      {t('home_published_on')} {new Date(p.created_at).toLocaleDateString('pt-PT')}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                       {p.profiles && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                           {p.profiles.avatar_url ? (
