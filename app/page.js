@@ -264,7 +264,11 @@ export default function HomePage() {
             <p style={{ fontSize: 15, color: 'var(--text-soft)', marginBottom: 26, lineHeight: 1.6, maxWidth: 400 }}>
               {t('home_investor_desc2')}
             </p>
-            <Link href="/simulador-investimento" className="btn btn-primary" style={{ fontSize: 15, padding: '12px 26px' }}>
+            <Link href="/simulador-investimento" className="btn" style={{
+              fontSize: 20, padding: '20px 44px', fontWeight: 700,
+              background: 'var(--gold-strong)', color: '#fff', border: 'none',
+              display: 'inline-block', boxShadow: '0 8px 24px rgba(201,162,39,0.4)',
+            }}>
               {t('home_investor_cta2')}
             </Link>
           </div>
