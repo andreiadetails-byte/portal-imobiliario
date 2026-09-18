@@ -618,13 +618,18 @@ function AdminInner() {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
           body: JSON.stringify({ propertyId: missing[i].id }),
         });
-        const result = await res.json();
-        if (!res.ok || !result.success) {
+
+        let result = null;
+        try { result = await res.json(); } catch (parseErr) { /* resposta não era JSON — provavelmente um timeout do servidor */ }
+
+        if (!res.ok || !result?.success) {
           failCount++;
-          if (result.address) failedAddrs.push(result.address);
+          if (result?.address) failedAddrs.push(result.address);
+          else failedAddrs.push(`Imóvel ${missing[i].id.slice(0, 8)} — erro ${res.status} (sem detalhe da morada)`);
         }
       } catch (err) {
         failCount++;
+        failedAddrs.push(`Imóvel ${missing[i].id.slice(0, 8)} — falha de rede: ${err.message}`);
       }
       setGeocodeProgress({ done: i + 1, total: missing.length });
       // Pausa entre pedidos, para respeitar o limite do serviço gratuito de geocodificação.

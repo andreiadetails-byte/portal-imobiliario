@@ -47,14 +47,24 @@ export async function POST(request) {
     }
 
     const fullAddress = [p.address, p.parish, p.municipality, p.district].filter(Boolean).join(', ');
-    const { latitude, longitude } = await geocodeAddress(fullAddress);
 
-    if (latitude == null || longitude == null) {
-      return Response.json({ success: false, address: fullAddress });
+    try {
+      const { latitude, longitude } = await geocodeAddress(fullAddress);
+
+      if (latitude == null || longitude == null) {
+        return Response.json({ success: false, address: fullAddress });
+      }
+
+      await supabaseAdmin.from('properties').update({ latitude, longitude }).eq('id', propertyId);
+      return Response.json({ success: true, latitude, longitude });
+    } catch (geoErr) {
+      // Inclui sempre a morada, mesmo quando o próprio pedido de
+      // geocodificação falha (não só quando simplesmente não encontra
+      // resultados) — sem isto, estas falhas ficavam invisíveis na lista
+      // de "moradas que falharam", tornando impossível perceber o padrão.
+      console.error('Erro ao geocodificar imóvel:', geoErr);
+      return Response.json({ success: false, address: fullAddress, error: geoErr.message });
     }
-
-    await supabaseAdmin.from('properties').update({ latitude, longitude }).eq('id', propertyId);
-    return Response.json({ success: true, latitude, longitude });
   } catch (err) {
     console.error('Erro ao geocodificar imóvel:', err);
     return Response.json({ error: err.message }, { status: 500 });
