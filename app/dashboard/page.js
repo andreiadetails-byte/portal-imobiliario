@@ -158,7 +158,11 @@ function DashboardInner() {
   async function countFeatured() {
     const { count } = await supabase
       .from('properties').select('id', { count: 'exact', head: true })
-      .eq('owner_id', userId).in('featured_status', ['pending', 'active']);
+      .eq('owner_id', userId).in('featured_status', ['pending', 'active'])
+      // Destaques oferecidos pela administradora (como prenda/promoção)
+      // não contam para o limite normal — só os que a pessoa pediu ela
+      // própria é que ocupam o seu limite.
+      .or('featured_gifted.is.null,featured_gifted.eq.false');
     return count || 0;
   }
 

@@ -13,6 +13,7 @@ import { agentLabel } from '../../lib/agentNames';
 import { ClipboardList, Flag, MessageCircle, Users, Mail, Footprints, Star, Building2, Newspaper, Megaphone, Settings, Send, Calculator } from 'lucide-react';
 import { compressImageFile } from '../../lib/imageCompression';
 import AdminDirectMessage from '../../components/AdminDirectMessage';
+import AdminGiftFeatured from '../../components/AdminGiftFeatured';
 
 function GroupedByOwner({ items, getOwnerKey, getOwnerLabel, renderItem, noOwnerLabel = 'Sem conta' }) {
   const [openGroups, setOpenGroups] = useState({});
@@ -2039,6 +2040,7 @@ function AdminInner() {
 
       {section === 'destaques' && (
         <>
+          <AdminGiftFeatured allUsers={allUsers} />
           {featuredList.length === 0 && <p className="empty-state">{t('admin_no_featured_requests')}</p>}
           <GroupedByOwner
             items={featuredList}
