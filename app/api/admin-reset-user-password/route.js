@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { randomInt } from 'crypto';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 
 // Confirma que quem está a pedir isto é mesmo um administrador, antes de
@@ -18,11 +19,13 @@ async function isCallerAdmin(request) {
 }
 
 // Gera uma password temporária, fácil de ditar/escrever mas segura o
-// suficiente — letras (sem confundir I/l/O/0) e números.
+// suficiente — letras (sem confundir I/l/O/0) e números. Usa "randomInt"
+// (criptograficamente seguro) em vez de Math.random, já que isto define
+// o acesso a uma conta de outra pessoa.
 function generateTempPassword() {
   const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
   let pass = '';
-  for (let i = 0; i < 10; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+  for (let i = 0; i < 10; i++) pass += chars[randomInt(chars.length)];
   return pass;
 }
 
