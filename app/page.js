@@ -325,21 +325,21 @@ export default function HomePage() {
                   )}
                   <div className="card-body" style={{ padding: '14px 18px 14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-                      <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
+                      <div className="addr" style={{ fontSize: 19 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
                       {p.property_type && (
                         <span style={{
-                          fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, letterSpacing: '0.03em',
+                          fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, letterSpacing: '0.03em',
                           color: 'var(--text-soft)', flexShrink: 0, textTransform: 'uppercase',
                         }}>
                           {p.property_type}
                         </span>
                       )}
                     </div>
-                    <div className="meta" style={{ marginBottom: 5, fontSize: 13 }}>{displayAddress(p)}</div>
-                    <div className="price" style={{ fontSize: 20, marginBottom: 4 }}>
+                    <div className="meta" style={{ marginBottom: 5, fontSize: 14.5 }}>{displayAddress(p)}</div>
+                    <div className="price" style={{ fontSize: 22, marginBottom: 4 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 14 }}>
                       {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
@@ -444,21 +444,21 @@ export default function HomePage() {
                   )}
                   <div className="card-body" style={{ padding: '14px 18px 14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-                      <div className="addr" style={{ fontSize: 17 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
+                      <div className="addr" style={{ fontSize: 19 }}>{p.typology || p.property_type || 'Imóvel'} · {p.district}</div>
                       {p.property_type && (
                         <span style={{
-                          fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, letterSpacing: '0.03em',
+                          fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, letterSpacing: '0.03em',
                           color: 'var(--text-soft)', flexShrink: 0, textTransform: 'uppercase',
                         }}>
                           {p.property_type}
                         </span>
                       )}
                     </div>
-                    <div className="meta" style={{ marginBottom: 5, fontSize: 13 }}>{displayAddress(p)}</div>
-                    <div className="price" style={{ fontSize: 20, marginBottom: 4 }}>
+                    <div className="meta" style={{ marginBottom: 5, fontSize: 14.5 }}>{displayAddress(p)}</div>
+                    <div className="price" style={{ fontSize: 22, marginBottom: 4 }}>
                       {Number(p.price).toLocaleString('pt-PT')} {p.business_type === 'Arrendamento' ? '€/mês' : '€'}
                     </div>
-                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 12.5 }}>
+                    <div className="meta" style={{ marginBottom: 4, color: 'var(--azulejo)', fontSize: 14 }}>
                       {p.bedrooms ? `${p.bedrooms} ${t('home_bedrooms_inline')}` : ''}
                       {p.bathrooms ? ` · ${p.bathrooms} ${t('home_wc_inline')}` : ''}
                       {p.area_util ? ` · ${p.area_util} ${t('meta_sqm_useful')}` : ''}
