@@ -1553,7 +1553,7 @@ function AdminInner() {
                     </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap' }}>
                   {isProfessionalAccount(u.account_type) && u.subscription_proof_url && u.subscription_status === 'pending' && (
                     <a href={u.subscription_proof_url} target="_blank" rel="noopener noreferrer" className="btn" style={{ fontSize: 13 }}>
                       📄 Ver comprovativo
