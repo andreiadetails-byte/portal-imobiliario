@@ -558,9 +558,16 @@ export default function HomePage() {
                 }}>
                   {card.title}
                 </div>
-                <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5, marginBottom: 0 }}>
+                <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5, marginBottom: 16 }}>
                   {card.text}
                 </p>
+                <span style={{
+                  display: 'inline-block', fontSize: 15, fontWeight: 700, padding: '10px 22px',
+                  background: 'var(--gold-strong)', color: '#fff', borderRadius: 8,
+                  boxShadow: '0 4px 14px rgba(201,162,39,0.35)',
+                }}>
+                  Calcular →
+                </span>
                 </div>
               </Link>
             ))}
@@ -613,26 +620,6 @@ export default function HomePage() {
           </div>
           <div style={{ maxWidth: 620, margin: '0 auto 40px' }}>
             <PricePerM2Lookup />
-          </div>
-          <div className="hide-on-mobile" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, maxWidth: 900, margin: '0 auto' }}>
-            {[
-              { href: '/valuation', label: t('home_data_avaliacao') },
-              { href: '/simulador-credito', label: t('home_data_credito') },
-              { href: '/simulador-imt', label: t('home_data_imt') },
-              { href: '/results', label: t('home_data_evolucao') },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  padding: '16px 12px', borderRadius: 10, border: '1px solid rgba(126,143,106,0.25)',
-                  background: 'var(--paper)', textDecoration: 'none', fontSize: 13.5, fontWeight: 600, color: 'var(--telha)',
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
           </div>
         </div>
       </section>
