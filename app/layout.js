@@ -10,7 +10,7 @@ import InstallPrompt from '../components/InstallPrompt';
 import ScrollToTop from '../components/ScrollToTop';
 
 export const metadata = {
-  metadataBase: new URL('https://www.moreada.pt'),
+  metadataBase: new URL('https://moreada.pt'),
   title: { default: 'More·ada — Portal imobiliário Portugal', template: '%s' },
   description: 'Compre, arrende ou publique o seu imóvel diretamente em Portugal — sem intermediários obrigatórios. Milhares de imóveis, chat direto com anunciantes, simuladores de crédito e IMT.',
   manifest: '/manifest.json',
@@ -45,8 +45,8 @@ export default function RootLayout({ children }) {
     '@context': 'https://schema.org',
     '@type': 'RealEstateAgent',
     name: 'More·ada',
-    url: 'https://www.moreada.pt',
-    logo: 'https://www.moreada.pt/icon-512.png',
+    url: 'https://moreada.pt',
+    logo: 'https://moreada.pt/icon-512.png',
     description: 'Portal imobiliário em Portugal — compre, arrende ou publique o seu imóvel diretamente, sem intermediários obrigatórios.',
     areaServed: { '@type': 'Country', name: 'Portugal' },
   };

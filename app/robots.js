@@ -9,6 +9,6 @@ export default function robots() {
         '/testemunho-resposta', '/comparar', '/api/',
       ],
     },
-    sitemap: 'https://www.moreada.pt/sitemap.xml',
+    sitemap: 'https://moreada.pt/sitemap.xml',
   };
 }
