@@ -1,4 +1,5 @@
 import { sendEmail } from '../../../lib/sendEmail';
+import { requireAdmin } from '../../../lib/requireAdmin';
 import { renderEmail, escapeHtml, SITE_URL } from '../../../lib/emailTemplate';
 
 // Esta rota é chamada diretamente pelo painel de admin (não é um Database
@@ -6,6 +7,13 @@ import { renderEmail, escapeHtml, SITE_URL } from '../../../lib/emailTemplate';
 // (com ou sem documento anexado) a quem a pediu.
 export async function POST(request) {
   try {
+    // Só o administrador pode mandar emails por aqui — antes, qualquer pessoa
+    // na internet podia usar esta rota para enviar mensagens, com texto à
+    // escolha, a qualquer endereço, em nome de geral@moreada.pt.
+    if (!(await requireAdmin(request))) {
+      return Response.json({ error: 'Não autorizado.' }, { status: 403 });
+    }
+
     const { toEmail, toName, address, replyText, attachmentUrl } = await request.json();
     if (!toEmail) {
       return Response.json({ error: 'Falta o email de destino.' }, { status: 400 });

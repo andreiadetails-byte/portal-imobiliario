@@ -11,6 +11,22 @@ import { isProfessionalAccount } from '../../lib/accountTypes';
 import { compressImageFile } from '../../lib/imageCompression';
 import { migrateLocalFavoritesToAccount } from '../../lib/localFavorites';
 
+// Traduz os erros técnicos do Supabase (em inglês) para mensagens que a pessoa
+// percebe e sabe o que fazer a seguir. Erros que não conhecemos ficam como estão.
+function friendlyAuthError(message) {
+  const m = String(message || '').toLowerCase();
+  if (m.includes('sending confirmation email') || m.includes('sending recovery email') || m.includes('sending email')) {
+    return 'Não conseguimos enviar o email para este endereço. Experimente com outro email, ou escreva-nos para geral@moreada.pt e ajudamos a criar a conta.';
+  }
+  if (m.includes('rate limit') || m.includes('too many')) {
+    return 'Foram feitas demasiadas tentativas seguidas. Aguarde alguns minutos e tente de novo.';
+  }
+  if (m.includes('signups not allowed') || m.includes('signup is disabled') || m.includes('signups are disabled')) {
+    return 'O registo de novas contas está temporariamente indisponível. Escreva-nos para geral@moreada.pt.';
+  }
+  return message;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { t } = useLanguage();
@@ -43,7 +59,7 @@ export default function LoginPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
-    if (error) { setError(error.message); return; }
+    if (error) { setError(friendlyAuthError(error.message)); return; }
     setForgotSent(true);
   }
 
@@ -135,7 +151,7 @@ export default function LoginPage() {
       password,
       options: { data: { full_name: fullName, account_type: accountType } },
     });
-    if (error) { setError(error.message); setLoading(false); return; }
+    if (error) { setError(friendlyAuthError(error.message)); setLoading(false); return; }
 
     // O Supabase não devolve um erro claro quando o email já existe (por segurança,
     // para não revelar quais emails já têm conta) — em vez disso, devolve uma resposta
@@ -417,7 +433,6 @@ export default function LoginPage() {
               <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
                 <option value="particular">{t('login_particular_opt')}</option>
                 <option value="agencia">{t('login_agency_opt')}</option>
-                <option value="consultor">{t('login_consultant_opt')}</option>
                 <option value="promotor">{t('login_developer_opt')}</option>
               </select>
             </div>

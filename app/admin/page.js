@@ -633,8 +633,10 @@ function AdminInner() {
         failedAddrs.push(`Imóvel ${missing[i].id.slice(0, 8)} — falha de rede: ${err.message}`);
       }
       setGeocodeProgress({ done: i + 1, total: missing.length });
-      // Pausa entre pedidos, para respeitar o limite do serviço gratuito de geocodificação.
-      await new Promise((resolve) => setTimeout(resolve, 1100));
+      // Pequena pausa entre pedidos — o Google Maps aguenta muito mais
+      // volume do que o serviço anterior, mas mantém-se uma pausa curta
+      // para não sobrecarregar tudo de uma vez.
+      await new Promise((resolve) => setTimeout(resolve, 150));
     }
 
     setGeocodeFailCount(failCount);
@@ -827,9 +829,10 @@ function AdminInner() {
       }
     }
 
+    const { data: { session: replySession } } = await supabase.auth.getSession();
     const res = await fetch('/api/notify-valuation-reply', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${replySession?.access_token}` },
       body: JSON.stringify({ toEmail: v.contact, toName: v.name, address: v.address, replyText: text, attachmentUrl }),
     });
 
@@ -862,9 +865,10 @@ function AdminInner() {
     // Se deixou um contacto que parece email, envia também por email —
     // cobre quem denunciou sem ter conta no site.
     if (report.reporter_contact?.includes('@')) {
+      const { data: { session: reportSession } } = await supabase.auth.getSession();
       await fetch('/api/notify-report-reply', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${reportSession?.access_token}` },
         body: JSON.stringify({ toEmail: report.reporter_contact, reportReason: report.reason, replyText: text }),
       }).catch(() => {});
     }
