@@ -13,10 +13,19 @@ import { migrateLocalFavoritesToAccount } from '../../lib/localFavorites';
 
 // Traduz os erros técnicos do Supabase (em inglês) para mensagens que a pessoa
 // percebe e sabe o que fazer a seguir. Erros que não conhecemos ficam como estão.
-function friendlyAuthError(message) {
+function friendlyAuthError(message, lang = 'pt') {
+  // Só reescrevemos as mensagens quando o site está em português; nas outras
+  // línguas fica a mensagem original, como antes.
+  if (lang !== 'pt') return message;
   const m = String(message || '').toLowerCase();
   if (m.includes('sending confirmation email') || m.includes('sending recovery email') || m.includes('sending email')) {
     return 'Não conseguimos enviar o email para este endereço. Experimente com outro email, ou escreva-nos para geral@moreada.pt e ajudamos a criar a conta.';
+  }
+  if (m.includes('invalid login credentials')) {
+    return 'Email ou password incorretos. Se acabou de criar a conta, confirme primeiro o email (veja também o lixo eletrónico). Se se esqueceu da password, use "Esqueci-me da password".';
+  }
+  if (m.includes('email not confirmed')) {
+    return 'Ainda não confirmou o email. Abra o email de confirmação que lhe enviámos (veja também o lixo eletrónico) e clique no link.';
   }
   if (m.includes('rate limit') || m.includes('too many')) {
     return 'Foram feitas demasiadas tentativas seguidas. Aguarde alguns minutos e tente de novo.';
@@ -29,7 +38,7 @@ function friendlyAuthError(message) {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +68,7 @@ export default function LoginPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
-    if (error) { setError(friendlyAuthError(error.message)); return; }
+    if (error) { setError(friendlyAuthError(error.message, lang)); return; }
     setForgotSent(true);
   }
 
@@ -103,7 +112,7 @@ export default function LoginPage() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(friendlyAuthError(error.message, lang));
       return;
     }
     if (data.user) {
@@ -151,7 +160,7 @@ export default function LoginPage() {
       password,
       options: { data: { full_name: fullName, account_type: accountType } },
     });
-    if (error) { setError(friendlyAuthError(error.message)); setLoading(false); return; }
+    if (error) { setError(friendlyAuthError(error.message, lang)); setLoading(false); return; }
 
     // O Supabase não devolve um erro claro quando o email já existe (por segurança,
     // para não revelar quais emails já têm conta) — em vez disso, devolve uma resposta
