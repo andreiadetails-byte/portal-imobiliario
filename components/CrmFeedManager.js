@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 
 // Importa os imóveis do CRM da Gold Residence para o More·ada.
 // Só visível para a administradora (o dashboard controla isso).
-export default function CrmFeedManager() {
+function CrmImportCard() {
   const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(null);
@@ -159,5 +159,64 @@ export default function CrmFeedManager() {
         </div>
       )}
     </div>
+  );
+}
+
+// Cartão de diagnóstico: envia um email de teste e mostra a configuração real em uso.
+function EmailTestCard() {
+  const [to, setTo] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
+
+  async function send() {
+    setBusy(true); setResult(null); setError('');
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const res = await fetch('/api/admin-test-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionData?.session?.access_token}` },
+        body: JSON.stringify({ to: to.trim() }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch { /* não era JSON */ }
+      if (!data) throw new Error(`Erro ${res.status} — a rota /api/admin-test-email pode não estar publicada.`);
+      if (data.error && !data.config) throw new Error(data.error);
+      setResult(data);
+    } catch (err) { setError(err.message); }
+    setBusy(false);
+  }
+
+  return (
+    <div className="card" style={{ padding: 20, marginBottom: 24, border: '1px solid rgba(126,143,106,0.3)' }}>
+      <h2 className="display" style={{ fontSize: 17, marginBottom: 2 }}>Testar envio de email</h2>
+      <p style={{ fontSize: 13, color: 'var(--text-soft)', margin: '0 0 12px' }}>
+        Envia um email de teste e mostra que servidor de envio o site está a usar. Deixa em branco para enviar para o teu email.
+      </p>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+        <input type="email" value={to} onChange={(e) => setTo(e.target.value)} placeholder="email de destino (opcional)" style={{ flex: 1, minWidth: 220 }} />
+        <button type="button" className="btn btn-primary" onClick={send} disabled={busy}>{busy ? 'A enviar...' : 'Enviar email de teste'}</button>
+      </div>
+      {error && <p className="error-text">{error}</p>}
+      {result && (
+        <div style={{ fontSize: 13.5, background: result.success ? 'rgba(126,143,106,0.14)' : 'rgba(138,59,42,0.08)', borderRadius: 8, padding: 14 }}>
+          <p style={{ margin: 0, fontWeight: 600 }}>
+            {result.success ? `Enviado para ${result.to}. Confere no Resend → Emails.` : `Falhou: ${result.error}`}
+          </p>
+          <p style={{ margin: '8px 0 0', fontSize: 12.5 }}>
+            Servidor em uso: <b>{result.config.usa}</b> · host <b>{result.config.host || '—'}</b> · porta <b>{result.config.porta || '—'}</b> · seguro <b>{result.config.seguro || '—'}</b> · utilizador <b>{result.config.utilizador || '—'}</b> · remetente <b>{result.config.remetente || '—'}</b> · password definida: <b>{result.config.temPassword ? 'sim' : 'não'}</b>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function CrmFeedManager() {
+  return (
+    <>
+      <CrmImportCard />
+      <EmailTestCard />
+    </>
   );
 }
